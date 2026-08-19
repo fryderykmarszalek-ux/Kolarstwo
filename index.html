@@ -182,6 +182,23 @@ const DZIS = dzienNaTekst(naDzien(D.meta.pobrano));
 const ostatniDzien = dniZJazda[dniZJazda.length-1];
 const przerwaTrwa = roznicaDni(naDzien(ostatniDzien), naDzien(DZIS));
 const PROG = D.kryterium_przerwy.prog_dni;
+const WARIANT = D.kryterium_przerwy.wybor;
+const WYJAZDY = D.kryterium_przerwy.wyjazdy_bez_roweru || [];
+
+// Wariant B: przerwa nachodząca na zgłoszony wyjazd bez roweru nie liczy się
+// do kryterium. Warunek zgłoszenia z góry jest sprawdzany, nie zakładany.
+function wyjazdDla(od, doo){
+  if (WARIANT !== "B") return null;
+  // Zgłoszenie musi wyprzedzić moment, w którym przerwa łamie limit — wtedy
+  // jest regułą. Zgłoszone po tym dniu byłoby wymówką z datą wsteczną.
+  const granica = dzienNaTekst(naDzien(od) + PROG*86400000);
+  return WYJAZDY.find(w =>
+    w.od <= doo && w.do >= od && w.zgloszony <= granica
+  ) || null;
+}
+przerwy.forEach(p => { p.wyjazd = wyjazdDla(p.od, p.do); });
+const przerwyLiczone = przerwy.filter(p => !p.wyjazd);
+const zlamania = przerwyLiczone.filter(p => p.dni > PROG);
 const najdluzsza = przerwy.reduce((a,b) => b.dni > a.dni ? b : a);
 
 function poniedzialek(tekst){
@@ -196,6 +213,7 @@ for (const a of jazdy){
 }
 const tenTydzien = godzinyWTygodniu[poniedzialek(DZIS)] || 0;
 const ostatniaJazda = jazdy[jazdy.length-1];
+const wyjazdTrwa = wyjazdDla(ostatniDzien, DZIS);
 
 /* ==========================================================================
    WYKRES C2 — PRZERWY
@@ -245,7 +263,8 @@ function wykresPrzerw(){
     const x = 4 + i*(szerSlupka+odstep);
     const h = Math.max(skala(p.dni), 1.5);
     const y = marGora + wys - h;
-    const kolor = p.dni > PROG ? "var(--alarm)" : "var(--akcent)";
+    const kolor = p.wyjazd ? "var(--slaby)"
+                : p.dni > PROG ? "var(--alarm)" : "var(--akcent)";
     s += `<rect x="${x}" y="${y}" width="${szerSlupka}" height="${h}"
            fill="${kolor}" opacity="${p.dni > PROG ? 1 : .55}"
            data-i="${i}" class="slupek" rx="1.5"/>`;
@@ -284,7 +303,10 @@ function wykresPrzerw(){
    nie po dacie startu, bo ta wpadłaby w zły tydzień.
    ========================================================================== */
 
-const SUFIT_H = 6;   // tyle zakłada plan na koniec października
+// Cel z planu na koniec października. To linia odniesienia, NIE sufit —
+// gdyby sufit był sztywny, tydzień powyżej 6 h zostałby ucięty i wyglądałby
+// tak samo jak dokładnie 6 h. Skala rośnie razem z najmocniejszym tygodniem.
+const CEL_H = 6;
 
 function tydzienPlanu(pn){
   const kon = pn + 6*86400000;
@@ -324,12 +346,21 @@ function wykresGodzin(){
   const szerSlupka = 13, odstep = 3, marGora = 16, wys = 220, marDol = 34,
         szerOsi = 34;
   const szer = tygodnie.length*(szerSlupka+odstep) + 20;
-  const skala = h => (Math.min(h, SUFIT_H)/SUFIT_H) * wys;
+
+  const najwyzszy = Math.max(CEL_H,
+    ...tygodnie.map(t => t.godziny),
+    ...tygodnie.map(t => t.plan || 0));
+  const gora = Math.ceil(najwyzszy + 0.5);      // zapas, żeby nic nie dotykało krawędzi
+  // krok podziałki: najmniejszy z listy, który daje najwyżej 6 przedziałów
+  const krok = [1,2,3,5,10,20].find(k => gora/k <= 6) || 50;
+  const podzialka = [];
+  for (let v = 0; v <= gora; v += krok) podzialka.push(v);
+  const skala = h => (h/gora) * wys;
   const wysCalk = wys + marGora + marDol;
   const x = i => 6 + i*(szerSlupka+odstep);
 
   let os = `<svg class="os" width="${szerOsi}" height="${wysCalk}" aria-hidden="true">`;
-  for (const v of [0,2,4,6]){
+  for (const v of podzialka){
     os += `<text x="${szerOsi-6}" y="${marGora+wys-skala(v)+4}" text-anchor="end"
             font-size="10" fill="var(--slaby)">${v}</text>`;
   }
@@ -347,11 +378,16 @@ function wykresGodzin(){
     }
   });
 
-  for (const v of [0,2,4,6]){
+  for (const v of podzialka){
     const y = marGora + wys - skala(v);
     s += `<line x1="0" y1="${y}" x2="${szer}" y2="${y}"
            stroke="var(--linia)" stroke-width="1"/>`;
   }
+
+  // cel 6 h — linia odniesienia, zostaje na miejscu, gdy skala urośnie
+  const yCel = marGora + wys - skala(CEL_H);
+  s += `<line x1="0" y1="${yCel}" x2="${szer}" y2="${yCel}"
+         stroke="var(--plan)" stroke-width="1" stroke-dasharray="4 4" opacity=".55"/>`;
 
   // słupki: przeszłość pełnym kolorem, przyszłość pusta
   tygodnie.forEach((t,i) => {
@@ -411,7 +447,7 @@ const c1Godziny = () => {
       Jeden słupek = jeden tydzień, poniedziałek–niedziela, czas w ruchu.
       Pomarańczowa linia to plan objętości na wrzesień i październik.
       Szare pasy to tygodnie odciążeniowe — tam niższy słupek jest
-      zgodny z planem, nie wpadką. Skala do ${SUFIT_H} h.
+      zgodny z planem, nie wpadką. Przerywana pozioma linia to cel ${CEL_H} h; skala rośnie sama, gdyby jakiś tydzień go przekroczył.
     </p>
     ${wykresGodzin()}
     <div class="info" id="info-tydzien">Dotknij słupka, żeby zobaczyć szczegóły.</div>
@@ -436,7 +472,7 @@ const c1Godziny = () => {
       </div>
       <div class="kafel">
         <div class="etykieta">Cel na koniec X</div>
-        <div class="liczba">${SUFIT_H},0</div>
+        <div class="liczba">${CEL_H},0</div>
         <div class="stopka">godzin tygodniowo</div>
       </div>
     </div>
@@ -459,10 +495,12 @@ const przegladStart = () => `
     <h2>Jak mi idzie</h2>
     <p class="opis">Stan na ${pl(DZIS)}. Liczone od ${pl(OD)}.</p>
     <div class="kafelki">
-      <div class="kafel ${przerwaTrwa > PROG ? "uwaga" : ""}">
+      <div class="kafel ${przerwaTrwa > PROG && !wyjazdTrwa ? "uwaga" : ""}">
         <div class="etykieta">Od ostatniej jazdy</div>
         <div class="liczba">${przerwaTrwa}</div>
-        <div class="stopka">dni · limit ${PROG}</div>
+        <div class="stopka">${wyjazdTrwa
+          ? wyjazdTrwa.opis + " · nie liczy się"
+          : "dni · limit " + PROG}</div>
       </div>
       <div class="kafel">
         <div class="etykieta">W tym tygodniu</div>
@@ -498,12 +536,15 @@ const c2Przerwy = () => `
 const kryterium = () => `
   <section>
     <h2>Kryterium sezonu</h2>
-    <p class="opis">Żadna przerwa nie przekracza dwóch tygodni. Liczone od ${pl(OD)}.</p>
+    <p class="opis">
+      Żadna przerwa nie przekracza dwóch tygodni. Liczone od ${pl(OD)}.
+      ${WARIANT === "B" ? `<br>Wariant B: ${D.kryterium_przerwy.zasada_B}` : ""}
+    </p>
     <div class="kafelki">
-      <div class="kafel uwaga">
-        <div class="etykieta">Przerw ponad ${PROG} dni</div>
-        <div class="liczba">${przerwy.filter(p=>p.dni>PROG).length}</div>
-        <div class="stopka">z ${przerwy.length} przerw</div>
+      <div class="kafel ${zlamania.length ? "uwaga" : ""}">
+        <div class="etykieta">Złamań kryterium</div>
+        <div class="liczba">${zlamania.length}</div>
+        <div class="stopka">z ${przerwyLiczone.length} liczonych przerw</div>
       </div>
       <div class="kafel uwaga">
         <div class="etykieta">Najdłuższa</div>
@@ -512,9 +553,10 @@ const kryterium = () => `
       </div>
       <div class="kafel">
         <div class="etykieta">Wariant kryterium</div>
-        <div class="liczba">${D.kryterium_przerwy.wybor || "—"}</div>
-        <div class="stopka">${D.kryterium_przerwy.wybor
-          ? "wybrany" : "NIEROZSTRZYGNIĘTE, decyzja do 1.09"}</div>
+        <div class="liczba">${WARIANT || "—"}</div>
+        <div class="stopka">${WARIANT
+          ? "wybrany " + pl(D.kryterium_przerwy.wybrany_dnia)
+          : "NIEROZSTRZYGNIĘTE"}</div>
       </div>
     </div>
   </section>`;
@@ -628,7 +670,9 @@ function podepnijSlupki(){
       const p = przerwy[+el.dataset.i];
       info.innerHTML = `<b>${p.dni} ${p.dni===1?"dzień":"dni"}</b> przerwy · `
         + `${pl(p.od)} → ${pl(p.do)}`
-        + (p.dni > PROG ? ` · <b style="color:var(--alarm)">ponad limit</b>` : "");
+        + (p.wyjazd
+            ? ` · <b>${p.wyjazd.opis}</b>, wyjazd zgłoszony — nie liczy się`
+            : p.dni > PROG ? ` · <b style="color:var(--alarm)">ponad limit</b>` : "");
     };
     el.addEventListener("click", pokazInfo);
     el.addEventListener("mouseenter", pokazInfo);

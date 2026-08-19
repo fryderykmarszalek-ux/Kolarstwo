@@ -84,13 +84,18 @@ zalozenia: {
 
 kryterium_przerwy: {
   "_opis": "NIEROZSTRZYGNIĘTE. Decyzja musi zapaść przed 2026-09-01 — po fakcie byłaby decyzją pod wynik.",
-  "wybor": null,
+  "wybor": "B",
   "warianty": {
     "A": "bez wyjątków — 17 dni to złamanie",
     "B": "wyjazdy bez dostępu do roweru wyłączone, zgłaszane z góry, maks. 2 razy w roku",
     "C": "kryterium liczy się od 2026-09-01, wcześniejsze przerwy to historia"
   },
-  "prog_dni": 14
+  "prog_dni": 14,
+  "wybrany_dnia": "2026-08-19",
+  "zasada_B": "Wyjazd bez dostępu do roweru nie liczy się jako przerwa, pod warunkiem że został zgłoszony ZANIM przerwa przekroczyła 14 dni — czyli zanim reguła mogła zostać złamana. Maksymalnie dwa wyjazdy w roku kalendarzowym. Wszystko inne — pogoda, brak chęci, szkoła — liczy się normalnie.",
+  "wyjazdy_bez_roweru": [
+    {"od": "2026-08-17", "do": "2026-08-31", "opis": "Francja", "zgloszony": "2026-08-19"}
+  ]
 },
 
 plan_objetosci: [
