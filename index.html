@@ -248,6 +248,7 @@ section{margin-bottom:34px}
 .wykres .os{flex:0 0 auto}
 .ramka{overflow-x:auto;-webkit-overflow-scrolling:touch;flex:1 1 auto;min-width:0}
 svg{display:block}
+.dysc{display:inline-block;vertical-align:-3px;flex:0 0 auto}
 .slupek,.tydzien{
   transform-box:fill-box;transform-origin:bottom;
   animation:wyrasta .5s cubic-bezier(.2,.85,.25,1) both;
@@ -273,6 +274,21 @@ svg{display:block}
   background:var(--plyta);border-radius:8px;padding:8px 12px;
 }
 .info b{color:var(--tekst);font-weight:600}
+
+.lista{margin-top:8px;border:1px solid var(--linia);border-radius:10px;overflow:hidden}
+.lista .rzad{
+  display:flex;align-items:center;gap:11px;padding:9px 13px;
+  border-top:1px solid var(--linia);font-size:14px;
+  transition:background .15s ease;
+}
+.lista .rzad:first-child{border-top:0}
+.lista .rzad:hover{background:var(--plyta)}
+.lista .rzad .ikona{color:var(--slaby);display:flex}
+.lista .rzad .nazwa{flex:1 1 auto;min-width:0;overflow:hidden;
+  text-overflow:ellipsis;white-space:nowrap}
+.lista .rzad .data{color:var(--slaby);font-size:12.5px;flex:0 0 auto}
+.lista .rzad .km{font-variant-numeric:tabular-nums;flex:0 0 auto;
+  color:var(--slaby);font-size:13px}
 
 .pusto{
   border:1px dashed var(--linia);border-radius:10px;
@@ -528,6 +544,26 @@ const tygodnie = (() => {
 
 const indeksDzis = tygodnie.findIndex(t => t.od === poniedzialek(DZIS));
 
+// Seria liczy się WYŁĄCZNIE po tygodniach, które miały plan i już minęły.
+// Tydzień bez planu nie może serii ani przedłużyć, ani zerwać — nie było
+// czego dowozić. Tydzień odciążeniowy liczy się normalnie, bo ma własny,
+// niższy plan i jego dowiezienie jest tak samo zaplanowane.
+const tygodnieZPlanem = tygodnie.filter(t => !t.przyszly && t.plan != null);
+
+const seria = (() => {
+  let biezaca = 0;
+  for (let i = tygodnieZPlanem.length - 1; i >= 0; i--){
+    if (tygodnieZPlanem[i].godziny >= tygodnieZPlanem[i].plan) biezaca++;
+    else break;
+  }
+  let najdluzsza = 0, licznik = 0;
+  for (const t of tygodnieZPlanem){
+    if (t.godziny >= t.plan){ licznik++; najdluzsza = Math.max(najdluzsza, licznik); }
+    else licznik = 0;
+  }
+  return { biezaca, najdluzsza, ocenionych: tygodnieZPlanem.length };
+})();
+
 function wykresGodzin(){
   const szerSlupka = 13, odstep = 3, marGora = 16, wys = 220, marDol = 34,
         szerOsi = 34;
@@ -681,9 +717,49 @@ const c1Godziny = () => {
         <div class="liczba">${CEL_H},0</div>
         <div class="stopka">godzin tygodniowo</div>
       </div>
+      <div class="kafel">
+        <div class="etykieta">Seria z dowiezionym planem</div>
+        <div class="liczba" style="${seria.biezaca ? "color:var(--plan)" : ""}">${
+          seria.ocenionych ? seria.biezaca : "—"}</div>
+        <div class="stopka">${seria.ocenionych
+          ? `tygodni z rzędu · rekord ${seria.najdluzsza} z ${seria.ocenionych}`
+          : "plan rusza 1.09 — nie ma czego liczyć"}</div>
+      </div>
     </div>
   </section>`;
 };
+
+/* ==========================================================================
+   DYSCYPLINA — kształt, nie kolor
+   Podział jest dwuwartościowy: szosa (Ride) i Zwift (VirtualRide). Gravel
+   to nawierzchnia, nie dyscyplina — jeździ się po nim tym samym rowerem,
+   więc liczy się jako szosa. Rozróżnienie niesie SYLWETKA, nie barwa:
+   dokładanie dwóch kolorów tylko po to zabrałoby im znaczenie.
+   ========================================================================== */
+
+const DYSCYPLINY = {
+  Ride: { nazwa:"szosa", rysunek:
+    `<circle cx="5" cy="12" r="3.1"/><circle cx="15" cy="12" r="3.1"/>
+     <path d="M5 12h4.5M9.5 12 7.2 6.5M5.8 6.5h3.3M7.2 6.5l5.6.4M9.5 12l3.3-5.6
+              M12.8 6.9 15 12M12.8 6.9l.7-1.5M12.2 5.4h2.8"/>` },
+  VirtualRide: { nazwa:"Zwift", rysunek:
+    `<rect x="2.5" y="3" width="15" height="10" rx="1.6"/>
+     <path d="M5.5 10.2 8 7l2.2 2.4L14.5 5.6"/>
+     <path d="M10 13v3M6.5 16.5h7"/>` }
+};
+
+function ikonaDyscypliny(typ, rozmiar){
+  const d = DYSCYPLINY[typ];
+  if (!d) return "";
+  const r = rozmiar || 16;
+  // Poniżej ~24 px kreska 1,5 zlepia szprychy i ramę w plamę — im mniejsza
+  // ikona, tym cieńsza linia, żeby sylwetka została czytelna.
+  const kreska = r < 22 ? 1.15 : r < 32 ? 1.35 : 1.5;
+  return `<svg class="dysc" width="${r}" height="${r}" viewBox="0 0 20 20"
+    role="img" aria-label="${d.nazwa}"><title>${d.nazwa}</title>
+    <g fill="none" stroke="currentColor" stroke-width="${kreska}"
+       stroke-linecap="round" stroke-linejoin="round">${d.rysunek}</g></svg>`;
+}
 
 /* ==========================================================================
    TREŚCI
@@ -716,13 +792,32 @@ const przegladStart = () => `
       <div class="kafel">
         <div class="etykieta">Ostatnia jazda</div>
         <div class="liczba">${liczba(ostatniaJazda.dystans_m/1000,1)}</div>
-        <div class="stopka">km · ${pl(ostatniaJazda.data)}</div>
+        <div class="stopka">${ikonaDyscypliny(ostatniaJazda.typ,15)}
+          km · ${pl(ostatniaJazda.data)}</div>
       </div>
       <div class="kafel">
         <div class="etykieta">Dni z jazdą</div>
         <div class="liczba">${dniZJazda.length}</div>
         <div class="stopka">z ${roznicaDni(naDzien(OD),naDzien(DZIS))} dni</div>
       </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Ostatnie jazdy</h2>
+    <p class="opis">
+      Sylwetka po lewej mówi, gdzie odbyła się jazda: rower to szosa,
+      ekran to Zwift. Gravel liczy się jako szosa — to nawierzchnia,
+      nie osobna dyscyplina.
+    </p>
+    <div class="lista">
+      ${jazdy.slice(-6).reverse().map(a => `
+        <div class="rzad">
+          <span class="ikona">${ikonaDyscypliny(a.typ,21)}</span>
+          <span class="nazwa">${a.nazwa}</span>
+          <span class="km">${liczba(a.dystans_m/1000,1)} km</span>
+          <span class="data">${pl(a.data)}</span>
+        </div>`).join("")}
     </div>
   </section>`;
 
@@ -868,7 +963,9 @@ function podepnijTygodnie(){
         : t.godziny >= t.plan
           ? ` · plan ${liczba(t.plan,1)} h · <b style="color:var(--plan)">dowieziony</b>`
           : ` · plan ${liczba(t.plan,1)} h · brakuje ${liczba(t.plan-t.godziny,1)} h`;
-      info.innerHTML = `<b>${liczba(t.godziny,1)} h</b> · ${t.jazd} `
+      const wTygodniu = jazdy.filter(a => poniedzialek(a.data) === t.od);
+      const sylwetki = wTygodniu.map(a => ikonaDyscypliny(a.typ,16)).join(" ");
+      info.innerHTML = `<b>${liczba(t.godziny,1)} h</b> · ${sylwetki} ${t.jazd} `
         + (t.jazd===1?"jazda":"jazdy") + ` · ${pl(t.od)} – ${pl(t.do)}`
         + stan
         + (t.odciazenie ? " · tydzień odciążeniowy" : "");
