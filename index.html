@@ -9,6 +9,7 @@
 :root{
   --tlo:#ffffff; --tekst:#16181d; --slaby:#6b7280; --linia:#e3e6ea;
   --akcent:#1f6feb; --alarm:#d1242f; --plyta:#f6f7f9;
+  --ramka-paska:#2f6fe4;
 }
 *{box-sizing:border-box}
 body{
@@ -16,25 +17,76 @@ body{
   font:16px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;
   -webkit-text-size-adjust:100%;
 }
-header{border-bottom:1px solid var(--linia);padding:14px 20px}
-header h1{margin:0;font-size:17px;font-weight:600;letter-spacing:-.01em}
-header .pod{color:var(--slaby);font-size:13px;margin-top:2px}
 
-/* nawigacja — generowana z listy sekcji, nie wpisana ręcznie */
-nav{display:flex;gap:4px;padding:0 12px;border-bottom:1px solid var(--linia);
-    overflow-x:auto;-webkit-overflow-scrolling:touch}
-nav a{
-  padding:11px 14px;text-decoration:none;color:var(--slaby);font-size:15px;
-  white-space:nowrap;border-bottom:2px solid transparent;
+/* --- nagłówek: nazwa na środku, jak na szkicu --- */
+header{padding:18px 20px 14px;text-align:center}
+header h1{margin:0;font-size:19px;font-weight:600;letter-spacing:-.01em}
+header .pod{color:var(--slaby);font-size:12.5px;margin-top:3px}
+
+/* --- POZIOM 1: pasek zakładek, obramowany z góry i z dołu --- */
+.pasek1{
+  border-top:2px solid var(--ramka-paska);
+  border-bottom:2px solid var(--ramka-paska);
+  overflow-x:auto;-webkit-overflow-scrolling:touch;
+  scrollbar-width:none;
 }
-nav a.akt{color:var(--tekst);border-bottom-color:var(--akcent);font-weight:600}
+.pasek1 .wiersz{display:flex;gap:2px;width:max-content;margin:0 auto}
+.pasek1::-webkit-scrollbar{display:none}
+.pasek1 button{
+  appearance:none;background:none;border:0;cursor:pointer;
+  font:inherit;font-size:15px;color:var(--slaby);
+  padding:12px 18px;white-space:nowrap;position:relative;
+  transition:color .18s ease, background .18s ease;
+}
+.pasek1 button:hover{color:var(--tekst)}
+.pasek1 button.akt{color:var(--tekst);font-weight:600}
+.pasek1 button.akt::after{
+  content:"";position:absolute;left:14px;right:14px;bottom:0;height:3px;
+  background:var(--akcent);border-radius:3px 3px 0 0;
+}
+.pasek1 button .strzalka{
+  display:inline-block;margin-left:6px;font-size:10px;color:var(--slaby);
+  transition:transform .28s cubic-bezier(.4,0,.2,1);
+}
+.pasek1 button.akt .strzalka{transform:rotate(180deg)}
 
-main{padding:20px;max-width:1000px}
+/* --- POZIOM 2: mini-zakładki, rozwijane kliknięciem --- */
+.pasek2-obudowa{
+  max-height:0;opacity:0;overflow:hidden;
+  border-bottom:1px solid transparent;
+  transition:max-height .3s cubic-bezier(.4,0,.2,1),
+             opacity .22s ease,
+             border-color .3s ease;
+}
+.pasek2-obudowa.otwarty{
+  max-height:120px;opacity:1;border-bottom-color:var(--linia);
+}
+.pasek2{
+  padding:9px 12px;background:var(--plyta);
+  overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;
+}
+.pasek2 .wiersz{display:flex;gap:6px;width:max-content;margin:0 auto}
+.pasek2::-webkit-scrollbar{display:none}
+.pasek2 button{
+  appearance:none;border:1px solid transparent;cursor:pointer;
+  background:transparent;font:inherit;font-size:13.5px;color:var(--slaby);
+  padding:5px 13px;border-radius:999px;white-space:nowrap;
+  transition:background .18s ease,color .18s ease,border-color .18s ease;
+}
+.pasek2 button:hover{color:var(--tekst)}
+.pasek2 button.akt{
+  background:var(--tlo);color:var(--tekst);font-weight:600;
+  border-color:var(--linia);
+}
+
+main{padding:20px;max-width:1000px;margin:0 auto}
+main.wchodzi{animation:wejscie .26s ease both}
+@keyframes wejscie{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
 h2{font-size:15px;font-weight:600;margin:0 0 4px}
 .opis{color:var(--slaby);font-size:13px;margin:0 0 14px}
 section{margin-bottom:34px}
 
-/* kafelki na stronie głównej */
 .kafelki{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
 .kafel{background:var(--plyta);border-radius:8px;padding:13px 15px}
 .kafel .etykieta{font-size:12px;color:var(--slaby)}
@@ -42,13 +94,26 @@ section{margin-bottom:34px}
 .kafel .stopka{font-size:12px;color:var(--slaby);margin-top:2px}
 .kafel.uwaga .liczba{color:var(--alarm)}
 
-.ramka{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.wykres{display:flex;align-items:flex-start}
+.wykres .os{flex:0 0 auto}
+.ramka{overflow-x:auto;-webkit-overflow-scrolling:touch;flex:1 1 auto;min-width:0}
 svg{display:block}
-.info{
-  font-size:13px;color:var(--slaby);margin-top:8px;min-height:20px;
-}
+.info{font-size:13px;color:var(--slaby);margin-top:8px;min-height:20px}
 .info b{color:var(--tekst);font-weight:600}
-footer{color:var(--slaby);font-size:12px;padding:0 20px 30px;max-width:1000px}
+
+.pusto{
+  border:1px dashed var(--linia);border-radius:10px;
+  padding:44px 20px;text-align:center;color:var(--slaby);font-size:14px;
+}
+.pusto .znak{font-size:26px;font-weight:600;color:var(--linia);display:block;margin-bottom:6px}
+
+footer{color:var(--slaby);font-size:12px;padding:0 20px 30px;max-width:1000px;
+       margin:0 auto;text-align:center}
+
+/* szanuj ustawienie "ogranicz ruch" w systemie */
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{transition-duration:.01ms !important;animation-duration:.01ms !important}
+}
 </style>
 </head>
 <body>
@@ -58,7 +123,11 @@ footer{color:var(--slaby);font-size:12px;padding:0 20px 30px;max-width:1000px}
   <div class="pod" id="stopka-naglowka"></div>
 </header>
 
-<nav id="nawigacja"></nav>
+<div class="pasek1" id="pasek1"></div>
+<div class="pasek2-obudowa" id="pasek2-obudowa">
+  <div class="pasek2" id="pasek2"></div>
+</div>
+
 <main id="tresc"></main>
 <footer id="stopka"></footer>
 
@@ -79,29 +148,27 @@ function naDzien(tekst){
 function roznicaDni(a,b){ return Math.round((b-a)/86400000); }
 function dzienNaTekst(ms){ return new Date(ms).toISOString().slice(0,10); }
 function pl(tekst){                       // "2026-08-15" -> "15.08.2026"
-  const [r,m,d] = tekst.split("-");
+  const [r,m,d] = tekst.slice(0,10).split("-");
   return d+"."+m+"."+r;
 }
-function godziny(sekundy){ return sekundy/3600; }
-function liczba(x, miejsc){
-  return x.toFixed(miejsc).replace(".", ",");
-}
+function liczba(x, miejsc){ return x.toFixed(miejsc).replace(".", ","); }
 
 /* ==========================================================================
    WYLICZENIA — nic z tego nie jest zapisane w dane.js (wariant B)
    ========================================================================== */
 
 const D = window.DANE;
-const TYPY_KOLARSKIE = D.meta.typy_kolarskie;   // Ride + VirtualRide
 
-// Tylko te aktywności liczą się jako trening kolarski.
-// Spacery, treki, biegi i e-bike NIE przerywają przerwy.
-const jazdy = D.aktywnosci.filter(a => TYPY_KOLARSKIE.includes(a.typ));
+// Decyzja Fryderyka: liczymy dopiero od tej daty. Historia sprzed niej
+// zostaje w pliku nietknięta, ale nie wchodzi do żadnego wykresu.
+const OD = D.meta.liczone_od;
 
-// Unikalne dni z jazdą, rosnąco.
+const jazdy = D.aktywnosci.filter(a =>
+  D.meta.typy_kolarskie.includes(a.typ) && a.data.slice(0,10) >= OD
+);
+
 const dniZJazda = [...new Set(jazdy.map(a => a.data.slice(0,10)))].sort();
 
-// Przerwy: odstęp w dniach między kolejnymi dniami z jazdą.
 const przerwy = [];
 for (let i = 1; i < dniZJazda.length; i++){
   przerwy.push({
@@ -111,15 +178,12 @@ for (let i = 1; i < dniZJazda.length; i++){
   });
 }
 
-// Przerwa trwająca teraz — od ostatniej jazdy do dziś.
-const ostatniDzien = dniZJazda[dniZJazda.length-1];
 const DZIS = dzienNaTekst(naDzien(D.meta.pobrano));
+const ostatniDzien = dniZJazda[dniZJazda.length-1];
 const przerwaTrwa = roznicaDni(naDzien(ostatniDzien), naDzien(DZIS));
-
-const PROG = D.kryterium_przerwy.prog_dni;      // 14
+const PROG = D.kryterium_przerwy.prog_dni;
 const najdluzsza = przerwy.reduce((a,b) => b.dni > a.dni ? b : a);
 
-// Poniedziałek tygodnia, w którym leży dana data.
 function poniedzialek(tekst){
   const ms = naDzien(tekst);
   const dt = new Date(ms).getUTCDay();          // 0 = niedziela
@@ -128,56 +192,64 @@ function poniedzialek(tekst){
 const godzinyWTygodniu = {};
 for (const a of jazdy){
   const p = poniedzialek(a.data);
-  godzinyWTygodniu[p] = (godzinyWTygodniu[p]||0) + godziny(a.czas_ruchu_s);
+  godzinyWTygodniu[p] = (godzinyWTygodniu[p]||0) + a.czas_ruchu_s/3600;
 }
 const tenTydzien = godzinyWTygodniu[poniedzialek(DZIS)] || 0;
 const ostatniaJazda = jazdy[jazdy.length-1];
 
 /* ==========================================================================
    WYKRES C2 — PRZERWY
-   Oś ucięta na 60 dniach. Słupki dłuższe rysowane do sufitu, z liczbą nad
-   nimi i ząbkiem u góry. Powód: 226 dni to 56x typowa przerwa — bez ucięcia
-   wszystkie normalne słupki zlewają się w kreskę przy zerze.
+   Oś ucięta na 60 dniach: słupki dłuższe idą do sufitu, dostają ząbek
+   i liczbę nad sobą. Bez tego 108 dni spłaszcza wszystkie normalne
+   przerwy do kreski przy zerze.
    ========================================================================== */
 
 const SUFIT = 60;
 
 function wykresPrzerw(){
-  const szerSlupka = 9, odstep = 2, marLewy = 34, marGora = 22,
-        wys = 240, marDol = 34;
-  const szer = marLewy + przerwy.length*(szerSlupka+odstep) + 14;
+  const szerSlupka = 14, odstep = 3, marGora = 22, wys = 240, marDol = 34,
+        szerOsi = 34;
+  const szer = przerwy.length*(szerSlupka+odstep) + 60;
   const skala = d => (Math.min(d, SUFIT)/SUFIT) * wys;
+  const wysCalk = wys + marGora + marDol;
+  const PODZIALKA = [0,30,45,60];
 
-  let s = `<svg width="${szer}" height="${wys+marGora+marDol}"
-            role="img" aria-label="Przerwy między jazdami">`;
-
-  // siatka pozioma
-  for (const v of [0,15,30,45,60]){
+  // --- oś: zostaje nieruchomo, nie przewija się razem ze słupkami ---
+  let os = `<svg class="os" width="${szerOsi}" height="${wysCalk}" aria-hidden="true">`;
+  for (const v of PODZIALKA){
     const y = marGora + wys - skala(v);
-    s += `<line x1="${marLewy}" y1="${y}" x2="${szer-6}" y2="${y}"
+    os += `<text x="${szerOsi-6}" y="${y+4}" text-anchor="end"
+            font-size="10" fill="var(--slaby)">${v===SUFIT?SUFIT+"+":v}</text>`;
+  }
+  // próg kryterium na stałej osi — przy przewijaniu musi zostać widoczny
+  const yP = marGora + wys - skala(PROG);
+  os += `<text x="${szerOsi-6}" y="${yP+4}" text-anchor="end" font-size="10"
+          font-weight="600" fill="var(--alarm)">${PROG}</text>`;
+  os += `</svg>`;
+
+  // --- słupki: przewijane w poziomie ---
+  let s = `<svg width="${szer}" height="${wysCalk}"
+            role="img" aria-label="Przerwy między jazdami od ${pl(OD)}">`;
+
+  for (const v of PODZIALKA){
+    const y = marGora + wys - skala(v);
+    s += `<line x1="0" y1="${y}" x2="${szer}" y2="${y}"
            stroke="var(--linia)" stroke-width="1"/>`;
-    s += `<text x="${marLewy-6}" y="${y+4}" text-anchor="end"
-           font-size="10" fill="var(--slaby)">${v===60?"60+":v}</text>`;
   }
 
-  // czerwona linia kryterium na 14 dniach
   const yProg = marGora + wys - skala(PROG);
-  s += `<line x1="${marLewy}" y1="${yProg}" x2="${szer-6}" y2="${yProg}"
+  s += `<line x1="0" y1="${yProg}" x2="${szer}" y2="${yProg}"
          stroke="var(--alarm)" stroke-width="1.5" stroke-dasharray="5 3"/>`;
-  s += `<text x="${szer-8}" y="${yProg-5}" text-anchor="end" font-size="10"
-         fill="var(--alarm)" font-weight="600">2 tygodnie</text>`;
 
   przerwy.forEach((p, i) => {
-    const x = marLewy + i*(szerSlupka+odstep);
+    const x = 4 + i*(szerSlupka+odstep);
     const h = Math.max(skala(p.dni), 1.5);
     const y = marGora + wys - h;
-    const ucieta = p.dni > SUFIT;
     const kolor = p.dni > PROG ? "var(--alarm)" : "var(--akcent)";
     s += `<rect x="${x}" y="${y}" width="${szerSlupka}" height="${h}"
            fill="${kolor}" opacity="${p.dni > PROG ? 1 : .55}"
-           data-i="${i}" class="slupek"/>`;
-    if (ucieta){
-      // ząbek = "słupek jest urwany, patrz liczba"
+           data-i="${i}" class="slupek" rx="1.5"/>`;
+    if (p.dni > SUFIT){
       s += `<path d="M${x} ${y} l${szerSlupka/4} -4 l${szerSlupka/4} 4
              l${szerSlupka/4} -4 l${szerSlupka/4} 4"
              fill="none" stroke="var(--tlo)" stroke-width="2.5"/>`;
@@ -186,12 +258,11 @@ function wykresPrzerw(){
     }
   });
 
-  // etykiety lat pod osią
   let rokPoprzedni = null;
   przerwy.forEach((p, i) => {
     const rok = p.do.slice(0,4);
     if (rok !== rokPoprzedni){
-      const x = marLewy + i*(szerSlupka+odstep);
+      const x = 4 + i*(szerSlupka+odstep);
       s += `<line x1="${x}" y1="${marGora+wys}" x2="${x}" y2="${marGora+wys+6}"
              stroke="var(--slaby)" stroke-width="1"/>`;
       s += `<text x="${x+3}" y="${marGora+wys+18}" font-size="10"
@@ -200,107 +271,167 @@ function wykresPrzerw(){
     }
   });
 
-  s += `<line x1="${marLewy}" y1="${marGora+wys}" x2="${szer-6}" y2="${marGora+wys}"
-         stroke="var(--slaby)" stroke-width="1"/>`;
-  s += `</svg>`;
-  return s;
+  s += `<line x1="0" y1="${marGora+wys}" x2="${szer}" y2="${marGora+wys}"
+         stroke="var(--slaby)" stroke-width="1"/></svg>`;
+
+  return `<div class="wykres">${os}<div class="ramka">${s}</div></div>`;
 }
 
 /* ==========================================================================
-   SEKCJE — zakładka pojawia się w menu TYLKO gdy ma zawartość
+   TREŚCI
+   ========================================================================== */
+
+const pusto = (nazwa) => `
+  <div class="pusto">
+    <span class="znak">${nazwa}</span>
+    Miejsce zarezerwowane. Zakładka dostanie nazwę i treść,
+    kiedy będzie co w niej pokazać.
+  </div>`;
+
+const przegladStart = () => `
+  <section>
+    <h2>Jak mi idzie</h2>
+    <p class="opis">Stan na ${pl(DZIS)}. Liczone od ${pl(OD)}.</p>
+    <div class="kafelki">
+      <div class="kafel ${przerwaTrwa > PROG ? "uwaga" : ""}">
+        <div class="etykieta">Od ostatniej jazdy</div>
+        <div class="liczba">${przerwaTrwa}</div>
+        <div class="stopka">dni · limit ${PROG}</div>
+      </div>
+      <div class="kafel">
+        <div class="etykieta">W tym tygodniu</div>
+        <div class="liczba">${liczba(tenTydzien,1)}</div>
+        <div class="stopka">godzin w ruchu</div>
+      </div>
+      <div class="kafel">
+        <div class="etykieta">Ostatnia jazda</div>
+        <div class="liczba">${liczba(ostatniaJazda.dystans_m/1000,1)}</div>
+        <div class="stopka">km · ${pl(ostatniaJazda.data)}</div>
+      </div>
+      <div class="kafel">
+        <div class="etykieta">Dni z jazdą</div>
+        <div class="liczba">${dniZJazda.length}</div>
+        <div class="stopka">z ${roznicaDni(naDzien(OD),naDzien(DZIS))} dni</div>
+      </div>
+    </div>
+  </section>`;
+
+const c2Przerwy = () => `
+  <section>
+    <h2>C2 · Przerwy między jazdami</h2>
+    <p class="opis">
+      Jeden słupek = jedna przerwa, od ${pl(OD)}. Liczone tylko między jazdami
+      typu <code>Ride</code> i <code>VirtualRide</code> — spacery, treki, biegi
+      i e-bike przerwy nie przerywają. Oś ucięta na 60 dniach; słupek z ząbkiem
+      jest dłuższy, liczba nad nim podaje ile naprawdę.
+    </p>
+    ${wykresPrzerw()}
+    <div class="info" id="info-przerwa">Dotknij słupka, żeby zobaczyć daty.</div>
+  </section>`;
+
+const kryterium = () => `
+  <section>
+    <h2>Kryterium sezonu</h2>
+    <p class="opis">Żadna przerwa nie przekracza dwóch tygodni. Liczone od ${pl(OD)}.</p>
+    <div class="kafelki">
+      <div class="kafel uwaga">
+        <div class="etykieta">Przerw ponad ${PROG} dni</div>
+        <div class="liczba">${przerwy.filter(p=>p.dni>PROG).length}</div>
+        <div class="stopka">z ${przerwy.length} przerw</div>
+      </div>
+      <div class="kafel uwaga">
+        <div class="etykieta">Najdłuższa</div>
+        <div class="liczba">${najdluzsza.dni}</div>
+        <div class="stopka">dni · ${pl(najdluzsza.od)} → ${pl(najdluzsza.do)}</div>
+      </div>
+      <div class="kafel">
+        <div class="etykieta">Wariant kryterium</div>
+        <div class="liczba">${D.kryterium_przerwy.wybor || "—"}</div>
+        <div class="stopka">${D.kryterium_przerwy.wybor
+          ? "wybrany" : "NIEROZSTRZYGNIĘTE, decyzja do 1.09"}</div>
+      </div>
+    </div>
+  </section>`;
+
+/* ==========================================================================
+   SEKCJE — poziom 1 i poziom 2.
+   Zakładka trafia na pasek tylko gdy ma wpis tutaj. Z1–Z5 to miejsca
+   zarezerwowane; dostaną nazwy, kiedy dostaną treść.
    ========================================================================== */
 
 const SEKCJE = [
-  {
-    id: "start",
-    tytul: "Start",
-    gotowa: true,
-    rysuj: () => `
-      <section>
-        <h2>Jak mi idzie</h2>
-        <p class="opis">Stan na ${pl(DZIS)}.</p>
-        <div class="kafelki">
-          <div class="kafel ${przerwaTrwa > PROG ? "uwaga" : ""}">
-            <div class="etykieta">Od ostatniej jazdy</div>
-            <div class="liczba">${przerwaTrwa}</div>
-            <div class="stopka">dni · limit ${PROG}</div>
-          </div>
-          <div class="kafel">
-            <div class="etykieta">W tym tygodniu</div>
-            <div class="liczba">${liczba(tenTydzien,1)}</div>
-            <div class="stopka">godzin w ruchu</div>
-          </div>
-          <div class="kafel">
-            <div class="etykieta">Ostatnia jazda</div>
-            <div class="liczba">${liczba(ostatniaJazda.dystans_m/1000,1)}</div>
-            <div class="stopka">km · ${pl(ostatniaJazda.data.slice(0,10))}</div>
-          </div>
-          <div class="kafel">
-            <div class="etykieta">Dni z jazdą</div>
-            <div class="liczba">${dniZJazda.length}</div>
-            <div class="stopka">z ${roznicaDni(naDzien(dniZJazda[0]),naDzien(DZIS))} dni historii</div>
-          </div>
-        </div>
-      </section>`
-  },
-  {
-    id: "regularnosc",
-    tytul: "Regularność",
-    gotowa: true,
-    rysuj: () => `
-      <section>
-        <h2>C2 · Przerwy między jazdami</h2>
-        <p class="opis">
-          Jeden słupek = jedna przerwa. Liczone tylko między jazdami typu
-          <code>Ride</code> i <code>VirtualRide</code> — spacery, treki, biegi
-          i e-bike przerwy nie przerywają. Oś ucięta na 60 dniach; słupki
-          z ząbkiem są dłuższe, liczba nad nimi podaje ile naprawdę.
-        </p>
-        <div class="ramka">${wykresPrzerw()}</div>
-        <div class="info" id="info-przerwa">
-          Dotknij słupka, żeby zobaczyć daty.
-        </div>
-      </section>
-
-      <section>
-        <h2>Kryterium sezonu</h2>
-        <p class="opis">Żadna przerwa nie przekracza dwóch tygodni.</p>
-        <div class="kafelki">
-          <div class="kafel uwaga">
-            <div class="etykieta">Przerw ponad ${PROG} dni</div>
-            <div class="liczba">${przerwy.filter(p=>p.dni>PROG).length}</div>
-            <div class="stopka">w całej historii</div>
-          </div>
-          <div class="kafel uwaga">
-            <div class="etykieta">Najdłuższa</div>
-            <div class="liczba">${najdluzsza.dni}</div>
-            <div class="stopka">dni · ${pl(najdluzsza.od)} → ${pl(najdluzsza.do)}</div>
-          </div>
-          <div class="kafel">
-            <div class="etykieta">Wariant kryterium</div>
-            <div class="liczba">${D.kryterium_przerwy.wybor || "—"}</div>
-            <div class="stopka">${D.kryterium_przerwy.wybor
-              ? "wybrany" : "NIEROZSTRZYGNIĘTE, decyzja do 1.09"}</div>
-          </div>
-        </div>
-      </section>`
-  }
+  { id:"start", tytul:"Start", pod:[
+      { id:"przeglad", tytul:"Przegląd", rysuj: przegladStart }
+  ]},
+  { id:"regularnosc", tytul:"Regularność", pod:[
+      { id:"przerwy",   tytul:"Przerwy",   rysuj: c2Przerwy },
+      { id:"kryterium", tytul:"Kryterium", rysuj: kryterium }
+  ]},
+  ...[1,2,3,4,5].map(n => ({
+    id:"z"+n, tytul:"Z"+n, pod:[1,2,3].map(m => ({
+      id:"z"+n+"-"+m, tytul:"Z"+n+"."+m, rysuj: () => pusto("Z"+n+"."+m)
+    }))
+  }))
 ];
 
 /* ==========================================================================
-   NAWIGACJA I ROUTING
+   NAWIGACJA DWUPOZIOMOWA
+   Rozwijanie kliknięciem — nie hoverem. Na iPadzie hover nie istnieje.
    ========================================================================== */
 
-const widoczne = SEKCJE.filter(s => s.gotowa);
+const el1     = document.getElementById("pasek1");
+const el2     = document.getElementById("pasek2");
+const obudowa = document.getElementById("pasek2-obudowa");
+const tresc   = document.getElementById("tresc");
+
+let aktywnaSekcja = null;
+
+function zHasha(){
+  const [a,b] = location.hash.slice(1).split("/");
+  const s = SEKCJE.find(x => x.id === a) || SEKCJE[0];
+  const p = s.pod.find(x => x.id === b) || s.pod[0];
+  return [s,p];
+}
 
 function pokaz(){
-  const id = location.hash.slice(1) || widoczne[0].id;
-  const sekcja = widoczne.find(s => s.id === id) || widoczne[0];
-  document.getElementById("tresc").innerHTML = sekcja.rysuj();
-  document.querySelectorAll("#nawigacja a").forEach(a => {
-    a.classList.toggle("akt", a.getAttribute("href") === "#"+sekcja.id);
+  const [s,p] = zHasha();
+  const zmianaSekcji = aktywnaSekcja !== s.id;
+  aktywnaSekcja = s.id;
+
+  // poziom 1
+  el1.querySelectorAll("button").forEach(b => {
+    const akt = b.dataset.s === s.id;
+    b.classList.toggle("akt", akt);
+    // na wąskim ekranie aktywna zakładka musi być widoczna sama z siebie
+    if (akt && el1.scrollWidth > el1.clientWidth){
+      el1.scrollLeft = b.offsetLeft - (el1.clientWidth - b.offsetWidth)/2;
+    }
   });
+
+  // poziom 2 — rozwija się tylko gdy jest więcej niż jedna mini-zakładka
+  const rozwin = s.pod.length > 1;
+  if (zmianaSekcji){
+    obudowa.classList.remove("otwarty");
+    void obudowa.offsetHeight;              // wymuś przerysowanie, żeby
+  }                                         // animacja zagrała od nowa
+  el2.innerHTML = `<div class="wiersz">` + s.pod.map(x =>
+    `<button data-s="${s.id}" data-p="${x.id}"
+      class="${x.id===p.id?"akt":""}">${x.tytul}</button>`).join("") + `</div>`;
+  obudowa.classList.toggle("otwarty", rozwin);
+
+  // treść
+  tresc.classList.remove("wchodzi");
+  void tresc.offsetHeight;
+  tresc.innerHTML = p.rysuj();
+  tresc.classList.add("wchodzi");
+
   podepnijSlupki();
+
+  // Wykres otwiera się na najświeższym końcu — najnowsza przerwa jest
+  // najważniejsza, a przy dwóch latach historii ląduje poza kadrem.
+  const ramka = tresc.querySelector(".ramka");
+  if (ramka) ramka.scrollLeft = ramka.scrollWidth;
+
   window.scrollTo(0,0);
 }
 
@@ -319,15 +450,25 @@ function podepnijSlupki(){
   });
 }
 
-document.getElementById("nawigacja").innerHTML =
-  widoczne.map(s => `<a href="#${s.id}">${s.tytul}</a>`).join("");
+el1.innerHTML = `<div class="wiersz">` + SEKCJE.map(s =>
+  `<button data-s="${s.id}">${s.tytul}` +
+  (s.pod.length > 1 ? `<span class="strzalka">▾</span>` : ``) +
+  `</button>`).join("") + `</div>`;
+
+el1.addEventListener("click", e => {
+  const b = e.target.closest("button");
+  if (b) location.hash = b.dataset.s;
+});
+el2.addEventListener("click", e => {
+  const b = e.target.closest("button");
+  if (b) location.hash = b.dataset.s + "/" + b.dataset.p;
+});
 
 document.getElementById("stopka-naglowka").textContent =
-  `${D.meta.liczba_aktywnosci} aktywności · ${pl(D.meta.zakres[0])} – ${pl(D.meta.zakres[1])}`;
-
+  `${jazdy.length} jazd · od ${pl(OD)}`;
 document.getElementById("stopka").innerHTML =
   `Dane ze Stravy, pobrane ${D.meta.pobrano.replace("T"," ")}. `
-  + `Strona liczy, nie przechowuje — jedynym źródłem prawdy jest Strava.`;
+  + `Liczone od ${pl(OD)} — wcześniejsza historia zostaje w pliku, ale nie wchodzi do wykresów.`;
 
 window.addEventListener("hashchange", pokaz);
 pokaz();
