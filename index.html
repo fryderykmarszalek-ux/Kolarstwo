@@ -4,9 +4,333 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex">
-<title>Kolarstwo</title>
+<title>Kolarstwo — Fryderyk Marszałek</title>
+<style>
+:root{
+  --tlo:#ffffff; --tekst:#16181d; --slaby:#6b7280; --linia:#e3e6ea;
+  --akcent:#1f6feb; --alarm:#d1242f; --plyta:#f6f7f9;
+}
+*{box-sizing:border-box}
+body{
+  margin:0; background:var(--tlo); color:var(--tekst);
+  font:16px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;
+  -webkit-text-size-adjust:100%;
+}
+header{border-bottom:1px solid var(--linia);padding:14px 20px}
+header h1{margin:0;font-size:17px;font-weight:600;letter-spacing:-.01em}
+header .pod{color:var(--slaby);font-size:13px;margin-top:2px}
+
+/* nawigacja — generowana z listy sekcji, nie wpisana ręcznie */
+nav{display:flex;gap:4px;padding:0 12px;border-bottom:1px solid var(--linia);
+    overflow-x:auto;-webkit-overflow-scrolling:touch}
+nav a{
+  padding:11px 14px;text-decoration:none;color:var(--slaby);font-size:15px;
+  white-space:nowrap;border-bottom:2px solid transparent;
+}
+nav a.akt{color:var(--tekst);border-bottom-color:var(--akcent);font-weight:600}
+
+main{padding:20px;max-width:1000px}
+h2{font-size:15px;font-weight:600;margin:0 0 4px}
+.opis{color:var(--slaby);font-size:13px;margin:0 0 14px}
+section{margin-bottom:34px}
+
+/* kafelki na stronie głównej */
+.kafelki{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.kafel{background:var(--plyta);border-radius:8px;padding:13px 15px}
+.kafel .etykieta{font-size:12px;color:var(--slaby)}
+.kafel .liczba{font-size:27px;font-weight:600;letter-spacing:-.02em;margin-top:3px}
+.kafel .stopka{font-size:12px;color:var(--slaby);margin-top:2px}
+.kafel.uwaga .liczba{color:var(--alarm)}
+
+.ramka{overflow-x:auto;-webkit-overflow-scrolling:touch}
+svg{display:block}
+.info{
+  font-size:13px;color:var(--slaby);margin-top:8px;min-height:20px;
+}
+.info b{color:var(--tekst);font-weight:600}
+footer{color:var(--slaby);font-size:12px;padding:0 20px 30px;max-width:1000px}
+</style>
 </head>
 <body>
-<p>działa</p>
+
+<header>
+  <h1>Kolarstwo — postępy</h1>
+  <div class="pod" id="stopka-naglowka"></div>
+</header>
+
+<nav id="nawigacja"></nav>
+<main id="tresc"></main>
+<footer id="stopka"></footer>
+
+<script src="dane.js"></script>
+<script>
+"use strict";
+
+/* ==========================================================================
+   POMOCNICZE
+   ========================================================================== */
+
+// Daty trzymamy jako "RRRR-MM-DD". Do liczenia różnic używamy południa UTC,
+// żeby zmiana czasu letni/zimowy nigdy nie przesunęła doby o jeden.
+function naDzien(tekst){
+  const [r,m,d] = tekst.slice(0,10).split("-").map(Number);
+  return Date.UTC(r, m-1, d, 12);
+}
+function roznicaDni(a,b){ return Math.round((b-a)/86400000); }
+function dzienNaTekst(ms){ return new Date(ms).toISOString().slice(0,10); }
+function pl(tekst){                       // "2026-08-15" -> "15.08.2026"
+  const [r,m,d] = tekst.split("-");
+  return d+"."+m+"."+r;
+}
+function godziny(sekundy){ return sekundy/3600; }
+function liczba(x, miejsc){
+  return x.toFixed(miejsc).replace(".", ",");
+}
+
+/* ==========================================================================
+   WYLICZENIA — nic z tego nie jest zapisane w dane.js (wariant B)
+   ========================================================================== */
+
+const D = window.DANE;
+const TYPY_KOLARSKIE = D.meta.typy_kolarskie;   // Ride + VirtualRide
+
+// Tylko te aktywności liczą się jako trening kolarski.
+// Spacery, treki, biegi i e-bike NIE przerywają przerwy.
+const jazdy = D.aktywnosci.filter(a => TYPY_KOLARSKIE.includes(a.typ));
+
+// Unikalne dni z jazdą, rosnąco.
+const dniZJazda = [...new Set(jazdy.map(a => a.data.slice(0,10)))].sort();
+
+// Przerwy: odstęp w dniach między kolejnymi dniami z jazdą.
+const przerwy = [];
+for (let i = 1; i < dniZJazda.length; i++){
+  przerwy.push({
+    dni: roznicaDni(naDzien(dniZJazda[i-1]), naDzien(dniZJazda[i])),
+    od: dniZJazda[i-1],
+    do: dniZJazda[i]
+  });
+}
+
+// Przerwa trwająca teraz — od ostatniej jazdy do dziś.
+const ostatniDzien = dniZJazda[dniZJazda.length-1];
+const DZIS = dzienNaTekst(naDzien(D.meta.pobrano));
+const przerwaTrwa = roznicaDni(naDzien(ostatniDzien), naDzien(DZIS));
+
+const PROG = D.kryterium_przerwy.prog_dni;      // 14
+const najdluzsza = przerwy.reduce((a,b) => b.dni > a.dni ? b : a);
+
+// Poniedziałek tygodnia, w którym leży dana data.
+function poniedzialek(tekst){
+  const ms = naDzien(tekst);
+  const dt = new Date(ms).getUTCDay();          // 0 = niedziela
+  return dzienNaTekst(ms - ((dt+6)%7)*86400000);
+}
+const godzinyWTygodniu = {};
+for (const a of jazdy){
+  const p = poniedzialek(a.data);
+  godzinyWTygodniu[p] = (godzinyWTygodniu[p]||0) + godziny(a.czas_ruchu_s);
+}
+const tenTydzien = godzinyWTygodniu[poniedzialek(DZIS)] || 0;
+const ostatniaJazda = jazdy[jazdy.length-1];
+
+/* ==========================================================================
+   WYKRES C2 — PRZERWY
+   Oś ucięta na 60 dniach. Słupki dłuższe rysowane do sufitu, z liczbą nad
+   nimi i ząbkiem u góry. Powód: 226 dni to 56x typowa przerwa — bez ucięcia
+   wszystkie normalne słupki zlewają się w kreskę przy zerze.
+   ========================================================================== */
+
+const SUFIT = 60;
+
+function wykresPrzerw(){
+  const szerSlupka = 9, odstep = 2, marLewy = 34, marGora = 22,
+        wys = 240, marDol = 34;
+  const szer = marLewy + przerwy.length*(szerSlupka+odstep) + 14;
+  const skala = d => (Math.min(d, SUFIT)/SUFIT) * wys;
+
+  let s = `<svg width="${szer}" height="${wys+marGora+marDol}"
+            role="img" aria-label="Przerwy między jazdami">`;
+
+  // siatka pozioma
+  for (const v of [0,15,30,45,60]){
+    const y = marGora + wys - skala(v);
+    s += `<line x1="${marLewy}" y1="${y}" x2="${szer-6}" y2="${y}"
+           stroke="var(--linia)" stroke-width="1"/>`;
+    s += `<text x="${marLewy-6}" y="${y+4}" text-anchor="end"
+           font-size="10" fill="var(--slaby)">${v===60?"60+":v}</text>`;
+  }
+
+  // czerwona linia kryterium na 14 dniach
+  const yProg = marGora + wys - skala(PROG);
+  s += `<line x1="${marLewy}" y1="${yProg}" x2="${szer-6}" y2="${yProg}"
+         stroke="var(--alarm)" stroke-width="1.5" stroke-dasharray="5 3"/>`;
+  s += `<text x="${szer-8}" y="${yProg-5}" text-anchor="end" font-size="10"
+         fill="var(--alarm)" font-weight="600">2 tygodnie</text>`;
+
+  przerwy.forEach((p, i) => {
+    const x = marLewy + i*(szerSlupka+odstep);
+    const h = Math.max(skala(p.dni), 1.5);
+    const y = marGora + wys - h;
+    const ucieta = p.dni > SUFIT;
+    const kolor = p.dni > PROG ? "var(--alarm)" : "var(--akcent)";
+    s += `<rect x="${x}" y="${y}" width="${szerSlupka}" height="${h}"
+           fill="${kolor}" opacity="${p.dni > PROG ? 1 : .55}"
+           data-i="${i}" class="slupek"/>`;
+    if (ucieta){
+      // ząbek = "słupek jest urwany, patrz liczba"
+      s += `<path d="M${x} ${y} l${szerSlupka/4} -4 l${szerSlupka/4} 4
+             l${szerSlupka/4} -4 l${szerSlupka/4} 4"
+             fill="none" stroke="var(--tlo)" stroke-width="2.5"/>`;
+      s += `<text x="${x+szerSlupka/2}" y="${y-8}" text-anchor="middle"
+             font-size="10" font-weight="600" fill="var(--alarm)">${p.dni}</text>`;
+    }
+  });
+
+  // etykiety lat pod osią
+  let rokPoprzedni = null;
+  przerwy.forEach((p, i) => {
+    const rok = p.do.slice(0,4);
+    if (rok !== rokPoprzedni){
+      const x = marLewy + i*(szerSlupka+odstep);
+      s += `<line x1="${x}" y1="${marGora+wys}" x2="${x}" y2="${marGora+wys+6}"
+             stroke="var(--slaby)" stroke-width="1"/>`;
+      s += `<text x="${x+3}" y="${marGora+wys+18}" font-size="10"
+             fill="var(--slaby)">${rok}</text>`;
+      rokPoprzedni = rok;
+    }
+  });
+
+  s += `<line x1="${marLewy}" y1="${marGora+wys}" x2="${szer-6}" y2="${marGora+wys}"
+         stroke="var(--slaby)" stroke-width="1"/>`;
+  s += `</svg>`;
+  return s;
+}
+
+/* ==========================================================================
+   SEKCJE — zakładka pojawia się w menu TYLKO gdy ma zawartość
+   ========================================================================== */
+
+const SEKCJE = [
+  {
+    id: "start",
+    tytul: "Start",
+    gotowa: true,
+    rysuj: () => `
+      <section>
+        <h2>Jak mi idzie</h2>
+        <p class="opis">Stan na ${pl(DZIS)}.</p>
+        <div class="kafelki">
+          <div class="kafel ${przerwaTrwa > PROG ? "uwaga" : ""}">
+            <div class="etykieta">Od ostatniej jazdy</div>
+            <div class="liczba">${przerwaTrwa}</div>
+            <div class="stopka">dni · limit ${PROG}</div>
+          </div>
+          <div class="kafel">
+            <div class="etykieta">W tym tygodniu</div>
+            <div class="liczba">${liczba(tenTydzien,1)}</div>
+            <div class="stopka">godzin w ruchu</div>
+          </div>
+          <div class="kafel">
+            <div class="etykieta">Ostatnia jazda</div>
+            <div class="liczba">${liczba(ostatniaJazda.dystans_m/1000,1)}</div>
+            <div class="stopka">km · ${pl(ostatniaJazda.data.slice(0,10))}</div>
+          </div>
+          <div class="kafel">
+            <div class="etykieta">Dni z jazdą</div>
+            <div class="liczba">${dniZJazda.length}</div>
+            <div class="stopka">z ${roznicaDni(naDzien(dniZJazda[0]),naDzien(DZIS))} dni historii</div>
+          </div>
+        </div>
+      </section>`
+  },
+  {
+    id: "regularnosc",
+    tytul: "Regularność",
+    gotowa: true,
+    rysuj: () => `
+      <section>
+        <h2>C2 · Przerwy między jazdami</h2>
+        <p class="opis">
+          Jeden słupek = jedna przerwa. Liczone tylko między jazdami typu
+          <code>Ride</code> i <code>VirtualRide</code> — spacery, treki, biegi
+          i e-bike przerwy nie przerywają. Oś ucięta na 60 dniach; słupki
+          z ząbkiem są dłuższe, liczba nad nimi podaje ile naprawdę.
+        </p>
+        <div class="ramka">${wykresPrzerw()}</div>
+        <div class="info" id="info-przerwa">
+          Dotknij słupka, żeby zobaczyć daty.
+        </div>
+      </section>
+
+      <section>
+        <h2>Kryterium sezonu</h2>
+        <p class="opis">Żadna przerwa nie przekracza dwóch tygodni.</p>
+        <div class="kafelki">
+          <div class="kafel uwaga">
+            <div class="etykieta">Przerw ponad ${PROG} dni</div>
+            <div class="liczba">${przerwy.filter(p=>p.dni>PROG).length}</div>
+            <div class="stopka">w całej historii</div>
+          </div>
+          <div class="kafel uwaga">
+            <div class="etykieta">Najdłuższa</div>
+            <div class="liczba">${najdluzsza.dni}</div>
+            <div class="stopka">dni · ${pl(najdluzsza.od)} → ${pl(najdluzsza.do)}</div>
+          </div>
+          <div class="kafel">
+            <div class="etykieta">Wariant kryterium</div>
+            <div class="liczba">${D.kryterium_przerwy.wybor || "—"}</div>
+            <div class="stopka">${D.kryterium_przerwy.wybor
+              ? "wybrany" : "NIEROZSTRZYGNIĘTE, decyzja do 1.09"}</div>
+          </div>
+        </div>
+      </section>`
+  }
+];
+
+/* ==========================================================================
+   NAWIGACJA I ROUTING
+   ========================================================================== */
+
+const widoczne = SEKCJE.filter(s => s.gotowa);
+
+function pokaz(){
+  const id = location.hash.slice(1) || widoczne[0].id;
+  const sekcja = widoczne.find(s => s.id === id) || widoczne[0];
+  document.getElementById("tresc").innerHTML = sekcja.rysuj();
+  document.querySelectorAll("#nawigacja a").forEach(a => {
+    a.classList.toggle("akt", a.getAttribute("href") === "#"+sekcja.id);
+  });
+  podepnijSlupki();
+  window.scrollTo(0,0);
+}
+
+function podepnijSlupki(){
+  const info = document.getElementById("info-przerwa");
+  if (!info) return;
+  document.querySelectorAll(".slupek").forEach(el => {
+    const pokazInfo = () => {
+      const p = przerwy[+el.dataset.i];
+      info.innerHTML = `<b>${p.dni} ${p.dni===1?"dzień":"dni"}</b> przerwy · `
+        + `${pl(p.od)} → ${pl(p.do)}`
+        + (p.dni > PROG ? ` · <b style="color:var(--alarm)">ponad limit</b>` : "");
+    };
+    el.addEventListener("click", pokazInfo);
+    el.addEventListener("mouseenter", pokazInfo);
+  });
+}
+
+document.getElementById("nawigacja").innerHTML =
+  widoczne.map(s => `<a href="#${s.id}">${s.tytul}</a>`).join("");
+
+document.getElementById("stopka-naglowka").textContent =
+  `${D.meta.liczba_aktywnosci} aktywności · ${pl(D.meta.zakres[0])} – ${pl(D.meta.zakres[1])}`;
+
+document.getElementById("stopka").innerHTML =
+  `Dane ze Stravy, pobrane ${D.meta.pobrano.replace("T"," ")}. `
+  + `Strona liczy, nie przechowuje — jedynym źródłem prawdy jest Strava.`;
+
+window.addEventListener("hashchange", pokaz);
+pokaz();
+</script>
 </body>
 </html>
