@@ -258,6 +258,16 @@ svg{display:block}
 .slupek.wybrany,.tydzien.wybrany{
   opacity:1;stroke:var(--tekst);stroke-width:1.5;paint-order:stroke;
 }
+.legenda{
+  display:flex;flex-wrap:wrap;gap:6px 16px;margin-top:10px;
+  font-size:12.5px;color:var(--slaby);
+}
+.legenda span{display:inline-flex;align-items:center;gap:6px}
+.legenda i{
+  width:11px;height:11px;border-radius:3px;display:inline-block;flex:0 0 auto;
+}
+.legenda i.kreska{height:0;border-top:2px dashed currentColor;border-radius:0}
+
 .info{
   font-size:13px;color:var(--slaby);margin-top:10px;min-height:22px;
   background:var(--plyta);border-radius:8px;padding:8px 12px;
@@ -565,25 +575,37 @@ function wykresGodzin(){
   s += `<line x1="0" y1="${yCel}" x2="${szer}" y2="${yCel}"
          stroke="var(--plan)" stroke-width="1" stroke-dasharray="4 4" opacity=".55"/>`;
 
-  // słupki: przeszłość pełnym kolorem, przyszłość pusta
+  // Słupki. Kolor niesie to samo znaczenie co linia planu: zielony = plan.
+  // Tydzień, który sięgnął linii, przejmuje jej kolor — to nie jest nowe
+  // znaczenie zieleni, tylko ta sama informacja podana wypełnieniem.
+  // Tygodnie bez planu (cała historia przed IX 2026) zostają niebieskie:
+  // nie da się dowieźć planu, którego nie było.
   tygodnie.forEach((t,i) => {
     if (t.przyszly || t.godziny === 0) return;
     const h = Math.max(skala(t.godziny), 1.5);
+    const dowieziony = t.plan != null && t.godziny >= t.plan;
     s += `<rect x="${x(i)}" y="${marGora+wys-h}" width="${szerSlupka}" height="${h}"
-           fill="var(--akcent)" opacity=".75" rx="1.5"
+           fill="${dowieziony ? "var(--plan)" : "var(--akcent)"}"
+           opacity="${dowieziony ? .85 : .75}" rx="1.5"
            class="tydzien" data-i="${i}"
            style="animation-delay:${Math.min(i*7,600)}ms"/>`;
   });
 
-  // linia planu — schodkowa, bo plan jest stały w obrębie tygodnia
+  // Linia planu — schodkowa, bo plan jest stały w obrębie tygodnia.
+  // Rysowana PO słupkach i podbita otoczką w kolorze karty, żeby nie zlała
+  // się z zielonym słupkiem, który jej dotyka.
   let d = "";
   tygodnie.forEach((t,i) => {
     if (t.plan == null) return;
     const y = marGora + wys - skala(t.plan);
     d += `${d ? "L" : "M"}${x(i)-odstep/2} ${y} L${x(i)+szerSlupka+odstep/2} ${y} `;
   });
-  if (d) s += `<path d="${d}" fill="none" stroke="var(--plan)" stroke-width="2"
-                stroke-linejoin="round" stroke-dasharray="1 0"/>`;
+  if (d){
+    s += `<path d="${d}" fill="none" stroke="var(--powierzchnia)" stroke-width="4.5"
+           stroke-linejoin="round" stroke-linecap="round"/>`;
+    s += `<path d="${d}" fill="none" stroke="var(--plan)" stroke-width="2"
+           stroke-linejoin="round" stroke-linecap="round"/>`;
+  }
 
   // pionowa kreska "dziś"
   if (indeksDzis >= 0){
@@ -627,6 +649,13 @@ const c1Godziny = () => {
       zgodny z planem, nie wpadką. Przerywana pozioma linia to cel ${CEL_H} h; skala rośnie sama, gdyby jakiś tydzień go przekroczył.
     </p>
     ${wykresGodzin()}
+    <div class="legenda">
+      <span><i style="background:var(--plan)"></i>plan dowieziony</span>
+      <span><i style="background:var(--akcent)"></i>poniżej planu lub bez planu</span>
+      <span style="color:var(--plan)"><i class="kreska"></i><span
+        style="color:var(--slaby)">linia planu i cel ${CEL_H} h</span></span>
+      <span><i style="background:var(--odciazenie)"></i>tydzień odciążeniowy</span>
+    </div>
     <div class="info" id="info-tydzien">Dotknij słupka, żeby zobaczyć szczegóły.</div>
   </section>
 
@@ -835,9 +864,13 @@ function podepnijTygodnie(){
   document.querySelectorAll(".tydzien").forEach(el => {
     const pokazInfo = () => {
       const t = tygodnie[+el.dataset.i];
+      const stan = t.plan == null ? ""
+        : t.godziny >= t.plan
+          ? ` · plan ${liczba(t.plan,1)} h · <b style="color:var(--plan)">dowieziony</b>`
+          : ` · plan ${liczba(t.plan,1)} h · brakuje ${liczba(t.plan-t.godziny,1)} h`;
       info.innerHTML = `<b>${liczba(t.godziny,1)} h</b> · ${t.jazd} `
         + (t.jazd===1?"jazda":"jazdy") + ` · ${pl(t.od)} – ${pl(t.do)}`
-        + (t.plan!=null ? ` · plan ${liczba(t.plan,1)} h` : "")
+        + stan
         + (t.odciazenie ? " · tydzień odciążeniowy" : "");
     };
     el.addEventListener("click", () => { zaznacz(el); pokazInfo(); });
