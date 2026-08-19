@@ -100,6 +100,18 @@
 }
 
 *{box-sizing:border-box}
+
+/* Warstwa dekoracyjna: leży pod wszystkim, jak „przesuń na spód" w Wordzie.
+   pointer-events:none sprawia, że palec jej nie zauważa — kliknięcia
+   przechodzą na wylot. Karta z treścią jest nieprzezroczysta, więc ikony
+   widać wyłącznie na marginesach i nigdy pod wykresem. */
+#tlo-ikony{
+  position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;
+  color:var(--sek-kropka);
+  transition:color .3s ease;
+}
+#tlo-ikony svg{position:absolute;opacity:.07}
+header,.pasek1,.pasek2-obudowa,main,footer{position:relative;z-index:1}
 body{
   margin:0; background:var(--tlo); color:var(--tekst);
   font:16px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;
@@ -107,7 +119,13 @@ body{
 }
 
 /* --- nagłówek: nazwa na środku, jak na szkicu --- */
-header{padding:18px 20px 13px;text-align:center;position:relative}
+header{
+  padding:18px 20px 13px;text-align:center;position:relative;
+  /* Kolor sekcji wchodzi na nagłówek, ale zaraz gaśnie — ma mówić
+     „tu jesteś", nie przeciągać uwagi na siebie. */
+  background:linear-gradient(180deg, var(--sek-tlo) 0%, transparent 100%);
+  transition:background .3s ease;
+}
 #motyw{
   position:absolute;right:14px;top:14px;appearance:none;cursor:pointer;
   background:var(--plyta);border:1px solid var(--linia);color:var(--slaby);
@@ -261,6 +279,8 @@ footer{color:var(--slaby);font-size:12px;padding:14px 20px 34px;max-width:1000px
 </style>
 </head>
 <body>
+
+<div id="tlo-ikony" aria-hidden="true"></div>
 
 <header>
   <button id="motyw" type="button" title="Motyw: auto / jasny / ciemny"></button>
@@ -784,6 +804,8 @@ function pokaz(){
   obudowa.className = "pasek2-obudowa b-" + s.barwa
     + (obudowa.classList.contains("otwarty") ? " otwarty" : "");
   tresc.className = "b-" + s.barwa;
+  document.getElementById("tlo-ikony").className = "b-" + s.barwa;
+  document.querySelector("header").className = "b-" + s.barwa;
   el2.innerHTML = `<div class="wiersz">` + s.pod.map(x =>
     `<button data-s="${s.id}" data-p="${x.id}"
       class="${x.id===p.id?"akt":""}">${x.tytul}</button>`).join("") + `</div>`;
@@ -864,6 +886,73 @@ document.getElementById("stopka-naglowka").textContent =
 document.getElementById("stopka").innerHTML =
   `Dane ze Stravy, pobrane ${D.meta.pobrano.replace("T"," ")}. `
   + `Liczone od ${pl(OD)} — wcześniejsza historia zostaje w pliku, ale nie wchodzi do wykresów.`;
+
+/* ---------------------------------------------------------------------------
+   Ikony w tle. Rysowane od zera jako SVG — zero plików, zero zależności.
+   Losowe położenie i obrót, ale z ustalonego ziarna: układ jest ten sam
+   przy każdym wejściu. Prawdziwy los oznaczałby, że ikony skaczą po
+   każdym odświeżeniu, a to męczy przy codziennym otwieraniu.
+   --------------------------------------------------------------------------- */
+const IKONY = [
+  // rower
+  `<circle cx="6" cy="17" r="4.2"/><circle cx="22" cy="17" r="4.2"/>
+   <path d="M6 17l5-9h6M11 8l5 9M22 17l-4-9h-3M9 8h4"/>`,
+  // kask
+  `<path d="M3 16a11 11 0 0 1 22 0"/><path d="M3 16h22l-3 4H6z"/>
+   <path d="M9 6l4 9M19 6l-4 9"/>`,
+  // koło zębate / tarcza korby
+  `<circle cx="14" cy="14" r="9"/><circle cx="14" cy="14" r="2.5"/>
+   <path d="M14 5v3M14 20v3M5 14h3M20 14h3M7.6 7.6l2.1 2.1M18.3 18.3l2.1 2.1
+            M20.4 7.6l-2.1 2.1M9.7 18.3l-2.1 2.1"/>`,
+  // bidon
+  `<rect x="9" y="8" width="10" height="16" rx="2.5"/>
+   <path d="M11.5 8V5.5h5V8M9 13h10"/>`,
+  // góry / podjazd
+  `<path d="M1 23h26M3 23l7-13 4.5 8 3-5 7.5 10"/><path d="M10 10l2.2 4"/>`,
+  // stoper
+  `<circle cx="14" cy="16" r="8"/><path d="M14 16V11M11 3h6M14 3v3M21 9l2-2"/>`,
+  // łańcuch
+  `<circle cx="8" cy="14" r="3.5"/><circle cx="20" cy="14" r="3.5"/>
+   <path d="M11.5 14h5"/>`
+];
+
+function losTlo(ziarno){                       // powtarzalny generator liczb
+  return function(){
+    ziarno |= 0; ziarno = ziarno + 0x6D2B79F5 | 0;
+    let t = Math.imul(ziarno ^ ziarno >>> 15, 1 | ziarno);
+    t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+    return ((t ^ t >>> 14) >>> 0) / 4294967296;
+  };
+}
+
+(function rysujTlo(){
+  const warstwa = document.getElementById("tlo-ikony");
+  const los = losTlo(20260819);
+  const ile = 18;
+  let html = "";
+  for (let i = 0; i < ile; i++){
+    const ikona = IKONY[Math.floor(los() * IKONY.length)];
+    const rozmiar = 62 + los()*80;
+
+    // Karta z treścią jest nieprzezroczysta i zajmuje środek ekranu, więc
+    // ikona wylosowana na środku po prostu znika. Losujemy w pasach przy
+    // krawędziach: albo lewy/prawy margines, albo góra/dół strony.
+    let x, y;
+    if (los() < .55){                     // pas boczny
+      x = los() < .5 ? los()*11 : 89 + los()*11;
+      y = los()*100;
+    } else {                              // pas górny albo dolny
+      x = los()*100;
+      y = los() < .45 ? los()*13 : 80 + los()*20;
+    }
+    const obrot = -35 + los()*70;
+    html += `<svg viewBox="0 0 28 28" width="${rozmiar}" height="${rozmiar}"
+      style="left:${x}%;top:${y}%;transform:translate(-50%,-50%) rotate(${obrot}deg)"
+      fill="none" stroke="currentColor" stroke-width="1.4"
+      stroke-linecap="round" stroke-linejoin="round">${ikona}</svg>`;
+  }
+  warstwa.innerHTML = html;
+})();
 
 /* ---------------------------------------------------------------------------
    Motyw: auto (idzie za ustawieniem telefonu) / jasny / ciemny.
