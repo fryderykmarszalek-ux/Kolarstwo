@@ -8,7 +8,7 @@
 <style>
 :root{
   --tlo:#ffffff; --tekst:#16181d; --slaby:#6b7280; --linia:#e3e6ea;
-  --akcent:#1f6feb; --alarm:#d1242f; --plyta:#f6f7f9;
+  --akcent:#1f6feb; --alarm:#d1242f; --plyta:#f6f7f9; --plan:#c2740a; --odciazenie:#eceef1;
   --ramka-paska:#2f6fe4;
 }
 *{box-sizing:border-box}
@@ -278,6 +278,172 @@ function wykresPrzerw(){
 }
 
 /* ==========================================================================
+   C1 — GODZINY TYGODNIOWO
+   Tygodnie poniedziałek–niedziela. Plan zaczyna się we wtorek 1.09, więc
+   wpis planu przypisuję do tygodnia, z którym ma największe pokrycie —
+   nie po dacie startu, bo ta wpadłaby w zły tydzień.
+   ========================================================================== */
+
+const SUFIT_H = 6;   // tyle zakłada plan na koniec października
+
+function tydzienPlanu(pn){
+  const kon = pn + 6*86400000;
+  let naj = null, najDni = 0;
+  for (const p of D.plan_objetosci){
+    const a = Math.max(pn, naDzien(p.od)), b = Math.min(kon, naDzien(p.do));
+    const dni = Math.floor((b-a)/86400000) + 1;
+    if (dni > najDni){ najDni = dni; naj = p; }
+  }
+  return najDni > 0 ? naj : null;
+}
+
+const tygodnie = (() => {
+  const pierwszy = naDzien(poniedzialek(OD));
+  const ostatniPlan = D.plan_objetosci[D.plan_objetosci.length-1].do;
+  const ostatni = Math.max(naDzien(poniedzialek(DZIS)), naDzien(poniedzialek(ostatniPlan)));
+  const wynik = [];
+  for (let ms = pierwszy; ms <= ostatni; ms += 7*86400000){
+    const klucz = dzienNaTekst(ms);
+    const p = tydzienPlanu(ms);
+    wynik.push({
+      od: klucz,
+      do: dzienNaTekst(ms + 6*86400000),
+      godziny: godzinyWTygodniu[klucz] || 0,
+      jazd: jazdy.filter(a => poniedzialek(a.data) === klucz).length,
+      plan: p ? p.godziny : null,
+      odciazenie: p ? p.odciazenie : false,
+      przyszly: ms > naDzien(poniedzialek(DZIS))
+    });
+  }
+  return wynik;
+})();
+
+const indeksDzis = tygodnie.findIndex(t => t.od === poniedzialek(DZIS));
+
+function wykresGodzin(){
+  const szerSlupka = 13, odstep = 3, marGora = 16, wys = 220, marDol = 34,
+        szerOsi = 34;
+  const szer = tygodnie.length*(szerSlupka+odstep) + 20;
+  const skala = h => (Math.min(h, SUFIT_H)/SUFIT_H) * wys;
+  const wysCalk = wys + marGora + marDol;
+  const x = i => 6 + i*(szerSlupka+odstep);
+
+  let os = `<svg class="os" width="${szerOsi}" height="${wysCalk}" aria-hidden="true">`;
+  for (const v of [0,2,4,6]){
+    os += `<text x="${szerOsi-6}" y="${marGora+wys-skala(v)+4}" text-anchor="end"
+            font-size="10" fill="var(--slaby)">${v}</text>`;
+  }
+  os += `</svg>`;
+
+  let s = `<svg width="${szer}" height="${wysCalk}"
+            role="img" aria-label="Godziny tygodniowo od ${pl(OD)}">`;
+
+  // tygodnie odciążeniowe — pas w tle, żeby niższy słupek nie wyglądał na wpadkę
+  tygodnie.forEach((t,i) => {
+    if (t.odciazenie){
+      s += `<rect x="${x(i)-odstep/2}" y="${marGora}"
+             width="${szerSlupka+odstep}" height="${wys}"
+             fill="var(--odciazenie)"/>`;
+    }
+  });
+
+  for (const v of [0,2,4,6]){
+    const y = marGora + wys - skala(v);
+    s += `<line x1="0" y1="${y}" x2="${szer}" y2="${y}"
+           stroke="var(--linia)" stroke-width="1"/>`;
+  }
+
+  // słupki: przeszłość pełnym kolorem, przyszłość pusta
+  tygodnie.forEach((t,i) => {
+    if (t.przyszly || t.godziny === 0) return;
+    const h = Math.max(skala(t.godziny), 1.5);
+    s += `<rect x="${x(i)}" y="${marGora+wys-h}" width="${szerSlupka}" height="${h}"
+           fill="var(--akcent)" opacity=".65" rx="1.5"
+           class="tydzien" data-i="${i}"/>`;
+  });
+
+  // linia planu — schodkowa, bo plan jest stały w obrębie tygodnia
+  let d = "";
+  tygodnie.forEach((t,i) => {
+    if (t.plan == null) return;
+    const y = marGora + wys - skala(t.plan);
+    d += `${d ? "L" : "M"}${x(i)-odstep/2} ${y} L${x(i)+szerSlupka+odstep/2} ${y} `;
+  });
+  if (d) s += `<path d="${d}" fill="none" stroke="var(--plan)" stroke-width="2"
+                stroke-linejoin="round" stroke-dasharray="1 0"/>`;
+
+  // pionowa kreska "dziś"
+  if (indeksDzis >= 0){
+    const xd = x(indeksDzis) + szerSlupka + odstep/2;
+    s += `<line x1="${xd}" y1="${marGora}" x2="${xd}" y2="${marGora+wys}"
+           stroke="var(--slaby)" stroke-width="1" stroke-dasharray="3 3"/>`;
+    s += `<text x="${xd-3}" y="${marGora+10}" text-anchor="end" font-size="10"
+           fill="var(--slaby)">dziś</text>`;
+  }
+
+  // podpisy miesięcy
+  let mPop = null;
+  tygodnie.forEach((t,i) => {
+    const m = t.od.slice(0,7);
+    if (m !== mPop){
+      s += `<text x="${x(i)}" y="${marGora+wys+16}" font-size="9.5"
+             fill="var(--slaby)">${t.od.slice(8,10)}.${t.od.slice(5,7)}</text>`;
+      mPop = m;
+    }
+  });
+
+  s += `<line x1="0" y1="${marGora+wys}" x2="${szer}" y2="${marGora+wys}"
+         stroke="var(--slaby)" stroke-width="1"/></svg>`;
+
+  // otwórz tak, żeby "dziś" był w prawej części kadru, a plan widoczny dalej
+  const doScrolla = Math.max(0, x(indeksDzis) - 260);
+  return `<div class="wykres">${os}<div class="ramka" data-scroll="${doScrolla}">${s}</div></div>`;
+}
+
+const c1Godziny = () => {
+  const zJazda = tygodnie.filter(t => !t.przyszly && t.godziny > 0).length;
+  const minione = tygodnie.filter(t => !t.przyszly).length;
+  const suma = tygodnie.reduce((a,t) => a + t.godziny, 0);
+  return `
+  <section>
+    <h2>C1 · Godziny tygodniowo</h2>
+    <p class="opis">
+      Jeden słupek = jeden tydzień, poniedziałek–niedziela, czas w ruchu.
+      Pomarańczowa linia to plan objętości na wrzesień i październik.
+      Szare pasy to tygodnie odciążeniowe — tam niższy słupek jest
+      zgodny z planem, nie wpadką. Skala do ${SUFIT_H} h.
+    </p>
+    ${wykresGodzin()}
+    <div class="info" id="info-tydzien">Dotknij słupka, żeby zobaczyć szczegóły.</div>
+  </section>
+
+  <section>
+    <div class="kafelki">
+      <div class="kafel">
+        <div class="etykieta">Tygodnie z jazdą</div>
+        <div class="liczba">${zJazda}</div>
+        <div class="stopka">z ${minione} minionych</div>
+      </div>
+      <div class="kafel">
+        <div class="etykieta">Średnia tygodniowa</div>
+        <div class="liczba">${liczba(suma/minione,1)}</div>
+        <div class="stopka">godzin · licząc puste tygodnie</div>
+      </div>
+      <div class="kafel">
+        <div class="etykieta">Najmocniejszy tydzień</div>
+        <div class="liczba">${liczba(Math.max(...tygodnie.map(t=>t.godziny)),1)}</div>
+        <div class="stopka">godzin</div>
+      </div>
+      <div class="kafel">
+        <div class="etykieta">Cel na koniec X</div>
+        <div class="liczba">${SUFIT_H},0</div>
+        <div class="stopka">godzin tygodniowo</div>
+      </div>
+    </div>
+  </section>`;
+};
+
+/* ==========================================================================
    TREŚCI
    ========================================================================== */
 
@@ -364,6 +530,7 @@ const SEKCJE = [
       { id:"przeglad", tytul:"Przegląd", rysuj: przegladStart }
   ]},
   { id:"regularnosc", tytul:"Regularność", pod:[
+      { id:"godziny",   tytul:"Godziny",   rysuj: c1Godziny },
       { id:"przerwy",   tytul:"Przerwy",   rysuj: c2Przerwy },
       { id:"kryterium", tytul:"Kryterium", rysuj: kryterium }
   ]},
@@ -430,12 +597,30 @@ function pokaz(){
   // Wykres otwiera się na najświeższym końcu — najnowsza przerwa jest
   // najważniejsza, a przy dwóch latach historii ląduje poza kadrem.
   const ramka = tresc.querySelector(".ramka");
-  if (ramka) ramka.scrollLeft = ramka.scrollWidth;
+  if (ramka) ramka.scrollLeft = ramka.dataset.scroll
+    ? +ramka.dataset.scroll : ramka.scrollWidth;
 
   window.scrollTo(0,0);
 }
 
+function podepnijTygodnie(){
+  const info = document.getElementById("info-tydzien");
+  if (!info) return;
+  document.querySelectorAll(".tydzien").forEach(el => {
+    const pokazInfo = () => {
+      const t = tygodnie[+el.dataset.i];
+      info.innerHTML = `<b>${liczba(t.godziny,1)} h</b> · ${t.jazd} `
+        + (t.jazd===1?"jazda":"jazdy") + ` · ${pl(t.od)} – ${pl(t.do)}`
+        + (t.plan!=null ? ` · plan ${liczba(t.plan,1)} h` : "")
+        + (t.odciazenie ? " · tydzień odciążeniowy" : "");
+    };
+    el.addEventListener("click", pokazInfo);
+    el.addEventListener("mouseenter", pokazInfo);
+  });
+}
+
 function podepnijSlupki(){
+  podepnijTygodnie();
   const info = document.getElementById("info-przerwa");
   if (!info) return;
   document.querySelectorAll(".slupek").forEach(el => {
