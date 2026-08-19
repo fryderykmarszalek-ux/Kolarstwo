@@ -18,30 +18,38 @@
    --------------------------------------------------------------------------- */
 :root{
   color-scheme:light;
-  --tlo:#f8f9fb;          /* plan strony        */
-  --plyta:#eef1f6;        /* kafelki, pasek 2   */
-  --tekst:#141821;        /* 16,9:1 na tle      */
-  --slaby:#646b79;        /*  4,7:1 na kafelku  */
-  --linia:#dfe4ec;        /* siatka, obwódki    */
-  --akcent:#2a78d6;       /* DANE: jazda        */
-  --plan:#12895f;         /* DANE: plan i cel   */
-  --alarm:#d03b3b;        /* DANE: ponad limit  */
-  --odciazenie:#e6eaf2;   /* pas tygodnia odciążeniowego */
-  --ramka-paska:#2a78d6;
+  --tlo:#e8edf5;          /* plan strony — celowo nie biały */
+  --powierzchnia:#f9fbfd; /* karta z treścią, tło wykresów  */
+  --plyta:#eef2f9;        /* kafelki, pasek 2               */
+  --tekst:#141821;        /* 17,1:1 na powierzchni */
+  --slaby:#5d6472;        /*  5,3:1 na kafelku     */
+  --linia:#d7dee9;
+  --akcent:#2a78d6;       /* DANE: jazda            */
+  --akcent-tlo:#d8e6f9;   /* podświetlenie aktywnej zakładki */
+  --akcent-pelny:#256abf; /* wypełnienie pod biały napis, 5,4:1 */
+  --na-akcencie:#ffffff;
+  --plan:#12895f;         /* DANE: plan i cel       */
+  --alarm:#d03b3b;        /* DANE: ponad limit      */
+  --odciazenie:#e2e8f2;
+  --cien:rgba(20,24,33,.07);
 }
 @media (prefers-color-scheme: dark){
   :root:not([data-motyw="jasny"]){
     color-scheme:dark;
-    --tlo:#14171d; --plyta:#1d2129; --tekst:#f2f5fa; --slaby:#98a1b2;
-    --linia:#282d37; --akcent:#3987e5; --plan:#199e70; --alarm:#e66767;
-    --odciazenie:#232833; --ramka-paska:#3987e5;
+    --tlo:#0f1218; --powierzchnia:#171b23; --plyta:#1f242e;
+    --tekst:#f2f5fa; --slaby:#98a1b2; --linia:#262c37;
+    --akcent:#3987e5; --akcent-tlo:#1a2c45; --akcent-pelny:#256abf;
+    --na-akcencie:#ffffff; --plan:#199e70; --alarm:#e66767;
+    --odciazenie:#232936; --cien:rgba(0,0,0,.35);
   }
 }
 :root[data-motyw="ciemny"]{
   color-scheme:dark;
-  --tlo:#14171d; --plyta:#1d2129; --tekst:#f2f5fa; --slaby:#98a1b2;
-  --linia:#282d37; --akcent:#3987e5; --plan:#199e70; --alarm:#e66767;
-  --odciazenie:#232833; --ramka-paska:#3987e5;
+  --tlo:#0f1218; --powierzchnia:#171b23; --plyta:#1f242e;
+  --tekst:#f2f5fa; --slaby:#98a1b2; --linia:#262c37;
+  --akcent:#3987e5; --akcent-tlo:#1a2c45; --akcent-pelny:#256abf;
+  --na-akcencie:#ffffff; --plan:#199e70; --alarm:#e66767;
+  --odciazenie:#232936; --cien:rgba(0,0,0,.35);
 }
 *{box-sizing:border-box}
 body{
@@ -51,7 +59,7 @@ body{
 }
 
 /* --- nagłówek: nazwa na środku, jak na szkicu --- */
-header{padding:18px 20px 14px;text-align:center;position:relative}
+header{padding:18px 20px 13px;text-align:center;position:relative}
 #motyw{
   position:absolute;right:14px;top:14px;appearance:none;cursor:pointer;
   background:var(--plyta);border:1px solid var(--linia);color:var(--slaby);
@@ -64,8 +72,9 @@ header .pod{color:var(--slaby);font-size:12.5px;margin-top:3px}
 
 /* --- POZIOM 1: pasek zakładek, obramowany z góry i z dołu --- */
 .pasek1{
-  border-top:2px solid var(--ramka-paska);
-  border-bottom:2px solid var(--ramka-paska);
+  background:var(--powierzchnia);
+  border-top:1px solid var(--linia);
+  border-bottom:1px solid var(--linia);
   overflow-x:auto;-webkit-overflow-scrolling:touch;
   scrollbar-width:none;
 }
@@ -75,12 +84,16 @@ header .pod{color:var(--slaby);font-size:12.5px;margin-top:3px}
   appearance:none;background:none;border:0;cursor:pointer;
   font:inherit;font-size:15px;color:var(--slaby);
   padding:12px 18px;white-space:nowrap;position:relative;
-  transition:color .18s ease, background .18s ease;
+  border-radius:9px 9px 0 0;
+  transition:color .16s ease, background .16s ease;
 }
-.pasek1 button:hover{color:var(--tekst)}
-.pasek1 button.akt{color:var(--tekst);font-weight:600}
+.pasek1 button:hover{color:var(--tekst);background:var(--plyta)}
+.pasek1 button:active{background:var(--akcent-tlo)}
+.pasek1 button.akt{
+  color:var(--tekst);font-weight:600;background:var(--akcent-tlo);
+}
 .pasek1 button.akt::after{
-  content:"";position:absolute;left:14px;right:14px;bottom:0;height:3px;
+  content:"";position:absolute;left:10px;right:10px;bottom:0;height:3px;
   background:var(--akcent);border-radius:3px 3px 0 0;
 }
 .pasek1 button .strzalka{
@@ -109,16 +122,23 @@ header .pod{color:var(--slaby);font-size:12.5px;margin-top:3px}
 .pasek2 button{
   appearance:none;border:1px solid transparent;cursor:pointer;
   background:transparent;font:inherit;font-size:13.5px;color:var(--slaby);
-  padding:5px 13px;border-radius:999px;white-space:nowrap;
-  transition:background .18s ease,color .18s ease,border-color .18s ease;
+  padding:6px 14px;border-radius:999px;white-space:nowrap;
+  transition:background .16s ease,color .16s ease,border-color .16s ease;
 }
-.pasek2 button:hover{color:var(--tekst)}
+.pasek2 button:hover{color:var(--tekst);background:var(--powierzchnia);
+  border-color:var(--linia)}
 .pasek2 button.akt{
-  background:var(--tlo);color:var(--tekst);font-weight:600;
-  border-color:var(--linia);
+  background:var(--akcent-pelny);color:var(--na-akcencie);font-weight:600;
+  border-color:transparent;
 }
+.pasek2 button.akt:hover{background:var(--akcent-pelny);color:var(--na-akcencie)}
 
-main{padding:20px;max-width:1000px;margin:0 auto}
+main{
+  padding:20px;max-width:1000px;margin:18px auto 0;
+  background:var(--powierzchnia);
+  border:1px solid var(--linia);border-radius:14px;
+  box-shadow:0 1px 3px var(--cien);
+}
 main.wchodzi{animation:wejscie .26s ease both}
 @keyframes wejscie{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 
@@ -127,7 +147,12 @@ h2{font-size:15px;font-weight:600;margin:0 0 4px}
 section{margin-bottom:34px}
 
 .kafelki{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
-.kafel{background:var(--plyta);border-radius:8px;padding:13px 15px}
+.kafel{
+  background:var(--plyta);border-radius:10px;padding:13px 15px;
+  border:1px solid transparent;
+  transition:border-color .16s ease, transform .16s ease;
+}
+.kafel:hover{border-color:var(--akcent);transform:translateY(-1px)}
 .kafel .etykieta{font-size:12px;color:var(--slaby)}
 .kafel .liczba{font-size:27px;font-weight:600;letter-spacing:-.02em;margin-top:3px}
 .kafel .liczba.data{font-size:20px;letter-spacing:-.01em}
@@ -144,7 +169,14 @@ svg{display:block}
   cursor:pointer;
 }
 @keyframes wyrasta{from{transform:scaleY(0)}to{transform:scaleY(1)}}
-.info{font-size:13px;color:var(--slaby);margin-top:8px;min-height:20px}
+.slupek:hover,.tydzien:hover{opacity:1}
+.slupek.wybrany,.tydzien.wybrany{
+  opacity:1;stroke:var(--tekst);stroke-width:1.5;paint-order:stroke;
+}
+.info{
+  font-size:13px;color:var(--slaby);margin-top:10px;min-height:22px;
+  background:var(--plyta);border-radius:8px;padding:8px 12px;
+}
 .info b{color:var(--tekst);font-weight:600}
 
 .pusto{
@@ -153,7 +185,7 @@ svg{display:block}
 }
 .pusto .znak{font-size:26px;font-weight:600;color:var(--linia);display:block;margin-bottom:6px}
 
-footer{color:var(--slaby);font-size:12px;padding:0 20px 30px;max-width:1000px;
+footer{color:var(--slaby);font-size:12px;padding:14px 20px 34px;max-width:1000px;
        margin:0 auto;text-align:center}
 
 /* szanuj ustawienie "ogranicz ruch" w systemie */
@@ -715,9 +747,14 @@ function podepnijTygodnie(){
         + (t.plan!=null ? ` · plan ${liczba(t.plan,1)} h` : "")
         + (t.odciazenie ? " · tydzień odciążeniowy" : "");
     };
-    el.addEventListener("click", pokazInfo);
+    el.addEventListener("click", () => { zaznacz(el); pokazInfo(); });
     el.addEventListener("mouseenter", pokazInfo);
   });
+}
+
+function zaznacz(el){
+  tresc.querySelectorAll(".wybrany").forEach(x => x.classList.remove("wybrany"));
+  el.classList.add("wybrany");
 }
 
 function podepnijSlupki(){
@@ -733,7 +770,7 @@ function podepnijSlupki(){
             ? ` · <b>${p.wyjazd.opis}</b>, wyjazd zgłoszony — nie liczy się`
             : p.dni > PROG ? ` · <b style="color:var(--alarm)">ponad limit</b>` : "");
     };
-    el.addEventListener("click", pokazInfo);
+    el.addEventListener("click", () => { zaznacz(el); pokazInfo(); });
     el.addEventListener("mouseenter", pokazInfo);
   });
 }
