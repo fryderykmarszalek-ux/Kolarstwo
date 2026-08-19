@@ -29,6 +29,7 @@
   --alarm:#d03b3b;        /* DANE: ponad limit      */
   --odciazenie:#e2e8f2;
   --cien:rgba(20,24,33,.07);
+  --ikona-krycie:.17;
 }
 @media (prefers-color-scheme: dark){
   :root:not([data-motyw="jasny"]){
@@ -37,7 +38,7 @@
     --tekst:#f2f5fa; --slaby:#98a1b2; --linia:#262c37;
     --akcent:#3987e5;
     --plan:#199e70; --alarm:#e66767;
-    --odciazenie:#232936; --cien:rgba(0,0,0,.35);
+    --odciazenie:#232936; --cien:rgba(0,0,0,.35); --ikona-krycie:.07;
   }
 }
 :root[data-motyw="ciemny"]{
@@ -46,7 +47,7 @@
   --tekst:#f2f5fa; --slaby:#98a1b2; --linia:#262c37;
   --akcent:#3987e5;
   --plan:#199e70; --alarm:#e66767;
-  --odciazenie:#232936; --cien:rgba(0,0,0,.35);
+  --odciazenie:#232936; --cien:rgba(0,0,0,.35); --ikona-krycie:.07;
 }
 
 /* --- Tożsamość sekcji. Kolor należy do zakładki na stałe, nie do jej stanu.
@@ -110,7 +111,7 @@
   color:var(--sek-kropka);
   transition:color .3s ease;
 }
-#tlo-ikony svg{position:absolute;opacity:.07}
+#tlo-ikony svg{position:absolute;opacity:var(--ikona-krycie)}
 header,.pasek1,.pasek2-obudowa,main,footer{position:relative;z-index:1}
 body{
   margin:0; background:var(--tlo); color:var(--tekst);
@@ -894,26 +895,30 @@ document.getElementById("stopka").innerHTML =
    każdym odświeżeniu, a to męczy przy codziennym otwieraniu.
    --------------------------------------------------------------------------- */
 const IKONY = [
-  // rower
-  `<circle cx="6" cy="17" r="4.2"/><circle cx="22" cy="17" r="4.2"/>
-   <path d="M6 17l5-9h6M11 8l5 9M22 17l-4-9h-3M9 8h4"/>`,
-  // kask
-  `<path d="M3 16a11 11 0 0 1 22 0"/><path d="M3 16h22l-3 4H6z"/>
-   <path d="M9 6l4 9M19 6l-4 9"/>`,
-  // koło zębate / tarcza korby
-  `<circle cx="14" cy="14" r="9"/><circle cx="14" cy="14" r="2.5"/>
-   <path d="M14 5v3M14 20v3M5 14h3M20 14h3M7.6 7.6l2.1 2.1M18.3 18.3l2.1 2.1
-            M20.4 7.6l-2.1 2.1M9.7 18.3l-2.1 2.1"/>`,
-  // bidon
-  `<rect x="9" y="8" width="10" height="16" rx="2.5"/>
-   <path d="M11.5 8V5.5h5V8M9 13h10"/>`,
-  // góry / podjazd
-  `<path d="M1 23h26M3 23l7-13 4.5 8 3-5 7.5 10"/><path d="M10 10l2.2 4"/>`,
-  // stoper
-  `<circle cx="14" cy="16" r="8"/><path d="M14 16V11M11 3h6M14 3v3M21 9l2-2"/>`,
-  // łańcuch
-  `<circle cx="8" cy="14" r="3.5"/><circle cx="20" cy="14" r="3.5"/>
-   <path d="M11.5 14h5"/>`
+  // rower — pełny: rama, siodełko, mostek i kierownica
+  `<circle cx="6.5" cy="19" r="4.3"/><circle cx="21.5" cy="19" r="4.3"/>
+   <path d="M6.5 19h7M13.5 19 10 10M7.6 10H12M10 10l8.5 .5M13.5 19l5-8.5
+            M18.5 10.5 21.5 19M18.5 10.5l1-2.3M17.6 8.2h4.2"/>`,
+  // kask — kopuła, otwory wentylacyjne, pasek z zapięciem
+  `<path d="M4 15.5a10 10 0 0 1 20 0M3.2 15.5h21.6"/>
+   <path d="M10.5 6.6 12.3 15M17.5 6.6 15.7 15"/>
+   <path d="M9.5 15.5l1.6 5M18.5 15.5l-1.6 5M11.1 20.5h5.8"/>`,
+  // tarcza korby — pierścień, oś, promienie na zewnątrz
+  `<circle cx="14" cy="14" r="8.5"/><circle cx="14" cy="14" r="2"/>
+   <path d="M14 5.5V2.8M14 22.5v2.7M5.5 14H2.8M22.5 14h2.7
+            M8 8 6.1 6.1M20 20l1.9 1.9M20 8l1.9-1.9M8 20l-1.9 1.9"/>`,
+  // bidon — ustnik, korek, butelka z dwiema liniami
+  `<path d="M12 6.5V4.6h4v1.9M11 6.5h6"/>
+   <rect x="9.5" y="6.5" width="9" height="17" rx="2.2"/>
+   <path d="M9.5 12.5h9M9.5 17.5h9"/>`,
+  // podjazd — linia ziemi i dwa szczyty
+  `<path d="M2 22h24M4 22l6.5-11 4 6.8M11.9 14.3l3.4-5.7L24 22"/>`,
+  // stoper — tarcza, wskazówka, przycisk, boczna korona
+  `<circle cx="14" cy="16" r="7.5"/>
+   <path d="M14 16l2.8-2.4M14 6v2.5M11.8 3.5h4.4M14 3.5v2.5M20.3 9.2l1.6-1.6"/>`,
+  // ogniwo łańcucha — dwa oczka i cięgna
+  `<circle cx="9" cy="14" r="3.6"/><circle cx="19" cy="14" r="3.6"/>
+   <path d="M9 10.4h10M9 17.6h10"/>`
 ];
 
 function losTlo(ziarno){                       // powtarzalny generator liczb
@@ -929,23 +934,38 @@ function losTlo(ziarno){                       // powtarzalny generator liczb
   const warstwa = document.getElementById("tlo-ikony");
   const los = losTlo(20260819);
   const ile = 18;
+  const zajete = [];
   let html = "";
-  for (let i = 0; i < ile; i++){
-    const ikona = IKONY[Math.floor(los() * IKONY.length)];
-    const rozmiar = 62 + los()*80;
 
-    // Karta z treścią jest nieprzezroczysta i zajmuje środek ekranu, więc
-    // ikona wylosowana na środku po prostu znika. Losujemy w pasach przy
-    // krawędziach: albo lewy/prawy margines, albo góra/dół strony.
+  // pozycja w pasach przy krawędziach — środek zasłania karta
+  function pozycja(){
     let x, y;
-    if (los() < .55){                     // pas boczny
+    if (los() < .55){
       x = los() < .5 ? los()*11 : 89 + los()*11;
       y = los()*100;
-    } else {                              // pas górny albo dolny
+    } else {
       x = los()*100;
       y = los() < .45 ? los()*13 : 80 + los()*20;
     }
-    const obrot = -35 + los()*70;
+    return [x, y];
+  }
+
+  for (let i = 0; i < ile; i++){
+    const ikona = IKONY[i % IKONY.length];   // każda sylwetka min. 2 razy
+    const rozmiar = 62 + los()*80;
+
+    // odrzucaj pozycje bliżej niż ~12% ekranu od już położonej ikony —
+    // to naprawia nachodzenie na siebie; po 25 próbach bierz co jest
+    let x = 0, y = 0;
+    for (let proba = 0; proba < 25; proba++){
+      [x, y] = pozycja();
+      const koliduje = zajete.some(([a,b]) =>
+        (a-x)*(a-x) + (b-y)*(b-y) < 12*12);
+      if (!koliduje) break;
+    }
+    zajete.push([x, y]);
+
+    const obrot = -30 + los()*60;
     html += `<svg viewBox="0 0 28 28" width="${rozmiar}" height="${rozmiar}"
       style="left:${x}%;top:${y}%;transform:translate(-50%,-50%) rotate(${obrot}deg)"
       fill="none" stroke="currentColor" stroke-width="1.4"
