@@ -25,12 +25,6 @@
   --slaby:#5d6472;        /*  5,3:1 na kafelku     */
   --linia:#d7dee9;
   --akcent:#2a78d6;       /* DANE: jazda — TYLKO dane, nigdy interfejs */
-  /* Chrom interfejsu ma własny odcień, żeby zaznaczenie zakładki nie
-     udawało danych. Niebieski znaczy „jazda", indygo znaczy „tu jesteś". */
-  --chrom-tlo:#e7e3f8;    /* aktywna zakładka, tło       */
-  --chrom-tekst:#413195;  /* aktywna zakładka, napis 8,0:1 */
-  --chrom-pelny:#4a3aa7;  /* aktywna pod-zakładka, tło   */
-  --na-chromie:#f4f2fe;   /* napis na pełnym, 7,7:1      */
   --plan:#12895f;         /* DANE: plan i cel       */
   --alarm:#d03b3b;        /* DANE: ponad limit      */
   --odciazenie:#e2e8f2;
@@ -42,8 +36,6 @@
     --tlo:#0f1218; --powierzchnia:#171b23; --plyta:#1f242e;
     --tekst:#f2f5fa; --slaby:#98a1b2; --linia:#262c37;
     --akcent:#3987e5;
-    --chrom-tlo:#262046; --chrom-tekst:#b3a9f0;
-    --chrom-pelny:#6a5fd0; --na-chromie:#f4f2fe;
     --plan:#199e70; --alarm:#e66767;
     --odciazenie:#232936; --cien:rgba(0,0,0,.35);
   }
@@ -53,11 +45,60 @@
   --tlo:#0f1218; --powierzchnia:#171b23; --plyta:#1f242e;
   --tekst:#f2f5fa; --slaby:#98a1b2; --linia:#262c37;
   --akcent:#3987e5;
-  --chrom-tlo:#262046; --chrom-tekst:#b3a9f0;
-  --chrom-pelny:#6a5fd0; --na-chromie:#f4f2fe;
   --plan:#199e70; --alarm:#e66767;
   --odciazenie:#232936; --cien:rgba(0,0,0,.35);
 }
+
+/* --- Tożsamość sekcji. Kolor należy do zakładki na stałe, nie do jej stanu.
+   Aktywna = pełne nasycenie, nieaktywna = ten sam kolor ledwie tknięty.
+   Te barwy żyją wyłącznie w nawigacji i na krawędzi karty — NIGDY w wykresie. --- */
+.b-bursztyn{--sek-kropka:#d97706;--sek-napis:#92400e;--sek-tlo:#f5ebdf;
+  --sek-tlo-slabe:#f7f4f1;--sek-pigulka:#92400e;--na-pigulce:#ffffff}
+.b-turkus{--sek-kropka:#0d9488;--sek-napis:#115e59;--sek-tlo:#ddefef;
+  --sek-tlo-slabe:#edf6f7;--sek-pigulka:#115e59;--na-pigulce:#ffffff}
+.b-fiolet{--sek-kropka:#7c3aed;--sek-napis:#5b21b6;--sek-tlo:#eae4fb;
+  --sek-tlo-slabe:#f3f1fc;--sek-pigulka:#5b21b6;--na-pigulce:#ffffff}
+.b-limonka{--sek-kropka:#4d7c0f;--sek-napis:#365314;--sek-tlo:#e4ece0;
+  --sek-tlo-slabe:#f0f5f1;--sek-pigulka:#365314;--na-pigulce:#ffffff}
+.b-fuksja{--sek-kropka:#c026d3;--sek-napis:#86198f;--sek-tlo:#f2e1f8;
+  --sek-tlo-slabe:#f6f0fb;--sek-pigulka:#86198f;--na-pigulce:#ffffff}
+.b-cyjan{--sek-kropka:#0891b2;--sek-napis:#155e75;--sek-tlo:#dceef4;
+  --sek-tlo-slabe:#edf6f9;--sek-pigulka:#155e75;--na-pigulce:#ffffff}
+.b-pomarancz{--sek-kropka:#ea580c;--sek-napis:#9a3412;--sek-tlo:#f7e7e0;
+  --sek-tlo-slabe:#f8f3f1;--sek-pigulka:#9a3412;--na-pigulce:#ffffff}
+@media (prefers-color-scheme: dark){:root:not([data-motyw="jasny"]) {
+.b-bursztyn{--sek-kropka:#f59e0b;--sek-napis:#fcd34d;--sek-tlo:#48381e;
+  --sek-tlo-slabe:#2d2821;--sek-pigulka:#f59e0b;--na-pigulce:#0f1218}
+.b-turkus{--sek-kropka:#14b8a6;--sek-napis:#5eead4;--sek-tlo:#163e40;
+  --sek-tlo-slabe:#172b30;--sek-pigulka:#14b8a6;--na-pigulce:#0f1218}
+.b-fiolet{--sek-kropka:#8b5cf6;--sek-napis:#c4b5fd;--sek-tlo:#312951;
+  --sek-tlo-slabe:#232238;--sek-pigulka:#a78bfa;--na-pigulce:#0f1218}
+.b-limonka{--sek-kropka:#84cc16;--sek-napis:#bef264;--sek-tlo:#2f4220;
+  --sek-tlo-slabe:#222d22;--sek-pigulka:#84cc16;--na-pigulce:#0f1218}
+.b-fuksja{--sek-kropka:#d946ef;--sek-napis:#f0abfc;--sek-tlo:#422450;
+  --sek-tlo-slabe:#2a1f37;--sek-pigulka:#d946ef;--na-pigulce:#0f1218}
+.b-cyjan{--sek-kropka:#22d3ee;--sek-napis:#67e8f9;--sek-tlo:#194350;
+  --sek-tlo-slabe:#182d37;--sek-pigulka:#22d3ee;--na-pigulce:#0f1218}
+.b-pomarancz{--sek-kropka:#f97316;--sek-napis:#fdba74;--sek-tlo:#492e20;
+  --sek-tlo-slabe:#2e2422;--sek-pigulka:#f97316;--na-pigulce:#0f1218}
+}}
+:root[data-motyw="ciemny"]{
+.b-bursztyn{--sek-kropka:#f59e0b;--sek-napis:#fcd34d;--sek-tlo:#48381e;
+  --sek-tlo-slabe:#2d2821;--sek-pigulka:#f59e0b;--na-pigulce:#0f1218}
+.b-turkus{--sek-kropka:#14b8a6;--sek-napis:#5eead4;--sek-tlo:#163e40;
+  --sek-tlo-slabe:#172b30;--sek-pigulka:#14b8a6;--na-pigulce:#0f1218}
+.b-fiolet{--sek-kropka:#8b5cf6;--sek-napis:#c4b5fd;--sek-tlo:#312951;
+  --sek-tlo-slabe:#232238;--sek-pigulka:#a78bfa;--na-pigulce:#0f1218}
+.b-limonka{--sek-kropka:#84cc16;--sek-napis:#bef264;--sek-tlo:#2f4220;
+  --sek-tlo-slabe:#222d22;--sek-pigulka:#84cc16;--na-pigulce:#0f1218}
+.b-fuksja{--sek-kropka:#d946ef;--sek-napis:#f0abfc;--sek-tlo:#422450;
+  --sek-tlo-slabe:#2a1f37;--sek-pigulka:#d946ef;--na-pigulce:#0f1218}
+.b-cyjan{--sek-kropka:#22d3ee;--sek-napis:#67e8f9;--sek-tlo:#194350;
+  --sek-tlo-slabe:#182d37;--sek-pigulka:#22d3ee;--na-pigulce:#0f1218}
+.b-pomarancz{--sek-kropka:#f97316;--sek-napis:#fdba74;--sek-tlo:#492e20;
+  --sek-tlo-slabe:#2e2422;--sek-pigulka:#f97316;--na-pigulce:#0f1218}
+}
+
 *{box-sizing:border-box}
 body{
   margin:0; background:var(--tlo); color:var(--tekst);
@@ -97,18 +138,25 @@ header .pod{color:var(--slaby);font-size:12.5px;margin-top:3px}
   transition:color .16s ease, background .16s ease,
              transform .32s cubic-bezier(.34,1.56,.64,1);
 }
-.pasek1 button:hover{color:var(--tekst);background:var(--plyta)}
+.pasek1 button{background:var(--sek-tlo-slabe)}
+.pasek1 button::before{           /* kropka tożsamości sekcji */
+  content:"";display:inline-block;width:7px;height:7px;border-radius:50%;
+  background:var(--sek-kropka);margin-right:7px;vertical-align:1px;
+  transition:width .2s ease,height .2s ease;
+}
+.pasek1 button:hover{color:var(--tekst);background:var(--sek-tlo)}
 .pasek1 button:active{transform:scale(.94);transition-duration:.09s}
 .pasek1 button.akt{
-  color:var(--chrom-tekst);font-weight:600;background:var(--chrom-tlo);
+  color:var(--sek-napis);font-weight:600;background:var(--sek-tlo);
   transform:scale(1.08);
 }
+.pasek1 button.akt::before{width:8px;height:8px}
 .pasek1 button.akt:active{transform:scale(1.02)}
 .pasek1 button.akt::after{
   content:"";position:absolute;left:10px;right:10px;bottom:0;height:3px;
-  background:var(--chrom-pelny);border-radius:3px 3px 0 0;
+  background:var(--sek-kropka);border-radius:3px 3px 0 0;
 }
-.pasek1 button.akt .strzalka{color:var(--chrom-tekst)}
+.pasek1 button.akt .strzalka{color:var(--sek-napis)}
 .pasek1 button .strzalka{
   display:inline-block;margin-left:6px;font-size:10px;color:var(--slaby);
   transition:transform .28s cubic-bezier(.4,0,.2,1);
@@ -127,7 +175,7 @@ header .pod{color:var(--slaby);font-size:12.5px;margin-top:3px}
   max-height:140px;opacity:1;border-bottom-color:var(--linia);
 }
 .pasek2{
-  padding:9px 12px;background:var(--plyta);
+  padding:9px 12px;background:var(--sek-tlo-slabe);
   overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;
 }
 .pasek2 .wiersz{display:flex;gap:6px;width:max-content;margin:0 auto}
@@ -140,20 +188,21 @@ header .pod{color:var(--slaby);font-size:12.5px;margin-top:3px}
   transition:background .16s ease,color .16s ease,border-color .16s ease,
              transform .32s cubic-bezier(.34,1.56,.64,1);
 }
-.pasek2 button:hover{color:var(--tekst);background:var(--powierzchnia);
-  border-color:var(--linia)}
+.pasek2 button{background:var(--sek-tlo);color:var(--sek-napis)}
+.pasek2 button:hover{background:var(--powierzchnia);border-color:var(--sek-kropka)}
 .pasek2 button:active{transform:scale(.93);transition-duration:.09s}
 .pasek2 button.akt{
-  background:var(--chrom-pelny);color:var(--na-chromie);font-weight:600;
+  background:var(--sek-pigulka);color:var(--na-pigulce);font-weight:600;
   border-color:transparent;transform:scale(1.1);
 }
-.pasek2 button.akt:hover{background:var(--chrom-pelny);color:var(--na-chromie)}
+.pasek2 button.akt:hover{background:var(--sek-pigulka);color:var(--na-pigulce)}
 .pasek2 button.akt:active{transform:scale(1.04)}
 
 main{
   padding:20px;max-width:1000px;margin:18px auto 0;
   background:var(--powierzchnia);
-  border:1px solid var(--linia);border-radius:14px;
+  border:1px solid var(--linia);border-top:3px solid var(--sek-kropka);
+  border-radius:14px;
   box-shadow:0 1px 3px var(--cien);
 }
 main.wchodzi{animation:wejscie .26s ease both}
@@ -169,7 +218,7 @@ section{margin-bottom:34px}
   border:1px solid transparent;
   transition:border-color .16s ease, transform .16s ease;
 }
-.kafel:hover{border-color:var(--chrom-pelny);transform:translateY(-1px)}
+.kafel:hover{border-color:var(--sek-kropka);transform:translateY(-1px)}
 .kafel .etykieta{font-size:12px;color:var(--slaby)}
 .kafel .liczba{font-size:27px;font-weight:600;letter-spacing:-.02em;margin-top:3px}
 .kafel .liczba.data{font-size:20px;letter-spacing:-.01em}
@@ -676,16 +725,17 @@ const kryterium = () => `
    ========================================================================== */
 
 const SEKCJE = [
-  { id:"start", tytul:"Start", pod:[
+  { id:"start", tytul:"Start", barwa:"bursztyn", pod:[
       { id:"przeglad", tytul:"Przegląd", rysuj: przegladStart }
   ]},
-  { id:"regularnosc", tytul:"Regularność", pod:[
+  { id:"regularnosc", tytul:"Regularność", barwa:"turkus", pod:[
       { id:"godziny",   tytul:"Godziny",   rysuj: c1Godziny },
       { id:"przerwy",   tytul:"Przerwy",   rysuj: c2Przerwy },
       { id:"kryterium", tytul:"Kryterium", rysuj: kryterium }
   ]},
   ...[1,2,3,4,5].map(n => ({
-    id:"z"+n, tytul:"Z"+n, pod:[1,2,3].map(m => ({
+    id:"z"+n, tytul:"Z"+n, barwa:["fiolet","limonka","fuksja","cyjan","pomarancz"][n-1],
+    pod:[1,2,3].map(m => ({
       id:"z"+n+"-"+m, tytul:"Z"+n+"."+m, rysuj: () => pusto("Z"+n+"."+m)
     }))
   }))
@@ -731,6 +781,9 @@ function pokaz(){
     obudowa.classList.remove("otwarty");
     void obudowa.offsetHeight;              // wymuś przerysowanie, żeby
   }                                         // animacja zagrała od nowa
+  obudowa.className = "pasek2-obudowa b-" + s.barwa
+    + (obudowa.classList.contains("otwarty") ? " otwarty" : "");
+  tresc.className = "b-" + s.barwa;
   el2.innerHTML = `<div class="wiersz">` + s.pod.map(x =>
     `<button data-s="${s.id}" data-p="${x.id}"
       class="${x.id===p.id?"akt":""}">${x.tytul}</button>`).join("") + `</div>`;
@@ -793,7 +846,7 @@ function podepnijSlupki(){
 }
 
 el1.innerHTML = `<div class="wiersz">` + SEKCJE.map(s =>
-  `<button data-s="${s.id}">${s.tytul}` +
+  `<button data-s="${s.id}" class="b-${s.barwa}">${s.tytul}` +
   (s.pod.length > 1 ? `<span class="strzalka">▾</span>` : ``) +
   `</button>`).join("") + `</div>`;
 
