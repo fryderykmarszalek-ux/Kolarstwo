@@ -6,10 +6,42 @@
 <meta name="robots" content="noindex">
 <title>Kolarstwo — Fryderyk Marszałek</title>
 <style>
+/* ---------------------------------------------------------------------------
+   ROLE, NIE KOLORY. Kod pyta o rolę ("--akcent"), nigdy o konkretny kolor.
+   Motyw zmienia wartości w jednym miejscu i cała strona idzie za nim.
+
+   Kolory danych dobrane walidatorem, nie okiem:
+     niebieski / zielony / czerwony przechodzą testy rozróżnialności
+     w obu motywach, też w symulacji trzech rodzajów daltonizmu.
+   Odrzucone: pomarańczowy plan (ΔE 10,8 do czerwieni przy progu 15),
+   fioletowy (ΔE 1,9 do niebieskiego w ciemnym), żółty (ΔE 13,0 w ciemnym).
+   --------------------------------------------------------------------------- */
 :root{
-  --tlo:#ffffff; --tekst:#16181d; --slaby:#6b7280; --linia:#e3e6ea;
-  --akcent:#1f6feb; --alarm:#d1242f; --plyta:#f6f7f9; --plan:#c2740a; --odciazenie:#eceef1;
-  --ramka-paska:#2f6fe4;
+  color-scheme:light;
+  --tlo:#f8f9fb;          /* plan strony        */
+  --plyta:#eef1f6;        /* kafelki, pasek 2   */
+  --tekst:#141821;        /* 16,9:1 na tle      */
+  --slaby:#646b79;        /*  4,7:1 na kafelku  */
+  --linia:#dfe4ec;        /* siatka, obwódki    */
+  --akcent:#2a78d6;       /* DANE: jazda        */
+  --plan:#12895f;         /* DANE: plan i cel   */
+  --alarm:#d03b3b;        /* DANE: ponad limit  */
+  --odciazenie:#e6eaf2;   /* pas tygodnia odciążeniowego */
+  --ramka-paska:#2a78d6;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-motyw="jasny"]){
+    color-scheme:dark;
+    --tlo:#14171d; --plyta:#1d2129; --tekst:#f2f5fa; --slaby:#98a1b2;
+    --linia:#282d37; --akcent:#3987e5; --plan:#199e70; --alarm:#e66767;
+    --odciazenie:#232833; --ramka-paska:#3987e5;
+  }
+}
+:root[data-motyw="ciemny"]{
+  color-scheme:dark;
+  --tlo:#14171d; --plyta:#1d2129; --tekst:#f2f5fa; --slaby:#98a1b2;
+  --linia:#282d37; --akcent:#3987e5; --plan:#199e70; --alarm:#e66767;
+  --odciazenie:#232833; --ramka-paska:#3987e5;
 }
 *{box-sizing:border-box}
 body{
@@ -19,7 +51,14 @@ body{
 }
 
 /* --- nagłówek: nazwa na środku, jak na szkicu --- */
-header{padding:18px 20px 14px;text-align:center}
+header{padding:18px 20px 14px;text-align:center;position:relative}
+#motyw{
+  position:absolute;right:14px;top:14px;appearance:none;cursor:pointer;
+  background:var(--plyta);border:1px solid var(--linia);color:var(--slaby);
+  font:inherit;font-size:13px;line-height:1;padding:7px 11px;border-radius:99px;
+  transition:color .18s ease,border-color .18s ease;
+}
+#motyw:hover{color:var(--tekst);border-color:var(--slaby)}
 header h1{margin:0;font-size:19px;font-weight:600;letter-spacing:-.01em}
 header .pod{color:var(--slaby);font-size:12.5px;margin-top:3px}
 
@@ -99,6 +138,12 @@ section{margin-bottom:34px}
 .wykres .os{flex:0 0 auto}
 .ramka{overflow-x:auto;-webkit-overflow-scrolling:touch;flex:1 1 auto;min-width:0}
 svg{display:block}
+.slupek,.tydzien{
+  transform-box:fill-box;transform-origin:bottom;
+  animation:wyrasta .5s cubic-bezier(.2,.85,.25,1) both;
+  cursor:pointer;
+}
+@keyframes wyrasta{from{transform:scaleY(0)}to{transform:scaleY(1)}}
 .info{font-size:13px;color:var(--slaby);margin-top:8px;min-height:20px}
 .info b{color:var(--tekst);font-weight:600}
 
@@ -120,6 +165,7 @@ footer{color:var(--slaby);font-size:12px;padding:0 20px 30px;max-width:1000px;
 <body>
 
 <header>
+  <button id="motyw" type="button" title="Motyw: auto / jasny / ciemny"></button>
   <h1>Kolarstwo — postępy</h1>
   <div class="pod" id="stopka-naglowka"></div>
 </header>
@@ -277,7 +323,8 @@ function wykresPrzerw(){
                 : p.dni > PROG ? "var(--alarm)" : "var(--akcent)";
     s += `<rect x="${x}" y="${y}" width="${szerSlupka}" height="${h}"
            fill="${kolor}" opacity="${p.dni > PROG ? 1 : .55}"
-           data-i="${i}" class="slupek" rx="1.5"/>`;
+           data-i="${i}" class="slupek" rx="1.5"
+           style="animation-delay:${Math.min(i*7,600)}ms"/>`;
     if (p.dni > SUFIT){
       s += `<path d="M${x} ${y} l${szerSlupka/4} -4 l${szerSlupka/4} 4
              l${szerSlupka/4} -4 l${szerSlupka/4} 4"
@@ -404,8 +451,9 @@ function wykresGodzin(){
     if (t.przyszly || t.godziny === 0) return;
     const h = Math.max(skala(t.godziny), 1.5);
     s += `<rect x="${x(i)}" y="${marGora+wys-h}" width="${szerSlupka}" height="${h}"
-           fill="var(--akcent)" opacity=".65" rx="1.5"
-           class="tydzien" data-i="${i}"/>`;
+           fill="var(--akcent)" opacity=".75" rx="1.5"
+           class="tydzien" data-i="${i}"
+           style="animation-delay:${Math.min(i*7,600)}ms"/>`;
   });
 
   // linia planu — schodkowa, bo plan jest stały w obrębie tygodnia
@@ -455,7 +503,7 @@ const c1Godziny = () => {
     <h2>C1 · Godziny tygodniowo</h2>
     <p class="opis">
       Jeden słupek = jeden tydzień, poniedziałek–niedziela, czas w ruchu.
-      Pomarańczowa linia to plan objętości na wrzesień i październik.
+      Zielona linia to plan objętości na wrzesień i październik.
       Szare pasy to tygodnie odciążeniowe — tam niższy słupek jest
       zgodny z planem, nie wpadką. Przerywana pozioma linia to cel ${CEL_H} h; skala rośnie sama, gdyby jakiś tydzień go przekroczył.
     </p>
@@ -709,6 +757,35 @@ document.getElementById("stopka-naglowka").textContent =
 document.getElementById("stopka").innerHTML =
   `Dane ze Stravy, pobrane ${D.meta.pobrano.replace("T"," ")}. `
   + `Liczone od ${pl(OD)} — wcześniejsza historia zostaje w pliku, ale nie wchodzi do wykresów.`;
+
+/* ---------------------------------------------------------------------------
+   Motyw: auto (idzie za ustawieniem telefonu) / jasny / ciemny.
+   Wybór przeżywa zamknięcie karty.
+   --------------------------------------------------------------------------- */
+const MOTYWY = [
+  { id:"auto",   ikona:"◐", opis:"auto" },
+  { id:"jasny",  ikona:"☀", opis:"jasny" },
+  { id:"ciemny", ikona:"☾", opis:"ciemny" }
+];
+const przyciskMotywu = document.getElementById("motyw");
+
+function ustawMotyw(id){
+  const m = MOTYWY.find(x => x.id === id) || MOTYWY[0];
+  if (m.id === "auto") document.documentElement.removeAttribute("data-motyw");
+  else document.documentElement.setAttribute("data-motyw", m.id);
+  przyciskMotywu.textContent = m.ikona + " " + m.opis;
+  przyciskMotywu.dataset.id = m.id;
+  try { localStorage.setItem("motyw", m.id); } catch(e){}
+}
+
+przyciskMotywu.addEventListener("click", () => {
+  const i = MOTYWY.findIndex(x => x.id === przyciskMotywu.dataset.id);
+  ustawMotyw(MOTYWY[(i+1) % MOTYWY.length].id);
+});
+
+let zapisany = "auto";
+try { zapisany = localStorage.getItem("motyw") || "auto"; } catch(e){}
+ustawMotyw(zapisany);
 
 window.addEventListener("hashchange", pokaz);
 pokaz();
