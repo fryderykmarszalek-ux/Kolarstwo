@@ -24,10 +24,13 @@
   --tekst:#141821;        /* 17,1:1 na powierzchni */
   --slaby:#5d6472;        /*  5,3:1 na kafelku     */
   --linia:#d7dee9;
-  --akcent:#2a78d6;       /* DANE: jazda            */
-  --akcent-tlo:#d8e6f9;   /* podświetlenie aktywnej zakładki */
-  --akcent-pelny:#256abf; /* wypełnienie pod biały napis, 5,4:1 */
-  --na-akcencie:#ffffff;
+  --akcent:#2a78d6;       /* DANE: jazda — TYLKO dane, nigdy interfejs */
+  /* Chrom interfejsu ma własny odcień, żeby zaznaczenie zakładki nie
+     udawało danych. Niebieski znaczy „jazda", indygo znaczy „tu jesteś". */
+  --chrom-tlo:#e7e3f8;    /* aktywna zakładka, tło       */
+  --chrom-tekst:#413195;  /* aktywna zakładka, napis 8,0:1 */
+  --chrom-pelny:#4a3aa7;  /* aktywna pod-zakładka, tło   */
+  --na-chromie:#f4f2fe;   /* napis na pełnym, 7,7:1      */
   --plan:#12895f;         /* DANE: plan i cel       */
   --alarm:#d03b3b;        /* DANE: ponad limit      */
   --odciazenie:#e2e8f2;
@@ -38,8 +41,10 @@
     color-scheme:dark;
     --tlo:#0f1218; --powierzchnia:#171b23; --plyta:#1f242e;
     --tekst:#f2f5fa; --slaby:#98a1b2; --linia:#262c37;
-    --akcent:#3987e5; --akcent-tlo:#1a2c45; --akcent-pelny:#256abf;
-    --na-akcencie:#ffffff; --plan:#199e70; --alarm:#e66767;
+    --akcent:#3987e5;
+    --chrom-tlo:#262046; --chrom-tekst:#b3a9f0;
+    --chrom-pelny:#6a5fd0; --na-chromie:#f4f2fe;
+    --plan:#199e70; --alarm:#e66767;
     --odciazenie:#232936; --cien:rgba(0,0,0,.35);
   }
 }
@@ -47,8 +52,10 @@
   color-scheme:dark;
   --tlo:#0f1218; --powierzchnia:#171b23; --plyta:#1f242e;
   --tekst:#f2f5fa; --slaby:#98a1b2; --linia:#262c37;
-  --akcent:#3987e5; --akcent-tlo:#1a2c45; --akcent-pelny:#256abf;
-  --na-akcencie:#ffffff; --plan:#199e70; --alarm:#e66767;
+  --akcent:#3987e5;
+  --chrom-tlo:#262046; --chrom-tekst:#b3a9f0;
+  --chrom-pelny:#6a5fd0; --na-chromie:#f4f2fe;
+  --plan:#199e70; --alarm:#e66767;
   --odciazenie:#232936; --cien:rgba(0,0,0,.35);
 }
 *{box-sizing:border-box}
@@ -78,24 +85,30 @@ header .pod{color:var(--slaby);font-size:12.5px;margin-top:3px}
   overflow-x:auto;-webkit-overflow-scrolling:touch;
   scrollbar-width:none;
 }
-.pasek1 .wiersz{display:flex;gap:2px;width:max-content;margin:0 auto}
+.pasek1{padding-top:6px}   /* zapas na powiększenie aktywnej zakładki */
+.pasek1 .wiersz{display:flex;gap:6px;width:max-content;margin:0 auto}
 .pasek1::-webkit-scrollbar{display:none}
 .pasek1 button{
   appearance:none;background:none;border:0;cursor:pointer;
   font:inherit;font-size:15px;color:var(--slaby);
   padding:12px 18px;white-space:nowrap;position:relative;
-  border-radius:9px 9px 0 0;
-  transition:color .16s ease, background .16s ease;
+  border-radius:10px 10px 0 0;
+  transform-origin:center bottom;
+  transition:color .16s ease, background .16s ease,
+             transform .32s cubic-bezier(.34,1.56,.64,1);
 }
 .pasek1 button:hover{color:var(--tekst);background:var(--plyta)}
-.pasek1 button:active{background:var(--akcent-tlo)}
+.pasek1 button:active{transform:scale(.94);transition-duration:.09s}
 .pasek1 button.akt{
-  color:var(--tekst);font-weight:600;background:var(--akcent-tlo);
+  color:var(--chrom-tekst);font-weight:600;background:var(--chrom-tlo);
+  transform:scale(1.08);
 }
+.pasek1 button.akt:active{transform:scale(1.02)}
 .pasek1 button.akt::after{
   content:"";position:absolute;left:10px;right:10px;bottom:0;height:3px;
-  background:var(--akcent);border-radius:3px 3px 0 0;
+  background:var(--chrom-pelny);border-radius:3px 3px 0 0;
 }
+.pasek1 button.akt .strzalka{color:var(--chrom-tekst)}
 .pasek1 button .strzalka{
   display:inline-block;margin-left:6px;font-size:10px;color:var(--slaby);
   transition:transform .28s cubic-bezier(.4,0,.2,1);
@@ -111,7 +124,7 @@ header .pod{color:var(--slaby);font-size:12.5px;margin-top:3px}
              border-color .3s ease;
 }
 .pasek2-obudowa.otwarty{
-  max-height:120px;opacity:1;border-bottom-color:var(--linia);
+  max-height:140px;opacity:1;border-bottom-color:var(--linia);
 }
 .pasek2{
   padding:9px 12px;background:var(--plyta);
@@ -123,15 +136,19 @@ header .pod{color:var(--slaby);font-size:12.5px;margin-top:3px}
   appearance:none;border:1px solid transparent;cursor:pointer;
   background:transparent;font:inherit;font-size:13.5px;color:var(--slaby);
   padding:6px 14px;border-radius:999px;white-space:nowrap;
-  transition:background .16s ease,color .16s ease,border-color .16s ease;
+  transform-origin:center;
+  transition:background .16s ease,color .16s ease,border-color .16s ease,
+             transform .32s cubic-bezier(.34,1.56,.64,1);
 }
 .pasek2 button:hover{color:var(--tekst);background:var(--powierzchnia);
   border-color:var(--linia)}
+.pasek2 button:active{transform:scale(.93);transition-duration:.09s}
 .pasek2 button.akt{
-  background:var(--akcent-pelny);color:var(--na-akcencie);font-weight:600;
-  border-color:transparent;
+  background:var(--chrom-pelny);color:var(--na-chromie);font-weight:600;
+  border-color:transparent;transform:scale(1.1);
 }
-.pasek2 button.akt:hover{background:var(--akcent-pelny);color:var(--na-akcencie)}
+.pasek2 button.akt:hover{background:var(--chrom-pelny);color:var(--na-chromie)}
+.pasek2 button.akt:active{transform:scale(1.04)}
 
 main{
   padding:20px;max-width:1000px;margin:18px auto 0;
@@ -152,7 +169,7 @@ section{margin-bottom:34px}
   border:1px solid transparent;
   transition:border-color .16s ease, transform .16s ease;
 }
-.kafel:hover{border-color:var(--akcent);transform:translateY(-1px)}
+.kafel:hover{border-color:var(--chrom-pelny);transform:translateY(-1px)}
 .kafel .etykieta{font-size:12px;color:var(--slaby)}
 .kafel .liczba{font-size:27px;font-weight:600;letter-spacing:-.02em;margin-top:3px}
 .kafel .liczba.data{font-size:20px;letter-spacing:-.01em}
