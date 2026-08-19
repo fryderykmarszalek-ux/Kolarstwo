@@ -91,6 +91,7 @@ section{margin-bottom:34px}
 .kafel{background:var(--plyta);border-radius:8px;padding:13px 15px}
 .kafel .etykieta{font-size:12px;color:var(--slaby)}
 .kafel .liczba{font-size:27px;font-weight:600;letter-spacing:-.02em;margin-top:3px}
+.kafel .liczba.data{font-size:20px;letter-spacing:-.01em}
 .kafel .stopka{font-size:12px;color:var(--slaby);margin-top:2px}
 .kafel.uwaga .liczba{color:var(--alarm)}
 
@@ -199,6 +200,15 @@ function wyjazdDla(od, doo){
 przerwy.forEach(p => { p.wyjazd = wyjazdDla(p.od, p.do); });
 const przerwyLiczone = przerwy.filter(p => !p.wyjazd);
 const zlamania = przerwyLiczone.filter(p => p.dni > PROG);
+
+// Dzień złamania to nie początek i nie koniec przerwy, tylko moment, w którym
+// przerwa przekroczyła próg: ostatnia jazda + PROG + 1 dzień.
+const ostatnieZlamanie = (() => {
+  if (!zlamania.length) return null;
+  const p = zlamania[zlamania.length-1];
+  const dzien = dzienNaTekst(naDzien(p.od) + (PROG+1)*86400000);
+  return { dzien, przerwa: p, temu: roznicaDni(naDzien(dzien), naDzien(DZIS)) };
+})();
 const najdluzsza = przerwy.reduce((a,b) => b.dni > a.dni ? b : a);
 
 function poniedzialek(tekst){
@@ -552,11 +562,12 @@ const kryterium = () => `
         <div class="stopka">dni · ${pl(najdluzsza.od)} → ${pl(najdluzsza.do)}</div>
       </div>
       <div class="kafel">
-        <div class="etykieta">Wariant kryterium</div>
-        <div class="liczba">${WARIANT || "—"}</div>
-        <div class="stopka">${WARIANT
-          ? "wybrany " + pl(D.kryterium_przerwy.wybrany_dnia)
-          : "NIEROZSTRZYGNIĘTE"}</div>
+        <div class="etykieta">Ostatnie złamanie</div>
+        <div class="liczba data">${ostatnieZlamanie
+          ? pl(ostatnieZlamanie.dzien) : "—"}</div>
+        <div class="stopka">${ostatnieZlamanie
+          ? `${ostatnieZlamanie.temu} dni temu · przerwa ${ostatnieZlamanie.przerwa.dni} dni`
+          : "kryterium nigdy nie złamane"}</div>
       </div>
     </div>
   </section>`;
