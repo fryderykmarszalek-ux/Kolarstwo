@@ -1,0 +1,34 @@
+# JEDNORAZOWY. Zamienia kod z adresu zwrotnego na refresh token i zapisuje
+# go w sejfie repozytorium. Po udanym przebiegu ten plik i sekret
+# PAT_SEKRETY można skasować — nie są już do niczego potrzebne.
+
+name: Strava — pierwsze podłączenie
+
+on:
+  workflow_dispatch:
+    inputs:
+      kod:
+        description: "Kod z adresu zwrotnego — sam ciąg po code=, bez reszty adresu"
+        required: true
+
+jobs:
+  polacz:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Zamień kod na refresh token
+        id: wymiana
+        env:
+          STRAVA_CLIENT_ID: ${{ secrets.STRAVA_CLIENT_ID }}
+          STRAVA_CLIENT_SECRET: ${{ secrets.STRAVA_CLIENT_SECRET }}
+          STRAVA_KOD: ${{ inputs.kod }}
+        run: node .github/skrypty/wymien-kod.js
+
+      - name: Zapisz refresh token w sejfie
+        env:
+          GH_TOKEN: ${{ secrets.PAT_SEKRETY }}
+          TOKEN: ${{ steps.wymiana.outputs.refresh }}
+        run: |
+          gh secret set STRAVA_REFRESH_TOKEN --body "$TOKEN" --repo "$GITHUB_REPOSITORY"
+          echo "Gotowe. Sekret STRAVA_REFRESH_TOKEN zapisany."

@@ -1,0 +1,53 @@
+# Codziennie odświeża dane.js danymi ze Stravy i commituje, jeśli coś się
+# zmieniło. Strona zostaje statyczna — odświeża się sam plik z danymi.
+
+name: Strava — aktualizacja danych
+
+on:
+  schedule:
+    # 20:00 UTC = 22:00 w Polsce latem, 21:00 zimą. Cron GitHuba chodzi na UTC.
+    - cron: "0 20 * * *"
+  workflow_dispatch:        # pozwala odpalić ręcznie przyciskiem
+
+permissions:
+  contents: write
+
+concurrency:
+  group: strava-sync
+  cancel-in-progress: false
+
+jobs:
+  aktualizuj:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Pobierz ze Stravy
+        env:
+          STRAVA_CLIENT_ID: ${{ secrets.STRAVA_CLIENT_ID }}
+          STRAVA_CLIENT_SECRET: ${{ secrets.STRAVA_CLIENT_SECRET }}
+          STRAVA_REFRESH_TOKEN: ${{ secrets.STRAVA_REFRESH_TOKEN }}
+        run: node .github/skrypty/pobierz-strave.js
+
+      - name: Sprawdź, czy plik się parsuje
+        run: node -e "global.window={};require('./dane.js');
+             const n=window.DANE.aktywnosci.length;
+             if(!n) { console.error('Pusta lista — nie commituję.'); process.exit(1); }
+             console.log('Plik poprawny, aktywności:', n);"
+
+      - name: Commituj, jeśli są zmiany
+        run: |
+          if git diff --quiet dane.js; then
+            echo "Bez zmian — nic do zrobienia."
+          else
+            git config user.name "Automat Stravy"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add dane.js
+            git commit -m "Dane ze Stravy — $(date -u +%Y-%m-%d)"
+            git push
+            echo "Zmiany wypchnięte."
+          fi
