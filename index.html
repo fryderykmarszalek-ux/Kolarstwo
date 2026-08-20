@@ -280,7 +280,16 @@ svg{display:block}
   display:flex;align-items:center;gap:11px;padding:9px 13px;
   border-top:1px solid var(--linia);font-size:14px;
   transition:background .15s ease;
+  color:inherit;text-decoration:none;cursor:pointer;
 }
+.lista .rzad:active{background:var(--sek-tlo)}
+.lista .strzalka-zew{
+  color:var(--slaby);font-size:13px;flex:0 0 auto;opacity:.55;
+  transition:opacity .15s ease,transform .15s ease;
+}
+.lista .rzad:hover .strzalka-zew{opacity:1;transform:translate(1px,-1px)}
+.odn{color:inherit;text-decoration:none;border-bottom:1px dotted var(--slaby)}
+.odn:hover{border-bottom-color:var(--tekst)}
 .lista .rzad:first-child{border-top:0}
 .lista .rzad:hover{background:var(--plyta)}
 .lista .rzad .ikona{color:var(--slaby);display:flex}
@@ -748,6 +757,10 @@ const DYSCYPLINY = {
      <path d="M10 13v3M6.5 16.5h7"/>` }
 };
 
+// Strava trzyma jazdę pod adresem zbudowanym z jej identyfikatora. Ten
+// identyfikator już jest w dane.js, więc odnośnik nie wymaga nowego pola.
+function adresStravy(a){ return "https://www.strava.com/activities/" + a.id; }
+
 function ikonaDyscypliny(typ, rozmiar){
   const d = DYSCYPLINY[typ];
   if (!d) return "";
@@ -808,16 +821,18 @@ const przegladStart = () => `
     <p class="opis">
       Sylwetka po lewej mówi, gdzie odbyła się jazda: rower to szosa,
       ekran to Zwift. Gravel liczy się jako szosa — to nawierzchnia,
-      nie osobna dyscyplina.
+      nie osobna dyscyplina. Dotknij wiersza, żeby otworzyć jazdę na Stravie.
     </p>
     <div class="lista">
       ${jazdy.slice(-6).reverse().map(a => `
-        <div class="rzad">
+        <a class="rzad" href="${adresStravy(a)}" target="_blank" rel="noopener"
+           title="Otwórz na Stravie">
           <span class="ikona">${ikonaDyscypliny(a.typ,21)}</span>
           <span class="nazwa">${a.nazwa}</span>
           <span class="km">${liczba(a.dystans_m/1000,1)} km</span>
           <span class="data">${pl(a.data)}</span>
-        </div>`).join("")}
+          <span class="strzalka-zew" aria-hidden="true">↗</span>
+        </a>`).join("")}
     </div>
   </section>`;
 
@@ -1127,7 +1142,9 @@ function podepnijMiesiace(){
       const h = Math.floor(a.czas_ruchu_s/3600), min = Math.round(a.czas_ruchu_s%3600/60);
       const czas = h ? `${h} h ${min} min` : `${min} min`;
       const sr = (a.dystans_m/1000) / (a.czas_ruchu_s/3600);
-      info.innerHTML = `${ikonaDyscypliny(a.typ,15)} <b>${a.nazwa}</b> · `
+      info.innerHTML = `${ikonaDyscypliny(a.typ,15)} `
+        + `<a class="odn" href="${adresStravy(a)}" target="_blank" rel="noopener"`
+        + ` title="Otwórz na Stravie"><b>${a.nazwa}</b> ↗</a> · `
         + `${liczba(mm.km,1)} km · ${czas} · ${liczba(sr,1)} km/h śr. · `
         + `${liczba(a.przewyzszenie_m,0)} m w górę · ${pl(a.data)}`
         + (mm.jazd > 1 ? ` · najdłuższa z ${mm.jazd} jazd w miesiącu` : "");
