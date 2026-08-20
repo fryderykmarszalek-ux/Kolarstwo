@@ -318,7 +318,17 @@ svg{display:block}
    na boki. --- */
 .tabelka{overflow-x:auto;-webkit-overflow-scrolling:touch;margin-top:4px;
   border:1px solid var(--linia);border-radius:10px}
-table.segmenty{border-collapse:collapse;width:100%;min-width:600px;font-size:13.5px}
+/* table-layout:fixed — bez tego przeglądarka rozdziela szerokości według
+   długości treści i kolumny stoją w przypadkowych odstępach: "6,94 km" dostaje
+   dużo miejsca, "8" prawie żadnego. Przy stałym układzie każda kolumna liczbowa
+   ma tę samą szerokość, więc odstępy są równe na całej tabeli. Liczby zostają
+   dosunięte do prawej i pisane cyframi o równej szerokości (tabular-nums),
+   dzięki czemu rzędy wielkości układają się jeden pod drugim i da się je
+   porównywać wzrokiem, bez czytania. */
+table.segmenty{border-collapse:collapse;width:100%;min-width:760px;
+  table-layout:fixed;font-size:13.5px}
+table.segmenty th:first-child,table.segmenty td:first-child{width:28%}
+table.segmenty th:not(:first-child),table.segmenty td:not(:first-child){width:12%}
 table.segmenty th{padding:0;border-bottom:1px solid var(--linia);text-align:right;
   background:var(--plyta)}
 table.segmenty th:first-child{text-align:left}
@@ -338,9 +348,9 @@ table.segmenty td:first-child{text-align:left;color:var(--tekst)}
 table.segmenty td.akt{color:var(--tekst);font-weight:600}
 table.segmenty tr:last-child td{border-bottom:0}
 table.segmenty tbody tr:hover td{background:var(--plyta)}
-.seg-nazwa{color:inherit;text-decoration:none}
-.seg-nazwa:hover{text-decoration:underline}
-.seg-data{display:block;font-size:11.5px;color:var(--slaby);margin-top:1px}
+.seg-nazwa{color:inherit;display:block;overflow-wrap:anywhere}
+.seg-zwift{display:inline-block;vertical-align:-2px;margin-right:5px;color:var(--slaby)}
+.seg-data{display:block;font-size:11.5px;color:var(--slaby);margin-top:1px;min-height:1px}
 .przelaczniki{display:flex;gap:8px;margin:12px 0 0;flex-wrap:wrap}
 .przelaczniki button{
   appearance:none;font:inherit;font-size:12.5px;cursor:pointer;
@@ -1215,39 +1225,21 @@ function procentNaTekst(x){
   return (x < 0 ? "\u2212" : "") + liczba(Math.abs(x),1) + "%";
 }
 
-/* Moc [E] — wariant B w czystej postaci: nie ma jej w danych, bo da się ją
-   wyliczyć. Wzór i wszystkie stałe pochodzą z bloku "zalozenia":
+/* Moc pokazujemy WYŁĄCZNIE zmierzoną — nigdy policzoną z modelu.
 
-     P = ½·ρ·CdA·v³ + Crr·m·g·v + m·g·(Δh/t)
+   Do 20.08.2026 stała tu estymata [E] z fizyki: P = ½ρ·CdA·v³ + Crr·m·g·v +
+   m·g·(Δh/t). Liczba wyglądała solidnie i była nieweryfikowalna: siedzi w niej
+   CdA 0,38 z tagiem [?], a liczona ze średniej prędkości zaniża na zrywach
+   (kontrola na Bump 2: 471 W wobec 493 W z pełnego wyliczenia). Decyzja
+   Fryderyka: dopóki nie ma czym tego sprawdzić, kolumna ma być pusta.
 
-   Δh liczymy jako nachylenie × długość, a nie z przewyższenia Stravy: pole
-   elevation_gain sumuje same podjazdy i gubi znak. Na Obory-Opacz dałoby
-   +19,5 m zamiast prawdziwych −6,9 m.
+   Zostaje więc tylko moc, która naprawdę została zmierzona. Dziś jest to
+   wyłącznie Zwift — trenażer podaje waty do pliku, więc segmenty z X-XI 2025
+   mają je naprawdę. Na szosie Strava nie oddaje mocy segmentu przez API
+   (sprawdzone: 0 z 1385 przejazdów), bo na rowerze nie ma miernika.
 
-   Czego ta liczba NIE zawiera i dlatego zaniża wynik na zrywach:
-   1. Opór powietrza zależy od średniej z v³, a nie od sześcianu średniej v.
-      Na Bump 2 różnica sięga 19% w samym członie powietrznym.
-   2. Brakuje członu pędu — z podsumowania nie wiadomo, czy zawodnik wjechał
-      w segment z rozpędem, czy rozpędzał się na nim.
-   Oba wymagają strumieni sekunda po sekundzie, których w danych nie ma.
-   Kontrola na Bump 2: ten wzór daje 471 W, pełne wyliczenie z TRENING.md 493 W
-   — czyli zaniżenie o 4,4% na krótkim, mocno zmiennym podjeździe. */
-function mocE(dystans_m, nachylenie_proc, czas_s){
-  const Z = D.zalozenia;
-  if (!Z || !czas_s) return null;
-  const m = Z.masa_systemu_kg.v, CdA = Z.CdA_m2.v, Crr = Z.Crr_asfalt.v,
-        rho = Z.rho_kg_m3.v, g = Z.g.v;
-  const v = dystans_m / czas_s;
-  const dh = (nachylenie_proc == null ? 0 : nachylenie_proc/100) * dystans_m;
-  const P = 0.5*rho*CdA*v*v*v + Crr*m*g*v + m*g*(dh/czas_s);
-  // Na zjeździe człon wznoszenia jest ujemny i potrafi przewyższyć opory —
-  // wtedy wzór daje moc ujemną. Fizycznie znaczy to „grawitacja wykonuje pracę
-  // za zawodnika", a nie „zawodnik pedałuje wstecz": na takim segmencie można
-  // w ogóle nie pedałować, a czas i tak się zmierzy. Model nie wie, ile z tego
-  // było pedałowania, a ile toczenia się — więc uczciwą odpowiedzią jest brak
-  // liczby, nie liczba ze znakiem minus.
-  return P > 0 ? P : null;
-}
+   Ta zasada zadziała sama, gdy miernik się pojawi: liczba wjedzie do kolumny
+   w dniu, w którym Strava zacznie ją przysyłać. Nic tu nie trzeba zmieniać. */
 
 const SEGMENTY = (() => {
   const meta = new Map((D.segmenty || []).map(x => [x.id, x]));
@@ -1268,9 +1260,15 @@ const SEGMENTY = (() => {
       dystans: m.dystans_m,
       nachylenie: m.nachylenie_proc,
       czas: naj.czas_s,
-      // Moc z miernika, gdyby kiedyś była; do tego czasu estymata z fizyki.
-      moc: naj.moc_S != null ? naj.moc_S : mocE(m.dystans_m, m.nachylenie_proc, naj.czas_s),
-      mocTag: naj.moc_S != null ? (naj.z_miernika ? "Z" : "S") : "E",
+      // Prędkość liczy się tutaj, a nie w danych — wariant B. Dwie liczby,
+      // które już są (długość i czas), nie potrzebują trzeciej w pliku.
+      predkosc: naj.czas_s ? (m.dystans_m / naj.czas_s) * 3.6 : null,
+      // Tylko pomiar. Brak liczby to uczciwa odpowiedź, nie brak funkcji.
+      moc: naj.moc_S,
+      mocZMiernika: naj.z_miernika === 1,
+      // Zwift czy szosa — bierzemy z jazdy, w której padł najlepszy czas,
+      // bo to jej dotyczą wszystkie liczby w wierszu.
+      zwift: jazda ? jazda.typ === "VirtualRide" : false,
       prob: proby.length,
       data: jazda ? jazda.data.slice(0,10) : null
     });
@@ -1288,6 +1286,9 @@ const IKONY_KOLUMN = {
             stroke-width="1.5"><path d="M1.5 13.5h13L1.5 4.2z"/></svg>`,
   moc:   `<svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><path
             d="M9.2 1.2 3.4 9h3.4l-.9 5.8L12.6 7H9.1z"/></svg>`,
+  predkosc: `<svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor"
+            stroke-width="1.5" stroke-linecap="round"><path d="M2.2 12.4a6.4 6.4 0 1 1 11.6 0"/>
+            <path d="M8 11 11 6.4"/></svg>`,
   proby: `<svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor"
             stroke-width="1.5"><path d="M2 12.5c0-2 1.4-3.4 3-3.4s3 1.4 3 3.4M8 12.5c0-2 1.4-3.4 3-3.4
             s3 1.4 3 3.4"/><circle cx="5" cy="4.6" r="2.1"/><circle cx="11" cy="4.6" r="2.1"/></svg>`
@@ -1299,6 +1300,7 @@ const IKONY_KOLUMN = {
 const KOLUMNY = [
   { k:"nazwa",      etykieta:"Segment",   ikona:IKONY_KOLUMN.az,    tekst:true, malejaco:false },
   { k:"czas",       etykieta:"Najlepszy", ikona:IKONY_KOLUMN.czas,               malejaco:false },
+  { k:"predkosc",   etykieta:"Prędkość",  ikona:IKONY_KOLUMN.predkosc,           malejaco:true  },
   { k:"dystans",    etykieta:"Długość",   ikona:IKONY_KOLUMN.dlugosc,            malejaco:true  },
   { k:"nachylenie", etykieta:"Nachylenie",ikona:IKONY_KOLUMN.nachylenie,         malejaco:true  },
   { k:"moc",        etykieta:"Moc",       ikona:IKONY_KOLUMN.moc,                malejaco:true  },
@@ -1324,16 +1326,20 @@ function wierszeSegmentow(){
   return posortowane().map(x => `
     <tr>
       <td class="${sortKlucz==="nazwa"?"akt":""}">
-        <a class="seg-nazwa" href="https://www.strava.com/segments/${x.id}"
-           target="_blank" rel="noopener">${bezpieczny(x.nazwa)}</a>
-        ${x.data ? `<span class="seg-data">najlepsza próba ${pl(x.data)}</span>` : ""}
+        <span class="seg-nazwa">${x.zwift
+          ? `<span class="seg-zwift" title="Zwift — trenażer, nie szosa">${
+              ikonaDyscypliny("VirtualRide",14)}</span>` : ""}${bezpieczny(x.nazwa)}</span>
+        <span class="seg-data">${x.zwift ? "Zwift · " : ""}${
+          x.data ? "najlepsza próba " + pl(x.data) : ""}</span>
       </td>
       <td class="${sortKlucz==="czas"?"akt":""}">${czasNaTekst(x.czas)}</td>
+      <td class="${sortKlucz==="predkosc"?"akt":""}">${
+        x.predkosc == null ? "—" : liczba(x.predkosc,1) + " km/h"}</td>
       <td class="${sortKlucz==="dystans"?"akt":""}">${dlugoscNaTekst(x.dystans)}</td>
       <td class="${sortKlucz==="nachylenie"?"akt":""}">${
         x.nachylenie == null ? "—" : procentNaTekst(x.nachylenie)}</td>
       <td class="${sortKlucz==="moc"?"akt":""}"${
-        x.moc == null ? ' title="Zjazd — model nie odróżnia pedałowania od toczenia się"' : ""
+        x.moc == null ? ' title="Brak pomiaru mocy — nie zgadujemy"' : ""
       }>${x.moc == null ? "—" : Math.round(x.moc) + " W"}</td>
       <td class="${sortKlucz==="prob"?"akt":""}">${x.prob}</td>
     </tr>`).join("");
@@ -1351,6 +1357,7 @@ function naglowkiSegmentow(){
 
 const tabelaSegmentow = () => {
   const wielokrotne = SEGMENTY.filter(x => x.prob > 1).length;
+  const ZWIFTOWYCH = SEGMENTY.filter(x => x.moc != null).length;
   const najwiecej = SEGMENTY.reduce((a,b) => b.prob > a.prob ? b : a, {prob:0});
   return `
   <section>
@@ -1360,17 +1367,19 @@ const tabelaSegmentow = () => {
       ${SEGMENTY.length} sztuk, ${(D.proby||[]).length} przejazdów.
       Wszystkie liczby pochodzą z <b>najlepszej próby</b>. Dotknij nagłówka,
       żeby posortować; dotknij drugi raz, żeby odwrócić kolejność.
-      Nazwa prowadzi na segment na Stravie.
+      Sylwetka ekranu oznacza segment ze Zwiftu — tak samo jak słupek
+      kreskowany na wykresie długich jazd.
     </p>
     <p class="opis">
-      Moc jest oznaczona <b>[E]</b>: nie ma jej w danych, bo Strava nie oddaje
-      mocy na segmencie przez API, a miernika mocy nie ma na rowerze. Liczy się
-      ją z fizyki przy założeniach CdA ${liczba(D.zalozenia.CdA_m2.v,2)} i masie
-      ${liczba(D.zalozenia.masa_systemu_kg.v,1)} kg. Ze średniej prędkości, więc
-      na krótkich zrywach zaniża o kilka procent. Zmiana CdA w danych przelicza
-      całą kolumnę. Na zjazdach zamiast liczby stoi kreska: tam wzór wychodzi
-      poniżej zera, bo pracę wykonuje grawitacja, a ile z tego było pedałowania
-      — tego z podsumowania nie da się wyczytać.
+      <b>Moc pokazujemy tylko tam, gdzie została zmierzona.</b> Dziś to
+      wyłącznie Zwift (${ZWIFTOWYCH} ${ZWIFTOWYCH === 1 ? "segment" :
+      ZWIFTOWYCH < 5 ? "segmenty" : "segmentów"}): trenażer zapisuje waty do
+      pliku. Na szosie Strava nie oddaje mocy segmentu przez API, bo na rowerze
+      nie ma miernika — dlatego stoi tam kreska, a nie liczba. Wcześniej była
+      w tym miejscu estymata z modelu fizycznego; wyleciała, bo nie ma dziś
+      czym jej sprawdzić, a liczba, której nie da się zweryfikować, wygląda
+      dokładnie jak pomiar. Kolumna wypełni się sama w dniu, w którym pojawi
+      się miernik mocy.
       <br>Najlepszy czas nie odróżnia jazdy solo od jazdy w grupie ani wiatru
       — rekord z koła kolegi wygląda tu tak samo jak samotny.
     </p>

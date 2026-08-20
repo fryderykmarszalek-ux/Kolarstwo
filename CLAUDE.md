@@ -133,23 +133,44 @@ nie kolor: sylwetka roweru vs ekranu, słupek kreskowany vs pełny.
     miesiące zostają), Zwift kreskowany, linie celu 80 km i rekordu
   - **Kryterium**: wariant B, złamania, data ostatniego złamania
 - **Postępy → Segmenty** (20.08.2026) — tabela wszystkich segmentów od
-  `meta.segmenty_od`: nazwa, najlepszy czas, długość, nachylenie, moc `[E]`,
-  liczba prób. Sortowanie po każdej kolumnie, drugie dotknięcie odwraca.
-  Filtr „więcej niż raz". Nazwa prowadzi na segment na Stravie.
+  `meta.segmenty_od`: nazwa, najlepszy czas, prędkość, długość, nachylenie,
+  moc, liczba prób. Wszystkie liczby z **najlepszej próby**. Sortowanie po
+  każdej z siedmiu kolumn, drugie dotknięcie odwraca. Filtr „więcej niż raz".
+  Segmenty ze Zwiftu niosą sylwetkę ekranu — ten sam znak co słupek
+  kreskowany na C3. Kolumny liczbowe mają równą szerokość
+  (`table-layout:fixed`), bo przy automatycznej rozjeżdżały się odstępy.
+  **Nazwa NIE jest odnośnikiem** — dotknięcie wiersza ma w przyszłości
+  prowadzić do zakładki z historią segmentu, nie na Stravę. Nie przywracać.
 - **Z2–Z5** — miejsca zarezerwowane, świadomie zostawione (Fryderyk chce
   widzieć docelowy kształt strony)
 - Ikony kolarskie w tle (7 sylwetek, losowe z ustalonego ziarna, pasy przy
   krawędziach, krycie 17% jasny / 10% ciemny)
 
-**Segmenty:** 309 segmentów, 1385 przejazdów, 36 jazd od 28.04.2026.
-**Strava NIE oddaje mocy na segmencie przez API** — `average_watts` przy
-przejeździe jest puste bez miernika mocy (sprawdzone: 0 ze 1385). Liczby, które
-Fryderyk widzi w aplikacji Stravy, nie mają odpowiednika w API. Dlatego kolumna
-mocy to `[E]` z modelu fizycznego, liczona przy wyświetlaniu z `zalozenia`.
-Kontrola na Bump 2: wzór ze średniej prędkości daje 471 W, pełne wyliczenie
-z `TRENING.md` (ważone `v³` + człon pędu) 493 W — zaniżenie 4,4% na krótkim,
-zmiennym podjeździe. Na zjazdach wzór schodzi poniżej zera i wtedy pokazujemy
-kreskę, nie liczbę ujemną.
+**Segmenty:** 365 segmentów, 1717 przejazdów, 61 jazd od `2025-08-01`
+(granica cofnięta 20.08.2026 na prośbę Fryderyka, żeby objąć blok Zwiftowy
+z X–XI 2025). Zmiana tej jednej daty plus przebieg z `pelne_segmenty`
+przesuwa granicę w dowolną stronę — jak `liczone_od`.
+
+**MOC: pokazujemy wyłącznie zmierzoną. Nie przywracać estymaty.**
+Decyzja Fryderyka z 20.08.2026, po tym jak przez pół dnia w kolumnie stała
+liczba `[E]` z modelu fizycznego. Powód jego słowami: te liczby to mocne
+estymaty, których nie ma dziś czym zweryfikować. Powód techniczny: w estymacie
+siedzi CdA 0,38 z tagiem `[?]`, a liczba wygląda w tabeli dokładnie tak samo
+jak pomiar.
+
+Stan faktyczny, sprawdzony na pełnych danych:
+
+| Źródło | Przejazdów | Z mocą | Skąd |
+|---|---|---|---|
+| Zwift (`VirtualRide`) | 118 | **118** | trenażer, `device_watts: true` → `[Z]` |
+| Szosa (`Ride`) | 1599 | **0** | brak miernika, Strava nie oddaje przez API |
+
+Czyli 45 segmentów z liczbą, 320 z kreską. Kolumna wypełni się **sama**
+w dniu, w którym pojawi się miernik mocy — kod bierze `moc_S` z próby i nic
+nie liczy. Funkcja `mocE()` skasowana; jej wyprowadzenie i kontrola na Bump 2
+(471 W wzorem ze średniej prędkości wobec 493 W z pełnego wyliczenia) zostają
+w `TRENING.md` §7.1, gdyby kiedyś wróciła jako osobna, wyraźnie oznaczona
+kolumna.
 
 Nachylenie bierzemy z `average_grade` Stravy. **Nie liczyć go z przewyższenia:**
 `elevation_gain` sumuje same podjazdy i gubi znak — na Obory-Opacz dałoby
