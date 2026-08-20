@@ -728,16 +728,26 @@ function wykresGodzin(){
            fill="var(--slaby)">dziś</text>`;
   }
 
-  // podpisy miesięcy
+  // Podpisy miesięcy. Słupek ma 16 px razem z odstępem, a data „25.08" zajmuje
+  // 27 px — więc dwa podpisy w sąsiednich tygodniach wchodzą na siebie. Zdarza
+  // się to na początku osi: zakres liczony jest od 31.08.2025, czyli pierwszy
+  // tydzień to końcówka sierpnia, a zaraz po nim zaczyna się wrzesień.
+  // Filtrujemy OD KOŃCA, więc przy ciasnocie zostaje podpis nowszy — czyli
+  // prawdziwy początek miesiąca, a nie ogryzek tygodnia sprzed zakresu.
+  const MIN_ODSTEP = 34;
+  const podpisy = [];
   let mPop = null;
   tygodnie.forEach((t,i) => {
     const m = t.od.slice(0,7);
-    if (m !== mPop){
-      s += `<text x="${x(i)}" y="${marGora+wys+16}" font-size="9.5"
-             fill="var(--slaby)">${t.od.slice(8,10)}.${t.od.slice(5,7)}</text>`;
-      mPop = m;
-    }
+    if (m !== mPop){ podpisy.push({ x: x(i), tekst: `${t.od.slice(8,10)}.${t.od.slice(5,7)}` }); mPop = m; }
   });
+  let xPop = Infinity;
+  for (let i = podpisy.length - 1; i >= 0; i--){
+    if (xPop - podpisy[i].x < MIN_ODSTEP) continue;
+    xPop = podpisy[i].x;
+    s += `<text x="${podpisy[i].x}" y="${marGora+wys+16}" font-size="9.5"
+           fill="var(--slaby)">${podpisy[i].tekst}</text>`;
+  }
 
   s += `<line x1="0" y1="${marGora+wys}" x2="${szer}" y2="${marGora+wys}"
          stroke="var(--slaby)" stroke-width="1"/></svg>`;
