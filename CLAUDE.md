@@ -160,6 +160,29 @@ w roku. Lista w `dane.js` → `kryterium_przerwy.wyjazdy_bez_roweru`.
 
 ---
 
+## 7a. Dostęp do Stravy — trzy różne drogi, nie mylić
+
+Nowa sesja łatwo wyciąga błędny wniosek: widzi, że serwer z `.mcp.json`
+prosi o logowanie, i ogłasza brak dostępu do Stravy. **To jest przedwczesny
+wniosek** — dróg jest trzy i tylko jedna bywa zablokowana.
+
+| Droga | Czym jest | Kiedy działa |
+|---|---|---|
+| **A** — `.mcp.json` | serwer zadeklarowany w repo | wymaga OAuth przez `/mcp` w sesji terminalowej; w czacie webowym **nie** |
+| **B** — konektor Stravy na koncie claude.ai | autoryzowany raz, na poziomie konta | działa w sesjach webowych; **tym pobrano komplet danych 19.08.2026** |
+| **C** — GitHub Actions + API Stravy | serwer GitHuba z kluczem z sekretów repo | docelowy automat; **nie wymaga żadnej sesji Claude** |
+
+**Zanim ogłosisz brak dostępu — sprawdź drogę B.** `ToolSearch` po słowie
+„strava" i próbne `list_activities` z `first: 1`. Zajmuje sekundę.
+
+Droga C jest odporna na ten problem z definicji: klucz leży w sekretach repo,
+GitHub loguje się sam. Dlatego automat, a nie ręczne pobieranie z sesji.
+
+**Klucze Stravy nigdy nie trafiają do plików w repo** — repo jest publiczne.
+Wyłącznie `Settings → Secrets and variables → Actions`.
+
+---
+
 ## 8. Co dalej
 
 **Przed 1.09.2026:**
