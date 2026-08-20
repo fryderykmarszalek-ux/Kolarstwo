@@ -132,10 +132,28 @@ nie kolor: sylwetka roweru vs ekranu, słupek kreskowany vs pełny.
   - **Długie jazdy** (C3): najdłuższa jazda w miesiącu, oś ciągła (puste
     miesiące zostają), Zwift kreskowany, linie celu 80 km i rekordu
   - **Kryterium**: wariant B, złamania, data ostatniego złamania
-- **Z1–Z5** — miejsca zarezerwowane, świadomie zostawione (Fryderyk chce
+- **Postępy → Segmenty** (20.08.2026) — tabela wszystkich segmentów od
+  `meta.segmenty_od`: nazwa, najlepszy czas, długość, nachylenie, moc `[E]`,
+  liczba prób. Sortowanie po każdej kolumnie, drugie dotknięcie odwraca.
+  Filtr „więcej niż raz". Nazwa prowadzi na segment na Stravie.
+- **Z2–Z5** — miejsca zarezerwowane, świadomie zostawione (Fryderyk chce
   widzieć docelowy kształt strony)
 - Ikony kolarskie w tle (7 sylwetek, losowe z ustalonego ziarna, pasy przy
   krawędziach, krycie 17% jasny / 10% ciemny)
+
+**Segmenty:** 309 segmentów, 1385 przejazdów, 36 jazd od 28.04.2026.
+**Strava NIE oddaje mocy na segmencie przez API** — `average_watts` przy
+przejeździe jest puste bez miernika mocy (sprawdzone: 0 ze 1385). Liczby, które
+Fryderyk widzi w aplikacji Stravy, nie mają odpowiednika w API. Dlatego kolumna
+mocy to `[E]` z modelu fizycznego, liczona przy wyświetlaniu z `zalozenia`.
+Kontrola na Bump 2: wzór ze średniej prędkości daje 471 W, pełne wyliczenie
+z `TRENING.md` (ważone `v³` + człon pędu) 493 W — zaniżenie 4,4% na krótkim,
+zmiennym podjeździe. Na zjazdach wzór schodzi poniżej zera i wtedy pokazujemy
+kreskę, nie liczbę ujemną.
+
+Nachylenie bierzemy z `average_grade` Stravy. **Nie liczyć go z przewyższenia:**
+`elevation_gain` sumuje same podjazdy i gubi znak — na Obory-Opacz dałoby
++0,28% zamiast prawdziwych −0,1%.
 
 **Dane:** 100 aktywności, pobrane 19.08.2026. `meta.liczone_od = "2025-08-31"`
 — decyzja Fryderyka; wcześniejsza historia zostaje w pliku, ale nie wchodzi do
@@ -269,9 +287,7 @@ jednorazowo, kolejne różnice będą już małe.
       `meta.pobrano`, bo tylko tyle strona naprawdę wie.
 
 **Listopad 2026** (czeka na dane, nie na kod):
-
-**Listopad 2026** (czeka na dane, nie na kod):
-- Grupa A — segmenty, krzywa mocy (wymaga backfillu segmentów od 28.04.2026)
+- Grupa A — krzywa mocy (segmenty zrobione 20.08.2026)
 - Grupa B — tętno, dryf, LTHR, RHR (wymaga danych z pulsometru po 22.08.2026)
 - Grupa D — prognozy vs rzeczywistość
 

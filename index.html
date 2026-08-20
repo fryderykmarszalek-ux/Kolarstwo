@@ -313,6 +313,45 @@ svg{display:block}
 }
 .info b{color:var(--tekst);font-weight:600}
 
+/* --- Tabela segmentów. Sześć kolumn nie mieści się na telefonie, więc tabela
+   przewija się w poziomie we własnej ramce — reszta strony nigdy nie jedzie
+   na boki. --- */
+.tabelka{overflow-x:auto;-webkit-overflow-scrolling:touch;margin-top:4px;
+  border:1px solid var(--linia);border-radius:10px}
+table.segmenty{border-collapse:collapse;width:100%;min-width:600px;font-size:13.5px}
+table.segmenty th{padding:0;border-bottom:1px solid var(--linia);text-align:right;
+  background:var(--plyta)}
+table.segmenty th:first-child{text-align:left}
+table.segmenty th button{
+  appearance:none;background:none;border:0;font:inherit;color:var(--slaby);
+  padding:9px 10px;cursor:pointer;white-space:nowrap;width:100%;
+  display:inline-flex;align-items:center;gap:5px;justify-content:flex-end;
+  transition:color .15s ease;
+}
+table.segmenty th:first-child button{justify-content:flex-start}
+table.segmenty th button:hover{color:var(--tekst)}
+table.segmenty th.akt button{color:var(--tekst);font-weight:600}
+table.segmenty th .strzalka-sort{font-size:10px;opacity:.85}
+table.segmenty td{padding:8px 10px;border-bottom:1px solid var(--linia);
+  text-align:right;font-variant-numeric:tabular-nums;color:var(--slaby)}
+table.segmenty td:first-child{text-align:left;color:var(--tekst)}
+table.segmenty td.akt{color:var(--tekst);font-weight:600}
+table.segmenty tr:last-child td{border-bottom:0}
+table.segmenty tbody tr:hover td{background:var(--plyta)}
+.seg-nazwa{color:inherit;text-decoration:none}
+.seg-nazwa:hover{text-decoration:underline}
+.seg-data{display:block;font-size:11.5px;color:var(--slaby);margin-top:1px}
+.przelaczniki{display:flex;gap:8px;margin:12px 0 0;flex-wrap:wrap}
+.przelaczniki button{
+  appearance:none;font:inherit;font-size:12.5px;cursor:pointer;
+  padding:6px 12px;border-radius:99px;
+  background:var(--plyta);border:1px solid var(--linia);color:var(--slaby);
+  transition:color .15s ease,border-color .15s ease;
+}
+.przelaczniki button:hover{color:var(--tekst)}
+.przelaczniki button.akt{color:var(--na-pigulce);background:var(--sek-pigulka);
+  border-color:var(--sek-pigulka)}
+
 .lista{margin-top:8px;border:1px solid var(--linia);border-radius:10px;overflow:hidden}
 .lista .rzad{
   display:flex;align-items:center;gap:11px;padding:9px 13px;
@@ -1148,6 +1187,259 @@ const c3Dlugie = () => {
 };
 
 /* ==========================================================================
+   SEGMENTY — tabela z sortowaniem
+
+   Dane: dwie tablice w dane.js. "segmenty" to metadane (nazwa, długość,
+   nachylenie ze Stravy), "proby" to pojedyncze przejazdy (czas). Wszystko
+   pozostałe — najlepszy czas, liczba prób, moc — liczy się tutaj, przy
+   wyświetlaniu, zgodnie z wariantem B.
+   ========================================================================== */
+
+// Nazwy segmentów pisali inni ludzie i bywa w nich wszystko: strzałki "->",
+// ampersandy, emoji. Wstawienie takiego tekstu prosto do HTML-a potrafi
+// rozsypać stronę, więc każdy znak specjalny zamieniamy na jego zapis.
+function bezpieczny(t){
+  return String(t).replace(/[&<>"]/g, z =>
+    ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;" })[z]);
+}
+
+function czasNaTekst(sek){
+  const h = Math.floor(sek/3600), m = Math.floor(sek%3600/60), s2 = sek%60;
+  return h ? `${h}:${String(m).padStart(2,"0")}:${String(s2).padStart(2,"0")}`
+           : `${m}:${String(s2).padStart(2,"0")}`;
+}
+function dlugoscNaTekst(m){
+  return m < 1000 ? `${Math.round(m)} m` : `${liczba(m/1000,2)} km`;
+}
+function procentNaTekst(x){
+  return (x < 0 ? "\u2212" : "") + liczba(Math.abs(x),1) + "%";
+}
+
+/* Moc [E] — wariant B w czystej postaci: nie ma jej w danych, bo da się ją
+   wyliczyć. Wzór i wszystkie stałe pochodzą z bloku "zalozenia":
+
+     P = ½·ρ·CdA·v³ + Crr·m·g·v + m·g·(Δh/t)
+
+   Δh liczymy jako nachylenie × długość, a nie z przewyższenia Stravy: pole
+   elevation_gain sumuje same podjazdy i gubi znak. Na Obory-Opacz dałoby
+   +19,5 m zamiast prawdziwych −6,9 m.
+
+   Czego ta liczba NIE zawiera i dlatego zaniża wynik na zrywach:
+   1. Opór powietrza zależy od średniej z v³, a nie od sześcianu średniej v.
+      Na Bump 2 różnica sięga 19% w samym członie powietrznym.
+   2. Brakuje członu pędu — z podsumowania nie wiadomo, czy zawodnik wjechał
+      w segment z rozpędem, czy rozpędzał się na nim.
+   Oba wymagają strumieni sekunda po sekundzie, których w danych nie ma.
+   Kontrola na Bump 2: ten wzór daje 471 W, pełne wyliczenie z TRENING.md 493 W
+   — czyli zaniżenie o 4,4% na krótkim, mocno zmiennym podjeździe. */
+function mocE(dystans_m, nachylenie_proc, czas_s){
+  const Z = D.zalozenia;
+  if (!Z || !czas_s) return null;
+  const m = Z.masa_systemu_kg.v, CdA = Z.CdA_m2.v, Crr = Z.Crr_asfalt.v,
+        rho = Z.rho_kg_m3.v, g = Z.g.v;
+  const v = dystans_m / czas_s;
+  const dh = (nachylenie_proc == null ? 0 : nachylenie_proc/100) * dystans_m;
+  const P = 0.5*rho*CdA*v*v*v + Crr*m*g*v + m*g*(dh/czas_s);
+  // Na zjeździe człon wznoszenia jest ujemny i potrafi przewyższyć opory —
+  // wtedy wzór daje moc ujemną. Fizycznie znaczy to „grawitacja wykonuje pracę
+  // za zawodnika", a nie „zawodnik pedałuje wstecz": na takim segmencie można
+  // w ogóle nie pedałować, a czas i tak się zmierzy. Model nie wie, ile z tego
+  // było pedałowania, a ile toczenia się — więc uczciwą odpowiedzią jest brak
+  // liczby, nie liczba ze znakiem minus.
+  return P > 0 ? P : null;
+}
+
+const SEGMENTY = (() => {
+  const meta = new Map((D.segmenty || []).map(x => [x.id, x]));
+  const jazdaPo = new Map(D.aktywnosci.map(a => [a.id, a]));
+  const grupy = new Map();
+  for (const p of (D.proby || [])){
+    if (!grupy.has(p.s)) grupy.set(p.s, []);
+    grupy.get(p.s).push(p);
+  }
+  const wynik = [];
+  for (const [id, proby] of grupy){
+    const m = meta.get(id);
+    if (!m) continue;                       // metadane bez prób i odwrotnie — pomijamy
+    const naj = proby.reduce((a,b) => b.czas_s < a.czas_s ? b : a);
+    const jazda = jazdaPo.get(naj.a);
+    wynik.push({
+      id, nazwa: m.nazwa,
+      dystans: m.dystans_m,
+      nachylenie: m.nachylenie_proc,
+      czas: naj.czas_s,
+      // Moc z miernika, gdyby kiedyś była; do tego czasu estymata z fizyki.
+      moc: naj.moc_S != null ? naj.moc_S : mocE(m.dystans_m, m.nachylenie_proc, naj.czas_s),
+      mocTag: naj.moc_S != null ? (naj.z_miernika ? "Z" : "S") : "E",
+      prob: proby.length,
+      data: jazda ? jazda.data.slice(0,10) : null
+    });
+  }
+  return wynik;
+})();
+
+const IKONY_KOLUMN = {
+  az:    `<span style="font-size:10.5px;letter-spacing:.02em">A→Z</span>`,
+  czas:  `<svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor"
+            stroke-width="1.5"><circle cx="8" cy="9" r="5.6"/><path d="M8 5.8V9l2.2 1.6M6 1.6h4"/></svg>`,
+  dlugosc: `<svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor"
+            stroke-width="1.5"><path d="M1.5 6.5h13v3h-13zM4.5 6.5v1.6M7.5 6.5v2.4M10.5 6.5v1.6"/></svg>`,
+  nachylenie: `<svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor"
+            stroke-width="1.5"><path d="M1.5 13.5h13L1.5 4.2z"/></svg>`,
+  moc:   `<svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><path
+            d="M9.2 1.2 3.4 9h3.4l-.9 5.8L12.6 7H9.1z"/></svg>`,
+  proby: `<svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor"
+            stroke-width="1.5"><path d="M2 12.5c0-2 1.4-3.4 3-3.4s3 1.4 3 3.4M8 12.5c0-2 1.4-3.4 3-3.4
+            s3 1.4 3 3.4"/><circle cx="5" cy="4.6" r="2.1"/><circle cx="11" cy="4.6" r="2.1"/></svg>`
+};
+
+// Kierunek PIERWSZEGO kliknięcia. Nazwa od A, czas od najkrótszego, reszta od
+// największej wartości — bo tak zwykle chce się patrzeć. Drugie kliknięcie
+// odwraca, trzecie znowu i tak w kółko.
+const KOLUMNY = [
+  { k:"nazwa",      etykieta:"Segment",   ikona:IKONY_KOLUMN.az,    tekst:true, malejaco:false },
+  { k:"czas",       etykieta:"Najlepszy", ikona:IKONY_KOLUMN.czas,               malejaco:false },
+  { k:"dystans",    etykieta:"Długość",   ikona:IKONY_KOLUMN.dlugosc,            malejaco:true  },
+  { k:"nachylenie", etykieta:"Nachylenie",ikona:IKONY_KOLUMN.nachylenie,         malejaco:true  },
+  { k:"moc",        etykieta:"Moc",       ikona:IKONY_KOLUMN.moc,                malejaco:true  },
+  { k:"prob",       etykieta:"Próby",     ikona:IKONY_KOLUMN.proby,              malejaco:true  }
+];
+
+let sortKlucz = "prob", sortMalejaco = true, tylkoWielokrotne = false;
+
+function posortowane(){
+  const kol = KOLUMNY.find(x => x.k === sortKlucz);
+  const lista = SEGMENTY.filter(x => !tylkoWielokrotne || x.prob > 1);
+  return lista.sort((a,b) => {
+    const x = a[sortKlucz], y = b[sortKlucz];
+    if (x == null && y == null) return 0;
+    if (x == null) return 1;                 // puste zawsze na końcu, w obie strony
+    if (y == null) return -1;
+    const r = kol.tekst ? String(x).localeCompare(String(y), "pl") : x - y;
+    return sortMalejaco ? -r : r;
+  });
+}
+
+function wierszeSegmentow(){
+  return posortowane().map(x => `
+    <tr>
+      <td class="${sortKlucz==="nazwa"?"akt":""}">
+        <a class="seg-nazwa" href="https://www.strava.com/segments/${x.id}"
+           target="_blank" rel="noopener">${bezpieczny(x.nazwa)}</a>
+        ${x.data ? `<span class="seg-data">najlepsza próba ${pl(x.data)}</span>` : ""}
+      </td>
+      <td class="${sortKlucz==="czas"?"akt":""}">${czasNaTekst(x.czas)}</td>
+      <td class="${sortKlucz==="dystans"?"akt":""}">${dlugoscNaTekst(x.dystans)}</td>
+      <td class="${sortKlucz==="nachylenie"?"akt":""}">${
+        x.nachylenie == null ? "—" : procentNaTekst(x.nachylenie)}</td>
+      <td class="${sortKlucz==="moc"?"akt":""}"${
+        x.moc == null ? ' title="Zjazd — model nie odróżnia pedałowania od toczenia się"' : ""
+      }>${x.moc == null ? "—" : Math.round(x.moc) + " W"}</td>
+      <td class="${sortKlucz==="prob"?"akt":""}">${x.prob}</td>
+    </tr>`).join("");
+}
+
+function naglowkiSegmentow(){
+  return KOLUMNY.map(kol => `
+    <th class="${sortKlucz===kol.k?"akt":""}">
+      <button type="button" data-k="${kol.k}"
+        title="Sortuj po: ${kol.etykieta}">${kol.ikona}<span>${kol.etykieta}</span>${
+        sortKlucz===kol.k ? `<span class="strzalka-sort">${sortMalejaco?"▼":"▲"}</span>` : ""
+      }</button>
+    </th>`).join("");
+}
+
+const tabelaSegmentow = () => {
+  const wielokrotne = SEGMENTY.filter(x => x.prob > 1).length;
+  const najwiecej = SEGMENTY.reduce((a,b) => b.prob > a.prob ? b : a, {prob:0});
+  return `
+  <section>
+    <h2>Segmenty</h2>
+    <p class="opis">
+      Każdy segment, który przejechałeś od ${pl(D.meta.segmenty_od)} —
+      ${SEGMENTY.length} sztuk, ${(D.proby||[]).length} przejazdów.
+      Wszystkie liczby pochodzą z <b>najlepszej próby</b>. Dotknij nagłówka,
+      żeby posortować; dotknij drugi raz, żeby odwrócić kolejność.
+      Nazwa prowadzi na segment na Stravie.
+    </p>
+    <p class="opis">
+      Moc jest oznaczona <b>[E]</b>: nie ma jej w danych, bo Strava nie oddaje
+      mocy na segmencie przez API, a miernika mocy nie ma na rowerze. Liczy się
+      ją z fizyki przy założeniach CdA ${liczba(D.zalozenia.CdA_m2.v,2)} i masie
+      ${liczba(D.zalozenia.masa_systemu_kg.v,1)} kg. Ze średniej prędkości, więc
+      na krótkich zrywach zaniża o kilka procent. Zmiana CdA w danych przelicza
+      całą kolumnę. Na zjazdach zamiast liczby stoi kreska: tam wzór wychodzi
+      poniżej zera, bo pracę wykonuje grawitacja, a ile z tego było pedałowania
+      — tego z podsumowania nie da się wyczytać.
+      <br>Najlepszy czas nie odróżnia jazdy solo od jazdy w grupie ani wiatru
+      — rekord z koła kolegi wygląda tu tak samo jak samotny.
+    </p>
+    <div class="przelaczniki">
+      <button type="button" data-filtr="wszystkie" class="${tylkoWielokrotne?"":"akt"}"
+        >Wszystkie (${SEGMENTY.length})</button>
+      <button type="button" data-filtr="wielokrotne" class="${tylkoWielokrotne?"akt":""}"
+        >Przejechane więcej niż raz (${wielokrotne})</button>
+    </div>
+    <div class="tabelka">
+      <table class="segmenty">
+        <thead><tr id="naglowki-segmentow">${naglowkiSegmentow()}</tr></thead>
+        <tbody id="wiersze-segmentow">${wierszeSegmentow()}</tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <div class="kafelki">
+      <div class="kafel">
+        <div class="etykieta">Segmentów</div>
+        <div class="liczba">${SEGMENTY.length}</div>
+        <div class="stopka">${wielokrotne} więcej niż raz</div>
+      </div>
+      <div class="kafel">
+        <div class="etykieta">Przejazdów</div>
+        <div class="liczba">${(D.proby||[]).length}</div>
+        <div class="stopka">z ${(D.segmenty_pobrane||[]).length} jazd</div>
+      </div>
+      <div class="kafel">
+        <div class="etykieta">Najczęstszy segment</div>
+        <div class="liczba">${najwiecej.prob}</div>
+        <div class="stopka">${najwiecej.nazwa ? bezpieczny(najwiecej.nazwa) : "—"}</div>
+      </div>
+      <div class="kafel">
+        <div class="etykieta">Najdłuższy</div>
+        <div class="liczba">${liczba(Math.max(...SEGMENTY.map(x=>x.dystans))/1000,1)}</div>
+        <div class="stopka">km</div>
+      </div>
+    </div>
+  </section>`;
+};
+
+function podepnijTabele(){
+  const naglowki = document.getElementById("naglowki-segmentow");
+  if (!naglowki) return;
+  const odswiez = () => {
+    naglowki.innerHTML = naglowkiSegmentow();
+    document.getElementById("wiersze-segmentow").innerHTML = wierszeSegmentow();
+  };
+  naglowki.addEventListener("click", e => {
+    const b = e.target.closest("button");
+    if (!b) return;
+    const k = b.dataset.k;
+    if (k === sortKlucz) sortMalejaco = !sortMalejaco;
+    else { sortKlucz = k; sortMalejaco = KOLUMNY.find(x => x.k === k).malejaco; }
+    odswiez();
+  });
+  document.querySelectorAll(".przelaczniki button").forEach(b => {
+    b.addEventListener("click", () => {
+      tylkoWielokrotne = b.dataset.filtr === "wielokrotne";
+      document.querySelectorAll(".przelaczniki button").forEach(x =>
+        x.classList.toggle("akt", (x.dataset.filtr === "wielokrotne") === tylkoWielokrotne));
+      odswiez();
+    });
+  });
+}
+
+/* ==========================================================================
    SEKCJE — poziom 1 i poziom 2.
    Zakładka trafia na pasek tylko gdy ma wpis tutaj. Z1–Z5 to miejsca
    zarezerwowane; dostaną nazwy, kiedy dostaną treść.
@@ -1163,7 +1455,12 @@ const SEKCJE = [
       { id:"dlugie",    tytul:"Długie jazdy", rysuj: c3Dlugie },
       { id:"kryterium", tytul:"Kryterium", rysuj: kryterium }
   ]},
-  ...[1,2,3,4,5].map(n => ({
+  { id:"postepy", tytul:"Postępy", barwa:"fiolet", pod:[
+      { id:"segmenty", tytul:"Segmenty", rysuj: tabelaSegmentow },
+      { id:"p2", tytul:"P2", rysuj: () => pusto("P2") },
+      { id:"p3", tytul:"P3", rysuj: () => pusto("P3") }
+  ]},
+  ...[2,3,4,5].map(n => ({
     id:"z"+n, tytul:"Z"+n, barwa:["fiolet","limonka","fuksja","cyjan","pomarancz"][n-1],
     pod:[1,2,3].map(m => ({
       id:"z"+n+"-"+m, tytul:"Z"+n+"."+m, rysuj: () => pusto("Z"+n+"."+m)
@@ -1290,6 +1587,7 @@ function zaznacz(el){
 function podepnijSlupki(){
   podepnijTygodnie();
   podepnijMiesiace();
+  podepnijTabele();
   const info = document.getElementById("info-przerwa");
   if (!info) return;
   document.querySelectorAll(".slupek").forEach(el => {
