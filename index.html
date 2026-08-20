@@ -351,7 +351,35 @@ table.segmenty tbody tr:hover td{background:var(--plyta)}
 .seg-nazwa{color:inherit;display:block;overflow-wrap:anywhere}
 .seg-zwift{display:inline-block;vertical-align:-2px;margin-right:5px;color:var(--slaby)}
 .seg-data{display:block;font-size:11.5px;color:var(--slaby);margin-top:1px;min-height:1px}
-.przelaczniki{display:flex;gap:8px;margin:12px 0 0;flex-wrap:wrap}
+/* Pasek nad tabelą: filtry po lewej, szukanie i reset po prawej. Na wąskim
+   ekranie grupa szukania spada do drugiej linii zamiast ściskać pastylki. */
+.przelaczniki{display:flex;gap:8px;margin:12px 0 0;flex-wrap:wrap;
+  align-items:center;justify-content:space-between}
+.grupa-filtry,.grupa-szukaj{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.szukajka{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:5px 12px;border-radius:99px;
+  background:var(--plyta);border:1px solid var(--linia);color:var(--slaby);
+  transition:border-color .15s ease,color .15s ease;
+}
+.szukajka:focus-within{border-color:var(--sek-kropka);color:var(--tekst)}
+.szukajka input{
+  appearance:none;background:none;border:0;outline:0;font:inherit;font-size:12.5px;
+  color:var(--tekst);width:130px;min-width:0;padding:1px 0;
+}
+.szukajka input::placeholder{color:var(--slaby)}
+/* Safari rysuje w polu type="search" własny krzyżyk — dwa krzyżyki obok siebie
+   znaczyłyby dwie różne rzeczy, więc zostawiamy tylko nasz. */
+.szukajka input::-webkit-search-cancel-button{-webkit-appearance:none;display:none}
+#reset-segmentow{
+  appearance:none;font:inherit;font-size:15px;line-height:1;cursor:pointer;
+  width:30px;height:30px;border-radius:99px;
+  display:inline-flex;align-items:center;justify-content:center;
+  background:var(--plyta);border:1px solid var(--linia);color:var(--slaby);
+  transition:color .15s ease,border-color .15s ease,transform .16s ease;
+}
+#reset-segmentow:hover{color:var(--tekst);border-color:var(--slaby)}
+#reset-segmentow:active{transform:scale(.92)}
 .przelaczniki button{
   appearance:none;font:inherit;font-size:12.5px;cursor:pointer;
   padding:6px 12px;border-radius:99px;
@@ -1307,11 +1335,41 @@ const KOLUMNY = [
   { k:"prob",       etykieta:"Próby",     ikona:IKONY_KOLUMN.proby,              malejaco:true  }
 ];
 
-let sortKlucz = "prob", sortMalejaco = true, tylkoWielokrotne = false;
+// Wartości domyślne trzymane osobno, bo krzyżyk musi umieć do nich wrócić.
+// Gdyby siedziały tylko w tych zmiennych, reset kopiowałby je po raz drugi
+// i któraś kopia kiedyś by się rozjechała.
+const DOMYSLNIE = { klucz:"prob", malejaco:true, filtr:"wszystkie", szukaj:"" };
+
+// Filtry wykluczają się wzajemnie — dlatego jedna wartość, a nie cztery
+// niezależne przełączniki. "Z pomiarem mocy" i "bez pomiaru" to dziś podział
+// na Zwift i szosę, ale reguła jest napisana na pomiarze, nie na dyscyplinie:
+// w dniu, w którym na rowerze pojawi się miernik, filtr sam zacznie znaczyć
+// to, co powinien, bez ruszania kodu.
+const FILTRY = [
+  { id:"wszystkie",   etykieta:"Wszystkie",             pasuje: () => true },
+  { id:"wielokrotne", etykieta:"Przejechane więcej niż raz", pasuje: x => x.prob > 1 },
+  { id:"zmoca",       etykieta:"Z pomiarem mocy",       pasuje: x => x.moc != null },
+  { id:"bezmocy",     etykieta:"Bez pomiaru mocy",      pasuje: x => x.moc == null }
+];
+
+let sortKlucz = DOMYSLNIE.klucz, sortMalejaco = DOMYSLNIE.malejaco,
+    filtr = DOMYSLNIE.filtr, szukaj = DOMYSLNIE.szukaj;
+
+// Szukanie ma nie zależeć od wielkości liter ani od ogonków: wpisane "petla"
+// musi znaleźć "Pętla". NFD rozkłada literę na znak i ogonek, który potem
+// wycinamy; ł nie ma takiego rozkładu, więc idzie osobno.
+function bezOgonkow(t){
+  const x = String(t).toLowerCase().replace(/ł/g, "l");
+  try { return x.normalize("NFD").replace(/[\u0300-\u036f]/g, ""); }
+  catch(e){ return x; }
+}
 
 function posortowane(){
   const kol = KOLUMNY.find(x => x.k === sortKlucz);
-  const lista = SEGMENTY.filter(x => !tylkoWielokrotne || x.prob > 1);
+  const fraza = bezOgonkow(szukaj.trim());
+  const przepuszcza = (FILTRY.find(f => f.id === filtr) || FILTRY[0]).pasuje;
+  const lista = SEGMENTY.filter(x =>
+    przepuszcza(x) && (!fraza || bezOgonkow(x.nazwa).includes(fraza)));
   return lista.sort((a,b) => {
     const x = a[sortKlucz], y = b[sortKlucz];
     if (x == null && y == null) return 0;
@@ -1323,7 +1381,11 @@ function posortowane(){
 }
 
 function wierszeSegmentow(){
-  return posortowane().map(x => `
+  const lista = posortowane();
+  if (!lista.length) return `
+    <tr><td colspan="7" class="pusty-wynik">Żaden segment nie ma
+      „${bezpieczny(szukaj.trim())}" w nazwie.</td></tr>`;
+  return lista.map(x => `
     <tr>
       <td class="${sortKlucz==="nazwa"?"akt":""}">
         <span class="seg-nazwa">${x.zwift
@@ -1343,6 +1405,20 @@ function wierszeSegmentow(){
       }>${x.moc == null ? "—" : Math.round(x.moc) + " W"}</td>
       <td class="${sortKlucz==="prob"?"akt":""}">${x.prob}</td>
     </tr>`).join("");
+}
+
+// Ile z ilu — bez tego przy włączonym szukaniu nie widać, czy lista jest
+// krótka, bo taka jest, czy dlatego, że coś zostało odfiltrowane.
+function podsumowanieSegmentow(){
+  const widac = posortowane().length;
+  const czynne = szukaj.trim() || filtr !== DOMYSLNIE.filtr;
+  return czynne
+    ? `Widać <b>${widac}</b> z ${SEGMENTY.length} segmentów.`
+      + (szukaj.trim() ? ` Szukane: „${bezpieczny(szukaj.trim())}".` : "")
+      + ` Krzyżyk czyści szukanie, filtr i sortowanie.`
+    : `Wszystkie ${SEGMENTY.length} segmentów. Sortowanie: `
+      + `${KOLUMNY.find(k => k.k === sortKlucz).etykieta.toLowerCase()}, `
+      + `${sortMalejaco ? "malejąco" : "rosnąco"}.`;
 }
 
 function naglowkiSegmentow(){
@@ -1384,10 +1460,25 @@ const tabelaSegmentow = () => {
       — rekord z koła kolegi wygląda tu tak samo jak samotny.
     </p>
     <div class="przelaczniki">
-      <button type="button" data-filtr="wszystkie" class="${tylkoWielokrotne?"":"akt"}"
-        >Wszystkie (${SEGMENTY.length})</button>
-      <button type="button" data-filtr="wielokrotne" class="${tylkoWielokrotne?"akt":""}"
-        >Przejechane więcej niż raz (${wielokrotne})</button>
+      <div class="grupa-filtry">
+        ${FILTRY.map(f => `<button type="button" data-filtr="${f.id}"
+          class="${filtr === f.id ? "akt" : ""}">${f.etykieta} (${
+          SEGMENTY.filter(f.pasuje).length})</button>`).join("")}
+      </div>
+      <div class="grupa-szukaj">
+        <label class="szukajka">
+          <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor"
+            stroke-width="1.6" stroke-linecap="round" aria-hidden="true">
+            <circle cx="7" cy="7" r="4.6"/><path d="M10.4 10.4 14 14"/></svg>
+          <input id="szukaj-segmentu" type="search" enterkeyhint="search"
+            autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
+            placeholder="Szukaj w nazwie" aria-label="Szukaj w nazwie segmentu"
+            value="${bezpieczny(szukaj)}">
+        </label>
+        <button type="button" id="reset-segmentow"
+          title="Wyczyść szukanie, filtr i sortowanie"
+          aria-label="Wyczyść szukanie, filtr i sortowanie">&times;</button>
+      </div>
     </div>
     <div class="tabelka">
       <table class="segmenty">
@@ -1395,6 +1486,7 @@ const tabelaSegmentow = () => {
         <tbody id="wiersze-segmentow">${wierszeSegmentow()}</tbody>
       </table>
     </div>
+    <div class="info" id="info-segmentow">${podsumowanieSegmentow()}</div>
   </section>
 
   <section>
@@ -1426,9 +1518,14 @@ const tabelaSegmentow = () => {
 function podepnijTabele(){
   const naglowki = document.getElementById("naglowki-segmentow");
   if (!naglowki) return;
+  // Przerysowujemy WYŁĄCZNIE nagłówki, wiersze i podsumowanie. Gdyby odświeżać
+  // cały blok, pole szukania powstawałoby od nowa przy każdym wciśniętym
+  // klawiszu i za każdym razem gubiłoby kursor razem z klawiaturą iPada.
   const odswiez = () => {
     naglowki.innerHTML = naglowkiSegmentow();
     document.getElementById("wiersze-segmentow").innerHTML = wierszeSegmentow();
+    const info = document.getElementById("info-segmentow");
+    if (info) info.innerHTML = podsumowanieSegmentow();
   };
   naglowki.addEventListener("click", e => {
     const b = e.target.closest("button");
@@ -1438,13 +1535,40 @@ function podepnijTabele(){
     else { sortKlucz = k; sortMalejaco = KOLUMNY.find(x => x.k === k).malejaco; }
     odswiez();
   });
-  document.querySelectorAll(".przelaczniki button").forEach(b => {
+  const zaznaczFiltr = () => document.querySelectorAll(".grupa-filtry button")
+    .forEach(x => x.classList.toggle("akt", x.dataset.filtr === filtr));
+
+  document.querySelectorAll(".grupa-filtry button").forEach(b => {
     b.addEventListener("click", () => {
-      tylkoWielokrotne = b.dataset.filtr === "wielokrotne";
-      document.querySelectorAll(".przelaczniki button").forEach(x =>
-        x.classList.toggle("akt", (x.dataset.filtr === "wielokrotne") === tylkoWielokrotne));
+      filtr = b.dataset.filtr;
+      zaznaczFiltr();
       odswiez();
     });
+  });
+
+  const pole = document.getElementById("szukaj-segmentu");
+  if (pole){
+    // Lista przesiewa się przy każdej literze — przy 365 wierszach jest to
+    // niezauważalne, a nie trzeba nic zatwierdzać. Enter niczego nie zmienia
+    // w wyniku, tylko chowa klawiaturę, żeby było widać całą tabelę.
+    pole.addEventListener("input", () => { szukaj = pole.value; odswiez(); });
+    pole.addEventListener("keydown", e => {
+      if (e.key === "Enter"){ e.preventDefault(); pole.blur(); }
+    });
+  }
+
+  const krzyzyk = document.getElementById("reset-segmentow");
+  if (krzyzyk) krzyzyk.addEventListener("click", () => {
+    sortKlucz = DOMYSLNIE.klucz;
+    sortMalejaco = DOMYSLNIE.malejaco;
+    filtr = DOMYSLNIE.filtr;
+    szukaj = DOMYSLNIE.szukaj;
+    if (pole) pole.value = "";
+    zaznaczFiltr();
+    odswiez();
+    // Tabela bywa przewinięta w bok — reset ma oddać widok, jaki był na wejściu.
+    const ramka = document.querySelector(".tabelka");
+    if (ramka) ramka.scrollLeft = 0;
   });
 }
 
