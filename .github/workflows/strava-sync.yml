@@ -8,6 +8,11 @@ on:
     # 20:00 UTC = 22:00 w Polsce latem, 21:00 zimą. Cron GitHuba chodzi na UTC.
     - cron: "0 20 * * *"
   workflow_dispatch:        # pozwala odpalić ręcznie przyciskiem
+    inputs:
+      pelne_opisy:
+        description: "Odśwież opisy WSZYSTKICH jazd, nie tylko z ostatnich 30 dni"
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -32,6 +37,9 @@ jobs:
           STRAVA_CLIENT_ID: ${{ secrets.STRAVA_CLIENT_ID }}
           STRAVA_CLIENT_SECRET: ${{ secrets.STRAVA_CLIENT_SECRET }}
           STRAVA_REFRESH_TOKEN: ${{ secrets.STRAVA_REFRESH_TOKEN }}
+          # Przy uruchomieniu z harmonogramu inputs jest puste, więc wychodzi
+          # "" i skrypt zostaje przy oknie 30 dni. Pełny przebieg tylko ręcznie.
+          PELNE_OPISY: ${{ inputs.pelne_opisy }}
         run: node .github/skrypty/pobierz-strave.js
 
       - name: Sprawdź, czy plik się parsuje

@@ -134,6 +134,23 @@ header{
   transition:color .18s ease,border-color .18s ease;
 }
 #motyw:hover{color:var(--tekst);border-color:var(--slaby)}
+
+/* Odnośnik do profilu na Stravie — lustro przycisku motywu, po drugiej stronie
+   nagłówka. Znak rysowany od zera jako SVG, żadnego pliku ani biblioteki.
+   Barwa: chrom interfejsu, nie pomarańcz Stravy. Pomarańcz jest w tym projekcie
+   zajęty przez zakładkę Z5, a kolory sekcji mają jedno znaczenie: „tu jesteś".
+   Tożsamość Stravy niesie tu KSZTAŁT, zgodnie z zasadą, że rozróżnienia
+   niebędące danymi idą sylwetką, nie kolorem. */
+#strava{
+  position:absolute;left:14px;top:14px;
+  display:inline-flex;align-items:center;justify-content:center;
+  width:34px;height:34px;border-radius:99px;
+  background:var(--plyta);border:1px solid var(--linia);color:var(--slaby);
+  transition:color .18s ease,border-color .18s ease,transform .16s ease;
+}
+#strava:hover{color:var(--tekst);border-color:var(--slaby)}
+#strava:active{transform:scale(.94)}
+#strava svg{display:block;width:16px;height:16px}
 header h1{margin:0;font-size:19px;font-weight:600;letter-spacing:-.01em}
 header .pod{color:var(--slaby);font-size:12.5px;margin-top:3px}
 
@@ -227,6 +244,27 @@ main{
 main.wchodzi{animation:wejscie .26s ease both}
 @keyframes wejscie{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 
+/* --- Wiek danych. Strona sama z siebie nie wie nic: pokazuje stan z pliku,
+   który dowozi automat. Gdy automat stanie, wszystko poniżej zamarza po cichu
+   i wygląda dokładnie tak samo jak dane świeże. Licznik dni od ostatniej jazdy
+   zamarza pierwszy, a to na nim stoi kryterium sezonu — dlatego wiek danych
+   dostaje własny pasek nad treścią, widoczny na każdej zakładce.
+   Czerwień znaczy tu to samo, co wszędzie indziej na tej stronie: przekroczony
+   próg, patrz i reaguj. Raz jest to próg przerwy, raz próg wieku danych. --- */
+#wiek-danych{
+  max-width:1000px;margin:16px auto -6px;padding:11px 15px;
+  background:var(--plyta);border:1px solid var(--linia);
+  border-left:3px solid var(--slaby);border-radius:10px;
+  font-size:13px;line-height:1.45;color:var(--slaby);
+  position:relative;z-index:1;
+}
+#wiek-danych:empty{display:none}
+#wiek-danych b{color:var(--tekst);font-weight:600}
+#wiek-danych.stoi{border-left-color:var(--alarm)}
+#wiek-danych.stoi b{color:var(--alarm)}
+#wiek-danych a{color:var(--slaby);text-decoration:underline}
+#wiek-danych a:hover{color:var(--tekst)}
+
 h2{font-size:15px;font-weight:600;margin:0 0 4px}
 .opis{color:var(--slaby);font-size:13px;margin:0 0 14px}
 section{margin-bottom:34px}
@@ -319,6 +357,13 @@ footer{color:var(--slaby);font-size:12px;padding:14px 20px 34px;max-width:1000px
 <div id="tlo-ikony" aria-hidden="true"></div>
 
 <header>
+  <a id="strava" href="https://www.strava.com" target="_blank" rel="noopener"
+     title="Mój profil na Stravie" aria-label="Otwórz mój profil na Stravie">
+    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <path d="M15.387 17.944l-2.089-4.116h-3.065L15.387 24l5.15-10.172h-3.066
+               m-7.008-5.599l2.836 5.598h4.172L10.463 0l-7 13.828h4.169"/>
+    </svg>
+  </a>
   <button id="motyw" type="button" title="Motyw: auto / jasny / ciemny"></button>
   <h1>Kolarstwo — postępy</h1>
   <div class="pod" id="stopka-naglowka"></div>
@@ -329,6 +374,7 @@ footer{color:var(--slaby);font-size:12px;padding:14px 20px 34px;max-width:1000px
   <div class="pasek2" id="pasek2"></div>
 </div>
 
+<div id="wiek-danych" role="status"></div>
 <main id="tresc"></main>
 <footer id="stopka"></footer>
 
@@ -426,6 +472,46 @@ const ostatniaJazda = jazdy[jazdy.length-1];
 const wyjazdTrwa = wyjazdDla(ostatniDzien, DZIS);
 
 /* ==========================================================================
+   WIEK DANYCH — jedyne miejsce, w którym strona pyta o zegar urządzenia.
+   Cała reszta liczy się względem dnia pobrania, bo tylko tyle strona naprawdę
+   wie. Różnica między „co wiem" a „który mamy dzień" jest jedyną liczbą
+   zdolną wykryć, że automat stanął.
+
+   Progi wynikają z harmonogramu: automat chodzi raz na dobę, więc zdrowy stan
+   to wiek 0 albo 1 dnia. Dwa dni = dwa nieudane odświeżenia z rzędu, warte
+   wzmianki. Cztery = to już nie zacięcie, tylko awaria.
+   ========================================================================== */
+
+const dzisRzeczywisty = (() => {
+  const t = new Date(), p = n => String(n).padStart(2,"0");
+  return `${t.getFullYear()}-${p(t.getMonth()+1)}-${p(t.getDate())}`;
+})();
+
+// Zegar urządzenia potrafi się cofnąć (strefa, ręcznie przestawiona data).
+// Ujemny wiek znaczy „nie wiem", a nie „dane z przyszłości" — ścinamy do zera.
+const WIEK = Math.max(0, roznicaDni(naDzien(DZIS), naDzien(dzisRzeczywisty)));
+const WIEK_UWAGA = 2;
+const WIEK_ALARM = 4;
+const DANE_STOJA = WIEK >= WIEK_ALARM;
+
+const ADRES_AUTOMATU =
+  "https://github.com/fryderykmarszalek-ux/Kolarstwo/actions";
+
+function pokazWiekDanych(){
+  const el = document.getElementById("wiek-danych");
+  if (WIEK < WIEK_UWAGA){ el.textContent = ""; return; }
+  el.classList.toggle("stoi", DANE_STOJA);
+  el.innerHTML = DANE_STOJA
+    ? `<b>Dane stoją od ${WIEK} dni.</b> Wszystko poniżej pokazuje stan na `
+      + `${pl(DZIS)}, nie na dziś. Licznik dni od ostatniej jazdy jest `
+      + `zaniżony o ${WIEK}, a kryterium sezonu liczy się z niepełnej historii. `
+      + `Automat miał odświeżyć plik wieczorem i tego nie zrobił — `
+      + `<a href="${ADRES_AUTOMATU}" target="_blank" rel="noopener">sprawdź przebiegi &#8599;</a>`
+    : `Dane sprzed <b>${WIEK} dni</b> — stan na ${pl(DZIS)}. Automat odświeża `
+      + `plik codziennie wieczorem; jeśli jutro ta data się nie ruszy, coś się zacięło.`;
+}
+
+/* ==========================================================================
    WYKRES C2 — PRZERWY
    Oś ucięta na 60 dniach: słupki dłuższe idą do sufitu, dostają ząbek
    i liczbę nad sobą. Bez tego 108 dni spłaszcza wszystkie normalne
@@ -517,7 +603,12 @@ function wykresPrzerw(){
 // Cel z planu na koniec października. To linia odniesienia, NIE sufit —
 // gdyby sufit był sztywny, tydzień powyżej 6 h zostałby ucięty i wyglądałby
 // tak samo jak dokładnie 6 h. Skala rośnie razem z najmocniejszym tygodniem.
-const CEL_H = 6;
+// Cel = najwyższy tydzień planu. Czytany z planu, a nie wpisany tutaj: gdyby
+// plan się zmienił, linia, legenda i kafelek mają pójść za nim same. Zapasowe
+// 6 to koło ratunkowe na wypadek pustego planu, nie drugie źródło prawdy.
+const CEL_H = D.plan_objetosci.length
+  ? Math.max(...D.plan_objetosci.map(p => p.godziny))
+  : 6;
 
 function tydzienPlanu(pn){
   const kon = pn + 6*86400000;
@@ -661,16 +752,26 @@ function wykresGodzin(){
            fill="var(--slaby)">dziś</text>`;
   }
 
-  // podpisy miesięcy
+  // Podpisy miesięcy. Słupek ma 16 px razem z odstępem, a data „25.08" zajmuje
+  // 27 px — więc dwa podpisy w sąsiednich tygodniach wchodzą na siebie. Zdarza
+  // się to na początku osi: zakres liczony jest od 31.08.2025, czyli pierwszy
+  // tydzień to końcówka sierpnia, a zaraz po nim zaczyna się wrzesień.
+  // Filtrujemy OD KOŃCA, więc przy ciasnocie zostaje podpis nowszy — czyli
+  // prawdziwy początek miesiąca, a nie ogryzek tygodnia sprzed zakresu.
+  const MIN_ODSTEP = 34;
+  const podpisy = [];
   let mPop = null;
   tygodnie.forEach((t,i) => {
     const m = t.od.slice(0,7);
-    if (m !== mPop){
-      s += `<text x="${x(i)}" y="${marGora+wys+16}" font-size="9.5"
-             fill="var(--slaby)">${t.od.slice(8,10)}.${t.od.slice(5,7)}</text>`;
-      mPop = m;
-    }
+    if (m !== mPop){ podpisy.push({ x: x(i), tekst: `${t.od.slice(8,10)}.${t.od.slice(5,7)}` }); mPop = m; }
   });
+  let xPop = Infinity;
+  for (let i = podpisy.length - 1; i >= 0; i--){
+    if (xPop - podpisy[i].x < MIN_ODSTEP) continue;
+    xPop = podpisy[i].x;
+    s += `<text x="${podpisy[i].x}" y="${marGora+wys+16}" font-size="9.5"
+           fill="var(--slaby)">${podpisy[i].tekst}</text>`;
+  }
 
   s += `<line x1="0" y1="${marGora+wys}" x2="${szer}" y2="${marGora+wys}"
          stroke="var(--slaby)" stroke-width="1"/></svg>`;
@@ -691,14 +792,14 @@ const c1Godziny = () => {
       Jeden słupek = jeden tydzień, poniedziałek–niedziela, czas w ruchu.
       Zielona linia to plan objętości na wrzesień i październik.
       Szare pasy to tygodnie odciążeniowe — tam niższy słupek jest
-      zgodny z planem, nie wpadką. Przerywana pozioma linia to cel ${CEL_H} h; skala rośnie sama, gdyby jakiś tydzień go przekroczył.
+      zgodny z planem, nie wpadką. Przerywana pozioma linia to cel ${liczba(CEL_H,1)} h; skala rośnie sama, gdyby jakiś tydzień go przekroczył.
     </p>
     ${wykresGodzin()}
     <div class="legenda">
       <span><i style="background:var(--plan)"></i>plan dowieziony</span>
       <span><i style="background:var(--akcent)"></i>poniżej planu lub bez planu</span>
       <span style="color:var(--plan)"><i class="kreska"></i><span
-        style="color:var(--slaby)">linia planu i cel ${CEL_H} h</span></span>
+        style="color:var(--slaby)">linia planu i cel ${liczba(CEL_H,1)} h</span></span>
       <span><i style="background:var(--odciazenie)"></i>tydzień odciążeniowy</span>
     </div>
     <div class="info" id="info-tydzien">Dotknij słupka, żeby zobaczyć szczegóły.</div>
@@ -723,7 +824,7 @@ const c1Godziny = () => {
       </div>
       <div class="kafel">
         <div class="etykieta">Cel na koniec X</div>
-        <div class="liczba">${CEL_H},0</div>
+        <div class="liczba">${liczba(CEL_H,1)}</div>
         <div class="stopka">godzin tygodniowo</div>
       </div>
       <div class="kafel">
@@ -795,7 +896,9 @@ const przegladStart = () => `
         <div class="liczba">${przerwaTrwa}</div>
         <div class="stopka">${wyjazdTrwa
           ? wyjazdTrwa.opis + " · nie liczy się"
-          : "dni · limit " + PROG}</div>
+          : "dni · limit " + PROG}${DANE_STOJA
+          ? ` · <b style="color:var(--alarm)" title="Dane sprzed ${WIEK} dni — ta liczba jest zaniżona">[?]</b>`
+          : ""}</div>
       </div>
       <div class="kafel">
         <div class="etykieta">W tym tygodniu</div>
@@ -886,7 +989,10 @@ const kryterium = () => `
    41 km na trenażerze nie znaczy tego samego co 41 km na szosie.
    ========================================================================== */
 
-const CEL_KM = 80;   // niedzielna długa jazda, cel z planu IX–X
+// Cel długiej jazdy to decyzja, nie pomiar — mieszka w dane.js obok planu
+// i kryterium. Liczba wpisana tutaj byłaby drugim źródłem prawdy, a przy
+// czterech miejscach użycia to gwarancja, że kiedyś się rozjadą.
+const CEL_KM = (D.cele && D.cele.dluga_jazda_km && D.cele.dluga_jazda_km.v) || 80;
 
 const MIESIACE_RZYM = ["I","II","III","IV","V","VI","VII","VIII","IX","X","XI","XII"];
 
@@ -1214,6 +1320,11 @@ el2.addEventListener("click", e => {
   if (b) location.hash = b.dataset.s + "/" + b.dataset.p;
 });
 
+// Numer zawodnika leży w danych (meta.athlete_id), więc adres profilu składamy
+// z niego — dokładnie tak, jak adresy poszczególnych jazd. Zero nowych pól.
+document.getElementById("strava").href =
+  "https://www.strava.com/athletes/" + D.meta.athlete_id;
+
 document.getElementById("stopka-naglowka").textContent =
   `${jazdy.length} jazd · od ${pl(OD)}`;
 document.getElementById("stopka").innerHTML =
@@ -1334,6 +1445,8 @@ przyciskMotywu.addEventListener("click", () => {
 let zapisany = "auto";
 try { zapisany = localStorage.getItem("motyw") || "auto"; } catch(e){}
 ustawMotyw(zapisany);
+
+pokazWiekDanych();
 
 window.addEventListener("hashchange", pokaz);
 pokaz();
