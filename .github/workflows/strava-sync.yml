@@ -24,7 +24,8 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          # lts/* zamiast konkretnej wersji — nie zestarzeje się za dwa lata
+          node-version: "lts/*"
 
       - name: Pobierz ze Stravy
         env:
@@ -43,11 +44,28 @@ jobs:
         run: |
           if git diff --quiet dane.js; then
             echo "Bez zmian — nic do zrobienia."
-          else
-            git config user.name "Automat Stravy"
-            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git add dane.js
-            git commit -m "Dane ze Stravy — $(date -u +%Y-%m-%d)"
-            git push
-            echo "Zmiany wypchnięte."
+            exit 0
           fi
+
+          git config user.name "Automat Stravy"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add dane.js
+          git commit -m "Dane ze Stravy — $(date -u +%Y-%m-%d)"
+
+          # Zadanie potrafi stać w kolejce GitHuba kilka minut. Jeśli w tym
+          # czasie ktoś wypchnie cokolwiek na main, push zostanie odrzucony
+          # ("fetch first") i cały przebieg pada — tak zginął przebieg #1.
+          # Dlatego: przy odrzuceniu dociągamy zmiany i próbujemy ponownie.
+          for proba in 1 2 3; do
+            if git push; then
+              echo "Zmiany wypchnięte (próba $proba)."
+              exit 0
+            fi
+            echo "Ktoś wyprzedził automat — dociągam i próbuję ponownie ($proba/3)."
+            git pull --rebase origin main || {
+              echo "Rebase się nie udał — przerywam, żeby niczego nie nadpisać."
+              exit 1
+            }
+          done
+          echo "Nie udało się wypchnąć po trzech próbach."
+          exit 1

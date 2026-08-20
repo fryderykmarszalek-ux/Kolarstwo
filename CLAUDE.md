@@ -213,6 +213,13 @@ Zabezpieczenia: pusta odpowiedź przerywa przebieg zamiast kasować dane; przed
 commitem plik musi się sparsować i mieć niezerową liczbę aktywności; commit
 tylko przy faktycznej zmianie.
 
+**Wyścig o push — naprawiony 20.08.2026, nie usuwać.** Zadanie potrafi stać
+w kolejce GitHuba kilka minut. Jeśli w tym czasie ktokolwiek wypchnie coś na
+`main`, push automatu leci na nieaktualny stan i GitHub go odrzuca
+(`fetch first`) — tak zginął przebieg #1. Krok commitujący ma teraz trzy
+próby z `git pull --rebase` pomiędzy. Przy nieudanym rebase przerywa zamiast
+nadpisywać.
+
 Testowane bez sieci (podstawiony `fetch`) — dziewięć kontroli, w tym
 nienaruszalność bloków ręcznych.
 
@@ -220,17 +227,24 @@ nienaruszalność bloków ręcznych.
 
 ## 8. Co dalej
 
-**Do domknięcia (stan 20.08.2026):**
-- [ ] **Potwierdzić pierwszy udany przebieg `strava-sync.yml`.** Podłączenie
-      (`strava-init.yml`) zakończyło się sukcesem, refresh token jest w sejfie.
-      Sam automat aktualizacji w chwili pisania czekał w kolejce GitHuba
-      i **nie został jeszcze potwierdzony**. Sprawdzić: Actions → „Strava —
-      aktualizacja danych" → zielony ptaszek + świeży commit „Dane ze Stravy".
+**Automat POTWIERDZONY 20.08.2026.** Przebieg #2 zakończył się sukcesem
+w 17 sekund i sam wypchnął commit `790c815` autorstwa „Automat Stravy".
+Sprawdzone po fakcie: `zalozenia` (CdA 0,38, masa 83,3, HRmax 201),
+`kryterium_przerwy` (wariant B + wyjazd do Francji), `plan_objetosci`
+(8 tygodni) i `liczone_od` — wszystko nienaruszone. 100 aktywności, 27
+z opisem. Pierwszy commit automatu przeformatował wszystkie linie
+aktywności (Python pisał ze spacjami po dwukropku, Node pisze bez) —
+jednorazowo, kolejne różnice będą już małe.
+
+**Do domknięcia:**
 - [ ] **Skasować sekret `PAT_SEKRETY`** — był potrzebny wyłącznie do zapisania
       refresh tokenu i po podłączeniu jest zbędnym ryzykiem.
+      `Settings → Secrets and variables → Actions → PAT_SEKRETY → kosz`.
+      Można też skasować sam token fine-grained w ustawieniach konta.
 - [ ] **Skasować `.github/workflows/strava-init.yml`** — jednorazowy, zużyty.
 - [ ] **Alarm na stronie, gdy dane starsze niż kilka dni.** Bez tego cicha
-      awaria automatu oznacza wiarę w nieaktualne liczby.
+      awaria automatu oznacza wiarę w nieaktualne liczby. `meta.pobrano`
+      jest w danych, więc to kilkanaście linii w `index.html`.
 
 **Listopad 2026** (czeka na dane, nie na kod):
 
