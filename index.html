@@ -249,14 +249,14 @@ section{margin-bottom:34px}
 .ramka{overflow-x:auto;-webkit-overflow-scrolling:touch;flex:1 1 auto;min-width:0}
 svg{display:block}
 .dysc{display:inline-block;vertical-align:-3px;flex:0 0 auto}
-.slupek,.tydzien{
+.slupek,.tydzien,.miesiac{
   transform-box:fill-box;transform-origin:bottom;
   animation:wyrasta .5s cubic-bezier(.2,.85,.25,1) both;
   cursor:pointer;
 }
 @keyframes wyrasta{from{transform:scaleY(0)}to{transform:scaleY(1)}}
-.slupek:hover,.tydzien:hover{opacity:1}
-.slupek.wybrany,.tydzien.wybrany{
+.slupek:hover,.tydzien:hover,.miesiac:hover{opacity:1}
+.slupek.wybrany,.tydzien.wybrany,.miesiac.wybrany{
   opacity:1;stroke:var(--tekst);stroke-width:1.5;paint-order:stroke;
 }
 .legenda{
@@ -864,6 +864,169 @@ const kryterium = () => `
   </section>`;
 
 /* ==========================================================================
+   C3 — NAJDŁUŻSZA JAZDA W MIESIĄCU
+   Oś miesięcy jest CIĄGŁA: miesiąc bez jednej jazdy zostaje pusty, a nie
+   znika. Zima 2025/26 ma trzy takie z rzędu i to jest informacja, nie luka.
+   Zwift wchodzi do wykresu, ale jest kreskowany i podpisany sylwetką —
+   41 km na trenażerze nie znaczy tego samego co 41 km na szosie.
+   ========================================================================== */
+
+const CEL_KM = 80;   // niedzielna długa jazda, cel z planu IX–X
+
+const MIESIACE_RZYM = ["I","II","III","IV","V","VI","VII","VIII","IX","X","XI","XII"];
+
+const miesiace = (() => {
+  const pierwszy = OD.slice(0,7), ostatni = DZIS.slice(0,7);
+  const wynik = [];
+  let [r,m] = pierwszy.split("-").map(Number);
+  while (`${r}-${String(m).padStart(2,"0")}` <= ostatni){
+    const klucz = `${r}-${String(m).padStart(2,"0")}`;
+    const wMiesiacu = jazdy.filter(a => a.data.slice(0,7) === klucz);
+    const naj = wMiesiacu.length
+      ? wMiesiacu.reduce((a,b) => b.dystans_m > a.dystans_m ? b : a)
+      : null;
+    wynik.push({ klucz, rok:r, miesiac:m, jazd:wMiesiacu.length, naj,
+                 km: naj ? naj.dystans_m/1000 : 0 });
+    m++; if (m > 12){ m = 1; r++; }
+  }
+  return wynik;
+})();
+
+const rekordKm = Math.max(...miesiace.map(x => x.km));
+const rekordMies = miesiace.find(x => x.km === rekordKm);
+
+function wykresDlugich(){
+  const szerSlupka = 30, odstep = 8, marGora = 26, wys = 230, marDol = 40,
+        szerOsi = 34;
+  const szer = miesiace.length*(szerSlupka+odstep) + 24;
+  const gora = Math.ceil(Math.max(CEL_KM, rekordKm) * 1.08 / 10) * 10;
+  const krok = [10,20,25,50].find(k => gora/k <= 6) || 100;
+  const podzialka = []; for (let v = 0; v <= gora; v += krok) podzialka.push(v);
+  const skala = km => (km/gora) * wys;
+  const wysCalk = wys + marGora + marDol;
+  const x = i => 10 + i*(szerSlupka+odstep);
+
+  let os = `<svg class="os" width="${szerOsi}" height="${wysCalk}" aria-hidden="true">`;
+  for (const v of podzialka){
+    os += `<text x="${szerOsi-6}" y="${marGora+wys-skala(v)+4}" text-anchor="end"
+            font-size="10" fill="var(--slaby)">${v}</text>`;
+  }
+  os += `</svg>`;
+
+  let s = `<svg width="${szer}" height="${wysCalk}"
+            role="img" aria-label="Najdłuższa jazda w miesiącu">
+    <defs>
+      <pattern id="krata" width="7" height="7" patternUnits="userSpaceOnUse"
+               patternTransform="rotate(45)">
+        <rect width="7" height="7" fill="var(--akcent)" opacity=".22"/>
+        <line x1="0" y1="0" x2="0" y2="7" stroke="var(--akcent)" stroke-width="3.4"/>
+      </pattern>
+    </defs>`;
+
+  for (const v of podzialka){
+    const y = marGora + wys - skala(v);
+    s += `<line x1="0" y1="${y}" x2="${szer}" y2="${y}"
+           stroke="var(--linia)" stroke-width="1"/>`;
+  }
+
+  // słupki
+  miesiace.forEach((mm,i) => {
+    if (!mm.naj) return;
+    const h = Math.max(skala(mm.km), 2);
+    const y = marGora + wys - h;
+    const zwift = mm.naj.typ === "VirtualRide";
+    const osiagniety = mm.km >= CEL_KM;
+    s += `<rect x="${x(i)}" y="${y}" width="${szerSlupka}" height="${h}"
+           fill="${zwift ? "url(#krata)" : osiagniety ? "var(--plan)" : "var(--akcent)"}"
+           opacity="${zwift ? 1 : osiagniety ? .85 : .75}" rx="2"
+           class="miesiac" data-i="${i}"
+           style="animation-delay:${Math.min(i*40,600)}ms"/>`;
+    s += `<text x="${x(i)+szerSlupka/2}" y="${y-7}" text-anchor="middle"
+           font-size="10.5" font-weight="600"
+           fill="${osiagniety ? "var(--plan)" : "var(--slaby)"}">${liczba(mm.km,1)}</text>`;
+  });
+
+  // linia rekordu — pod celem, słabsza
+  const yRek = marGora + wys - skala(rekordKm);
+  s += `<line x1="0" y1="${yRek}" x2="${szer}" y2="${yRek}"
+         stroke="var(--slaby)" stroke-width="1" stroke-dasharray="2 4" opacity=".8"/>`;
+
+  // linia celu — z otoczką, żeby nie zlała się ze słupkiem
+  const yCel = marGora + wys - skala(CEL_KM);
+  s += `<line x1="0" y1="${yCel}" x2="${szer}" y2="${yCel}"
+         stroke="var(--powierzchnia)" stroke-width="4.5"/>`;
+  s += `<line x1="0" y1="${yCel}" x2="${szer}" y2="${yCel}"
+         stroke="var(--plan)" stroke-width="2" stroke-dasharray="6 4"/>`;
+
+  // podpisy miesięcy i lat
+  let rokPop = null;
+  miesiace.forEach((mm,i) => {
+    s += `<text x="${x(i)+szerSlupka/2}" y="${marGora+wys+16}" text-anchor="middle"
+           font-size="10" fill="var(--slaby)">${MIESIACE_RZYM[mm.miesiac-1]}</text>`;
+    if (mm.rok !== rokPop){
+      s += `<text x="${x(i)+szerSlupka/2}" y="${marGora+wys+31}" text-anchor="middle"
+             font-size="10" font-weight="600" fill="var(--slaby)">${mm.rok}</text>`;
+      rokPop = mm.rok;
+    }
+  });
+
+  s += `<line x1="0" y1="${marGora+wys}" x2="${szer}" y2="${marGora+wys}"
+         stroke="var(--slaby)" stroke-width="1"/></svg>`;
+  return `<div class="wykres">${os}<div class="ramka">${s}</div></div>`;
+}
+
+const c3Dlugie = () => {
+  const zJazda = miesiace.filter(m => m.naj).length;
+  const brakuje = Math.max(0, CEL_KM - rekordKm);
+  return `
+  <section>
+    <h2>C3 · Najdłuższa jazda w miesiącu</h2>
+    <p class="opis">
+      Jeden słupek = najdłuższy przejazd w danym miesiącu. Oś jest ciągła,
+      więc miesiąc bez ani jednej jazdy zostaje pusty — zima 2025/26 ma trzy
+      takie z rzędu. Słupek kreskowany oznacza, że rekordem miesiąca była
+      sesja na Zwifcie; 41 km na trenażerze to nie to samo co 41 km na szosie.
+      Zielona linia to cel ${CEL_KM} km z planu, szara — Twój obecny rekord.
+    </p>
+    ${wykresDlugich()}
+    <div class="legenda">
+      <span><i style="background:var(--akcent);opacity:.75"></i>na dworze</span>
+      <span>${ikonaDyscypliny("VirtualRide",15)} Zwift — słupek kreskowany</span>
+      <span style="color:var(--plan)"><i class="kreska"></i><span
+        style="color:var(--slaby)">cel ${CEL_KM} km</span></span>
+      <span style="color:var(--slaby)"><i class="kreska"></i>rekord ${liczba(rekordKm,1)} km</span>
+    </div>
+    <div class="info" id="info-miesiac">Dotknij słupka, żeby zobaczyć szczegóły jazdy.</div>
+  </section>
+
+  <section>
+    <div class="kafelki">
+      <div class="kafel">
+        <div class="etykieta">Rekord</div>
+        <div class="liczba">${liczba(rekordKm,1)}</div>
+        <div class="stopka">${ikonaDyscypliny(rekordMies.naj.typ,13)}
+          km · ${pl(rekordMies.naj.data)}</div>
+      </div>
+      <div class="kafel">
+        <div class="etykieta">Cel</div>
+        <div class="liczba" style="color:var(--plan)">${CEL_KM}</div>
+        <div class="stopka">km · niedzielna długa</div>
+      </div>
+      <div class="kafel">
+        <div class="etykieta">Brakuje do celu</div>
+        <div class="liczba">${liczba(brakuje,1)}</div>
+        <div class="stopka">km · ${liczba(100*rekordKm/CEL_KM,0)}% celu</div>
+      </div>
+      <div class="kafel">
+        <div class="etykieta">Miesiące z jazdą</div>
+        <div class="liczba">${zJazda}</div>
+        <div class="stopka">z ${miesiace.length} w zakresie</div>
+      </div>
+    </div>
+  </section>`;
+};
+
+/* ==========================================================================
    SEKCJE — poziom 1 i poziom 2.
    Zakładka trafia na pasek tylko gdy ma wpis tutaj. Z1–Z5 to miejsca
    zarezerwowane; dostaną nazwy, kiedy dostaną treść.
@@ -876,6 +1039,7 @@ const SEKCJE = [
   { id:"regularnosc", tytul:"Regularność", barwa:"turkus", pod:[
       { id:"godziny",   tytul:"Godziny",   rysuj: c1Godziny },
       { id:"przerwy",   tytul:"Przerwy",   rysuj: c2Przerwy },
+      { id:"dlugie",    tytul:"Długie jazdy", rysuj: c3Dlugie },
       { id:"kryterium", tytul:"Kryterium", rysuj: kryterium }
   ]},
   ...[1,2,3,4,5].map(n => ({
@@ -953,6 +1117,26 @@ function pokaz(){
   window.scrollTo(0,0);
 }
 
+function podepnijMiesiace(){
+  const info = document.getElementById("info-miesiac");
+  if (!info) return;
+  document.querySelectorAll(".miesiac").forEach(el => {
+    const pokazInfo = () => {
+      const mm = miesiace[+el.dataset.i];
+      const a = mm.naj;
+      const h = Math.floor(a.czas_ruchu_s/3600), min = Math.round(a.czas_ruchu_s%3600/60);
+      const czas = h ? `${h} h ${min} min` : `${min} min`;
+      const sr = (a.dystans_m/1000) / (a.czas_ruchu_s/3600);
+      info.innerHTML = `${ikonaDyscypliny(a.typ,15)} <b>${a.nazwa}</b> · `
+        + `${liczba(mm.km,1)} km · ${czas} · ${liczba(sr,1)} km/h śr. · `
+        + `${liczba(a.przewyzszenie_m,0)} m w górę · ${pl(a.data)}`
+        + (mm.jazd > 1 ? ` · najdłuższa z ${mm.jazd} jazd w miesiącu` : "");
+    };
+    el.addEventListener("click", () => { zaznacz(el); pokazInfo(); });
+    el.addEventListener("mouseenter", pokazInfo);
+  });
+}
+
 function podepnijTygodnie(){
   const info = document.getElementById("info-tydzien");
   if (!info) return;
@@ -982,6 +1166,7 @@ function zaznacz(el){
 
 function podepnijSlupki(){
   podepnijTygodnie();
+  podepnijMiesiace();
   const info = document.getElementById("info-przerwa");
   if (!info) return;
   document.querySelectorAll(".slupek").forEach(el => {
