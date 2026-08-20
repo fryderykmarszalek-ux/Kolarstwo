@@ -348,11 +348,46 @@ table.segmenty td:first-child{text-align:left;color:var(--tekst)}
 table.segmenty td.akt{color:var(--tekst);font-weight:600}
 table.segmenty tr:last-child td{border-bottom:0}
 table.segmenty tbody tr:hover td{background:var(--plyta)}
-.seg-nazwa{color:inherit;display:block;overflow-wrap:anywhere}
+.seg-nazwa{color:inherit;display:block;overflow-wrap:anywhere;text-decoration:none}
+.seg-nazwa .strzalka-wew{color:var(--slaby);margin-left:5px;font-size:15px;line-height:1}
+.seg-nazwa:hover{text-decoration:underline}
+.seg-nazwa:hover .strzalka-wew{color:var(--tekst)}
 .seg-zwift{display:inline-block;vertical-align:-2px;margin-right:5px;color:var(--slaby)}
 .seg-data{display:block;font-size:11.5px;color:var(--slaby);margin-top:1px;min-height:1px}
 /* Pasek nad tabelą: filtry po lewej, szukanie i reset po prawej. Na wąskim
    ekranie grupa szukania spada do drugiej linii zamiast ściskać pastylki. */
+/* --- Porównania S: tytuł segmentu w jednej linii z kółkiem powrotu. --- */
+.proba-tytul{display:flex;align-items:flex-start;justify-content:space-between;
+  gap:12px;margin:0 0 4px}
+.proba-tytul h2{margin:0}
+.kolko-reset{
+  flex:0 0 auto;display:inline-flex;align-items:center;justify-content:center;
+  width:32px;height:32px;border-radius:99px;text-decoration:none;
+  background:var(--plyta);border:1px solid var(--linia);color:var(--slaby);
+  transition:color .15s ease,border-color .15s ease,transform .16s ease;
+}
+.kolko-reset:hover{color:var(--tekst);border-color:var(--slaby)}
+.kolko-reset:active{transform:scale(.92) rotate(-40deg)}
+/* Odnośnik do sąsiedniej zakładki nosi jej barwę — to nadal nawigacja,
+   a nie dana, więc kolor sekcji jest tu na swoim miejscu. */
+.odn-zakladka{color:var(--sek-napis);font-weight:600;text-decoration:underline;
+  text-underline-offset:2px}
+.proba-naglowek{display:flex;align-items:center;gap:8px;flex-wrap:wrap;
+  margin-bottom:3px}
+.proba-naglowek .odn{color:var(--tekst);text-decoration:none;
+  display:inline-flex;align-items:center;gap:5px}
+.proba-naglowek .odn:hover{text-decoration:underline}
+.znacznik-rpe{
+  font-size:11.5px;font-weight:600;color:var(--slaby);
+  padding:2px 8px;border-radius:99px;
+  background:var(--tlo);border:1px solid var(--linia);
+}
+.proba-dane{color:var(--slaby);font-size:12.5px;line-height:1.5}
+.proba-dane b{color:var(--tekst)}
+rect.proba{transform-box:fill-box;transform-origin:bottom;cursor:pointer;
+  animation:wyrasta .5s cubic-bezier(.2,.85,.25,1) both}
+rect.proba.wybrany{stroke:var(--tekst);stroke-width:1.5}
+
 .przelaczniki{display:flex;gap:8px;margin:12px 0 0;flex-wrap:wrap;
   align-items:center;justify-content:space-between}
 .grupa-filtry,.grupa-szukaj{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
@@ -1388,9 +1423,11 @@ function wierszeSegmentow(){
   return lista.map(x => `
     <tr>
       <td class="${sortKlucz==="nazwa"?"akt":""}">
-        <span class="seg-nazwa">${x.zwift
+        <a class="seg-nazwa" href="#postepy/porownania/${x.id}"
+           title="Pokaż wszystkie próby na tym segmencie">${x.zwift
           ? `<span class="seg-zwift" title="Zwift — trenażer, nie szosa">${
-              ikonaDyscypliny("VirtualRide",14)}</span>` : ""}${bezpieczny(x.nazwa)}</span>
+              ikonaDyscypliny("VirtualRide",14)}</span>` : ""}${bezpieczny(x.nazwa)}<span
+          class="strzalka-wew" aria-hidden="true">›</span></a>
         <span class="seg-data">${x.zwift ? "Zwift · " : ""}${
           x.data ? "najlepsza próba " + pl(x.data) : ""}</span>
       </td>
@@ -1573,6 +1610,232 @@ function podepnijTabele(){
 }
 
 /* ==========================================================================
+   PORÓWNANIA S — wszystkie próby jednego segmentu
+
+   Wybrany segment żyje w adresie (#postepy/porownania/<id>), a nie w zmiennej.
+   Dzięki temu dotknięcie nazwy w tabeli, przycisk wstecz i odświeżenie strony
+   robią to samo, bez trzeciego stanu do pilnowania.
+
+   Oś czasu zaczyna się od ZERA, choć przy próbach różniących się o sekundy
+   słupki wyglądają wtedy niemal identycznie. Ucięta oś pokazywałaby poprawę
+   z 1527 na 1503 s jako przepaść — a to 1,6%. Skoro słupek ma znaczyć czas,
+   jego wysokość musi być czasowi proporcjonalna. Dokładne liczby i różnicę
+   do rekordu podaje panel pod wykresem.
+   ========================================================================== */
+
+const JAZDA_PO_ID = new Map(D.aktywnosci.map(a => [a.id, a]));
+
+function probySegmentu(id){
+  return (D.proby || [])
+    .map((x, i) => ({ ...x, i }))
+    .filter(x => x.s === id)
+    .map(x => ({ ...x, jazda: JAZDA_PO_ID.get(x.a) }))
+    .filter(x => x.jazda)
+    .sort((a,b) => a.jazda.data === b.jazda.data ? a.i - b.i
+                 : (a.jazda.data < b.jazda.data ? -1 : 1));
+}
+
+function roznicaCzasu(sek){
+  const znak = sek > 0 ? "+" : "−";
+  const a = Math.abs(sek);
+  return znak + (a < 60 ? `${a} s` : czasNaTekst(a));
+}
+
+// Krok podziałki dobierany z listy wartości, które człowiek czyta bez liczenia:
+// 15 s, pół minuty, minuta, pięć minut. 7-sekundowa działka byłaby bezużyteczna.
+const DZIALKI_CZASU = [5,10,15,20,30,60,120,300,600,900,1800,3600];
+
+function wykresProb(lista, wybrany, najlepszyCzas){
+  const szerSlupka = 34, odstep = 8, marGora = 26, wys = 230, marDol = 42,
+        szerOsi = 46;
+  const szer = lista.length*(szerSlupka+odstep) + 26;
+  const gora = Math.max(...lista.map(x => x.czas_s)) * 1.1;
+  const krok = DZIALKI_CZASU.find(k => gora/k <= 6) || 3600;
+  const podzialka = []; for (let v = 0; v <= gora; v += krok) podzialka.push(v);
+  const skala = t => (t/gora) * wys;
+  const wysCalk = wys + marGora + marDol;
+  const x = i => 12 + i*(szerSlupka+odstep);
+
+  let os = `<svg class="os" width="${szerOsi}" height="${wysCalk}" aria-hidden="true">`;
+  for (const v of podzialka){
+    os += `<text x="${szerOsi-6}" y="${marGora+wys-skala(v)+4}" text-anchor="end"
+            font-size="10" fill="var(--slaby)">${czasNaTekst(v)}</text>`;
+  }
+  os += `</svg>`;
+
+  let g = `<svg width="${szer}" height="${wysCalk}" role="img"
+    aria-label="Czasy wszystkich prób na segmencie">
+    <defs>
+      <pattern id="krata-proby" width="7" height="7" patternUnits="userSpaceOnUse"
+               patternTransform="rotate(45)">
+        <rect width="7" height="7" fill="var(--akcent)" opacity=".22"/>
+        <line x1="0" y1="0" x2="0" y2="7" stroke="var(--akcent)" stroke-width="3.4"/>
+      </pattern>
+    </defs>`;
+
+  for (const v of podzialka){
+    const y = marGora + wys - skala(v);
+    g += `<line x1="0" y1="${y}" x2="${szer}" y2="${y}"
+           stroke="var(--linia)" stroke-width="1"/>`;
+  }
+
+  // linia rekordu — ta sama konwencja co na wykresie długich jazd
+  const yRek = marGora + wys - skala(najlepszyCzas);
+  g += `<line x1="0" y1="${yRek}" x2="${szer}" y2="${yRek}"
+         stroke="var(--slaby)" stroke-width="1" stroke-dasharray="2 4" opacity=".85"/>`;
+
+  lista.forEach((pr, i) => {
+    const h = Math.max(skala(pr.czas_s), 2);
+    const y = marGora + wys - h;
+    const zwift = pr.jazda.typ === "VirtualRide";
+    const akt = i === wybrany;
+    g += `<rect x="${x(i)}" y="${y}" width="${szerSlupka}" height="${h}"
+           fill="${zwift ? "url(#krata-proby)" : "var(--akcent)"}"
+           opacity="${akt ? 1 : .6}" rx="2"
+           class="proba${akt ? " wybrany" : ""}" data-i="${i}"
+           style="animation-delay:${Math.min(i*30,500)}ms"/>`;
+    if (akt){
+      g += `<text x="${x(i)+szerSlupka/2}" y="${y-8}" text-anchor="middle"
+             font-size="11" font-weight="600" fill="var(--tekst)"
+             >${czasNaTekst(pr.czas_s)}</text>`;
+    }
+  });
+
+  // daty pod słupkami; rok dopisany tylko przy zmianie
+  let rokPop = null;
+  lista.forEach((pr, i) => {
+    const d = pr.jazda.data;
+    g += `<text x="${x(i)+szerSlupka/2}" y="${marGora+wys+16}" text-anchor="middle"
+           font-size="9.5" fill="var(--slaby)">${d.slice(8,10)}.${d.slice(5,7)}</text>`;
+    if (d.slice(0,4) !== rokPop){
+      g += `<text x="${x(i)+szerSlupka/2}" y="${marGora+wys+31}" text-anchor="middle"
+             font-size="9.5" font-weight="600" fill="var(--slaby)">${d.slice(0,4)}</text>`;
+      rokPop = d.slice(0,4);
+    }
+  });
+
+  g += `<line x1="0" y1="${marGora+wys}" x2="${szer}" y2="${marGora+wys}"
+         stroke="var(--slaby)" stroke-width="1"/></svg>`;
+
+  return `<div class="wykres">${os}<div class="ramka">${g}</div></div>`;
+}
+
+function panelProby(seg, pr, najlepszyCzas, numer, ile){
+  const j = pr.jazda;
+  const v = pr.czas_s ? (seg.dystans_m / pr.czas_s) * 3.6 : null;
+  const roznica = pr.czas_s - najlepszyCzas;
+  return `
+    <div class="proba-naglowek">
+      <a class="odn" href="${adresStravy(j)}" target="_blank" rel="noopener"
+         title="Otwórz tę jazdę na Stravie">${ikonaDyscypliny(j.typ,15)}
+         <b>${bezpieczny(j.nazwa)}</b> &#8599;</a>
+      <span class="znacznik-rpe" title="RPE — subiektywna ocena wysiłku, skala 1-10"
+        >RPE ${j.rpe == null ? "—" : j.rpe}</span>
+    </div>
+    <div class="proba-dane">
+      ${pl(j.data)} · <b>${czasNaTekst(pr.czas_s)}</b>
+      · ${v == null ? "—" : liczba(v,1) + " km/h"}
+      · ${dlugoscNaTekst(seg.dystans_m)}
+      · ${seg.nachylenie_proc == null ? "—" : procentNaTekst(seg.nachylenie_proc)}
+      · ${pr.moc_S == null ? "moc —" : Math.round(pr.moc_S) + " W"}
+      · ${roznica === 0
+            ? `<b style="color:var(--plan)">rekord</b>`
+            : roznicaCzasu(roznica) + " do rekordu"}
+      · próba ${numer} z ${ile}
+    </div>`;
+}
+
+// Indeks wybranej próby. Null znaczy „jeszcze nie tknięto wykresu" — wtedy
+// pokazujemy ostatnią, bo najciekawsze jest to, jak jest TERAZ, a nie jak było.
+let wybranaProba = null, segmentWPorownaniu = null;
+
+const porownaniaS = (id) => {
+  if (!id){
+    wybranaProba = null; segmentWPorownaniu = null;
+    return `
+      <div class="pusto">
+        <span class="znak">Porównania S</span>
+        To pole otworzy się po wybraniu segmentu w zakładce
+        <a class="odn-zakladka" href="#postepy/segmenty">Segmenty</a>.
+      </div>`;
+  }
+
+  const seg = (D.segmenty || []).find(x => x.id === id);
+  const lista = probySegmentu(id);
+  if (!seg || !lista.length){
+    return `
+      <div class="pusto">
+        <span class="znak">Nie znam takiego segmentu</span>
+        Wróć do zakładki
+        <a class="odn-zakladka" href="#postepy/segmenty">Segmenty</a> i wybierz z listy.
+      </div>`;
+  }
+
+  if (segmentWPorownaniu !== id){ segmentWPorownaniu = id; wybranaProba = null; }
+  const wybrany = wybranaProba == null ? lista.length - 1 : wybranaProba;
+  const najlepszy = Math.min(...lista.map(x => x.czas_s));
+  const zwift = lista.some(x => x.jazda.typ === "VirtualRide");
+  const pierwsza = lista[0].jazda.data, ostatnia = lista[lista.length-1].jazda.data;
+
+  return `
+  <section>
+    <div class="proba-tytul">
+      <h2>${zwift ? ikonaDyscypliny("VirtualRide",16) + " " : ""}${bezpieczny(seg.nazwa)}</h2>
+      <a class="kolko-reset" href="#postepy/porownania"
+         title="Wróć do wyboru segmentu" aria-label="Wróć do wyboru segmentu">
+        <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor"
+          stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M13.5 8a5.5 5.5 0 1 1-1.6-3.9"/><path d="M13.6 2v3.2h-3.2"/></svg>
+      </a>
+    </div>
+    <p class="opis">
+      ${lista.length} ${lista.length === 1 ? "próba" : lista.length < 5 ? "próby" : "prób"}
+      od ${pl(pierwsza)} do ${pl(ostatnia)}. Jeden słupek to jeden przejazd,
+      wysokość to czas — <b>im niżej, tym lepiej</b>. Oś zaczyna się od zera,
+      więc różnice kilku sekund są celowo małe; dokładne liczby są pod wykresem.
+      Szara kreska to rekord: ${czasNaTekst(najlepszy)}.
+      <br>Czas nie odróżnia jazdy solo od jazdy w grupie ani wiatru. RPE obok
+      nazwy jazdy mówi, ile Cię ta próba kosztowała — bez tego szybszy czas
+      z koła kolegi wygląda jak forma.
+    </p>
+    <div id="wykres-prob">${wykresProb(lista, wybrany, najlepszy)}</div>
+    <div class="info" id="info-proby">${
+      panelProby(seg, lista[wybrany], najlepszy, wybrany+1, lista.length)}</div>
+  </section>`;
+};
+
+// Zdarzenia podpinamy do POJEMNIKA, nie do słupków: pojemnik zostaje ten sam
+// przy każdym przerysowaniu, więc nie trzeba niczego podpinać po raz drugi.
+function podepnijProby(){
+  const pojemnik = document.getElementById("wykres-prob");
+  if (!pojemnik) return;
+  const [, , id] = zHasha();
+  const seg = (D.segmenty || []).find(x => x.id === id);
+  if (!seg) return;
+  const lista = probySegmentu(id);
+  const najlepszy = Math.min(...lista.map(x => x.czas_s));
+
+  const wybierz = (i) => {
+    if (i == null || i < 0 || i >= lista.length || i === wybranaProba) return;
+    wybranaProba = i;
+    const ramka = pojemnik.querySelector(".ramka");
+    const przewiniecie = ramka ? ramka.scrollLeft : 0;
+    pojemnik.innerHTML = wykresProb(lista, i, najlepszy);
+    const nowa = pojemnik.querySelector(".ramka");
+    if (nowa) nowa.scrollLeft = przewiniecie;   // wybór nie ma przesuwać widoku
+    document.getElementById("info-proby").innerHTML =
+      panelProby(seg, lista[i], najlepszy, i+1, lista.length);
+  };
+
+  const zZdarzenia = e => {
+    const r = e.target.closest("rect.proba");
+    return r ? +r.dataset.i : null;
+  };
+  pojemnik.addEventListener("click", e => wybierz(zZdarzenia(e)));
+  pojemnik.addEventListener("mouseover", e => wybierz(zZdarzenia(e)));
+}
+
+/* ==========================================================================
    SEKCJE — poziom 1 i poziom 2.
    Zakładka trafia na pasek tylko gdy ma wpis tutaj. Z1–Z5 to miejsca
    zarezerwowane; dostaną nazwy, kiedy dostaną treść.
@@ -1590,7 +1853,7 @@ const SEKCJE = [
   ]},
   { id:"postepy", tytul:"Postępy", barwa:"fiolet", pod:[
       { id:"segmenty", tytul:"Segmenty", rysuj: tabelaSegmentow },
-      { id:"p2", tytul:"P2", rysuj: () => pusto("P2") },
+      { id:"porownania", tytul:"Porównania S", rysuj: porownaniaS },
       { id:"p3", tytul:"P3", rysuj: () => pusto("P3") }
   ]},
   ...[2,3,4,5].map(n => ({
@@ -1613,15 +1876,19 @@ const tresc   = document.getElementById("tresc");
 
 let aktywnaSekcja = null;
 
+// Adres ma trzy człony: sekcja/podsekcja/argument. Trzeci niesie identyfikator
+// wybranego segmentu, dzięki czemu wybór żyje w adresie, a nie w zmiennej —
+// przycisk wstecz wraca do poprzedniego segmentu, a odświeżenie strony niczego
+// nie gubi.
 function zHasha(){
-  const [a,b] = location.hash.slice(1).split("/");
+  const [a,b,c] = location.hash.slice(1).split("/");
   const s = SEKCJE.find(x => x.id === a) || SEKCJE[0];
   const p = s.pod.find(x => x.id === b) || s.pod[0];
-  return [s,p];
+  return [s, p, c ? decodeURIComponent(c) : null];
 }
 
 function pokaz(){
-  const [s,p] = zHasha();
+  const [s,p,arg] = zHasha();
   const zmianaSekcji = aktywnaSekcja !== s.id;
   aktywnaSekcja = s.id;
 
@@ -1654,10 +1921,11 @@ function pokaz(){
   // treść
   tresc.classList.remove("wchodzi");
   void tresc.offsetHeight;
-  tresc.innerHTML = p.rysuj();
+  tresc.innerHTML = p.rysuj(arg);
   tresc.classList.add("wchodzi");
 
   podepnijSlupki();
+  podepnijProby();
 
   // Wykres otwiera się na najświeższym końcu — najnowsza przerwa jest
   // najważniejsza, a przy dwóch latach historii ląduje poza kadrem.

@@ -141,6 +141,24 @@ nie kolor: sylwetka roweru vs ekranu, słupek kreskowany vs pełny.
   (`table-layout:fixed`), bo przy automatycznej rozjeżdżały się odstępy.
   **Nazwa NIE jest odnośnikiem** — dotknięcie wiersza ma w przyszłości
   prowadzić do zakładki z historią segmentu, nie na Stravę. Nie przywracać.
+- **Postępy → Porównania S** (20.08.2026) — wszystkie próby JEDNEGO segmentu.
+  Słupek = przejazd, wysokość = czas, data pod spodem. Dotknięcie słupka
+  wybiera próbę; nad wybranym staje czas, a pod wykresem panel: nazwa jazdy
+  (odnośnik na Stravę), **RPE**, data, czas, prędkość, długość, nachylenie,
+  moc i różnica do rekordu. Szara kreska = rekord, słupek kreskowany = Zwift.
+  Kółko ze strzałką wraca do stanu pustego.
+
+  **Oś zaczyna się od zera i tak ma zostać.** Przy ucięciu poprawa z 1527 na
+  1503 s (1,6%) wyglądałaby jak przepaść. Skoro słupek znaczy czas, wysokość
+  musi być mu proporcjonalna; różnice podaje panel, nie oko.
+
+  **Wybór segmentu żyje w adresie** — `#postepy/porownania/<id>`. `zHasha()`
+  zwraca trzeci człon, `rysuj(arg)` go dostaje. Dzięki temu wstecz i
+  odświeżenie działają bez dodatkowego stanu. Nie przenosić tego do zmiennej.
+
+  Odnośnik „Segmenty" w pustym stanie nosi kolor sekcji (`--sek-napis`).
+  To jedyne miejsce poza nawigacją, gdzie kolor sekcji jest dozwolony —
+  bo wskazuje zakładkę, czyli nadal jest nawigacją.
 - **Z2–Z5** — miejsca zarezerwowane, świadomie zostawione (Fryderyk chce
   widzieć docelowy kształt strony)
 - Ikony kolarskie w tle (7 sylwetek, losowe z ustalonego ziarna, pasy przy
@@ -171,6 +189,12 @@ nie liczy. Funkcja `mocE()` skasowana; jej wyprowadzenie i kontrola na Bump 2
 (471 W wzorem ze średniej prędkości wobec 493 W z pełnego wyliczenia) zostają
 w `TRENING.md` §7.1, gdyby kiedyś wróciła jako osobna, wyraźnie oznaczona
 kolumna.
+
+**RPE** (`perceived_exertion`) wchodzi do `aktywnosci` od 20.08.2026 — 44 jazdy
+ze 100 je mają. Przychodzi tym samym zapytaniem co opis i segmenty, więc nie
+kosztuje ani jednego dodatkowego ruchu. Przy braku miernika mocy i tętna jest
+najlepszą dostępną miarą wysiłku (`TRENING.md` §8.6) i bez niego czas na
+segmencie kłamie: przejazd z koła kolegi wygląda jak forma.
 
 Nachylenie bierzemy z `average_grade` Stravy. **Nie liczyć go z przewyższenia:**
 `elevation_gain` sumuje same podjazdy i gubi znak — na Obory-Opacz dałoby
