@@ -170,6 +170,11 @@ function zapisz(D){
   }
 
   const opisy = new Map(stare.aktywnosci.map(a => [a.id, a.opis]));
+  // RPE (perceived_exertion) — jak opis: nie ma go w liście aktywności,
+  // przychodzi dopiero ze szczegółami jazdy. Przy braku pomiaru mocy i tętna
+  // jest najlepszą dostępną miarą wysiłku, więc nie wolno go zgubić przy
+  // przebiegu, który akurat nie pyta o tę jazdę.
+  const rpeStare = new Map(stare.aktywnosci.map(a => [a.id, a.rpe]));
   const znaneId = new Set(stare.aktywnosci.map(a => a.id));
 
   const nowe = zeStravy.map(naNasz)
@@ -200,8 +205,11 @@ function zapisz(D){
     const chceSegmenty = kolarska && a.data.slice(0,10) >= SEGMENTY_OD
       && (!jazdyZeSegmentami.has(a.id) || PELNE_SEGMENTY);
 
+    const staryRpe = rpeStare.get(a.id);
+
     if (!chceOpis && !chceSegmenty){
       if (stary) a.opis = stary;               // nic do pytania — zachowaj, co mamy
+      if (staryRpe != null) a.rpe = staryRpe;
       continue;
     }
 
@@ -210,8 +218,12 @@ function zapisz(D){
 
     if (jazda === undefined){                  // zapytanie padło — nie ruszamy niczego
       if (stary) a.opis = stary;
+      if (staryRpe != null) a.rpe = staryRpe;
       continue;
     }
+
+    // Strava jest masterem również tutaj: skasowany RPE znika też u nas.
+    if (jazda.perceived_exertion != null) a.rpe = jazda.perceived_exertion;
 
     if (chceOpis){
       const o = (jazda.description || "").trim() || null;
@@ -223,6 +235,7 @@ function zapisz(D){
     } else if (stary){
       a.opis = stary;
     }
+    if (!chceOpis && staryRpe != null && a.rpe == null) a.rpe = staryRpe;
 
     if (chceSegmenty){
       const w = wyciagnijProby(jazda);
