@@ -134,6 +134,23 @@ header{
   transition:color .18s ease,border-color .18s ease;
 }
 #motyw:hover{color:var(--tekst);border-color:var(--slaby)}
+
+/* Odnośnik do profilu na Stravie — lustro przycisku motywu, po drugiej stronie
+   nagłówka. Znak rysowany od zera jako SVG, żadnego pliku ani biblioteki.
+   Barwa: chrom interfejsu, nie pomarańcz Stravy. Pomarańcz jest w tym projekcie
+   zajęty przez zakładkę Z5, a kolory sekcji mają jedno znaczenie: „tu jesteś".
+   Tożsamość Stravy niesie tu KSZTAŁT, zgodnie z zasadą, że rozróżnienia
+   niebędące danymi idą sylwetką, nie kolorem. */
+#strava{
+  position:absolute;left:14px;top:14px;
+  display:inline-flex;align-items:center;justify-content:center;
+  width:34px;height:34px;border-radius:99px;
+  background:var(--plyta);border:1px solid var(--linia);color:var(--slaby);
+  transition:color .18s ease,border-color .18s ease,transform .16s ease;
+}
+#strava:hover{color:var(--tekst);border-color:var(--slaby)}
+#strava:active{transform:scale(.94)}
+#strava svg{display:block;width:16px;height:16px}
 header h1{margin:0;font-size:19px;font-weight:600;letter-spacing:-.01em}
 header .pod{color:var(--slaby);font-size:12.5px;margin-top:3px}
 
@@ -340,6 +357,13 @@ footer{color:var(--slaby);font-size:12px;padding:14px 20px 34px;max-width:1000px
 <div id="tlo-ikony" aria-hidden="true"></div>
 
 <header>
+  <a id="strava" href="https://www.strava.com" target="_blank" rel="noopener"
+     title="Mój profil na Stravie" aria-label="Otwórz mój profil na Stravie">
+    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <path d="M15.387 17.944l-2.089-4.116h-3.065L15.387 24l5.15-10.172h-3.066
+               m-7.008-5.599l2.836 5.598h4.172L10.463 0l-7 13.828h4.169"/>
+    </svg>
+  </a>
   <button id="motyw" type="button" title="Motyw: auto / jasny / ciemny"></button>
   <h1>Kolarstwo — postępy</h1>
   <div class="pod" id="stopka-naglowka"></div>
@@ -1295,6 +1319,11 @@ el2.addEventListener("click", e => {
   const b = e.target.closest("button");
   if (b) location.hash = b.dataset.s + "/" + b.dataset.p;
 });
+
+// Numer zawodnika leży w danych (meta.athlete_id), więc adres profilu składamy
+// z niego — dokładnie tak, jak adresy poszczególnych jazd. Zero nowych pól.
+document.getElementById("strava").href =
+  "https://www.strava.com/athletes/" + D.meta.athlete_id;
 
 document.getElementById("stopka-naglowka").textContent =
   `${jazdy.length} jazd · od ${pl(OD)}`;
