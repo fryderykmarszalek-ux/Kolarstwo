@@ -71,6 +71,11 @@ function wyciagnijProby(jazda){
         ? Number((seg.elevation_high - seg.elevation_low).toFixed(1)) : null
     });
     proby.push({
+      // Identyfikator przejazdu ze Stravy. Nie służy do rysowania — jest
+      // KOTWICĄ dla notatek. Bez niego notatka musiałaby się wiązać z próbą
+      // przez kolejność w jeździe, a ta potrafi się zmienić przy ponownym
+      // wgraniu pliku i notatka wylądowałaby przy cudzym przejeździe.
+      id: String(e.id),
       s: String(seg.id),
       a: String(jazda.id),
       czas_s: e.elapsed_time,
