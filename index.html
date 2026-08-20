@@ -383,6 +383,45 @@ table.segmenty tbody tr:hover td{background:var(--plyta)}
   background:var(--tlo);border:1px solid var(--linia);
 }
 .proba-dane{color:var(--slaby);font-size:12.5px;line-height:1.5}
+.podpis-wykresu{color:var(--slaby);font-size:12px;line-height:1.45;margin:14px 0 2px}
+rect.proba-punkt{cursor:pointer}
+
+/* --- Notatka do próby. Dwa kółka: ptaszek zapisuje, krzyżyk cofa. --- */
+.notatka{margin-top:14px;padding:12px 14px;border-radius:10px;
+  background:var(--plyta);border:1px solid var(--linia)}
+.notatka-gora{display:flex;justify-content:space-between;align-items:baseline;
+  gap:10px;flex-wrap:wrap;margin-bottom:7px}
+.notatka-tytul{font-size:13px;font-weight:600}
+.notatka-stan{font-size:11.5px;color:var(--slaby)}
+.stan-brudnopis{color:var(--slaby)}
+.stan-niezapisane{color:var(--alarm);font-weight:600}
+.notatka textarea{
+  width:100%;box-sizing:border-box;resize:vertical;
+  font:inherit;font-size:13px;line-height:1.45;
+  color:var(--tekst);background:var(--powierzchnia);
+  border:1px solid var(--linia);border-radius:8px;padding:8px 10px;
+}
+.notatka textarea:focus{outline:0;border-color:var(--sek-kropka)}
+.notatka-dol{display:flex;justify-content:space-between;align-items:center;
+  gap:10px;margin-top:8px;flex-wrap:wrap}
+.notatka-przyciski{display:flex;gap:8px}
+.kolko-akcja{
+  appearance:none;font:inherit;font-size:14px;line-height:1;cursor:pointer;
+  width:32px;height:32px;border-radius:99px;
+  display:inline-flex;align-items:center;justify-content:center;
+  background:var(--powierzchnia);border:1px solid var(--linia);color:var(--slaby);
+  transition:color .15s ease,border-color .15s ease,transform .16s ease;
+}
+#notatka-zapisz:hover{color:var(--plan);border-color:var(--plan)}
+#notatka-anuluj:hover{color:var(--alarm);border-color:var(--alarm)}
+.kolko-akcja:active{transform:scale(.92)}
+.link-tekstowy{
+  appearance:none;background:none;border:0;padding:0;cursor:pointer;
+  font:inherit;font-size:12px;color:var(--slaby);text-decoration:underline;
+  text-underline-offset:2px;
+}
+.link-tekstowy:hover{color:var(--tekst)}
+#notatka-eksport-pole{margin-top:8px;font-size:11.5px}
 .proba-dane b{color:var(--tekst)}
 rect.proba{transform-box:fill-box;transform-origin:bottom;cursor:pointer;
   animation:wyrasta .5s cubic-bezier(.2,.85,.25,1) both}
@@ -1646,15 +1685,15 @@ function roznicaCzasu(sek){
 const DZIALKI_CZASU = [5,10,15,20,30,60,120,300,600,900,1800,3600];
 
 function wykresProb(lista, wybrany, najlepszyCzas){
-  const szerSlupka = 34, odstep = 8, marGora = 26, wys = 230, marDol = 42,
-        szerOsi = 46;
-  const szer = lista.length*(szerSlupka+odstep) + 26;
+  const szerSlupka = G.szerSlupka, odstep = G.odstep, marGora = G.marGora,
+        wys = 230, marDol = 42, szerOsi = G.szerOsi;
+  const szer = szerProb(lista.length);
   const gora = Math.max(...lista.map(x => x.czas_s)) * 1.1;
   const krok = DZIALKI_CZASU.find(k => gora/k <= 6) || 3600;
   const podzialka = []; for (let v = 0; v <= gora; v += krok) podzialka.push(v);
   const skala = t => (t/gora) * wys;
   const wysCalk = wys + marGora + marDol;
-  const x = i => 12 + i*(szerSlupka+odstep);
+  const x = xProby;
 
   let os = `<svg class="os" width="${szerOsi}" height="${wysCalk}" aria-hidden="true">`;
   for (const v of podzialka){
@@ -1679,25 +1718,34 @@ function wykresProb(lista, wybrany, najlepszyCzas){
            stroke="var(--linia)" stroke-width="1"/>`;
   }
 
-  // linia rekordu — ta sama konwencja co na wykresie długich jazd
+  // Linia rekordu w barwie rekordu — ta sama, co słupek PB, bo mówią to samo.
   const yRek = marGora + wys - skala(najlepszyCzas);
   g += `<line x1="0" y1="${yRek}" x2="${szer}" y2="${yRek}"
-         stroke="var(--slaby)" stroke-width="1" stroke-dasharray="2 4" opacity=".85"/>`;
+         stroke="var(--plan)" stroke-width="1" stroke-dasharray="2 4" opacity=".7"/>`;
 
   lista.forEach((pr, i) => {
     const h = Math.max(skala(pr.czas_s), 2);
     const y = marGora + wys - h;
     const zwift = pr.jazda.typ === "VirtualRide";
     const akt = i === wybrany;
+    const pb = pr.czas_s === najlepszyCzas;
+    // Rekord niesie kolor ORAZ podpis. Sam kolor byłby informacją, której nie
+    // da się odczytać na wydruku ani przy daltonizmie — a tu chodzi o jedną
+    // konkretną próbę, więc musi się dać wskazać palcem bez zgadywania.
     g += `<rect x="${x(i)}" y="${y}" width="${szerSlupka}" height="${h}"
-           fill="${zwift ? "url(#krata-proby)" : "var(--akcent)"}"
-           opacity="${akt ? 1 : .6}" rx="2"
+           fill="${zwift ? "url(#krata-proby)" : pb ? "var(--plan)" : "var(--akcent)"}"
+           opacity="${akt ? 1 : pb ? .85 : .6}" rx="2"
            class="proba${akt ? " wybrany" : ""}" data-i="${i}"
            style="animation-delay:${Math.min(i*30,500)}ms"/>`;
+    if (pb && !akt){
+      g += `<text x="${x(i)+szerSlupka/2}" y="${y-7}" text-anchor="middle"
+             font-size="9.5" font-weight="700" fill="var(--plan)">PB</text>`;
+    }
     if (akt){
       g += `<text x="${x(i)+szerSlupka/2}" y="${y-8}" text-anchor="middle"
-             font-size="11" font-weight="600" fill="var(--tekst)"
-             >${czasNaTekst(pr.czas_s)}</text>`;
+             font-size="11" font-weight="600"
+             fill="${pb ? "var(--plan)" : "var(--tekst)"}"
+             >${czasNaTekst(pr.czas_s)}${pb ? " · PB" : ""}</text>`;
     }
   });
 
@@ -1717,6 +1765,85 @@ function wykresProb(lista, wybrany, najlepszyCzas){
   g += `<line x1="0" y1="${marGora+wys}" x2="${szer}" y2="${marGora+wys}"
          stroke="var(--slaby)" stroke-width="1"/></svg>`;
 
+  return `<div class="wykres">${os}<div class="ramka">${g}</div></div>`;
+}
+
+// Geometria wspólna dla obu wykresów. Ta sama szerokość słupka, ten sam odstęp
+// i ta sama szerokość osi — dzięki temu punkt na linii stoi DOKŁADNIE nad
+// słupkiem tej samej próby, a oba wykresy przewijają się jak jeden.
+const G = { szerSlupka:34, odstep:8, szerOsi:46, marGora:26 };
+const xProby = i => 12 + i*(G.szerSlupka+G.odstep);
+const szerProb = n => n*(G.szerSlupka+G.odstep) + 26;
+
+// Prędkość to DRUGA miara, w innej jednostce i innym zakresie — więc drugi
+// wykres, a nie druga oś na tym samym. Dwie osie na jednym wykresie pozwalają
+// dowieść dowolnej tezy przez samo przesunięcie skali.
+//
+// Oś prędkości NIE zaczyna się od zera i to nie jest niekonsekwencja wobec
+// słupków: w słupku wartość niesie WYSOKOŚĆ (pole), więc ucięcie kłamie;
+// w linii wartość niesie POŁOŻENIE punktu, więc zakres wolno dopasować.
+const DZIALKI_PREDKOSCI = [0.5,1,2,2.5,5,10];
+
+function wykresPredkosci(lista, wybrany, seg){
+  const wys = 150, marDol = 34;
+  const szer = szerProb(lista.length);
+  const v = lista.map(pr => pr.czas_s ? (seg.dystans_m / pr.czas_s) * 3.6 : null);
+  const sensowne = v.filter(x => x != null);
+  const min = Math.min(...sensowne), max = Math.max(...sensowne);
+  const zapas = Math.max((max - min) * 0.25, 0.5);
+  const dol = Math.max(0, min - zapas), gora = max + zapas;
+  const krok = DZIALKI_PREDKOSCI.find(k => (gora-dol)/k <= 5) || 20;
+  const podzialka = [];
+  for (let t = Math.ceil(dol/krok)*krok; t <= gora; t += krok) podzialka.push(t);
+  const skala = x => wys - ((x - dol)/(gora - dol)) * wys;
+  const wysCalk = wys + G.marGora + marDol;
+  const najszybsza = Math.max(...sensowne);
+
+  let os = `<svg class="os" width="${G.szerOsi}" height="${wysCalk}" aria-hidden="true">`;
+  for (const t of podzialka){
+    os += `<text x="${G.szerOsi-6}" y="${G.marGora+skala(t)+4}" text-anchor="end"
+            font-size="10" fill="var(--slaby)">${liczba(t,1)}</text>`;
+  }
+  os += `</svg>`;
+
+  let g = `<svg width="${szer}" height="${wysCalk}" role="img"
+    aria-label="Średnia prędkość na kolejnych próbach">`;
+  for (const t of podzialka){
+    const y = G.marGora + skala(t);
+    g += `<line x1="0" y1="${y}" x2="${szer}" y2="${y}"
+           stroke="var(--linia)" stroke-width="1"/>`;
+  }
+
+  const punkt = i => [xProby(i) + G.szerSlupka/2, G.marGora + skala(v[i])];
+  const d = lista.map((_, i) => {
+    const [px,py] = punkt(i);
+    return `${i ? "L" : "M"}${px} ${py}`;
+  }).join(" ");
+  g += `<path d="${d}" fill="none" stroke="var(--akcent)" stroke-width="2"
+         stroke-linejoin="round" stroke-linecap="round"/>`;
+
+  lista.forEach((pr, i) => {
+    const [px,py] = punkt(i);
+    const akt = i === wybrany;
+    const pb = v[i] === najszybsza;
+    // Otoczka w kolorze karty odcina punkt od linii, żeby nie zlewał się z nią
+    // w plamę tam, gdzie próby leżą blisko siebie.
+    g += `<circle cx="${px}" cy="${py}" r="${akt ? 6.5 : 4.5}"
+           fill="${pb ? "var(--plan)" : "var(--akcent)"}"
+           stroke="var(--powierzchnia)" stroke-width="2"/>`;
+    if (akt){
+      g += `<text x="${px}" y="${py-13}" text-anchor="middle" font-size="11"
+             font-weight="600" fill="${pb ? "var(--plan)" : "var(--tekst)"}"
+             >${liczba(v[i],1)} km/h</text>`;
+    }
+    // Cel dotyku: kółko o promieniu 4,5 px jest za małe na palec, więc każdy
+    // punkt dostaje niewidoczny prostokąt na całą wysokość wykresu.
+    g += `<rect x="${xProby(i)-G.odstep/2}" y="0" width="${G.szerSlupka+G.odstep}"
+           height="${wysCalk}" fill="transparent" class="proba-punkt" data-i="${i}"/>`;
+  });
+
+  g += `<line x1="0" y1="${G.marGora+wys}" x2="${szer}" y2="${G.marGora+wys}"
+         stroke="var(--slaby)" stroke-width="1"/></svg>`;
   return `<div class="wykres">${os}<div class="ramka">${g}</div></div>`;
 }
 
@@ -1742,6 +1869,81 @@ function panelProby(seg, pr, najlepszyCzas, numer, ile){
             ? `<b style="color:var(--plan)">rekord</b>`
             : roznicaCzasu(roznica) + " do rekordu"}
       · próba ${numer} z ${ile}
+    </div>`;
+}
+
+/* ==========================================================================
+   NOTATKI DO PRÓB
+
+   Dwie warstwy, bo strona jest statyczna i NIE MOŻE nic zapisać do repozytorium
+   (klucz do zapisu w publicznym repo byłby kluczem dla wszystkich):
+
+   1. dane.js -> "notatki"  — źródło prawdy. Tu sięga Claude i tu notatka jest
+      w kopii zapasowej, widoczna na każdym urządzeniu.
+   2. localStorage          — brudnopis TEGO urządzenia. Trzyma to, co
+      napisane, ale jeszcze nie trafiło do repozytorium.
+
+   Reguła scalania jest jednozdaniowa: pokazujemy brudnopis, jeśli istnieje,
+   w przeciwnym razie wersję z repozytorium. Gdy brudnopis zrówna się z tym,
+   co przyszło w danych, znika sam — czyli po tym, jak notatka zostanie
+   dopisana do dane.js, urządzenie przestaje trzymać jej kopię.
+   ========================================================================== */
+
+const KLUCZ_NOTATEK = "kolarstwo-notatki";
+
+function notatkiLokalne(){
+  try { return JSON.parse(localStorage.getItem(KLUCZ_NOTATEK) || "{}"); }
+  catch(e){ return {}; }
+}
+function zapiszLokalne(obj){
+  try { localStorage.setItem(KLUCZ_NOTATEK, JSON.stringify(obj)); return true; }
+  catch(e){ return false; }          // prywatne okno albo brak miejsca
+}
+function notatkaZRepo(id){
+  const n = (D.notatki || {})[id];
+  if (!n) return "";
+  return typeof n === "string" ? n : (n.tekst || "");
+}
+function notatkaBiezaca(id){
+  const l = notatkiLokalne();
+  return Object.prototype.hasOwnProperty.call(l, id) ? l[id] : notatkaZRepo(id);
+}
+// Brudnopis, który zrównał się z repozytorium, nie ma po co żyć.
+(function sprzatnijBrudnopisy(){
+  const l = notatkiLokalne();
+  let zmiana = false;
+  for (const id of Object.keys(l))
+    if (l[id] === notatkaZRepo(id)){ delete l[id]; zmiana = true; }
+  if (zmiana) zapiszLokalne(l);
+})();
+
+function notatkaHTML(idProby){
+  const l = notatkiLokalne();
+  const brudnopis = Object.prototype.hasOwnProperty.call(l, idProby);
+  const tekst = notatkaBiezaca(idProby);
+  const stan = brudnopis
+    ? `<span class="stan-brudnopis">zapisana na tym urządzeniu — nie ma jej jeszcze w danych</span>`
+    : tekst ? `<span>z danych</span>` : "";
+  return `
+    <div class="notatka" data-proba="${idProby}">
+      <div class="notatka-gora">
+        <span class="notatka-tytul">Notatka do tej próby</span>
+        <span class="notatka-stan" id="notatka-stan">${stan}</span>
+      </div>
+      <textarea id="notatka-pole" rows="3" spellcheck="false"
+        placeholder="Co pamiętasz z tego przejazdu? Wiatr, koło, samopoczucie, sprzęt."
+        >${bezpieczny(tekst)}</textarea>
+      <div class="notatka-dol">
+        <div class="notatka-przyciski">
+          <button type="button" id="notatka-zapisz" class="kolko-akcja"
+            title="Zapisz notatkę" aria-label="Zapisz notatkę">&#10003;</button>
+          <button type="button" id="notatka-anuluj" class="kolko-akcja"
+            title="Odrzuć zmiany" aria-label="Odrzuć zmiany">&#10007;</button>
+        </div>
+        <button type="button" id="notatka-eksport" class="link-tekstowy"
+          >Notatki dla Claude…</button>
+      </div>
+      <textarea id="notatka-eksport-pole" readonly rows="4" hidden></textarea>
     </div>`;
 }
 
@@ -1793,14 +1995,21 @@ const porownaniaS = (id) => {
       od ${pl(pierwsza)} do ${pl(ostatnia)}. Jeden słupek to jeden przejazd,
       wysokość to czas — <b>im niżej, tym lepiej</b>. Oś zaczyna się od zera,
       więc różnice kilku sekund są celowo małe; dokładne liczby są pod wykresem.
-      Szara kreska to rekord: ${czasNaTekst(najlepszy)}.
+      Zielony słupek i zielona kreska to rekord: ${czasNaTekst(najlepszy)}
+      — ten sam przejazd jest zaznaczony na obu wykresach.
       <br>Czas nie odróżnia jazdy solo od jazdy w grupie ani wiatru. RPE obok
       nazwy jazdy mówi, ile Cię ta próba kosztowała — bez tego szybszy czas
       z koła kolegi wygląda jak forma.
     </p>
     <div id="wykres-prob">${wykresProb(lista, wybrany, najlepszy)}</div>
+    <p class="podpis-wykresu">Prędkość średnia na tej samej próbie. Punkt stoi
+      dokładnie nad słupkiem powyżej, a oba wykresy przewijają się razem.
+      Oś jest dopasowana do zakresu, nie zaczyna się od zera — w linii wartość
+      niesie położenie punktu, a nie wysokość, więc wolno ją przybliżyć.</p>
+    <div id="wykres-predkosci">${wykresPredkosci(lista, wybrany, seg)}</div>
     <div class="info" id="info-proby">${
       panelProby(seg, lista[wybrany], najlepszy, wybrany+1, lista.length)}</div>
+    <div id="notatka-miejsce">${notatkaHTML(lista[wybrany].id || "")}</div>
   </section>`;
 };
 
@@ -1815,24 +2024,118 @@ function podepnijProby(){
   const lista = probySegmentu(id);
   const najlepszy = Math.min(...lista.map(x => x.czas_s));
 
+  const pojemnikV = document.getElementById("wykres-predkosci");
+
   const wybierz = (i) => {
     if (i == null || i < 0 || i >= lista.length || i === wybranaProba) return;
     wybranaProba = i;
-    const ramka = pojemnik.querySelector(".ramka");
-    const przewiniecie = ramka ? ramka.scrollLeft : 0;
+    // Oba wykresy przerysowujemy razem — jedna próba, dwa spojrzenia na nią.
+    // Przewinięcie zapamiętujemy, żeby wybór nie szarpał widokiem.
+    const przewiniecie = (pojemnik.querySelector(".ramka") || {}).scrollLeft || 0;
     pojemnik.innerHTML = wykresProb(lista, i, najlepszy);
-    const nowa = pojemnik.querySelector(".ramka");
-    if (nowa) nowa.scrollLeft = przewiniecie;   // wybór nie ma przesuwać widoku
+    pojemnikV.innerHTML = wykresPredkosci(lista, i, seg);
+    for (const r of document.querySelectorAll("#wykres-prob .ramka, #wykres-predkosci .ramka"))
+      r.scrollLeft = przewiniecie;
+    podepnijPrzewijanie();
     document.getElementById("info-proby").innerHTML =
       panelProby(seg, lista[i], najlepszy, i+1, lista.length);
+    document.getElementById("notatka-miejsce").innerHTML =
+      notatkaHTML(lista[i].id || "");
   };
 
   const zZdarzenia = e => {
-    const r = e.target.closest("rect.proba");
-    return r ? +r.dataset.i : null;
+    const cel = e.target.closest("rect.proba, rect.proba-punkt");
+    return cel ? +cel.dataset.i : null;
   };
-  pojemnik.addEventListener("click", e => wybierz(zZdarzenia(e)));
-  pojemnik.addEventListener("mouseover", e => wybierz(zZdarzenia(e)));
+  for (const el of [pojemnik, pojemnikV]){
+    el.addEventListener("click", e => wybierz(zZdarzenia(e)));
+    el.addEventListener("mouseover", e => wybierz(zZdarzenia(e)));
+  }
+
+  // Dwa wykresy mają tę samą oś poziomą, więc muszą jeździć razem. Strażnik
+  // przeciw zapętleniu: ustawienie scrollLeft wywołuje zdarzenie scroll na
+  // drugiej ramce, które bez tego odbijałoby się w nieskończoność.
+  let wRuchu = false;
+  function podepnijPrzewijanie(){
+    const ramki = [...document.querySelectorAll(
+      "#wykres-prob .ramka, #wykres-predkosci .ramka")];
+    for (const r of ramki){
+      r.addEventListener("scroll", () => {
+        if (wRuchu) return;
+        wRuchu = true;
+        for (const inna of ramki) if (inna !== r) inna.scrollLeft = r.scrollLeft;
+        wRuchu = false;
+      });
+    }
+  }
+  podepnijPrzewijanie();
+  for (const r of document.querySelectorAll("#wykres-predkosci .ramka"))
+    r.scrollLeft = (pojemnik.querySelector(".ramka") || {}).scrollLeft || 0;
+
+  // ── notatki ──────────────────────────────────────────────────────────────
+  const miejsce = document.getElementById("notatka-miejsce");
+  if (!miejsce) return;
+
+  const stanNotatki = (tekst) => {
+    const el = document.getElementById("notatka-stan");
+    if (el) el.innerHTML = tekst;
+  };
+
+  miejsce.addEventListener("input", e => {
+    if (e.target.id === "notatka-pole")
+      stanNotatki(`<span class="stan-niezapisane">niezapisane — dotknij ✓</span>`);
+  });
+
+  miejsce.addEventListener("click", e => {
+    const b = e.target.closest("button");
+    if (!b) return;
+    const pole = document.getElementById("notatka-pole");
+    const idProby = miejsce.querySelector(".notatka").dataset.proba;
+
+    if (b.id === "notatka-zapisz"){
+      const l = notatkiLokalne();
+      const tekst = pole.value.trim();
+      // Notatka zgodna z tą z danych nie musi leżeć w brudnopisie.
+      if (tekst === notatkaZRepo(idProby)) delete l[idProby];
+      else l[idProby] = tekst;
+      const udane = zapiszLokalne(l);
+      stanNotatki(udane
+        ? (Object.prototype.hasOwnProperty.call(l, idProby)
+            ? `<span class="stan-brudnopis">zapisana na tym urządzeniu — nie ma jej jeszcze w danych</span>`
+            : `<span>z danych</span>`)
+        : `<span class="stan-niezapisane">nie udało się zapisać w przeglądarce</span>`);
+    }
+
+    if (b.id === "notatka-anuluj"){
+      pole.value = notatkaBiezaca(idProby);
+      const l = notatkiLokalne();
+      stanNotatki(Object.prototype.hasOwnProperty.call(l, idProby)
+        ? `<span class="stan-brudnopis">zapisana na tym urządzeniu — nie ma jej jeszcze w danych</span>`
+        : (pole.value ? `<span>z danych</span>` : ""));
+    }
+
+    if (b.id === "notatka-eksport"){
+      const l = notatkiLokalne();
+      const pełne = {};
+      for (const [k,v] of Object.entries(l)){
+        const pr = (D.proby || []).find(x => x.id === k);
+        const sg = pr && (D.segmenty || []).find(x => x.id === pr.s);
+        const jz = pr && JAZDA_PO_ID.get(pr.a);
+        pełne[k] = { tekst: v,
+          segment: sg ? sg.nazwa : "?",
+          data: jz ? jz.data.slice(0,10) : "?",
+          czas: pr ? czasNaTekst(pr.czas_s) : "?" };
+      }
+      const eks = document.getElementById("notatka-eksport-pole");
+      eks.value = Object.keys(pełne).length
+        ? JSON.stringify(pełne, null, 1)
+        : "Brak notatek zapisanych na tym urządzeniu.";
+      eks.hidden = false;
+      eks.select();
+      if (navigator.clipboard && navigator.clipboard.writeText)
+        navigator.clipboard.writeText(eks.value).catch(() => {});
+    }
+  });
 }
 
 /* ==========================================================================

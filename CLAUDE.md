@@ -148,6 +148,19 @@ nie kolor: sylwetka roweru vs ekranu, słupek kreskowany vs pełny.
   moc i różnica do rekordu. Szara kreska = rekord, słupek kreskowany = Zwift.
   Kółko ze strzałką wraca do stanu pustego.
 
+  **Drugi wykres pod pierwszym: prędkość, linią.** Ta sama geometria pozioma
+  (`G`, `xProby`), więc punkt stoi dokładnie nad słupkiem tej samej próby,
+  a obie ramki przewijają się razem (strażnik `wRuchu` przeciw zapętleniu).
+  Zaznaczenie jest wspólne — dotknięcie na jednym przestawia oba.
+  **Nigdy nie łączyć ich w jeden wykres o dwóch osiach**: dwie skale na jednym
+  obrazku pozwalają dowieść dowolnej tezy samym przesunięciem zakresu.
+
+  **Rekord (PB) niesie kolor ORAZ podpis** — zielony słupek, zielony punkt,
+  napis „PB". Sam kolor byłby nieczytelny na wydruku i przy daltonizmie.
+  To rozszerza znaczenie zieleni z „plan i cel" na „osiągnięcie": dowieziony
+  plan, osiągnięty cel, rekord. Nowej barwy nie wprowadzono, więc walidacja
+  palety pozostaje w mocy.
+
   **Oś zaczyna się od zera i tak ma zostać.** Przy ucięciu poprawa z 1527 na
   1503 s (1,6%) wyglądałaby jak przepaść. Skoro słupek znaczy czas, wysokość
   musi być mu proporcjonalna; różnice podaje panel, nie oko.
@@ -155,6 +168,10 @@ nie kolor: sylwetka roweru vs ekranu, słupek kreskowany vs pełny.
   **Wybór segmentu żyje w adresie** — `#postepy/porownania/<id>`. `zHasha()`
   zwraca trzeci człon, `rysuj(arg)` go dostaje. Dzięki temu wstecz i
   odświeżenie działają bez dodatkowego stanu. Nie przenosić tego do zmiennej.
+
+  Oś PRĘDKOŚCI od zera nie zaczyna się i to nie jest niekonsekwencja: w słupku
+  wartość niesie wysokość (pole), więc ucięcie kłamie; w linii niesie ją
+  położenie punktu, więc zakres wolno dopasować.
 
   Odnośnik „Segmenty" w pustym stanie nosi kolor sekcji (`--sek-napis`).
   To jedyne miejsce poza nawigacją, gdzie kolor sekcji jest dozwolony —
@@ -189,6 +206,26 @@ nie liczy. Funkcja `mocE()` skasowana; jej wyprowadzenie i kontrola na Bump 2
 (471 W wzorem ze średniej prędkości wobec 493 W z pełnego wyliczenia) zostają
 w `TRENING.md` §7.1, gdyby kiedyś wróciła jako osobna, wyraźnie oznaczona
 kolumna.
+
+**NOTATKI DO PRÓB — dwie warstwy, nie jedna.** Strona jest statyczna i nie ma
+jak zapisać niczego do repozytorium (klucz do zapisu w publicznym repo byłby
+kluczem dla wszystkich). Dlatego:
+
+1. `dane.js` → `notatki`, klucz = `id` próby — **źródło prawdy**. Tu sięga
+   Claude, tu jest kopia zapasowa, to widać na każdym urządzeniu.
+2. `localStorage` (`kolarstwo-notatki`) — **brudnopis tego urządzenia**.
+
+Reguła scalania: pokazujemy brudnopis, jeśli istnieje, inaczej wersję z danych.
+Brudnopis zrównany z danymi kasuje się sam — czyli po dopisaniu notatki do
+`dane.js` urządzenie przestaje trzymać kopię. Przycisk „Notatki dla Claude…"
+wypisuje brudnopisy jako JSON z nazwą segmentu, datą i czasem, żeby dało się je
+wkleić w czacie i dopisać do danych. **Nie wymyślać zapisu z przeglądarki
+prosto do repo — to wymagałoby klucza w publicznym repozytorium.**
+
+Identyfikator próby ma 19 cyfr, a `JSON.parse` trzyma liczby w float64 — trzy
+ostatnie cyfry są zaokrąglane. Sprawdzone na komplecie 1717 prób: wszystkie
+pozostają unikalne, najmniejsza różnica to 1024 wobec kroku zaokrąglenia 512.
+Klucze notatek są więc trwałe i rozłączne.
 
 **RPE** (`perceived_exertion`) wchodzi do `aktywnosci` od 20.08.2026 — 44 jazdy
 ze 100 je mają. Przychodzi tym samym zapytaniem co opis i segmenty, więc nie

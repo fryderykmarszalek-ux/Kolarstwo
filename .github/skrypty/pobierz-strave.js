@@ -72,7 +72,16 @@ function wyciagnijProby(jazda){
     });
     proby.push({
       // Identyfikator przejazdu ze Stravy. Nie służy do rysowania — jest
-      // KOTWICĄ dla notatek. Bez niego notatka musiałaby się wiązać z próbą
+      // KOTWICĄ dla notatek.
+      //
+      // UWAGA na precyzję: Strava przysyła to jako liczbę 19-cyfrową, a JSON.parse
+      // w JavaScripcie trzyma liczby w float64, gdzie przy 3,5·10^18 najbliższe
+      // wartości są oddalone o 512. Trzy ostatnie cyfry są więc zaokrąglane
+      // (widać to po końcówkach "000"). Sprawdzone na komplecie 1717 prób:
+      // wszystkie identyfikatory pozostają UNIKALNE, a najmniejsza różnica
+      // między dwoma wynosi 1024 — dwa razy więcej niż krok zaokrąglenia,
+      // więc dwie różne próby nie mogą się skleić w jeden klucz.
+      // Zaokrąglenie jest deterministyczne, więc klucz notatki jest trwały. Bez niego notatka musiałaby się wiązać z próbą
       // przez kolejność w jeździe, a ta potrafi się zmienić przy ponownym
       // wgraniu pliku i notatka wylądowałaby przy cudzym przejeździe.
       id: String(e.id),
