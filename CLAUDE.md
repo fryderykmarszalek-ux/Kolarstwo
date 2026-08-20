@@ -64,6 +64,11 @@ Założenia modelu (CdA, masy, Crr, HRmax, FTP…) żyją w `dane.js` w bloku
 `zalozenia`, każde z tagiem wiarygodności i datą. **Nigdy nie wpisywać stałej
 fizycznej w kod wykresu.**
 
+To samo dotyczy **celów**: 80 km na długą jazdę siedzi w `dane.js` → `cele`,
+a cel godzinowy wykres liczy jako najwyższy tydzień z `plan_objetosci`. Do
+20.08.2026 obie liczby były wpisane w `index.html` — wykres pokazywałby stary
+cel jeszcze długo po zmianie planu.
+
 ---
 
 ## 4. Pliki
@@ -202,12 +207,26 @@ Sekrety w repo: `STRAVA_CLIENT_ID` (273451), `STRAVA_CLIENT_SECRET`,
 
 **ZASADA NADRZĘDNA SKRYPTU — nie łamać.** `pobierz-strave.js` **nie generuje
 pliku od zera**. Wczytuje istniejący `dane.js` i podmienia wyłącznie listę
-aktywności oraz stemple w `meta`. Bloki `zalozenia`, `kryterium_przerwy`
-i `plan_objetosci` są ustalane ręcznie i muszą przetrwać każdą aktualizację.
-Automat, który je kasuje, byłby gorszy niż brak automatu.
+aktywności oraz stemple w `meta`. Bloki `zalozenia`, `kryterium_przerwy`,
+`cele` i `plan_objetosci` są ustalane ręcznie i muszą przetrwać każdą
+aktualizację. Automat, który je kasuje, byłby gorszy niż brak automatu.
 
-Opisów jazd nie ma w liście aktywności Stravy — dociągane osobno i **tylko dla
-jazd, których jeszcze nie ma w pliku**. Dzienny przebieg to 2–3 zapytania.
+**Zapis jest generyczny — 20.08.2026, nie cofać.** Pierwsza wersja wypisywała
+listę znanych nazw bloków. Skutek: dowolny nowy blok dopisany ręcznie znikał
+przy najbliższym przebiegu o 22:00, po cichu. Teraz pętla przepisuje **każdy**
+klucz, który zastała w pliku. Dzięki temu blok `cele` (dodany tego samego dnia)
+w ogóle przeżył pierwszą noc.
+
+Opisów jazd nie ma w liście aktywności Stravy — dociągane osobno, dla jazd
+nowych **oraz z ostatnich 30 dni** (`OKNO_OPISOW_DNI`). Powód: opis powstaje
+zwykle PO wgraniu jazdy, a poprawki jeszcze później — pobranie raz, przy
+pierwszym spotkaniu, gubiłoby wszystko, co dopisane potem. Dzienny przebieg to
+kilka zapytań. Ręczny przycisk ma przełącznik `pelne_opisy` do jednorazowego
+odświeżenia całej historii.
+
+Rozróżnienie, które musi zostać: brak opisu na Stravie **kasuje** opis u nas
+(Strava jest masterem), ale **nieudane zapytanie** zostawia to, co było. Bez
+tego jedna awaria sieci zjadałaby dane o wietrze i tętnie.
 
 Zabezpieczenia: pusta odpowiedź przerywa przebieg zamiast kasować dane; przed
 commitem plik musi się sparsować i mieć niezerową liczbę aktywności; commit
@@ -242,9 +261,12 @@ jednorazowo, kolejne różnice będą już małe.
       `Settings → Secrets and variables → Actions → PAT_SEKRETY → kosz`.
       Można też skasować sam token fine-grained w ustawieniach konta.
 - [ ] **Skasować `.github/workflows/strava-init.yml`** — jednorazowy, zużyty.
-- [ ] **Alarm na stronie, gdy dane starsze niż kilka dni.** Bez tego cicha
-      awaria automatu oznacza wiarę w nieaktualne liczby. `meta.pobrano`
-      jest w danych, więc to kilkanaście linii w `index.html`.
+- [x] **Alarm na stronie, gdy dane starsze niż kilka dni** — zrobione
+      20.08.2026. Pasek nad treścią, na każdej zakładce. Progi: 2 dni ciche
+      ostrzeżenie, 4 dni czerwony alarm z linkiem do przebiegów i tagiem `[?]`
+      na kafelku „Od ostatniej jazdy". **To jedyne miejsce, w którym strona
+      pyta o zegar urządzenia** — cała reszta liczy się względem
+      `meta.pobrano`, bo tylko tyle strona naprawdę wie.
 
 **Listopad 2026** (czeka na dane, nie na kod):
 

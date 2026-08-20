@@ -13,6 +13,15 @@ const { STRAVA, zapytaj, swiezyToken } = require("./wspolne");
 const PLIK = path.join(__dirname, "..", "..", "dane.js");
 const TYPY_Z_OPISEM = ["Ride", "VirtualRide"];   // tylko dla nich dociągamy opis
 
+// Opis jazdy to JEDYNY kanał, którym Fryderyk podaje wiatr, skład grupy
+// i tętno — rzeczy, których w podsumowaniu ze Stravy nie ma i nigdy nie będzie.
+// Pisze go zwykle po wgraniu jazdy, a poprawia jeszcze później (przykład
+// z życia: opis z 13.08 czeka na poprawkę "?1" -> "w?1"). Pobranie opisu raz,
+// przy pierwszym spotkaniu z jazdą, gubi wszystko, co powstało potem.
+// Dlatego świeże jazdy odpytujemy ponownie przy każdym przebiegu.
+const OKNO_OPISOW_DNI = 30;
+const PELNE_OPISY = process.env.PELNE_OPISY === "true";   // jednorazowy backfill
+
 function wczytajStare(){
   global.window = {};
   delete require.cache[require.resolve(PLIK)];
@@ -20,9 +29,13 @@ function wczytajStare(){
   return global.window.DANE;
 }
 
-// Lista aktywności nie zawiera opisu — trzeba po niego osobno. Robimy to
-// WYŁĄCZNIE dla jazd, których jeszcze nie mamy, żeby dzienny przebieg
-// kosztował dwa-trzy zapytania zamiast stu.
+// Lista aktywności nie zawiera opisu — trzeba po niego osobno, jazda po jeździe.
+// Pytamy o jazdy nowe i o te z ostatnich OKNO_OPISOW_DNI dni: dzienny przebieg
+// kosztuje wtedy kilka zapytań zamiast stu, a poprawka opisu sprzed tygodnia
+// nadal dociera.
+// Zwraca: tekst = opis, null = jazda bez opisu (Strava jest masterem, więc
+// skasowany opis ma zniknąć również u nas), undefined = nie wiem, bo zapytanie
+// padło — wtedy zostawiamy to, co mamy, zamiast kasować dane przez błąd sieci.
 async function dociagnijOpis(id, access){
   try {
     const a = await zapytaj(`${STRAVA}/api/v3/activities/${id}?include_all_efforts=false`,
@@ -30,7 +43,7 @@ async function dociagnijOpis(id, access){
     return (a.description || "").trim() || null;
   } catch (e){
     console.log(`  (nie udało się pobrać opisu ${id}: ${e.message.split("\n")[0]})`);
-    return null;
+    return undefined;
   }
 }
 
@@ -47,6 +60,10 @@ function naNasz(a){
   };
 }
 
+// Wypisuje KAŻDY blok, który zastał w pliku — nie listę nazw znanych temu
+// skryptowi. Blok dopisany ręcznie za pół roku ma przetrwać automat, a nie
+// zniknąć o 22:00 dlatego, że skrypt o nim nie słyszał. Ta pętla jest jedyną
+// różnicą między "automat odświeża dane" a "automat kasuje decyzje".
 function zapisz(D){
   const j = x => JSON.stringify(x, null, 0);
   const L = [];
@@ -56,16 +73,21 @@ function zapisz(D){
   L.push("// VAM, koszt kardiologiczny) liczy się przy wyświetlaniu, NIE tutaj.");
   L.push("");
   L.push("window.DANE = {");
-  L.push("");
-  L.push("meta: " + JSON.stringify(D.meta, null, 0) + ",");
-  L.push("");
-  L.push("zalozenia: " + JSON.stringify(D.zalozenia, null, 2) + ",");
-  L.push("");
-  L.push("kryterium_przerwy: " + JSON.stringify(D.kryterium_przerwy, null, 2) + ",");
-  L.push("");
-  L.push("plan_objetosci: [");
-  for (const p of D.plan_objetosci) L.push("  " + j(p) + ",");
-  L.push("],");
+
+  for (const klucz of Object.keys(D)){
+    if (klucz === "aktywnosci") continue;         // zawsze na końcu, własny format
+    L.push("");
+    if (klucz === "meta"){
+      L.push("meta: " + j(D.meta) + ",");         // jedna linia: i tak nikt tego nie czyta oczami
+    } else if (Array.isArray(D[klucz])){
+      L.push(klucz + ": [");                      // tablica: element na linię, czytelne różnice
+      for (const p of D[klucz]) L.push("  " + j(p) + ",");
+      L.push("],");
+    } else {
+      L.push(klucz + ": " + JSON.stringify(D[klucz], null, 2) + ",");
+    }
+  }
+
   L.push("");
   L.push("// czas_ruchu_s — czas w ruchu. Zgodnie z regułą: wszystkie średnie zawsze z czasu w ruchu.");
   L.push("aktywnosci: [");
@@ -111,21 +133,39 @@ function zapisz(D){
   const nowe = zeStravy.map(naNasz)
     .sort((a,b) => a.data < b.data ? -1 : a.data > b.data ? 1 : 0);
 
-  let dociagniete = 0;
+  // Granica okna: jazdy młodsze pytamy o opis za każdym razem, starsze tylko
+  // przy pierwszym spotkaniu albo na żądanie (PELNE_OPISY).
+  const granica = new Date(Date.now() - OKNO_OPISOW_DNI*86400000)
+    .toISOString().slice(0,10);
+
+  let zapytan = 0, zmienionych = 0;
   for (const a of nowe){
-    if (znaneId.has(a.id)){
-      const o = opisy.get(a.id);
-      if (o) a.opis = o;                       // zachowaj to, co już mamy
-    } else if (TYPY_Z_OPISEM.includes(a.typ)){
+    const znana    = znaneId.has(a.id);
+    const stary    = opisy.get(a.id);
+    const kolarska = TYPY_Z_OPISEM.includes(a.typ);
+    const swieza   = a.data.slice(0,10) >= granica;
+
+    if (kolarska && (!znana || swieza || PELNE_OPISY)){
       const o = await dociagnijOpis(a.id, access);
-      if (o) a.opis = o;
-      dociagniete++;
+      zapytan++;
+      if (o === undefined){
+        if (stary) a.opis = stary;             // zapytanie padło — nie kasuj tego, co mamy
+      } else {
+        if (o) a.opis = o;                     // null zostawia jazdę bez opisu, świadomie
+        if ((o || null) !== (stary || null)){
+          zmienionych++;
+          console.log(`  opis ${znana ? "zmieniony" : "nowy"}: ${a.data.slice(0,10)} ${a.nazwa}`);
+        }
+      }
+    } else if (stary){
+      a.opis = stary;                          // poza oknem: zachowaj to, co już mamy
     }
   }
-  console.log(`Nowych jazd z dociągniętym opisem: ${dociagniete}.`);
+  console.log(`Opisy: ${zapytan} zapytań, ${zmienionych} zmian.`);
 
   stare.aktywnosci = nowe;
   stare.meta.pobrano = new Date().toISOString().slice(0,16);
+  stare.meta.zrodlo = "Strava API (GitHub Actions): /athlete/activities + /activities/{id}";
   stare.meta.liczba_aktywnosci = nowe.length;
   stare.meta.zakres = [nowe[0].data.slice(0,10), nowe[nowe.length-1].data.slice(0,10)];
 

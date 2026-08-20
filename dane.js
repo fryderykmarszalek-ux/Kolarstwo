@@ -103,6 +103,16 @@ kryterium_przerwy: {
   ]
 },
 
+cele: {
+  "_opis": "Cele to decyzje, nie pomiary — jak plan i kryterium. Wykresy czytają je STĄD. Liczba wpisana w kod wykresu byłaby drugim źródłem prawdy i kiedyś rozjechałaby się z planem.",
+  "dluga_jazda_km": {
+    "v": 80,
+    "od": "2026-09-01",
+    "zrodlo": "plan IX–X: niedzielna długa startuje od 50 km, +8–10 km co dwa tygodnie",
+    "uwaga": "Cel na koniec października. Rekord życiowy to 64,3 km (14.07.2026) — nie wskakiwać od razu na 80."
+  }
+},
+
 plan_objetosci: [
   {"od":"2026-09-01","do":"2026-09-07","godziny":3,"odciazenie":false},
   {"od":"2026-09-08","do":"2026-09-14","godziny":4,"odciazenie":false},
