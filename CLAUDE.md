@@ -183,14 +183,56 @@ Wyłącznie `Settings → Secrets and variables → Actions`.
 
 ---
 
+## 7b. Automat aktualizacji danych — jak działa
+
+Zbudowany 20.08.2026. Serwer GitHuba codziennie loguje się do Stravy i odświeża
+`dane.js`. Strona zostaje statyczna — odświeża się sam *plik*. **Żadna sesja
+Claude nie jest do tego potrzebna.**
+
+```
+.github/workflows/strava-sync.yml   codziennie 20:00 UTC + przycisk ręczny
+.github/workflows/strava-init.yml   jednorazowy, zdobycie refresh tokenu
+.github/skrypty/pobierz-strave.js   pobiera i przepisuje dane.js
+.github/skrypty/wymien-kod.js       kod -> refresh token
+.github/skrypty/wspolne.js          odświeżanie tokenu, zapytania
+```
+
+Sekrety w repo: `STRAVA_CLIENT_ID` (273451), `STRAVA_CLIENT_SECRET`,
+`STRAVA_REFRESH_TOKEN`. Refresh token Stravy nie wygasa.
+
+**ZASADA NADRZĘDNA SKRYPTU — nie łamać.** `pobierz-strave.js` **nie generuje
+pliku od zera**. Wczytuje istniejący `dane.js` i podmienia wyłącznie listę
+aktywności oraz stemple w `meta`. Bloki `zalozenia`, `kryterium_przerwy`
+i `plan_objetosci` są ustalane ręcznie i muszą przetrwać każdą aktualizację.
+Automat, który je kasuje, byłby gorszy niż brak automatu.
+
+Opisów jazd nie ma w liście aktywności Stravy — dociągane osobno i **tylko dla
+jazd, których jeszcze nie ma w pliku**. Dzienny przebieg to 2–3 zapytania.
+
+Zabezpieczenia: pusta odpowiedź przerywa przebieg zamiast kasować dane; przed
+commitem plik musi się sparsować i mieć niezerową liczbę aktywności; commit
+tylko przy faktycznej zmianie.
+
+Testowane bez sieci (podstawiony `fetch`) — dziewięć kontroli, w tym
+nienaruszalność bloków ręcznych.
+
+---
+
 ## 8. Co dalej
 
-**Przed 1.09.2026:**
-- **Automatyczna aktualizacja danych** (uzgodnione, niezaczęte). Plan: GitHub
-  Actions o stałej porze loguje się do Stravy kluczem z sekretów repo,
-  regeneruje `dane.js`, commituje. Strona zostaje statyczna — odświeża się sam
-  *plik*. Wymaga: aplikacji Stravy założonej przez Fryderyka + trzech sekretów
-  w ustawieniach repo. Dołożyć alarm na stronie, gdy dane starsze niż kilka dni.
+**Do domknięcia (stan 20.08.2026):**
+- [ ] **Potwierdzić pierwszy udany przebieg `strava-sync.yml`.** Podłączenie
+      (`strava-init.yml`) zakończyło się sukcesem, refresh token jest w sejfie.
+      Sam automat aktualizacji w chwili pisania czekał w kolejce GitHuba
+      i **nie został jeszcze potwierdzony**. Sprawdzić: Actions → „Strava —
+      aktualizacja danych" → zielony ptaszek + świeży commit „Dane ze Stravy".
+- [ ] **Skasować sekret `PAT_SEKRETY`** — był potrzebny wyłącznie do zapisania
+      refresh tokenu i po podłączeniu jest zbędnym ryzykiem.
+- [ ] **Skasować `.github/workflows/strava-init.yml`** — jednorazowy, zużyty.
+- [ ] **Alarm na stronie, gdy dane starsze niż kilka dni.** Bez tego cicha
+      awaria automatu oznacza wiarę w nieaktualne liczby.
+
+**Listopad 2026** (czeka na dane, nie na kod):
 
 **Listopad 2026** (czeka na dane, nie na kod):
 - Grupa A — segmenty, krzywa mocy (wymaga backfillu segmentów od 28.04.2026)
