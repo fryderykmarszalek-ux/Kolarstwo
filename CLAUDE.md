@@ -227,6 +227,35 @@ nie kolor: sylwetka roweru vs ekranu, słupek kreskowany vs pełny.
   Odnośnik „Segmenty" w pustym stanie nosi kolor sekcji (`--sek-napis`).
   To jedyne miejsce poza nawigacją, gdzie kolor sekcji jest dozwolony —
   bo wskazuje zakładkę, czyli nadal jest nawigacją.
+- **Postępy → Dane** (21.08.2026) — rekordy mocy. Cztery kafelki (5 s, 1 min,
+  5 min, 20 min), krzywa mocy na osi logarytmicznej i tabela wszystkich okien.
+  Dotknięcie okna prowadzi do `#postepy/dane/<sekundy>`: wykres schodkowy
+  pokazujący, jak ten rekord rósł, z listą jazd i odnośnikami na Stravę.
+  Na wykresie stoją **wyłącznie jazdy, w których rekord padł** — przejazd
+  słabszy niczego nie zmienia, więc linia może iść tylko w górę i pokazuje
+  nie formę, tylko tempo poprawy.
+
+  **Skąd te liczby.** Strava NIE oddaje przez API gotowych rekordów mocy na
+  czas. Automat pobiera surowy strumień watów (`/activities/{id}/streams`)
+  i liczy maksima średnich kroczących dla szesnastu okien od 1 s do 90 min;
+  do `dane.js` trafiają same wyniki (`moc_krzywe`), kilkanaście liczb na jazdę.
+  Strumień pobierany **tylko dla jazd z pomiarem**: `VirtualRide` albo próba
+  na segmencie z `z_miernika`. Po kupnie miernika szosa wejdzie tu sama.
+
+  Przerwa w osi czasu dostaje **zera**, nie ostatnią wartość — inaczej postój
+  podbijałby długie okna mocą, której nikt nie wykręcił.
+
+  **Krzywa mocy NIE MUSI maleć z długością okna — nie „poprawiać" tego.**
+  Na jeździe z 18.10.2025 wyszło 10 min = 157 W przy 12 min = 158 W i wygląda
+  to na błąd. Nie jest: maksimum średniej kroczącej nie jest monotoniczne.
+  Kontrprzykład, seria `3 0 3 0 3` — najlepsza piątka daje 1,80, a najlepsza
+  dwójka tylko 1,50. Znaczy to, że żadne krótsze okno nie trafiło w tak równy
+  odcinek jak jedno dłuższe. Ścinanie krzywej do monotonicznej zaniżałoby
+  prawdziwy pomiar. Wyjaśnienie stoi na stronie, w opisie krzywej.
+
+  **Kontrola poprawności:** wyliczone rekordy z wyścigu 18.10.2025 zgadzają się
+  z tabelą w `TRENING.md` §8.1 co do wata — 30 s 271, 10 min 157, 20 min 148,
+  30 min 143; sprint z 01.11 daje 702 W, tak jak notuje `TRENING.md`.
 - **Z2–Z5** — miejsca zarezerwowane, świadomie zostawione (Fryderyk chce
   widzieć docelowy kształt strony)
 - Ikony kolarskie w tle (7 sylwetek, losowe z ustalonego ziarna, pasy przy

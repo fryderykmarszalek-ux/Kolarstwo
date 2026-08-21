@@ -431,14 +431,19 @@ table.segmenty tbody tr:hover td{background:var(--plyta)}
    odczyt pojedynczej liczby — te stoją w tabeli pod spodem. */
 .krzywa-mocy{margin-top:6px;background:var(--plyta);border:1px solid var(--linia);
   border-radius:10px;padding:10px 12px 4px}
-.krzywa-mocy svg{display:block;overflow:visible}
+.krzywa-mocy svg{display:block;height:auto;overflow:visible}
 table.segmenty.moc th:first-child,table.segmenty.moc td:first-child{width:20%}
 table.segmenty.moc th:not(:first-child),table.segmenty.moc td:not(:first-child){width:20%}
 table.segmenty.moc{min-width:520px}
-/* Pasek pod liczbą watów: ta sama informacja co w krzywej, tylko wiersz po
-   wierszu — widać kształt spadku, nie czytając liczb. */
-.pasek-mocy{display:block;height:3px;border-radius:2px;margin:0 0 3px auto;
-  width:var(--udzial);background:var(--seria-moc);opacity:.55}
+/* Tło komórki z watami: ta sama informacja co w krzywej, tylko wiersz po
+   wierszu — widać kształt spadku, nie czytając liczb. Wypełnienie od prawej,
+   bo liczby też są dosunięte do prawej. */
+.komorka-moc{position:relative}
+.komorka-moc::before{
+  content:"";position:absolute;inset:3px 0;left:auto;right:0;
+  width:var(--udzial);background:var(--seria-moc);opacity:.16;border-radius:3px;
+}
+.komorka-moc>*{position:relative}
 .kroki-mocy{list-style:none;margin:14px 0 0;padding:0;display:grid;gap:1px;
   border:1px solid var(--linia);border-radius:10px;overflow:hidden}
 .kroki-mocy li{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;
@@ -450,7 +455,6 @@ table.segmenty.moc{min-width:520px}
 .kroki-zysk{color:var(--seria-moc);font-size:12px;font-weight:600;min-width:86px}
 .kroki-mocy .odn{color:var(--slaby);text-decoration:none;font-size:12.5px}
 .kroki-mocy .odn:hover{color:var(--tekst);text-decoration:underline}
-.os-stala{flex:0 0 auto}
 rect.proba-punkt{cursor:pointer}
 
 /* --- Notatka do próby. Dwa kółka: ptaszek zapisuje, krzyżyk cofa. --- */
@@ -2467,7 +2471,9 @@ function wykresKrzywejMocy(){
   const znaczniki = [1,5,15,60,300,1200,3600,5400].filter(s2 => s2 >= minS && s2 <= maksS);
   const krokW = goraW > 600 ? 200 : goraW > 300 ? 100 : 50;
 
-  let g = `<svg viewBox="0 0 ${W} ${H}" width="100%" height="auto"
+  // Wysokość zostawiamy CSS-owi: atrybut height w SVG przyjmuje długość,
+  // nie słowo "auto" — przeglądarka zgłaszała to jako błąd.
+  let g = `<svg viewBox="0 0 ${W} ${H}" width="100%"
     preserveAspectRatio="xMidYMid meet" role="img"
     aria-label="Krzywa mocy: rekord na każdy czas trwania">`;
   for (let w = 0; w <= goraW; w += krokW){
@@ -2548,6 +2554,11 @@ const daneMocy = (arg) => {
       inaczej wszystko od sekundy do minuty zlałoby się w jeden punkt przy
       krawędzi. Kształt tej krzywej mówi więcej niż pojedyncza liczba: strome
       zejście na lewej stronie to zryw, płaski ogon po prawej to wytrzymałość.
+      <br>Jeśli zobaczysz, że dłuższe okno bije krótsze o wat czy dwa (np. 12 min
+      ponad 10 min) — to nie błąd. Maksimum średniej kroczącej nie musi maleć
+      z długością okna: przy serii <code>3 0 3 0 3</code> najlepsza piątka daje
+      1,80, a najlepsza dwójka tylko 1,50. Znaczy to tyle, że żadne krótsze okno
+      nie trafiło w tak równy odcinek jak jedno dłuższe.
     </p>
     ${wykresKrzywejMocy()}
   </section>
@@ -2565,9 +2576,9 @@ const daneMocy = (arg) => {
               <td><a class="seg-nazwa" href="#postepy/dane/${r.sek}"
                     title="Pokaż, jak rósł ten rekord">${oknoNaTekst(r.sek)}<span
                     class="strzalka-wew" aria-hidden="true">›</span></a></td>
-              <td><span class="pasek-mocy" style="--udzial:${
-                    Math.round(r.waty / REKORDY_MOCY[0].waty * 100)}%"></span>
-                  <b>${r.waty}</b> W</td>
+              <td class="komorka-moc" style="--udzial:${
+                    Math.round(r.waty / REKORDY_MOCY[0].waty * 100)}%"
+                  ><b>${r.waty}</b> W</td>
               <td>${naKg(r.waty)}</td>
               <td>${r.poprawek}</td>
               <td>${pl(r.jazda.data)}</td>
@@ -2598,57 +2609,54 @@ function postepMocy(sek){
 
   const kroki = r.kroki;
   const naKg = watyNaKg(r.waty);
-  const szerSlupka = 30, odstep = 14, marGora = 30, wys = 200, marDol = 46, szerOsi = 42;
-  const szer = Math.max(kroki.length*(szerSlupka+odstep) + 40, 260);
-  const goraW = Math.ceil(r.waty * 1.15 / 25) * 25;
+
+  // Wykres rozciąga się na szerokość karty, a nie na liczbę punktów: trzy
+  // poprawki wciśnięte w lewą ćwiartkę wyglądały jak niedokończony rysunek.
+  // Stąd viewBox skalowany do szerokości i punkty rozłożone równomiernie.
+  const W = 660, H = 290, lewy = 46, prawy = 22, gora = 34, dol = 42;
+  const px = W - lewy - prawy, py = H - gora - dol;
+  const goraW = Math.ceil(r.waty * 1.18 / 25) * 25;
   const krokW = goraW > 600 ? 200 : goraW > 300 ? 100 : 50;
-  const skala = w => (w / goraW) * wys;
-  const wysCalk = wys + marGora + marDol;
-  const x = i => 16 + i*(szerSlupka+odstep);
+  const y = w => gora + py - (w / goraW) * py;
+  const x = i2 => kroki.length === 1 ? lewy + px/2
+    : lewy + (i2 / (kroki.length - 1)) * (px - 40);
 
-  let os = `<svg class="os" width="${szerOsi}" height="${wysCalk}" aria-hidden="true">`;
-  for (let w = 0; w <= goraW; w += krokW)
-    os += `<text x="${szerOsi-6}" y="${marGora+wys-skala(w)+4}" text-anchor="end"
-            font-size="10" fill="var(--slaby)">${w}</text>`;
-  os += `</svg>`;
-
-  let g = `<svg width="${szer}" height="${wysCalk}" role="img"
+  let g = `<svg viewBox="0 0 ${W} ${H}" width="100%"
+    preserveAspectRatio="xMidYMid meet" role="img"
     aria-label="Jak rósł rekord na ${oknoNaTekst(sek)}">`;
-  for (let w = 0; w <= goraW; w += krokW)
-    g += `<line x1="0" y1="${marGora+wys-skala(w)}" x2="${szer}" y2="${marGora+wys-skala(w)}"
+  for (let w = 0; w <= goraW; w += krokW){
+    g += `<line x1="${lewy}" y1="${y(w)}" x2="${W-prawy}" y2="${y(w)}"
            stroke="var(--linia)" stroke-width="1"/>`;
-
-  // schodek: poziomo do następnej daty, potem pionowo w górę
-  let d = "";
-  kroki.forEach((k,i) => {
-    const px = x(i) + szerSlupka/2, py = marGora + wys - skala(k.waty);
-    d += i === 0 ? `M${px} ${py}` : ` L${px} ${marGora + wys - skala(kroki[i-1].waty)} L${px} ${py}`;
-  });
-  if (kroki.length > 1){
-    const ostX = x(kroki.length-1) + szerSlupka/2;
-    d += ` L${szer-10} ${marGora + wys - skala(r.waty)}`;
+    g += `<text x="${lewy-8}" y="${y(w)+4}" text-anchor="end" font-size="11"
+           fill="var(--slaby)">${w}</text>`;
   }
+
+  // Schodek, nie prosta: rekord nie rośnie płynnie między jazdami — stoi,
+  // dopóki ktoś go nie pobije. Prosta sugerowałaby poprawę, której nie było.
+  let d = `M${x(0)} ${y(kroki[0].waty)}`;
+  for (let i2 = 1; i2 < kroki.length; i2++)
+    d += ` L${x(i2)} ${y(kroki[i2-1].waty)} L${x(i2)} ${y(kroki[i2].waty)}`;
+  d += ` L${W-prawy} ${y(r.waty)}`;
   g += `<path d="${d}" fill="none" stroke="var(--seria-moc)" stroke-width="2.5"
          stroke-linejoin="round" stroke-linecap="round"/>`;
 
-  kroki.forEach((k,i) => {
-    const px = x(i) + szerSlupka/2, py = marGora + wys - skala(k.waty);
-    const aktualny = i === kroki.length-1;
-    g += `<circle cx="${px}" cy="${py}" r="${aktualny ? 6.5 : 5}"
+  kroki.forEach((k,i2) => {
+    const aktualny = i2 === kroki.length-1;
+    g += `<circle cx="${x(i2)}" cy="${y(k.waty)}" r="${aktualny ? 6.5 : 5}"
            fill="${aktualny ? "var(--plan)" : "var(--seria-moc)"}"
            stroke="var(--powierzchnia)" stroke-width="2"/>`;
-    g += `<text x="${px}" y="${py-12}" text-anchor="middle" font-size="11"
+    g += `<text x="${x(i2)}" y="${y(k.waty)-13}" text-anchor="middle" font-size="12"
            font-weight="600" fill="${aktualny ? "var(--plan)" : "var(--tekst)"}"
            >${k.waty} W</text>`;
     if (k.zysk)
-      g += `<text x="${px}" y="${py-25}" text-anchor="middle" font-size="9.5"
-             fill="var(--slaby)">+${k.zysk}</text>`;
-    g += `<text x="${px}" y="${marGora+wys+16}" text-anchor="middle" font-size="9.5"
-           fill="var(--slaby)">${k.jazda.data.slice(8,10)}.${k.jazda.data.slice(5,7)}</text>`;
-    g += `<text x="${px}" y="${marGora+wys+30}" text-anchor="middle" font-size="9.5"
+      g += `<text x="${x(i2)}" y="${y(k.waty)-27}" text-anchor="middle" font-size="10"
+             fill="var(--seria-moc)" font-weight="600">+${k.zysk} W</text>`;
+    g += `<text x="${x(i2)}" y="${gora+py+18}" text-anchor="middle" font-size="10.5"
+           fill="var(--slaby)">${pl(k.jazda.data).slice(0,5)}</text>`;
+    g += `<text x="${x(i2)}" y="${gora+py+31}" text-anchor="middle" font-size="10"
            fill="var(--slaby)">${k.jazda.data.slice(0,4)}</text>`;
   });
-  g += `<line x1="0" y1="${marGora+wys}" x2="${szer}" y2="${marGora+wys}"
+  g += `<line x1="${lewy}" y1="${gora+py}" x2="${W-prawy}" y2="${gora+py}"
          stroke="var(--slaby)" stroke-width="1"/></svg>`;
 
   const pierwszy = kroki[0], ostatni = kroki[kroki.length-1];
@@ -2679,8 +2687,7 @@ function postepMocy(sek){
         <b>+${ostatni.waty - pierwszy.waty} W</b> (${liczba(wzrost,1)}%).`
         : `<br>Ten rekord padł raz i nikt go jeszcze nie ruszył.`}
     </p>
-    <div class="wykres"><div class="os-stala">${os}</div>
-      <div class="ramka">${g}</div></div>
+    <div class="krzywa-mocy">${g}</div>
     <div class="info">
       <div class="proba-naglowek">
         <a class="odn" href="${adresStravy(ostatni.jazda)}" target="_blank" rel="noopener"
