@@ -51,6 +51,7 @@ prognozy). Przeczytać oba przed pierwszą większą zmianą.
 | Dane w `dane.js` jako `window.DANE`, nie `.json` | `fetch` na `file://` blokuje CORS |
 | `index.html` małymi literami w korzeniu | Pages szuka dokładnie tej nazwy |
 | Dotyk, nie hover | iPad i telefon to ekrany docelowe |
+| Logo Stravy w barwie firmowej `#FC4C02` | zgoda Fryderyka z 21.08.2026; to znak cudzej marki, nie dana ani nawigacja, więc nie miesza się z systemem ról |
 | Strona nigdy sama nie zaciągnie Stravy | Pages nie uruchamia programów, a sekretu nie da się schować w publicznym repo |
 
 **Wariant B (kluczowy).** W `dane.js` leżą wyłącznie pomiary. Wszystko wyliczalne
@@ -252,6 +253,28 @@ nie kolor: sylwetka roweru vs ekranu, słupek kreskowany vs pełny.
   dwójka tylko 1,50. Znaczy to, że żadne krótsze okno nie trafiło w tak równy
   odcinek jak jedno dłuższe. Ścinanie krzywej do monotonicznej zaniżałoby
   prawdziwy pomiar. Wyjaśnienie stoi na stronie, w opisie krzywej.
+
+  **ERG — znacznik przy jeździe, kryterium LICZBOWE** (21.08.2026). Strava
+  nie ma pola „to był ERG". Rozstrzyga iloraz: rekord 5-sekundowy podzielony
+  przez rekord z najdłuższego okna tej jazdy. Trenażer w ERG trzyma zadaną moc,
+  więc pięć sekund ledwie odstaje od dwudziestu minut. Zmierzone na komplecie:
+  treningi sterowane 1,05–1,48, wyścig 3,04, sesje ze sprintami 5,84–6,50 —
+  rozdział jest ostry, próg 1,5 nie jest naciągany. Wychodzi 12 jazd
+  sterowanych z 17. Nazwa treningu Zwifta (`NAZWY_PLANOW`) to tylko zapasowy
+  trop, gdy krzywej nie ma.
+
+  **Nie klasyfikować po nazwie.** Sesja „Strength" chodzi w ERG, ale sprint
+  w środku jest prawdziwy, bo ERG puszcza przy maksymalnym wysiłku. Znacznik
+  po nazwie podważałby rekord 702 W, który jest jak najbardziej Fryderyka.
+  `TRENING.md` §8.1 mówi „15 z 17 w ERG" i liczy zamiar; ta reguła liczy
+  dowód — stąd 12, nie 15, i to jest właściwa różnica.
+
+  Znacznik stoi na liście jazd (Start), w panelu próby (Porównania S) oraz
+  w kafelkach, tabeli i historii rekordów (Dane).
+
+  **Krzywa mocy ma drugą oś: W/kg.** To NIE jest druga seria ani drugi zakres
+  — te same waty podzielone przez masę zawodnika, przez to samo zero. Zakaz
+  dwóch osi dotyczy dwóch RÓŻNYCH miar, nie jednej w dwóch jednostkach.
 
   **Kontrola poprawności:** wyliczone rekordy z wyścigu 18.10.2025 zgadzają się
   z tabelą w `TRENING.md` §8.1 co do wata — 30 s 271, 10 min 157, 20 min 148,

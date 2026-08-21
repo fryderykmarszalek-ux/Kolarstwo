@@ -158,10 +158,14 @@ header{
   position:absolute;left:14px;top:14px;
   display:inline-flex;align-items:center;justify-content:center;
   width:34px;height:34px;border-radius:99px;
-  background:var(--plyta);border:1px solid var(--linia);color:var(--slaby);
-  transition:color .18s ease,border-color .18s ease,transform .16s ease;
+  background:var(--plyta);border:1px solid var(--linia);
+  /* Barwa firmowa Stravy. Wyłamuje się z systemu ról świadomie, na wyraźną
+     zgodę Fryderyka: to znak cudzej marki, a nie dana ani element nawigacji,
+     więc nie miesza się z niczyim znaczeniem. */
+  color:#FC4C02;
+  transition:border-color .18s ease,transform .16s ease;
 }
-#strava:hover{color:var(--tekst);border-color:var(--slaby)}
+#strava:hover{border-color:#FC4C02}
 #strava:active{transform:scale(.94)}
 #strava svg{display:block;width:16px;height:16px}
 header h1{margin:0;font-size:19px;font-weight:600;letter-spacing:-.01em}
@@ -360,6 +364,10 @@ table.segmenty td{padding:8px 10px;border-bottom:1px solid var(--linia);
 table.segmenty td:first-child{text-align:left;color:var(--tekst)}
 table.segmenty td.akt{color:var(--tekst);font-weight:600}
 table.segmenty tr:last-child td{border-bottom:0}
+/* Ostatnia kolumna dotykała krawędzi ramki co do piksela i wyglądała na
+   uciętą — stąd oddech po prawej. */
+table.segmenty th:last-child,table.segmenty td:last-child{padding-right:16px}
+table.segmenty th:last-child button{padding-right:16px}
 table.segmenty tbody tr:hover td{background:var(--plyta)}
 .seg-nazwa{color:inherit;display:block;overflow-wrap:anywhere;text-decoration:none}
 .seg-nazwa .strzalka-wew{color:var(--slaby);margin-left:5px;font-size:15px;line-height:1}
@@ -390,6 +398,14 @@ table.segmenty tbody tr:hover td{background:var(--plyta)}
 .proba-naglowek .odn{color:var(--tekst);text-decoration:none;
   display:inline-flex;align-items:center;gap:5px}
 .proba-naglowek .odn:hover{text-decoration:underline}
+/* Znacznik ERG — chodzi o to, żeby liczba obok niego nigdy nie udawała
+   maksimum zawodnika. Kształt pastylki jak przy RPE, barwa mocy. */
+.znacznik-erg{
+  display:inline-block;margin-left:6px;vertical-align:1px;
+  font-size:10px;font-weight:700;letter-spacing:.04em;
+  color:var(--seria-moc);padding:1px 6px;border-radius:99px;
+  border:1px solid var(--seria-moc);opacity:.9;
+}
 .znacznik-rpe{
   font-size:11.5px;font-weight:600;color:var(--slaby);
   padding:2px 8px;border-radius:99px;
@@ -1096,6 +1112,53 @@ const DYSCYPLINY = {
 // identyfikator już jest w dane.js, więc odnośnik nie wymaga nowego pola.
 function adresStravy(a){ return "https://www.strava.com/activities/" + a.id; }
 
+/* ==========================================================================
+   ERG — trening ze sterowaną mocą
+
+   Strava nie ma pola „to był ERG". Rozpoznajemy go z dwóch niezależnych
+   tropów, bo żaden sam nie wystarcza:
+
+   Rozstrzyga LICZBA, nie nazwa: iloraz rekordu 5-sekundowego przez rekord
+   z najdłuższego okna tej jazdy. ERG trzyma zadaną moc, więc pięć sekund
+   ledwie odstaje od dwudziestu minut. Zmierzone na tych danych:
+
+     Foundation / Tempo / Recovery / Intermittent   1,05 - 1,48   -> sterowane
+     wyścig                                          3,04         -> wolna moc
+     sesje Strength ze sprintami                     5,84 - 6,50  -> wolna moc
+
+   Rozdział jest ostry, więc próg 1,5 nie jest naciągany. Nazwa treningu
+   Zwifta służy tylko jako zapasowy trop, gdy krzywej nie ma.
+
+   Dlaczego nie po nazwie: sesja „Strength" chodzi w ERG, ale sprint w środku
+   jest prawdziwy, bo ERG puszcza przy maksymalnym wysiłku. Znacznik po nazwie
+   podważałby rekord 702 W, który jest jak najbardziej Fryderyka. Liczba widzi
+   to, czego nazwa nie widzi.
+   ========================================================================== */
+
+const NAZWY_PLANOW = /^Zwift\s*-\s*(Foundation|Tempo|Strength|Intermittent|Active Recovery|Recovery|Endurance|Threshold|Sweet ?Spot|VO2|Build|Base|Interval)/i;
+
+const PLASKOSC = new Map((D.moc_krzywe || []).map(k => {
+  const okna = Object.keys(k.w).map(Number).sort((a,b) => a-b);
+  const krotkie = k.w[5] != null ? k.w[5] : k.w[okna[0]];
+  const dlugie = k.w[okna[okna.length-1]];
+  return [k.a, dlugie ? krotkie/dlugie : null];
+}));
+
+function jestErg(jazda){
+  if (!jazda || jazda.typ !== "VirtualRide") return false;
+  const p = PLASKOSC.get(jazda.id);
+  if (p != null) return p < 1.5;        // profil tak równy, że musiał być trzymany
+  return NAZWY_PLANOW.test(jazda.nazwa || "");   // brak krzywej — zostaje nazwa
+}
+
+function znacznikErg(jazda, tytul){
+  if (!jestErg(jazda)) return "";
+  const p = PLASKOSC.get(jazda.id);
+  return `<span class="znacznik-erg" title="${tytul || "Trening ze sterowaną mocą"
+    } — w trybie ERG trenażer trzyma zadaną moc, więc liczba mówi, co kazał program${
+    p != null ? `. Płaskość krzywej: ${liczba(p,2)}` : ""}">ERG</span>`;
+}
+
 function ikonaDyscypliny(typ, rozmiar){
   const d = DYSCYPLINY[typ];
   if (!d) return "";
@@ -1165,7 +1228,7 @@ const przegladStart = () => `
         <a class="rzad" href="${adresStravy(a)}" target="_blank" rel="noopener"
            title="Otwórz na Stravie">
           <span class="ikona">${ikonaDyscypliny(a.typ,21)}</span>
-          <span class="nazwa">${a.nazwa}</span>
+          <span class="nazwa">${bezpieczny(a.nazwa)}${znacznikErg(a)}</span>
           <span class="km">${liczba(a.dystans_m/1000,1)} km</span>
           <span class="data">${pl(a.data)}</span>
           <span class="strzalka-zew" aria-hidden="true">↗</span>
@@ -2102,7 +2165,7 @@ function panelProby(seg, pr, najlepszyCzas, numer, ile){
     <div class="proba-naglowek">
       <a class="odn" href="${adresStravy(j)}" target="_blank" rel="noopener"
          title="Otwórz tę jazdę na Stravie">${ikonaDyscypliny(j.typ,15)}
-         <b>${bezpieczny(j.nazwa)}</b> &#8599;</a>
+         <b>${bezpieczny(j.nazwa)}</b> &#8599;</a>${znacznikErg(j)}
       <span class="znacznik-rpe" title="RPE — subiektywna ocena wysiłku, skala 1-10"
         >RPE ${j.rpe == null ? "—" : j.rpe}</span>
     </div>
@@ -2460,7 +2523,7 @@ function watyNaKg(w){
    a nie odczyt pojedynczej liczby — te są w tabeli pod spodem. */
 function wykresKrzywejMocy(){
   if (REKORDY_MOCY.length < 2) return "";
-  const W = 660, H = 300, lewy = 46, prawy = 14, gora = 18, dol = 34;
+  const W = 660, H = 300, lewy = 46, prawy = 40, gora = 26, dol = 34;
   const px = W - lewy - prawy, py = H - gora - dol;
   const minS = REKORDY_MOCY[0].sek, maksS = REKORDY_MOCY[REKORDY_MOCY.length-1].sek;
   const maksW = Math.max(...REKORDY_MOCY.map(x => x.waty));
@@ -2468,6 +2531,8 @@ function wykresKrzywejMocy(){
   const x = s2 => lewy + (Math.log(s2) - Math.log(minS)) / (Math.log(maksS) - Math.log(minS)) * px;
   const y = w => gora + py - (w / goraW) * py;
 
+  const masa = D.zalozenia && D.zalozenia.masa_zawodnika_kg
+    ? D.zalozenia.masa_zawodnika_kg.v : null;
   const znaczniki = [1,5,15,60,300,1200,3600,5400].filter(s2 => s2 >= minS && s2 <= maksS);
   const krokW = goraW > 600 ? 200 : goraW > 300 ? 100 : 50;
 
@@ -2481,6 +2546,20 @@ function wykresKrzywejMocy(){
            stroke="var(--linia)" stroke-width="1"/>`;
     g += `<text x="${lewy-8}" y="${y(w)+4}" text-anchor="end" font-size="11"
            fill="var(--slaby)">${w}</text>`;
+  }
+  // Druga oś, po prawej: te same waty podzielone przez masę zawodnika.
+  // To NIE jest druga seria ani drugi zakres — to ta sama linia w innej
+  // jednostce, przeliczona jedną stałą i przechodząca przez to samo zero.
+  // Dlatego wolno ją tu postawić, w odróżnieniu od dwóch osobnych miar.
+  if (masa){
+    const krokWkg = goraW/masa > 8 ? 4 : goraW/masa > 4 ? 2 : 1;
+    for (let wkg = 0; wkg*masa <= goraW; wkg += krokWkg)
+      g += `<text x="${W-prawy+8}" y="${y(wkg*masa)+4}" text-anchor="start"
+             font-size="11" fill="var(--slaby)">${wkg}</text>`;
+    g += `<text x="${W-prawy+8}" y="${gora-4}" text-anchor="start" font-size="10"
+           font-weight="600" fill="var(--slaby)">W/kg</text>`;
+    g += `<text x="${lewy-8}" y="${gora-4}" text-anchor="end" font-size="10"
+           font-weight="600" fill="var(--slaby)">W</text>`;
   }
   for (const s2 of znaczniki)
     g += `<text x="${x(s2)}" y="${H-12}" text-anchor="middle" font-size="11"
@@ -2542,7 +2621,7 @@ const daneMocy = (arg) => {
         <div class="kafel">
           <div class="etykieta">${oknoNaTekst(r.sek)}</div>
           <div class="liczba">${r.waty}</div>
-          <div class="stopka">W · ${naKg(r.waty)}</div>
+          <div class="stopka">W · ${naKg(r.waty)}${znacznikErg(r.jazda)}</div>
         </div>`).join("")}
     </div>
   </section>
@@ -2581,17 +2660,28 @@ const daneMocy = (arg) => {
                   ><b>${r.waty}</b> W</td>
               <td>${naKg(r.waty)}</td>
               <td>${r.poprawek}</td>
-              <td>${pl(r.jazda.data)}</td>
+              <td>${pl(r.jazda.data)}${znacznikErg(r.jazda)}</td>
             </tr>`).join("")}
         </tbody>
       </table>
     </div>
     <div class="info">
       Wszystkie liczby mają tag <b>[Z]</b> — to pomiar z trenażera, nie estymata.
-      Ale uwaga na ich sens: ${JAZDY_Z_MOCA.length} jazd to blok zwiftowy,
-      w którym większość sesji szła w trybie ERG, czyli z mocą narzuconą przez
-      program. Taka krzywa mówi, co kazał Zwift, a nie ile naprawdę potrafisz —
-      poza wyścigiem i sprintami, gdzie moc była Twoja.
+      Ale pomiar mocy sterowanej to wciąż moc sterowana: znacznik
+      <span class="znacznik-erg">ERG</span> stoi przy jazdach, w których trenażer
+      trzymał zadaną moc. ${(() => {
+        const ile = JAZDY_Z_MOCA.filter(k => jestErg(k.jazda)).length;
+        return `Dziś dotyczy to ${ile} z ${JAZDY_Z_MOCA.length} jazd`;
+      })()}. Taka liczba mówi, co kazał program, a nie ile potrafisz — z jednym
+      wyjątkiem: <b>sprint wewnątrz treningu jest prawdziwy</b>, bo ERG puszcza
+      przy maksymalnym wysiłku. Dlatego rekordy sekundowe z sesji „Strength"
+      są Twoje, a rekordy dwudziestominutowe z sesji „Foundation" to plan.
+      <br>Rozstrzyga liczba, nie nazwa: rekord 5-sekundowy podzielony przez
+      rekord z najdłuższego okna tej jazdy. Treningi sterowane mieszczą się
+      w 1,05–1,48, wyścig ma 3,04, a sesje ze sprintami od 5,84 do 6,50 —
+      rozdział jest ostry, więc próg 1,5 nie jest naciągany. Dzięki temu
+      sprint 702 W z sesji „Strength" NIE dostaje znacznika, choć sama sesja
+      szła po planie: liczba widzi to, czego nazwa nie widzi.
     </div>
   </section>`;
 };
@@ -2692,7 +2782,7 @@ function postepMocy(sek){
       <div class="proba-naglowek">
         <a class="odn" href="${adresStravy(ostatni.jazda)}" target="_blank" rel="noopener"
            title="Otwórz tę jazdę na Stravie">${ikonaDyscypliny(ostatni.jazda.typ,15)}
-           <b>${bezpieczny(ostatni.jazda.nazwa)}</b> &#8599;</a>
+           <b>${bezpieczny(ostatni.jazda.nazwa)}</b> &#8599;</a>${znacznikErg(ostatni.jazda)}
         <span class="znacznik-rpe">RPE ${ostatni.jazda.rpe == null ? "—" : ostatni.jazda.rpe}</span>
       </div>
       <div class="proba-dane">
@@ -2708,7 +2798,7 @@ function postepMocy(sek){
           <span class="kroki-waty">${k.waty} W</span>
           <span class="kroki-zysk">${k.zysk ? "+" + k.zysk + " W" : "pierwszy pomiar"}</span>
           <a class="odn" href="${adresStravy(k.jazda)}" target="_blank" rel="noopener"
-             >${bezpieczny(k.jazda.nazwa)} &#8599;</a>
+             >${bezpieczny(k.jazda.nazwa)} &#8599;</a>${znacznikErg(k.jazda)}
         </li>`).join("")}
     </ul>
   </section>`;
