@@ -281,25 +281,44 @@ function zapisz(D){
 
     const staryRpe = rpeStare.get(a.id);
 
-    if (!chceOpis && !chceSegmenty){
+    // Czy ta jazda MOŻE mieć moc z pomiaru — bez wydawania na to zapytania.
+    // Zwift zawsze podaje waty z trenażera, a przy szosie wystarczy zajrzeć
+    // do prób na segmentach: jeśli któraś ma z_miernika, to miernik był.
+    // Dzięki temu dzień po kupnie miernika szosa wejdzie tu sama.
+    const mocMozliwa = a.typ === "VirtualRide"
+      || proby.some(x => x.a === a.id && x.z_miernika === 1);
+    let chceMoc = mocMozliwa && (!mocPobrana.has(a.id) || PELNA_MOC);
+
+    if (!chceOpis && !chceSegmenty && !chceMoc){
       if (stary) a.opis = stary;               // nic do pytania — zachowaj, co mamy
       if (staryRpe != null) a.rpe = staryRpe;
       continue;
     }
 
-    const jazda = await dociagnijJazde(a.id, access, chceSegmenty);
-    zapytan++;
+    // Szczegółów nie pobieramy dla samej mocy — strumień jest osobnym adresem.
+    const jazda = (chceOpis || chceSegmenty)
+      ? await dociagnijJazde(a.id, access, chceSegmenty) : null;
+    if (chceOpis || chceSegmenty) zapytan++;
 
     if (jazda === undefined){                  // zapytanie padło — nie ruszamy niczego
       if (stary) a.opis = stary;
       if (staryRpe != null) a.rpe = staryRpe;
       continue;
     }
+    if (jazda === null){                       // pytamy wyłącznie o moc
+      if (stary) a.opis = stary;
+      if (staryRpe != null) a.rpe = staryRpe;
+    }
+
+    // Świeżo pobrane szczegóły mogą ujawnić miernik, o którym dane jeszcze nie
+    // wiedzą — nowa jazda z miernikiem trafia tu przy pierwszym spotkaniu.
+    if (jazda && jazda.device_watts === true && (!mocPobrana.has(a.id) || PELNA_MOC))
+      chceMoc = true;
 
     // Strava jest masterem również tutaj: skasowany RPE znika też u nas.
-    if (jazda.perceived_exertion != null) a.rpe = jazda.perceived_exertion;
+    if (jazda && jazda.perceived_exertion != null) a.rpe = jazda.perceived_exertion;
 
-    if (chceOpis){
+    if (chceOpis && jazda){
       const o = (jazda.description || "").trim() || null;
       if (o) a.opis = o;                       // null zostawia jazdę bez opisu, świadomie
       if ((o || null) !== (stary || null)){
@@ -311,8 +330,7 @@ function zapisz(D){
     }
     if (!chceOpis && staryRpe != null && a.rpe == null) a.rpe = staryRpe;
 
-    // Moc mierzona: tylko wtedy strumień w ogóle ma sens.
-    if (jazda.device_watts === true && (!mocPobrana.has(a.id) || PELNA_MOC)){
+    if (chceMoc){
       const str = await dociagnijStrumienMocy(a.id, access);
       zapytan++;
       if (str !== undefined){
@@ -328,7 +346,7 @@ function zapisz(D){
       }
     }
 
-    if (chceSegmenty){
+    if (chceSegmenty && jazda){
       const w = wyciagnijProby(jazda);
       for (let i = proby.length - 1; i >= 0; i--)   // podmieniamy, nie dokładamy
         if (proby[i].a === a.id) proby.splice(i, 1);

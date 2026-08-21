@@ -425,6 +425,32 @@ table.segmenty tbody tr:hover td{background:var(--plyta)}
 .analiza-stopka{margin:11px 0 0;padding-top:9px;border-top:1px solid var(--linia);
   font-size:11px;line-height:1.4;color:var(--slaby);opacity:.85}
 .podpis-wykresu{color:var(--slaby);font-size:12px;line-height:1.45;margin:14px 0 2px}
+
+/* --- Zakładka Dane: krzywa mocy i historia rekordów --- */
+/* Krzywa skaluje się do szerokości karty, bo jej sensem jest KSZTAŁT, a nie
+   odczyt pojedynczej liczby — te stoją w tabeli pod spodem. */
+.krzywa-mocy{margin-top:6px;background:var(--plyta);border:1px solid var(--linia);
+  border-radius:10px;padding:10px 12px 4px}
+.krzywa-mocy svg{display:block;overflow:visible}
+table.segmenty.moc th:first-child,table.segmenty.moc td:first-child{width:20%}
+table.segmenty.moc th:not(:first-child),table.segmenty.moc td:not(:first-child){width:20%}
+table.segmenty.moc{min-width:520px}
+/* Pasek pod liczbą watów: ta sama informacja co w krzywej, tylko wiersz po
+   wierszu — widać kształt spadku, nie czytając liczb. */
+.pasek-mocy{display:block;height:3px;border-radius:2px;margin:0 0 3px auto;
+  width:var(--udzial);background:var(--seria-moc);opacity:.55}
+.kroki-mocy{list-style:none;margin:14px 0 0;padding:0;display:grid;gap:1px;
+  border:1px solid var(--linia);border-radius:10px;overflow:hidden}
+.kroki-mocy li{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;
+  padding:9px 13px;font-size:13px;background:var(--powierzchnia);
+  border-top:1px solid var(--linia)}
+.kroki-mocy li:first-child{border-top:0}
+.kroki-data{color:var(--slaby);font-variant-numeric:tabular-nums;min-width:82px}
+.kroki-waty{font-weight:600;font-variant-numeric:tabular-nums;min-width:56px}
+.kroki-zysk{color:var(--seria-moc);font-size:12px;font-weight:600;min-width:86px}
+.kroki-mocy .odn{color:var(--slaby);text-decoration:none;font-size:12.5px}
+.kroki-mocy .odn:hover{color:var(--tekst);text-decoration:underline}
+.os-stala{flex:0 0 auto}
 rect.proba-punkt{cursor:pointer}
 
 /* --- Notatka do próby. Dwa kółka: ptaszek zapisuje, krzyżyk cofa. --- */
@@ -2368,6 +2394,320 @@ function podepnijProby(){
 }
 
 /* ==========================================================================
+   DANE — rekordy mocy
+
+   Strava nie oddaje gotowych rekordów mocy przez API. Automat liczy je ze
+   strumienia watów każdej jazdy z miernikiem i zapisuje jako "moc_krzywe":
+   jedna liczba na okno czasowe. Tutaj z tych jazd składamy dwie rzeczy:
+
+   1. REKORD na każdy czas — maksimum ze wszystkich jazd.
+   2. POSTĘP rekordu — idąc po datach, zapisujemy tylko te jazdy, w których
+      rekord został POBITY. Linia z definicji może iść wyłącznie w górę.
+
+   Wszystko liczone przy wyświetlaniu, więc nowa jazda z miernikiem przestawia
+   listę i wykresy sama.
+   ========================================================================== */
+
+const OKNA_OPISY = { 1:"1 s", 5:"5 s", 10:"10 s", 15:"15 s", 30:"30 s",
+  60:"1 min", 120:"2 min", 300:"5 min", 480:"8 min", 600:"10 min", 720:"12 min",
+  1200:"20 min", 1800:"30 min", 2700:"45 min", 3600:"1 h", 5400:"1,5 h" };
+
+function oknoNaTekst(sek){ return OKNA_OPISY[sek] || czasNaTekst(sek); }
+
+// Jazdy z krzywą, po dacie rosnąco — kolejność decyduje o tym, co jest
+// poprawą, a co tylko powtórzeniem.
+const JAZDY_Z_MOCA = (D.moc_krzywe || [])
+  .map(k => ({ ...k, jazda: JAZDA_PO_ID.get(k.a) }))
+  .filter(k => k.jazda)
+  .sort((a,b) => a.jazda.data < b.jazda.data ? -1 : 1);
+
+const OKNA_ZNANE = [...new Set(JAZDY_Z_MOCA.flatMap(k => Object.keys(k.w).map(Number)))]
+  .sort((a,b) => a-b);
+
+// Historia jednego okna: tylko przejazdy, które poprawiły dotychczasowy rekord.
+function postepOkna(sek){
+  const kroki = [];
+  let rekord = 0;
+  for (const k of JAZDY_Z_MOCA){
+    const w = k.w[sek];
+    if (w == null || w <= rekord) continue;
+    kroki.push({ waty: w, poprzedni: rekord || null, zysk: rekord ? w - rekord : null,
+                 jazda: k.jazda });
+    rekord = w;
+  }
+  return kroki;
+}
+
+const REKORDY_MOCY = OKNA_ZNANE.map(sek => {
+  const kroki = postepOkna(sek);
+  const ostatni = kroki[kroki.length-1];
+  return { sek, waty: ostatni ? ostatni.waty : null, jazda: ostatni ? ostatni.jazda : null,
+           poprawek: kroki.length, kroki };
+}).filter(x => x.waty != null);
+
+function watyNaKg(w){
+  const m = D.zalozenia && D.zalozenia.masa_zawodnika_kg;
+  return m && m.v ? w / m.v : null;
+}
+
+/* Krzywa mocy — oś czasu logarytmiczna, bo inaczej cała lewa strona (sekundy)
+   zlewa się w jeden punkt przy godzinie. Rysowana w viewBox skalowanym do
+   szerokości karty: wykres ma być widoczny w całości, bo jego sens to KSZTAŁT,
+   a nie odczyt pojedynczej liczby — te są w tabeli pod spodem. */
+function wykresKrzywejMocy(){
+  if (REKORDY_MOCY.length < 2) return "";
+  const W = 660, H = 300, lewy = 46, prawy = 14, gora = 18, dol = 34;
+  const px = W - lewy - prawy, py = H - gora - dol;
+  const minS = REKORDY_MOCY[0].sek, maksS = REKORDY_MOCY[REKORDY_MOCY.length-1].sek;
+  const maksW = Math.max(...REKORDY_MOCY.map(x => x.waty));
+  const goraW = Math.ceil(maksW * 1.1 / 50) * 50;
+  const x = s2 => lewy + (Math.log(s2) - Math.log(minS)) / (Math.log(maksS) - Math.log(minS)) * px;
+  const y = w => gora + py - (w / goraW) * py;
+
+  const znaczniki = [1,5,15,60,300,1200,3600,5400].filter(s2 => s2 >= minS && s2 <= maksS);
+  const krokW = goraW > 600 ? 200 : goraW > 300 ? 100 : 50;
+
+  let g = `<svg viewBox="0 0 ${W} ${H}" width="100%" height="auto"
+    preserveAspectRatio="xMidYMid meet" role="img"
+    aria-label="Krzywa mocy: rekord na każdy czas trwania">`;
+  for (let w = 0; w <= goraW; w += krokW){
+    g += `<line x1="${lewy}" y1="${y(w)}" x2="${W-prawy}" y2="${y(w)}"
+           stroke="var(--linia)" stroke-width="1"/>`;
+    g += `<text x="${lewy-8}" y="${y(w)+4}" text-anchor="end" font-size="11"
+           fill="var(--slaby)">${w}</text>`;
+  }
+  for (const s2 of znaczniki)
+    g += `<text x="${x(s2)}" y="${H-12}" text-anchor="middle" font-size="11"
+           fill="var(--slaby)">${oknoNaTekst(s2)}</text>`;
+
+  const d = REKORDY_MOCY.map((r,i) => `${i ? "L" : "M"}${x(r.sek)} ${y(r.waty)}`).join(" ");
+  // Wypełnienie pod krzywą: sama linia na dużym polu wygląda na zgubioną,
+  // a pole pod nią czyta się jako „tyle mocy mam w każdym czasie".
+  g += `<path d="${d} L${x(maksS)} ${y(0)} L${x(minS)} ${y(0)} Z"
+         fill="var(--seria-moc)" opacity=".10"/>`;
+  g += `<path d="${d}" fill="none" stroke="var(--seria-moc)" stroke-width="2.5"
+         stroke-linejoin="round" stroke-linecap="round"/>`;
+  for (const r of REKORDY_MOCY)
+    g += `<circle cx="${x(r.sek)}" cy="${y(r.waty)}" r="4"
+           fill="var(--seria-moc)" stroke="var(--powierzchnia)" stroke-width="2"/>`;
+
+  // Podpisane tylko skrajne i najciekawsze punkty — liczba przy każdym
+  // zamieniłaby wykres w tabelę.
+  for (const s2 of [minS, 60, 1200, maksS]){
+    const r = REKORDY_MOCY.find(x2 => x2.sek === s2);
+    if (!r) continue;
+    g += `<text x="${x(r.sek)}" y="${y(r.waty)-11}" text-anchor="middle"
+           font-size="11.5" font-weight="600" fill="var(--tekst)">${r.waty} W</text>`;
+  }
+  g += `</svg>`;
+  return `<div class="krzywa-mocy">${g}</div>`;
+}
+
+const daneMocy = (arg) => {
+  if (!JAZDY_Z_MOCA.length) return `
+    <div class="pusto">
+      <span class="znak">Rekordy mocy</span>
+      Nie ma jeszcze ani jednej jazdy ze zmierzoną mocą. Ta zakładka wypełni
+      się sama, gdy pojawi się miernik mocy albo trenażer.
+    </div>`;
+
+  if (arg) return postepMocy(Number(arg));
+
+  const naKg = (w) => { const x = watyNaKg(w); return x == null ? "" : liczba(x,2) + " W/kg"; };
+  const wyroznione = [5,60,300,1200].map(s2 => REKORDY_MOCY.find(r => r.sek === s2))
+    .filter(Boolean);
+  const odKiedy = JAZDY_Z_MOCA[0].jazda.data, doKiedy = JAZDY_Z_MOCA[JAZDY_Z_MOCA.length-1].jazda.data;
+
+  return `
+  <section>
+    <h2>Rekordy mocy</h2>
+    <p class="opis">
+      Najwyższa moc, jaką utrzymałeś przez dany czas — liczona ze strumienia
+      watów każdej jazdy, w której moc była <b>mierzona</b>, nie szacowana.
+      Dziś to ${JAZDY_Z_MOCA.length} ${JAZDY_Z_MOCA.length === 1 ? "jazda" :
+      JAZDY_Z_MOCA.length < 5 ? "jazdy" : "jazd"} z trenażera,
+      od ${pl(odKiedy)} do ${pl(doKiedy)}. Szosa dołączy do tej listy sama
+      w dniu, w którym na rowerze pojawi się miernik — kod nie odróżnia jednego
+      od drugiego, patrzy tylko na to, czy moc jest pomiarem.
+      <br>Dotknij wiersza w tabeli, żeby zobaczyć, jak ten rekord rósł w czasie.
+    </p>
+    <div class="kafelki">
+      ${wyroznione.map(r => `
+        <div class="kafel">
+          <div class="etykieta">${oknoNaTekst(r.sek)}</div>
+          <div class="liczba">${r.waty}</div>
+          <div class="stopka">W · ${naKg(r.waty)}</div>
+        </div>`).join("")}
+    </div>
+  </section>
+
+  <section>
+    <h2>Krzywa mocy</h2>
+    <p class="opis">
+      Ten sam komplet rekordów jako jedna linia. Oś czasu jest logarytmiczna —
+      inaczej wszystko od sekundy do minuty zlałoby się w jeden punkt przy
+      krawędzi. Kształt tej krzywej mówi więcej niż pojedyncza liczba: strome
+      zejście na lewej stronie to zryw, płaski ogon po prawej to wytrzymałość.
+    </p>
+    ${wykresKrzywejMocy()}
+  </section>
+
+  <section>
+    <h2>Wszystkie okna</h2>
+    <div class="tabelka">
+      <table class="segmenty moc">
+        <thead><tr>
+          <th>Czas</th><th>Moc</th><th>W/kg</th><th>Poprawek</th><th>Kiedy padł</th>
+        </tr></thead>
+        <tbody>
+          ${REKORDY_MOCY.map(r => `
+            <tr>
+              <td><a class="seg-nazwa" href="#postepy/dane/${r.sek}"
+                    title="Pokaż, jak rósł ten rekord">${oknoNaTekst(r.sek)}<span
+                    class="strzalka-wew" aria-hidden="true">›</span></a></td>
+              <td><span class="pasek-mocy" style="--udzial:${
+                    Math.round(r.waty / REKORDY_MOCY[0].waty * 100)}%"></span>
+                  <b>${r.waty}</b> W</td>
+              <td>${naKg(r.waty)}</td>
+              <td>${r.poprawek}</td>
+              <td>${pl(r.jazda.data)}</td>
+            </tr>`).join("")}
+        </tbody>
+      </table>
+    </div>
+    <div class="info">
+      Wszystkie liczby mają tag <b>[Z]</b> — to pomiar z trenażera, nie estymata.
+      Ale uwaga na ich sens: ${JAZDY_Z_MOCA.length} jazd to blok zwiftowy,
+      w którym większość sesji szła w trybie ERG, czyli z mocą narzuconą przez
+      program. Taka krzywa mówi, co kazał Zwift, a nie ile naprawdę potrafisz —
+      poza wyścigiem i sprintami, gdzie moc była Twoja.
+    </div>
+  </section>`;
+};
+
+/* Postęp jednego rekordu. Wykres schodkowy, bo rekord nie rośnie płynnie
+   między jazdami — stoi, dopóki ktoś go nie pobije. Linia prosta między
+   punktami sugerowałaby poprawę, której nie było. */
+function postepMocy(sek){
+  const r = REKORDY_MOCY.find(x => x.sek === sek);
+  if (!r) return `
+    <div class="pusto">
+      <span class="znak">Nie znam takiego okna</span>
+      Wróć do <a class="odn-zakladka" href="#postepy/dane">listy rekordów</a>.
+    </div>`;
+
+  const kroki = r.kroki;
+  const naKg = watyNaKg(r.waty);
+  const szerSlupka = 30, odstep = 14, marGora = 30, wys = 200, marDol = 46, szerOsi = 42;
+  const szer = Math.max(kroki.length*(szerSlupka+odstep) + 40, 260);
+  const goraW = Math.ceil(r.waty * 1.15 / 25) * 25;
+  const krokW = goraW > 600 ? 200 : goraW > 300 ? 100 : 50;
+  const skala = w => (w / goraW) * wys;
+  const wysCalk = wys + marGora + marDol;
+  const x = i => 16 + i*(szerSlupka+odstep);
+
+  let os = `<svg class="os" width="${szerOsi}" height="${wysCalk}" aria-hidden="true">`;
+  for (let w = 0; w <= goraW; w += krokW)
+    os += `<text x="${szerOsi-6}" y="${marGora+wys-skala(w)+4}" text-anchor="end"
+            font-size="10" fill="var(--slaby)">${w}</text>`;
+  os += `</svg>`;
+
+  let g = `<svg width="${szer}" height="${wysCalk}" role="img"
+    aria-label="Jak rósł rekord na ${oknoNaTekst(sek)}">`;
+  for (let w = 0; w <= goraW; w += krokW)
+    g += `<line x1="0" y1="${marGora+wys-skala(w)}" x2="${szer}" y2="${marGora+wys-skala(w)}"
+           stroke="var(--linia)" stroke-width="1"/>`;
+
+  // schodek: poziomo do następnej daty, potem pionowo w górę
+  let d = "";
+  kroki.forEach((k,i) => {
+    const px = x(i) + szerSlupka/2, py = marGora + wys - skala(k.waty);
+    d += i === 0 ? `M${px} ${py}` : ` L${px} ${marGora + wys - skala(kroki[i-1].waty)} L${px} ${py}`;
+  });
+  if (kroki.length > 1){
+    const ostX = x(kroki.length-1) + szerSlupka/2;
+    d += ` L${szer-10} ${marGora + wys - skala(r.waty)}`;
+  }
+  g += `<path d="${d}" fill="none" stroke="var(--seria-moc)" stroke-width="2.5"
+         stroke-linejoin="round" stroke-linecap="round"/>`;
+
+  kroki.forEach((k,i) => {
+    const px = x(i) + szerSlupka/2, py = marGora + wys - skala(k.waty);
+    const aktualny = i === kroki.length-1;
+    g += `<circle cx="${px}" cy="${py}" r="${aktualny ? 6.5 : 5}"
+           fill="${aktualny ? "var(--plan)" : "var(--seria-moc)"}"
+           stroke="var(--powierzchnia)" stroke-width="2"/>`;
+    g += `<text x="${px}" y="${py-12}" text-anchor="middle" font-size="11"
+           font-weight="600" fill="${aktualny ? "var(--plan)" : "var(--tekst)"}"
+           >${k.waty} W</text>`;
+    if (k.zysk)
+      g += `<text x="${px}" y="${py-25}" text-anchor="middle" font-size="9.5"
+             fill="var(--slaby)">+${k.zysk}</text>`;
+    g += `<text x="${px}" y="${marGora+wys+16}" text-anchor="middle" font-size="9.5"
+           fill="var(--slaby)">${k.jazda.data.slice(8,10)}.${k.jazda.data.slice(5,7)}</text>`;
+    g += `<text x="${px}" y="${marGora+wys+30}" text-anchor="middle" font-size="9.5"
+           fill="var(--slaby)">${k.jazda.data.slice(0,4)}</text>`;
+  });
+  g += `<line x1="0" y1="${marGora+wys}" x2="${szer}" y2="${marGora+wys}"
+         stroke="var(--slaby)" stroke-width="1"/></svg>`;
+
+  const pierwszy = kroki[0], ostatni = kroki[kroki.length-1];
+  const wzrost = kroki.length > 1
+    ? Math.round((ostatni.waty - pierwszy.waty) / pierwszy.waty * 1000)/10 : null;
+  const dni = kroki.length > 1
+    ? roznicaDni(naDzien(pierwszy.jazda.data), naDzien(ostatni.jazda.data)) : null;
+
+  return `
+  <section>
+    <div class="proba-tytul">
+      <h2>Rekord na ${oknoNaTekst(sek)} · ${r.waty} W</h2>
+      <a class="kolko-reset" href="#postepy/dane"
+         title="Wróć do listy rekordów" aria-label="Wróć do listy rekordów">
+        <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor"
+          stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M13.5 8a5.5 5.5 0 1 1-1.6-3.9"/><path d="M13.6 2v3.2h-3.2"/></svg>
+      </a>
+    </div>
+    <p class="opis">
+      Na wykresie stoją <b>wyłącznie jazdy, w których rekord został pobity</b> —
+      przejazdy słabsze od ówczesnego rekordu nie zmieniają niczego, więc ich tu
+      nie ma. Dlatego ta linia może iść tylko w górę i pokazuje nie formę,
+      tylko <b>tempo poprawy</b>. Płaski odcinek znaczy, że przez ten czas
+      rekord stał.
+      ${kroki.length > 1 ? `<br>Od ${pl(pierwszy.jazda.data)} do ${pl(ostatni.jazda.data)}
+        — ${dni} dni, ${kroki.length} poprawek, łącznie
+        <b>+${ostatni.waty - pierwszy.waty} W</b> (${liczba(wzrost,1)}%).`
+        : `<br>Ten rekord padł raz i nikt go jeszcze nie ruszył.`}
+    </p>
+    <div class="wykres"><div class="os-stala">${os}</div>
+      <div class="ramka">${g}</div></div>
+    <div class="info">
+      <div class="proba-naglowek">
+        <a class="odn" href="${adresStravy(ostatni.jazda)}" target="_blank" rel="noopener"
+           title="Otwórz tę jazdę na Stravie">${ikonaDyscypliny(ostatni.jazda.typ,15)}
+           <b>${bezpieczny(ostatni.jazda.nazwa)}</b> &#8599;</a>
+        <span class="znacznik-rpe">RPE ${ostatni.jazda.rpe == null ? "—" : ostatni.jazda.rpe}</span>
+      </div>
+      <div class="proba-dane">
+        Obecny rekord: ${pl(ostatni.jazda.data)} · <b>${r.waty} W</b>
+        ${naKg == null ? "" : "· " + liczba(naKg,2) + " W/kg"}
+        ${ostatni.zysk ? `· poprawa o ${ostatni.zysk} W wobec ${ostatni.poprzedni} W` : ""}
+      </div>
+    </div>
+    <ul class="kroki-mocy">
+      ${[...kroki].reverse().map(k => `
+        <li>
+          <span class="kroki-data">${pl(k.jazda.data)}</span>
+          <span class="kroki-waty">${k.waty} W</span>
+          <span class="kroki-zysk">${k.zysk ? "+" + k.zysk + " W" : "pierwszy pomiar"}</span>
+          <a class="odn" href="${adresStravy(k.jazda)}" target="_blank" rel="noopener"
+             >${bezpieczny(k.jazda.nazwa)} &#8599;</a>
+        </li>`).join("")}
+    </ul>
+  </section>`;
+}
+
+/* ==========================================================================
    SEKCJE — poziom 1 i poziom 2.
    Zakładka trafia na pasek tylko gdy ma wpis tutaj. Z1–Z5 to miejsca
    zarezerwowane; dostaną nazwy, kiedy dostaną treść.
@@ -2386,7 +2726,7 @@ const SEKCJE = [
   { id:"postepy", tytul:"Postępy", barwa:"fiolet", pod:[
       { id:"segmenty", tytul:"Segmenty", rysuj: tabelaSegmentow },
       { id:"porownania", tytul:"Porównania S", rysuj: porownaniaS },
-      { id:"p3", tytul:"P3", rysuj: () => pusto("P3") }
+      { id:"dane", tytul:"Dane", rysuj: daneMocy }
   ]},
   ...[2,3,4,5].map(n => ({
     id:"z"+n, tytul:"Z"+n, barwa:["fiolet","limonka","fuksja","cyjan","pomarancz"][n-1],
