@@ -17,6 +17,10 @@ on:
         description: "Pobierz od nowa próby na segmentach dla wszystkich jazd od meta.segmenty_od"
         type: boolean
         default: false
+      pelna_moc:
+        description: "Przelicz krzywe mocy od nowa dla wszystkich jazd z miernikiem"
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -45,6 +49,7 @@ jobs:
           # "" i skrypt zostaje przy oknie 30 dni. Pełny przebieg tylko ręcznie.
           PELNE_OPISY: ${{ inputs.pelne_opisy }}
           PELNE_SEGMENTY: ${{ inputs.pelne_segmenty }}
+          PELNA_MOC: ${{ inputs.pelna_moc }}
         run: node .github/skrypty/pobierz-strave.js
 
       - name: Sprawdź, czy plik się parsuje

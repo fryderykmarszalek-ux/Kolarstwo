@@ -30,6 +30,15 @@ const PELNE_OPISY = process.env.PELNE_OPISY === "true";   // jednorazowy backfil
 // przywraca dowolnie głęboką historię.
 const PELNE_SEGMENTY = process.env.PELNE_SEGMENTY === "true";
 
+// KRZYWA MOCY. Strava nie oddaje przez API gotowych rekordów mocy na czas —
+// oddaje surowy strumień watów, sekunda po sekundzie. Liczymy z niego maksima
+// średnich kroczących dla ustalonych okien i zapisujemy same wyniki: kilkanaście
+// liczb na jazdę zamiast kilku tysięcy. Strumień pobieramy WYŁĄCZNIE dla jazd
+// z device_watts, czyli tam, gdzie moc jest mierzona, a nie zgadywana — dziś
+// to Zwift, a po kupnie miernika ta sama reguła obejmie szosę bez zmian w kodzie.
+const CZASY_KRZYWEJ = [1,5,10,15,30,60,120,300,480,600,720,1200,1800,2700,3600,5400];
+const PELNA_MOC = process.env.PELNA_MOC === "true";
+
 function wczytajStare(){
   global.window = {};
   delete require.cache[require.resolve(PLIK)];
@@ -51,6 +60,50 @@ async function dociagnijJazde(id, access, zSegmentami){
     console.log(`  (nie udało się pobrać jazdy ${id}: ${e.message.split("\n")[0]})`);
     return undefined;
   }
+}
+
+async function dociagnijStrumienMocy(id, access){
+  try {
+    const s = await zapytaj(
+      `${STRAVA}/api/v3/activities/${id}/streams?keys=time,watts&key_by_type=true`,
+      { headers: { Authorization: `Bearer ${access}` } });
+    if (!s || !s.watts || !s.watts.data) return null;
+    return { watts: s.watts.data, czas: s.time && s.time.data ? s.time.data : null };
+  } catch (e){
+    console.log(`  (nie udało się pobrać mocy ${id}: ${e.message.split("\n")[0]})`);
+    return undefined;
+  }
+}
+
+// Maksimum średniej kroczącej dla każdego okna. Strumień rozkładamy najpierw
+// na siatkę co sekundę: przerwa w zapisie (postój) dostaje zero, a nie ostatnią
+// wartość — inaczej pauza podbijałaby długie okna mocą, której nikt nie wykręcił.
+function krzywaMocy(watts, czas){
+  if (!watts || !watts.length) return null;
+  let seria;
+  if (czas && czas.length === watts.length){
+    const koniec = czas[czas.length-1];
+    if (koniec > 200000) return null;               // absurd — nie ufamy
+    seria = new Array(koniec+1).fill(0);
+    for (let i = 0; i < watts.length; i++) seria[czas[i]] = watts[i] || 0;
+  } else {
+    seria = watts.map(x => x || 0);                 // brak osi czasu: zakładamy 1 Hz
+  }
+  // sumy prefiksowe, żeby każde okno liczyło się w stałym czasie
+  const suma = new Array(seria.length+1).fill(0);
+  for (let i = 0; i < seria.length; i++) suma[i+1] = suma[i] + seria[i];
+
+  const wynik = {};
+  for (const okno of CZASY_KRZYWEJ){
+    if (okno > seria.length) break;                 // jazda krótsza niż okno
+    let naj = 0;
+    for (let i = 0; i + okno <= seria.length; i++){
+      const sr = (suma[i+okno] - suma[i]) / okno;
+      if (sr > naj) naj = sr;
+    }
+    if (naj > 0) wynik[okno] = Math.round(naj);
+  }
+  return Object.keys(wynik).length ? wynik : null;
 }
 
 // Z odpowiedzi wyciągamy dwie rzeczy: metadane segmentu (nazwa, długość,
@@ -211,6 +264,8 @@ function zapisz(D){
   // Stare próby zostają — dociągamy tylko te jazdy, których jeszcze nie było.
   // Próby jazd skasowanych na Stravie wypadają razem z jazdą.
   const proby = (stare.proby || []).filter(p => wszystkieId.has(p.a));
+  const mocPobrana = new Set(stare.moc_pobrana || []);
+  const krzywe = (stare.moc_krzywe || []).filter(k => wszystkieId.has(k.a));
   const segmenty = new Map((stare.segmenty || []).map(x => [x.id, x]));
 
   let zapytan = 0, zmienionych = 0, nowychProb = 0;
@@ -256,6 +311,23 @@ function zapisz(D){
     }
     if (!chceOpis && staryRpe != null && a.rpe == null) a.rpe = staryRpe;
 
+    // Moc mierzona: tylko wtedy strumień w ogóle ma sens.
+    if (jazda.device_watts === true && (!mocPobrana.has(a.id) || PELNA_MOC)){
+      const str = await dociagnijStrumienMocy(a.id, access);
+      zapytan++;
+      if (str !== undefined){
+        mocPobrana.add(a.id);
+        const k = str ? krzywaMocy(str.watts, str.czas) : null;
+        for (let i = krzywe.length - 1; i >= 0; i--)
+          if (krzywe[i].a === a.id) krzywe.splice(i, 1);
+        if (k){
+          krzywe.push({ a: a.id, w: k });
+          console.log(`  krzywa mocy: ${a.data.slice(0,10)} ${a.nazwa} — `
+            + `${Object.keys(k).length} okien, szczyt ${Math.max(...Object.values(k))} W`);
+        }
+      }
+    }
+
     if (chceSegmenty){
       const w = wyciagnijProby(jazda);
       for (let i = proby.length - 1; i >= 0; i--)   // podmieniamy, nie dokładamy
@@ -275,6 +347,8 @@ function zapisz(D){
     x.nazwa.localeCompare(y.nazwa, "pl"));
   stare.proby = proby;
   stare.segmenty_pobrane = [...jazdyZeSegmentami].filter(id => wszystkieId.has(id)).sort();
+  stare.moc_krzywe = krzywe.sort((x,y) => x.a < y.a ? -1 : 1);
+  stare.moc_pobrana = [...mocPobrana].filter(id => wszystkieId.has(id)).sort();
 
   stare.aktywnosci = nowe;
   stare.meta.pobrano = new Date().toISOString().slice(0,16);
@@ -283,6 +357,7 @@ function zapisz(D){
   stare.meta.segmenty_od = SEGMENTY_OD;
   stare.meta.liczba_segmentow = stare.segmenty.length;
   stare.meta.liczba_prob = stare.proby.length;
+  stare.meta.jazd_z_moca = stare.moc_krzywe.length;
   stare.meta.zakres = [nowe[0].data.slice(0,10), nowe[nowe.length-1].data.slice(0,10)];
 
   zapisz(stare);
