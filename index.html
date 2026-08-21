@@ -25,6 +25,15 @@
   --slaby:#5d6472;        /*  5,3:1 na kafelku     */
   --linia:#d7dee9;
   --akcent:#2a78d6;       /* DANE: jazda — TYLKO dane, nigdy interfejs */
+  /* Barwy miar na Porównaniach S. Każda miara ma własną, żeby pasy dało się
+     rozróżnić przy przewijaniu. Dobrane walidatorem z pakietu dataviz,
+     w kolejności pasów: czas, prędkość, moc, tętno. Komplet przechodzi
+     wszystkie pięć kontroli w OBU motywach (pasmo jasności, próg nasycenia,
+     rozróżnialność przy daltonizmie, próg dla widzenia pełnego, kontrast). */
+  --seria-czas:#2a78d6;
+  --seria-predkosc:#0d9488;
+  --seria-moc:#b45309;
+  --seria-tetno:#b02893;
   --plan:#12895f;         /* DANE: plan i cel       */
   --alarm:#d03b3b;        /* DANE: ponad limit      */
   --odciazenie:#e2e8f2;
@@ -38,6 +47,8 @@
     --tekst:#f2f5fa; --slaby:#98a1b2; --linia:#262c37;
     --akcent:#3987e5;
     --plan:#199e70; --alarm:#e66767;
+    --seria-czas:#3987e5; --seria-predkosc:#22a99a;
+    --seria-moc:#c07f28; --seria-tetno:#cf5aab;
     --odciazenie:#232936; --cien:rgba(0,0,0,.35); --ikona-krycie:.10;
   }
 }
@@ -47,6 +58,8 @@
   --tekst:#f2f5fa; --slaby:#98a1b2; --linia:#262c37;
   --akcent:#3987e5;
   --plan:#199e70; --alarm:#e66767;
+  --seria-czas:#3987e5; --seria-predkosc:#22a99a;
+  --seria-moc:#c07f28; --seria-tetno:#cf5aab;
   --odciazenie:#232936; --cien:rgba(0,0,0,.35); --ikona-krycie:.10;
 }
 
@@ -383,6 +396,34 @@ table.segmenty tbody tr:hover td{background:var(--plyta)}
   background:var(--tlo);border:1px solid var(--linia);
 }
 .proba-dane{color:var(--slaby);font-size:12.5px;line-height:1.5}
+/* Wykresy zajmują pas o stałej wysokości, więc przy szerokim ekranie po
+   prawej zostaje pusta kolumna. Wnioski wchodzą właśnie tam. Poniżej 900 px
+   kolumna schodzi pod wykresy, zamiast ściskać oba w nieczytelne paski. */
+.porownanie-uklad{display:grid;grid-template-columns:minmax(0,1fr) 290px;gap:18px;
+  align-items:start}
+.porownanie-wykresy{min-width:0}
+@media (max-width: 900px){
+  .porownanie-uklad{grid-template-columns:minmax(0,1fr)}
+}
+.analiza{
+  background:var(--plyta);border:1px solid var(--linia);border-radius:10px;
+  padding:13px 15px;position:sticky;top:12px;
+}
+@media (max-width: 900px){ .analiza{position:static} }
+.analiza-gora{display:flex;justify-content:space-between;align-items:baseline;
+  gap:8px;margin-bottom:9px}
+.analiza-tytul{font-size:13px;font-weight:600}
+.analiza-zrodlo{font-size:11px;color:var(--slaby)}
+.analiza-lista{list-style:none;margin:0;padding:0;display:grid;gap:9px}
+.analiza-lista li{font-size:12.5px;line-height:1.45;color:var(--slaby)}
+.analiza-lista li b{display:block;font-size:11px;font-weight:700;
+  letter-spacing:.03em;text-transform:uppercase;color:var(--tekst);margin-bottom:1px}
+.analiza-lista li.uwaga b{color:var(--alarm)}
+.analiza-recznie{margin-top:11px;padding-top:10px;border-top:1px solid var(--linia)}
+.analiza-recznie b{font-size:11px;text-transform:uppercase;letter-spacing:.03em}
+.analiza-recznie p{margin:3px 0 0;font-size:12.5px;line-height:1.45;color:var(--slaby)}
+.analiza-stopka{margin:11px 0 0;padding-top:9px;border-top:1px solid var(--linia);
+  font-size:11px;line-height:1.4;color:var(--slaby);opacity:.85}
 .podpis-wykresu{color:var(--slaby);font-size:12px;line-height:1.45;margin:14px 0 2px}
 rect.proba-punkt{cursor:pointer}
 
@@ -434,7 +475,9 @@ text.etykieta-proby{opacity:0;transition:opacity .12s ease;pointer-events:none}
 text.etykieta-proby.wybrany{opacity:1}
 circle.punkt-proby{transition:r .12s ease}
 .seria{margin-top:10px}
-.podpis-serii{margin:0 0 2px 2px;font-size:11.5px;font-weight:600;color:var(--slaby)}
+.podpis-serii{margin:0 0 2px 2px;font-size:11.5px;font-weight:600;color:var(--slaby);
+  display:flex;align-items:center;gap:6px}
+.podpis-serii i{width:9px;height:9px;border-radius:2px;flex:0 0 auto}
 .podpis-serii span{font-weight:400;opacity:.8}
 
 .przelaczniki{display:flex;gap:8px;margin:12px 0 0;flex-wrap:wrap;
@@ -1708,6 +1751,11 @@ const DZIALKI_CZASU = [5,10,15,20,30,60,120,300,600,900,1800,3600];
    klasy. Przerysowywanie kasowało węzły SVG, więc animacja wyrastania grała
    od nowa przy każdym dotknięciu słupka i wykres "ładował się od zera". */
 function wykresProb(lista, wybrany, najlepszyCzas){
+  // Przy remisie rekordem jest próba, w której czas padł PIERWSZY raz.
+  // Bez tego cztery jednakowe przejazdy dostawały cztery napisy „PB",
+  // a na pasach niżej zieleń stała tylko przy jednym — dwie różne odpowiedzi
+  // na to samo pytanie.
+  const iPB = lista.findIndex(x => x.czas_s === najlepszyCzas);
   const wys = 230, marDol = 42;
   const szer = szerProb(lista.length);
   const gora = Math.max(...lista.map(x => x.czas_s)) * 1.1;
@@ -1727,8 +1775,8 @@ function wykresProb(lista, wybrany, najlepszyCzas){
     <defs>
       <pattern id="krata-proby" width="7" height="7" patternUnits="userSpaceOnUse"
                patternTransform="rotate(45)">
-        <rect width="7" height="7" fill="var(--akcent)" opacity=".22"/>
-        <line x1="0" y1="0" x2="0" y2="7" stroke="var(--akcent)" stroke-width="3.4"/>
+        <rect width="7" height="7" fill="var(--seria-czas)" opacity=".22"/>
+        <line x1="0" y1="0" x2="0" y2="7" stroke="var(--seria-czas)" stroke-width="3.4"/>
       </pattern>
     </defs>`;
   for (const v of podzialka){
@@ -1744,9 +1792,9 @@ function wykresProb(lista, wybrany, najlepszyCzas){
     const h = Math.max(skala(pr.czas_s), 2);
     const y = G.marGora + wys - h;
     const zwift = pr.jazda.typ === "VirtualRide";
-    const pb = pr.czas_s === najlepszyCzas;
+    const pb = i === iPB;
     g += `<rect x="${xProby(i)}" y="${y}" width="${G.szerSlupka}" height="${h}"
-           fill="${zwift ? "url(#krata-proby)" : pb ? "var(--plan)" : "var(--akcent)"}"
+           fill="${zwift ? "url(#krata-proby)" : pb ? "var(--plan)" : "var(--seria-czas)"}"
            rx="2" data-i="${i}"
            class="proba${pb ? " pb" : ""}${i === wybrany ? " wybrany" : ""}"
            style="animation-delay:${Math.min(i*30,500)}ms"/>`;
@@ -1795,13 +1843,13 @@ function wykresProb(lista, wybrany, najlepszyCzas){
 
 const SERIE = [
   { klucz:"predkosc", nazwa:"Prędkość", jednostka:"km/h", miejsc:1,
-    dzialki:[0.5,1,2,2.5,5,10],
+    kolor:"var(--seria-predkosc)", dzialki:[0.5,1,2,2.5,5,10],
     wartosc:(pr,seg) => pr.czas_s ? (seg.dystans_m / pr.czas_s) * 3.6 : null },
   { klucz:"moc", nazwa:"Moc", jednostka:"W", miejsc:0,
-    dzialki:[5,10,20,25,50,100],
+    kolor:"var(--seria-moc)", dzialki:[5,10,20,25,50,100],
     wartosc:(pr) => pr.moc_S == null ? null : pr.moc_S },
   { klucz:"tetno", nazwa:"Tętno", jednostka:"bpm", miejsc:0,
-    dzialki:[2,5,10,20],
+    kolor:"var(--seria-tetno)", dzialki:[2,5,10,20],
     wartosc:(pr) => pr.tetno == null ? null : pr.tetno }
 ];
 
@@ -1847,14 +1895,14 @@ function wykresSerii(lista, wybrany, seg, seria, iPB){
     d += `${trzeba ? "M" : "L"}${px(i)} ${py(i)} `;
     trzeba = false;
   });
-  g += `<path d="${d.trim()}" fill="none" stroke="var(--akcent)" stroke-width="2"
+  g += `<path d="${d.trim()}" fill="none" stroke="${seria.kolor}" stroke-width="2"
          stroke-linejoin="round" stroke-linecap="round"/>`;
 
   lista.forEach((pr, i) => {
     if (v[i] != null){
       const rekord = i === iPB;
       g += `<circle cx="${px(i)}" cy="${py(i)}" r="${i === wybrany ? 6.5 : 4.5}"
-             fill="${rekord ? "var(--plan)" : "var(--akcent)"}"
+             fill="${rekord ? "var(--plan)" : seria.kolor}"
              stroke="var(--powierzchnia)" stroke-width="2"
              class="punkt-proby${i === wybrany ? " wybrany" : ""}" data-i="${i}"/>`;
       g += `<text x="${px(i)}" y="${py(i)-13}" text-anchor="middle" font-size="11"
@@ -1869,7 +1917,8 @@ function wykresSerii(lista, wybrany, seg, seria, iPB){
   g += `</svg>`;
 
   return `<div class="seria">
-      <p class="podpis-serii">${seria.nazwa} <span>${seria.jednostka}</span></p>
+      <p class="podpis-serii"><i style="background:${seria.kolor}"></i>${
+        seria.nazwa} <span>${seria.jednostka}</span></p>
       <div class="wykres">${os}<div class="ramka">${g}</div></div>
     </div>`;
 }
@@ -1880,6 +1929,140 @@ function wykresySerii(lista, wybrany, seg){
   return SERIE.map(x => wykresSerii(lista, wybrany, seg, x, iPB)).join("");
 }
 
+
+/* ==========================================================================
+   WNIOSKI — analiza segmentu liczona przy wyświetlaniu
+
+   To NIE jest tekst pisany przez model językowy: strona jest statyczna i nie
+   ma jak nikogo zapytać. To reguły policzone z Twoich prób, więc przeliczają
+   się same przy każdej nowej jeździe i działają bez sieci.
+
+   Osobny blok "analizy" w dane.js jest miejscem na komentarz pisany ręcznie
+   przez Claude'a — jeśli istnieje dla tego segmentu, dopisuje się pod
+   wnioskami i jest wyraźnie podpisany datą.
+   ========================================================================== */
+
+// Opis jazdy ma format ze STRONA.md §6: Ok/trio/w?1/hr160-195, separator "/".
+// Parser jest sztywny — luźny kiedyś zgadnie źle i nikt się nie dowie.
+// Jedyny wyjątek: zapis "?1" bez litery w, który wyszedł w jeździe z 13.08.
+function zOpisu(opis){
+  const w = { ok:false, grupa:null, wiatr:null };
+  if (!opis) return w;
+  for (const czesc of String(opis).split("/").map(x => x.trim().toLowerCase())){
+    if (czesc === "ok") w.ok = true;
+    else if (/^(solo|duo|trio|tata)/.test(czesc)) w.grupa = czesc;
+    else if (/^w[?a-z]*\d/.test(czesc) || /^\?\d/.test(czesc)) w.wiatr = czesc;
+  }
+  return w;
+}
+
+function mediana(t){
+  const x = [...t].sort((a,b) => a-b);
+  const p = Math.floor(x.length/2);
+  return x.length % 2 ? x[p] : (x[p-1]+x[p])/2;
+}
+
+function wnioskiSegmentu(lista, seg){
+  const w = [];
+  const czasy = lista.map(x => x.czas_s);
+  const naj = Math.min(...czasy);
+  const iPB = lista.findIndex(x => x.czas_s === naj);
+  const pb = lista[iPB], ostatnia = lista[lista.length-1];
+  const dzisiaj = naDzien(DZIS);
+  const cechy = lista.map(x => zOpisu(x.jazda.opis));
+
+  const odKiedy = roznicaDni(naDzien(pb.jazda.data), dzisiaj);
+  w.push({ etykieta:"Rekord", tekst:
+    `${czasNaTekst(naj)} — ${pl(pb.jazda.data)}, ${odKiedy} dni temu.` +
+    (iPB === lista.length-1 ? " To Twoja ostatnia próba." : "") });
+
+  // Trend liczymy z median połówek, nie ze skrajnych prób: jedna jazda
+  // z wiatrem w plecy przestawiłaby wynik o kilkanaście procent.
+  if (lista.length >= 4){
+    const pol = Math.floor(lista.length/2);
+    const wcz = mediana(czasy.slice(0, pol)), poz = mediana(czasy.slice(-pol));
+    const zmiana = (poz - wcz) / wcz * 100;
+    w.push({ etykieta:"Trend", tekst: Math.abs(zmiana) < 1.5
+      ? `Bez zmian — mediana pierwszej połowy prób ${czasNaTekst(Math.round(wcz))}, drugiej ${czasNaTekst(Math.round(poz))}.`
+      : `${zmiana < 0 ? "Szybciej" : "Wolniej"} o ${liczba(Math.abs(zmiana),1)}% — `
+        + `mediana z ${czasNaTekst(Math.round(wcz))} na ${czasNaTekst(Math.round(poz))}.` });
+  } else {
+    w.push({ etykieta:"Trend", tekst:
+      `Za mało prób, żeby cokolwiek twierdzić — ${lista.length} ${
+        lista.length === 1 ? "przejazd" : "przejazdy"}. Trend liczę od czterech.` });
+  }
+
+  const med = mediana(czasy);
+  const rozrzut = Math.max(...czasy) - naj;
+  w.push({ etykieta:"Powtarzalność", tekst:
+    `Typowy przejazd ${czasNaTekst(Math.round(med))}, rozrzut ${roznicaCzasu(rozrzut).replace("+","")} `
+    + `między najszybszym a najwolniejszym.` });
+
+  const doPB = ostatnia.czas_s - naj;
+  w.push({ etykieta:"Ostatnia próba", tekst:
+    `${pl(ostatnia.jazda.data)}, ${czasNaTekst(ostatnia.czas_s)}` +
+    (doPB === 0 ? " — rekord." : ` — ${roznicaCzasu(doPB)} do rekordu, `
+      + `${ostatnia.czas_s <= med ? "poniżej" : "powyżej"} typowego czasu.`) });
+
+  // Porównywalność: draft i wiatr psują porównania czasów bardziej niż forma.
+  const grupowe = cechy.filter(x => x.grupa && x.grupa !== "solo").length;
+  const zWiatrem = cechy.filter(x => x.wiatr).length;
+  const opisane = cechy.filter(x => x.ok).length;
+  const zwifty = lista.filter(x => x.jazda.typ === "VirtualRide").length;
+  const uwagi = [];
+  if (cechy[iPB].grupa && cechy[iPB].grupa !== "solo")
+    uwagi.push(`rekord padł w grupie (${cechy[iPB].grupa}) — draft daje na płaskim do 30%`);
+  if (cechy[iPB].wiatr) uwagi.push("przy rekordzie zapisany wiatr");
+  if (grupowe) uwagi.push(`${grupowe} z ${lista.length} prób w grupie`);
+  if (zWiatrem) uwagi.push(`${zWiatrem} z zapisanym wiatrem`);
+  if (zwifty && zwifty < lista.length) uwagi.push(`${zwifty} na Zwifcie`);
+  // "Ok" w opisie znaczy: opis sprawdzony i świadomie wypełniony (STRONA.md §6).
+  // Jazda z opisem, ale bez tego znacznika, ma nieznane warunki tak samo jak
+  // jazda bez opisu — dlatego liczymy znacznik, a nie obecność tekstu.
+  if (opisane < lista.length)
+    uwagi.push(`${lista.length - opisane} bez znacznika „Ok" — warunków nie znamy`);
+  if (uwagi.length)
+    w.push({ etykieta:"Ostrożnie", ostrzezenie:true, tekst: uwagi.join(" · ") + "." });
+
+  const rpe = lista.map(x => x.jazda.rpe).filter(x => x != null);
+  if (rpe.length)
+    w.push({ etykieta:"Wysiłek", tekst:
+      `RPE znane dla ${rpe.length} z ${lista.length} prób, średnio `
+      + `${liczba(rpe.reduce((a,b)=>a+b,0)/rpe.length,1)}`
+      + (pb.jazda.rpe != null ? `; rekord przy RPE ${pb.jazda.rpe}.` : ".") });
+
+  const zMoca = lista.filter(x => x.moc_S != null);
+  if (zMoca.length)
+    w.push({ etykieta:"Moc", tekst:
+      `Zmierzona na ${zMoca.length} z ${lista.length} prób: `
+      + `${Math.round(Math.min(...zMoca.map(x=>x.moc_S)))}–${
+         Math.round(Math.max(...zMoca.map(x=>x.moc_S)))} W.` });
+
+  return w;
+}
+
+function panelAnalizy(lista, seg){
+  const w = wnioskiSegmentu(lista, seg);
+  const recznie = (D.analizy || {})[seg.id];
+  return `
+    <aside class="analiza">
+      <div class="analiza-gora">
+        <span class="analiza-tytul">Wnioski</span>
+        <span class="analiza-zrodlo">liczone z ${lista.length} prób</span>
+      </div>
+      <ul class="analiza-lista">
+        ${w.map(x => `<li${x.ostrzezenie ? ' class="uwaga"' : ""}>
+          <b>${x.etykieta}</b><span>${x.tekst}</span></li>`).join("")}
+      </ul>
+      ${recznie ? `<div class="analiza-recznie">
+        <b>Komentarz Claude'a${recznie.data ? " · " + pl(recznie.data) : ""}</b>
+        <p>${bezpieczny(recznie.tekst || "")}</p></div>` : ""}
+      <p class="analiza-stopka">Przeliczane przy każdym otwarciu strony, więc
+        nowa próba zmienia je same. To reguły policzone z Twoich danych,
+        nie tekst pisany przez model — strona jest statyczna i nie ma kogo
+        zapytać.</p>
+    </aside>`;
+}
 
 function panelProby(seg, pr, najlepszyCzas, numer, ile){
   const j = pr.jazda;
@@ -2035,8 +2218,10 @@ const porownaniaS = (id) => {
       nazwy jazdy mówi, ile Cię ta próba kosztowała — bez tego szybszy czas
       z koła kolegi wygląda jak forma.
     </p>
-    <div id="wykres-prob">${wykresProb(lista, wybrany, najlepszy)}</div>
-    <p class="podpis-wykresu">Poniżej te same próby w innych miarach. Każda ma
+    <div class="porownanie-uklad">
+      <div class="porownanie-wykresy">
+        <div id="wykres-prob">${wykresProb(lista, wybrany, najlepszy)}</div>
+        <p class="podpis-wykresu">Poniżej te same próby w innych miarach. Każda ma
       własny pas i własną oś, bo prędkość, waty i uderzenia serca nie mieszczą
       się na jednej skali — a dwie skale na jednym rysunku pozwalają udowodnić
       dowolną tezę samym przesunięciem zakresu. Wspólna oś pozioma i wspólne
@@ -2045,7 +2230,10 @@ const porownaniaS = (id) => {
       próby ze Zwiftu, a pas tętna zjawi się sam, gdy zacznie się zapisywać.
       Osie tych pasów nie zaczynają się od zera — w linii wartość niesie
       położenie punktu, a nie wysokość, więc wolno ją przybliżyć.</p>
-    <div id="wykres-serii">${wykresySerii(lista, wybrany, seg)}</div>
+        <div id="wykres-serii">${wykresySerii(lista, wybrany, seg)}</div>
+      </div>
+      ${panelAnalizy(lista, seg)}
+    </div>
     <div class="info" id="info-proby">${
       panelProby(seg, lista[wybrany], najlepszy, wybrany+1, lista.length)}</div>
     <div id="notatka-miejsce">${notatkaHTML(lista[wybrany].id || "")}</div>

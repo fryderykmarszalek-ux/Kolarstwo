@@ -165,6 +165,34 @@ nie kolor: sylwetka roweru vs ekranu, słupek kreskowany vs pełny.
   (`tetno` w `proby`, z `average_heartrate`). Przerwa w pomiarach rozcina
   linię, zamiast ją zmyślać.
 
+  **Wnioski po prawej stronie wykresów** (21.08.2026) — rekord, trend,
+  powtarzalność, ostatnia próba, ostrzeżenia o porównywalności, RPE, moc.
+  **To nie jest tekst pisany przez model** — strona jest statyczna i nie ma
+  kogo zapytać. To reguły liczone z prób przy każdym otwarciu, więc nowa jazda
+  przelicza je same. Nie nazywać tego „analizą AI" na stronie: nazwa, która
+  obiecuje więcej, niż jest, to ten sam błąd co moc `[E]` udająca pomiar.
+  Blok `analizy` w `dane.js` (klucz = id segmentu) jest miejscem na komentarz
+  pisany ręcznie przez Claude'a — dopisuje się pod wnioskami, podpisany datą.
+
+  Trend liczy się z **median połówek**, nie ze skrajnych prób, i dopiero od
+  czterech przejazdów. Jedna jazda z wiatrem w plecy przestawiłaby wynik
+  o kilkanaście procent.
+
+  Ostrzeżenia czyta parser opisu ze `STRONA.md` §6 (`Ok/trio/w?1/hr160-195`).
+  **Znacznik `Ok` liczy się osobno od obecności opisu**: jazda z opisem bez
+  `Ok` ma nieznane warunki tak samo jak jazda bez opisu.
+
+  **Barwy pasów dobrane walidatorem** (`dataviz/scripts/validate_palette.js`),
+  w kolejności czas → prędkość → moc → tętno: `#2a78d6 · #0d9488 · #b45309 ·
+  #b02893` w jasnym i `#3987e5 · #22a99a · #c07f28 · #cf5aab` w ciemnym.
+  Komplet przechodzi wszystkie pięć kontroli w OBU motywach. **Kolejność pasów
+  jest częścią wyniku** — fuksja obok turkusu wypada przy deuteranopii
+  (ΔE 3,4), więc rozdziela je bursztyn. Nie przestawiać bez ponownej walidacji.
+
+  **Przy remisie rekordem jest próba, w której czas padł PIERWSZY raz.**
+  Bez tego cztery jednakowe przejazdy dostawały cztery napisy „PB", a zieleń
+  na pasach stała tylko przy jednym.
+
   **Zieleń na pasach wskazuje próbę, która jest rekordem CZASU** — tę samą na
   każdym pasie, nie maksimum danej miary. Na pasie tętna zieleń przy najniższej
   wartości oznaczałaby najczęściej po prostu wolniejszą jazdę, czyli pochwałę

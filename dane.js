@@ -128,6 +128,10 @@ notatki: {
   "_opis": "Notatki do pojedynczych prób na segmentach. Klucz = id próby z tablicy 'proby'. To jest ŹRÓDŁO PRAWDY — strona umie tylko czytać stąd i trzymać brudnopis w przeglądarce, bo GitHub Pages nie może nic zapisać. Claude czyta i dopisuje tutaj."
 },
 
+analizy: {
+  "_opis": "Komentarz Claude'a do segmentu. Klucz = id segmentu, wartość {tekst, data}. Wnioski liczbowe strona liczy sama i nie trzyma ich tutaj — tu wchodzi wyłącznie to, czego reguła nie policzy."
+},
+
 segmenty: [
   {"id":"35265686","nazwa":"[ITT] Kamyk - GK","dystans_m":9814.1,"nachylenie_proc":0.2,"przewyzszenie_m":27.4},
   {"id":"23677071","nazwa":"[Na Osi - ] OS-2 ","dystans_m":1794.9,"nachylenie_proc":0,"przewyzszenie_m":1.2},
