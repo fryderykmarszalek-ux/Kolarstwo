@@ -424,8 +424,18 @@ rect.proba-punkt{cursor:pointer}
 #notatka-eksport-pole{margin-top:8px;font-size:11.5px}
 .proba-dane b{color:var(--tekst)}
 rect.proba{transform-box:fill-box;transform-origin:bottom;cursor:pointer;
-  animation:wyrasta .5s cubic-bezier(.2,.85,.25,1) both}
-rect.proba.wybrany{stroke:var(--tekst);stroke-width:1.5}
+  animation:wyrasta .5s cubic-bezier(.2,.85,.25,1) both;
+  opacity:.6;transition:opacity .12s ease}
+rect.proba.pb{opacity:.85}
+rect.proba.wybrany{opacity:1;stroke:var(--tekst);stroke-width:1.5}
+/* Etykiety wszystkich prób istnieją od początku — widać tę wybraną.
+   Dzięki temu wybór nie buduje SVG od nowa i nic nie miga. */
+text.etykieta-proby{opacity:0;transition:opacity .12s ease;pointer-events:none}
+text.etykieta-proby.wybrany{opacity:1}
+circle.punkt-proby{transition:r .12s ease}
+.seria{margin-top:10px}
+.podpis-serii{margin:0 0 2px 2px;font-size:11.5px;font-weight:600;color:var(--slaby)}
+.podpis-serii span{font-weight:400;opacity:.8}
 
 .przelaczniki{display:flex;gap:8px;margin:12px 0 0;flex-wrap:wrap;
   align-items:center;justify-content:space-between}
@@ -1680,26 +1690,36 @@ function roznicaCzasu(sek){
   return znak + (a < 60 ? `${a} s` : czasNaTekst(a));
 }
 
+
+// Geometria wspólna dla wszystkich wykresów w tej zakładce. Ta sama szerokość
+// słupka, ten sam odstęp i ta sama szerokość osi — dzięki temu punkt na każdej
+// linii stoi DOKŁADNIE nad słupkiem tej samej próby, a wszystkie ramki
+// przewijają się jak jedna.
+const G = { szerSlupka:34, odstep:8, szerOsi:46, marGora:26 };
+const xProby = i => 12 + i*(G.szerSlupka+G.odstep);
+const szerProb = n => n*(G.szerSlupka+G.odstep) + 26;
+
 // Krok podziałki dobierany z listy wartości, które człowiek czyta bez liczenia:
 // 15 s, pół minuty, minuta, pięć minut. 7-sekundowa działka byłaby bezużyteczna.
 const DZIALKI_CZASU = [5,10,15,20,30,60,120,300,600,900,1800,3600];
 
+/* Wybór próby NIE przerysowuje wykresów. Wszystkie etykiety są narysowane od
+   razu i schowane przezroczystością, a zaznaczenie to wyłącznie przełożenie
+   klasy. Przerysowywanie kasowało węzły SVG, więc animacja wyrastania grała
+   od nowa przy każdym dotknięciu słupka i wykres "ładował się od zera". */
 function wykresProb(lista, wybrany, najlepszyCzas){
-  const szerSlupka = G.szerSlupka, odstep = G.odstep, marGora = G.marGora,
-        wys = 230, marDol = 42, szerOsi = G.szerOsi;
+  const wys = 230, marDol = 42;
   const szer = szerProb(lista.length);
   const gora = Math.max(...lista.map(x => x.czas_s)) * 1.1;
   const krok = DZIALKI_CZASU.find(k => gora/k <= 6) || 3600;
   const podzialka = []; for (let v = 0; v <= gora; v += krok) podzialka.push(v);
   const skala = t => (t/gora) * wys;
-  const wysCalk = wys + marGora + marDol;
-  const x = xProby;
+  const wysCalk = wys + G.marGora + marDol;
 
-  let os = `<svg class="os" width="${szerOsi}" height="${wysCalk}" aria-hidden="true">`;
-  for (const v of podzialka){
-    os += `<text x="${szerOsi-6}" y="${marGora+wys-skala(v)+4}" text-anchor="end"
+  let os = `<svg class="os" width="${G.szerOsi}" height="${wysCalk}" aria-hidden="true">`;
+  for (const v of podzialka)
+    os += `<text x="${G.szerOsi-6}" y="${G.marGora+wys-skala(v)+4}" text-anchor="end"
             font-size="10" fill="var(--slaby)">${czasNaTekst(v)}</text>`;
-  }
   os += `</svg>`;
 
   let g = `<svg width="${szer}" height="${wysCalk}" role="img"
@@ -1711,141 +1731,155 @@ function wykresProb(lista, wybrany, najlepszyCzas){
         <line x1="0" y1="0" x2="0" y2="7" stroke="var(--akcent)" stroke-width="3.4"/>
       </pattern>
     </defs>`;
-
   for (const v of podzialka){
-    const y = marGora + wys - skala(v);
+    const y = G.marGora + wys - skala(v);
     g += `<line x1="0" y1="${y}" x2="${szer}" y2="${y}"
            stroke="var(--linia)" stroke-width="1"/>`;
   }
-
-  // Linia rekordu w barwie rekordu — ta sama, co słupek PB, bo mówią to samo.
-  const yRek = marGora + wys - skala(najlepszyCzas);
+  const yRek = G.marGora + wys - skala(najlepszyCzas);
   g += `<line x1="0" y1="${yRek}" x2="${szer}" y2="${yRek}"
          stroke="var(--plan)" stroke-width="1" stroke-dasharray="2 4" opacity=".7"/>`;
 
   lista.forEach((pr, i) => {
     const h = Math.max(skala(pr.czas_s), 2);
-    const y = marGora + wys - h;
+    const y = G.marGora + wys - h;
     const zwift = pr.jazda.typ === "VirtualRide";
-    const akt = i === wybrany;
     const pb = pr.czas_s === najlepszyCzas;
-    // Rekord niesie kolor ORAZ podpis. Sam kolor byłby informacją, której nie
-    // da się odczytać na wydruku ani przy daltonizmie — a tu chodzi o jedną
-    // konkretną próbę, więc musi się dać wskazać palcem bez zgadywania.
-    g += `<rect x="${x(i)}" y="${y}" width="${szerSlupka}" height="${h}"
+    g += `<rect x="${xProby(i)}" y="${y}" width="${G.szerSlupka}" height="${h}"
            fill="${zwift ? "url(#krata-proby)" : pb ? "var(--plan)" : "var(--akcent)"}"
-           opacity="${akt ? 1 : pb ? .85 : .6}" rx="2"
-           class="proba${akt ? " wybrany" : ""}" data-i="${i}"
+           rx="2" data-i="${i}"
+           class="proba${pb ? " pb" : ""}${i === wybrany ? " wybrany" : ""}"
            style="animation-delay:${Math.min(i*30,500)}ms"/>`;
-    if (pb && !akt){
-      g += `<text x="${x(i)+szerSlupka/2}" y="${y-7}" text-anchor="middle"
+    // Rekord niesie kolor ORAZ podpis — sam kolor znika na wydruku i przy
+    // daltonizmie, a tu chodzi o wskazanie jednej konkretnej próby.
+    if (pb)
+      g += `<text x="${xProby(i)+G.szerSlupka/2}" y="${y-7}" text-anchor="middle"
              font-size="9.5" font-weight="700" fill="var(--plan)">PB</text>`;
-    }
-    if (akt){
-      g += `<text x="${x(i)+szerSlupka/2}" y="${y-8}" text-anchor="middle"
-             font-size="11" font-weight="600"
-             fill="${pb ? "var(--plan)" : "var(--tekst)"}"
-             >${czasNaTekst(pr.czas_s)}${pb ? " · PB" : ""}</text>`;
-    }
+    g += `<text x="${xProby(i)+G.szerSlupka/2}" y="${y-22}" text-anchor="middle"
+           font-size="11" font-weight="600" data-i="${i}"
+           fill="${pb ? "var(--plan)" : "var(--tekst)"}"
+           class="etykieta-proby${i === wybrany ? " wybrany" : ""}"
+           >${czasNaTekst(pr.czas_s)}</text>`;
   });
 
-  // daty pod słupkami; rok dopisany tylko przy zmianie
   let rokPop = null;
   lista.forEach((pr, i) => {
     const d = pr.jazda.data;
-    g += `<text x="${x(i)+szerSlupka/2}" y="${marGora+wys+16}" text-anchor="middle"
+    g += `<text x="${xProby(i)+G.szerSlupka/2}" y="${G.marGora+wys+16}" text-anchor="middle"
            font-size="9.5" fill="var(--slaby)">${d.slice(8,10)}.${d.slice(5,7)}</text>`;
     if (d.slice(0,4) !== rokPop){
-      g += `<text x="${x(i)+szerSlupka/2}" y="${marGora+wys+31}" text-anchor="middle"
+      g += `<text x="${xProby(i)+G.szerSlupka/2}" y="${G.marGora+wys+31}" text-anchor="middle"
              font-size="9.5" font-weight="600" fill="var(--slaby)">${d.slice(0,4)}</text>`;
       rokPop = d.slice(0,4);
     }
   });
-
-  g += `<line x1="0" y1="${marGora+wys}" x2="${szer}" y2="${marGora+wys}"
-         stroke="var(--slaby)" stroke-width="1"/></svg>`;
-
-  return `<div class="wykres">${os}<div class="ramka">${g}</div></div>`;
-}
-
-// Geometria wspólna dla obu wykresów. Ta sama szerokość słupka, ten sam odstęp
-// i ta sama szerokość osi — dzięki temu punkt na linii stoi DOKŁADNIE nad
-// słupkiem tej samej próby, a oba wykresy przewijają się jak jeden.
-const G = { szerSlupka:34, odstep:8, szerOsi:46, marGora:26 };
-const xProby = i => 12 + i*(G.szerSlupka+G.odstep);
-const szerProb = n => n*(G.szerSlupka+G.odstep) + 26;
-
-// Prędkość to DRUGA miara, w innej jednostce i innym zakresie — więc drugi
-// wykres, a nie druga oś na tym samym. Dwie osie na jednym wykresie pozwalają
-// dowieść dowolnej tezy przez samo przesunięcie skali.
-//
-// Oś prędkości NIE zaczyna się od zera i to nie jest niekonsekwencja wobec
-// słupków: w słupku wartość niesie WYSOKOŚĆ (pole), więc ucięcie kłamie;
-// w linii wartość niesie POŁOŻENIE punktu, więc zakres wolno dopasować.
-const DZIALKI_PREDKOSCI = [0.5,1,2,2.5,5,10];
-
-function wykresPredkosci(lista, wybrany, seg){
-  const wys = 150, marDol = 34;
-  const szer = szerProb(lista.length);
-  const v = lista.map(pr => pr.czas_s ? (seg.dystans_m / pr.czas_s) * 3.6 : null);
-  const sensowne = v.filter(x => x != null);
-  const min = Math.min(...sensowne), max = Math.max(...sensowne);
-  const zapas = Math.max((max - min) * 0.25, 0.5);
-  const dol = Math.max(0, min - zapas), gora = max + zapas;
-  const krok = DZIALKI_PREDKOSCI.find(k => (gora-dol)/k <= 5) || 20;
-  const podzialka = [];
-  for (let t = Math.ceil(dol/krok)*krok; t <= gora; t += krok) podzialka.push(t);
-  const skala = x => wys - ((x - dol)/(gora - dol)) * wys;
-  const wysCalk = wys + G.marGora + marDol;
-  const najszybsza = Math.max(...sensowne);
-
-  let os = `<svg class="os" width="${G.szerOsi}" height="${wysCalk}" aria-hidden="true">`;
-  for (const t of podzialka){
-    os += `<text x="${G.szerOsi-6}" y="${G.marGora+skala(t)+4}" text-anchor="end"
-            font-size="10" fill="var(--slaby)">${liczba(t,1)}</text>`;
-  }
-  os += `</svg>`;
-
-  let g = `<svg width="${szer}" height="${wysCalk}" role="img"
-    aria-label="Średnia prędkość na kolejnych próbach">`;
-  for (const t of podzialka){
-    const y = G.marGora + skala(t);
-    g += `<line x1="0" y1="${y}" x2="${szer}" y2="${y}"
-           stroke="var(--linia)" stroke-width="1"/>`;
-  }
-
-  const punkt = i => [xProby(i) + G.szerSlupka/2, G.marGora + skala(v[i])];
-  const d = lista.map((_, i) => {
-    const [px,py] = punkt(i);
-    return `${i ? "L" : "M"}${px} ${py}`;
-  }).join(" ");
-  g += `<path d="${d}" fill="none" stroke="var(--akcent)" stroke-width="2"
-         stroke-linejoin="round" stroke-linecap="round"/>`;
-
-  lista.forEach((pr, i) => {
-    const [px,py] = punkt(i);
-    const akt = i === wybrany;
-    const pb = v[i] === najszybsza;
-    // Otoczka w kolorze karty odcina punkt od linii, żeby nie zlewał się z nią
-    // w plamę tam, gdzie próby leżą blisko siebie.
-    g += `<circle cx="${px}" cy="${py}" r="${akt ? 6.5 : 4.5}"
-           fill="${pb ? "var(--plan)" : "var(--akcent)"}"
-           stroke="var(--powierzchnia)" stroke-width="2"/>`;
-    if (akt){
-      g += `<text x="${px}" y="${py-13}" text-anchor="middle" font-size="11"
-             font-weight="600" fill="${pb ? "var(--plan)" : "var(--tekst)"}"
-             >${liczba(v[i],1)} km/h</text>`;
-    }
-    // Cel dotyku: kółko o promieniu 4,5 px jest za małe na palec, więc każdy
-    // punkt dostaje niewidoczny prostokąt na całą wysokość wykresu.
-    g += `<rect x="${xProby(i)-G.odstep/2}" y="0" width="${G.szerSlupka+G.odstep}"
-           height="${wysCalk}" fill="transparent" class="proba-punkt" data-i="${i}"/>`;
-  });
-
   g += `<line x1="0" y1="${G.marGora+wys}" x2="${szer}" y2="${G.marGora+wys}"
          stroke="var(--slaby)" stroke-width="1"/></svg>`;
   return `<div class="wykres">${os}<div class="ramka">${g}</div></div>`;
 }
+
+/* SERIE LINIOWE — prędkość, moc, tętno.
+
+   Każda miara dostaje WŁASNY pas z własną osią, jeden pod drugim, zamiast
+   trzech skal wciśniętych w jeden rysunek. Powód jest ten sam, dla którego
+   czas i prędkość są dwoma wykresami: przy dwóch osiach na jednym obrazku
+   wystarczy przesunąć zakres jednej z nich, żeby linie się przecięły albo
+   rozjechały — i dowieść dowolnej tezy o tym, że moc "idzie za" prędkością.
+   Wspólna oś pozioma i wspólne zaznaczenie sprawiają, że czyta się to jak
+   jeden wykres, tylko bez tej pułapki.
+
+   Pas pojawia się TYLKO wtedy, gdy dane istnieją. Moc mają dziś wyłącznie
+   próby ze Zwiftu; tętno nie ma jeszcze żadna, więc pas tętna zjawi się sam
+   pierwszego dnia, w którym Garmin zacznie je zapisywać. Nic nie trzeba
+   będzie zmieniać w kodzie. */
+
+const SERIE = [
+  { klucz:"predkosc", nazwa:"Prędkość", jednostka:"km/h", miejsc:1,
+    dzialki:[0.5,1,2,2.5,5,10],
+    wartosc:(pr,seg) => pr.czas_s ? (seg.dystans_m / pr.czas_s) * 3.6 : null },
+  { klucz:"moc", nazwa:"Moc", jednostka:"W", miejsc:0,
+    dzialki:[5,10,20,25,50,100],
+    wartosc:(pr) => pr.moc_S == null ? null : pr.moc_S },
+  { klucz:"tetno", nazwa:"Tętno", jednostka:"bpm", miejsc:0,
+    dzialki:[2,5,10,20],
+    wartosc:(pr) => pr.tetno == null ? null : pr.tetno }
+];
+
+// iPB — numer próby, która jest rekordem CZASU. Zieleń na wszystkich pasach
+// wskazuje TĘ SAMĄ próbę, a nie maksimum danej miary. Inaczej na pasie tętna
+// zielona kropka oznaczałaby najniższe tętno, czyli często po prostu jazdę
+// wolniejszą — pochwałę za nic.
+function wykresSerii(lista, wybrany, seg, seria, iPB){
+  const wys = 118, marDol = 12, marG = 22;
+  const szer = szerProb(lista.length);
+  const v = lista.map(pr => seria.wartosc(pr, seg));
+  const sens = v.filter(x => x != null);
+  if (!sens.length) return "";
+
+  const min = Math.min(...sens), max = Math.max(...sens);
+  const zapas = Math.max((max - min) * 0.25, max * 0.02, 0.5);
+  const dol = Math.max(0, min - zapas), gora = max + zapas;
+  const krok = seria.dzialki.find(k => (gora-dol)/k <= 4) || seria.dzialki[seria.dzialki.length-1];
+  const podzialka = [];
+  for (let t = Math.ceil(dol/krok)*krok; t <= gora; t += krok) podzialka.push(t);
+  const skala = x => wys - ((x - dol)/(gora - dol || 1)) * wys;
+  const wysCalk = wys + marG + marDol;
+
+  let os = `<svg class="os" width="${G.szerOsi}" height="${wysCalk}" aria-hidden="true">`;
+  for (const t of podzialka)
+    os += `<text x="${G.szerOsi-6}" y="${marG+skala(t)+4}" text-anchor="end"
+            font-size="10" fill="var(--slaby)">${liczba(t,seria.miejsc)}</text>`;
+  os += `</svg>`;
+
+  let g = `<svg width="${szer}" height="${wysCalk}" role="img"
+    aria-label="${seria.nazwa} na kolejnych próbach">`;
+  for (const t of podzialka)
+    g += `<line x1="0" y1="${marG+skala(t)}" x2="${szer}" y2="${marG+skala(t)}"
+           stroke="var(--linia)" stroke-width="1"/>`;
+
+  const px = i => xProby(i) + G.szerSlupka/2;
+  const py = i => marG + skala(v[i]);
+
+  // Przerwa w danych (próba bez pomiaru) rozcina linię, zamiast ją zmyślać.
+  let d = "", trzeba = true;
+  lista.forEach((_, i) => {
+    if (v[i] == null){ trzeba = true; return; }
+    d += `${trzeba ? "M" : "L"}${px(i)} ${py(i)} `;
+    trzeba = false;
+  });
+  g += `<path d="${d.trim()}" fill="none" stroke="var(--akcent)" stroke-width="2"
+         stroke-linejoin="round" stroke-linecap="round"/>`;
+
+  lista.forEach((pr, i) => {
+    if (v[i] != null){
+      const rekord = i === iPB;
+      g += `<circle cx="${px(i)}" cy="${py(i)}" r="${i === wybrany ? 6.5 : 4.5}"
+             fill="${rekord ? "var(--plan)" : "var(--akcent)"}"
+             stroke="var(--powierzchnia)" stroke-width="2"
+             class="punkt-proby${i === wybrany ? " wybrany" : ""}" data-i="${i}"/>`;
+      g += `<text x="${px(i)}" y="${py(i)-13}" text-anchor="middle" font-size="11"
+             font-weight="600" data-i="${i}"
+             fill="${rekord ? "var(--plan)" : "var(--tekst)"}"
+             class="etykieta-proby${i === wybrany ? " wybrany" : ""}"
+             >${liczba(v[i],seria.miejsc)} ${seria.jednostka}</text>`;
+    }
+    g += `<rect x="${xProby(i)-G.odstep/2}" y="0" width="${G.szerSlupka+G.odstep}"
+           height="${wysCalk}" fill="transparent" class="proba-punkt" data-i="${i}"/>`;
+  });
+  g += `</svg>`;
+
+  return `<div class="seria">
+      <p class="podpis-serii">${seria.nazwa} <span>${seria.jednostka}</span></p>
+      <div class="wykres">${os}<div class="ramka">${g}</div></div>
+    </div>`;
+}
+
+function wykresySerii(lista, wybrany, seg){
+  const naj = Math.min(...lista.map(x => x.czas_s));
+  const iPB = lista.findIndex(x => x.czas_s === naj);
+  return SERIE.map(x => wykresSerii(lista, wybrany, seg, x, iPB)).join("");
+}
+
 
 function panelProby(seg, pr, najlepszyCzas, numer, ile){
   const j = pr.jazda;
@@ -2002,11 +2036,16 @@ const porownaniaS = (id) => {
       z koła kolegi wygląda jak forma.
     </p>
     <div id="wykres-prob">${wykresProb(lista, wybrany, najlepszy)}</div>
-    <p class="podpis-wykresu">Prędkość średnia na tej samej próbie. Punkt stoi
-      dokładnie nad słupkiem powyżej, a oba wykresy przewijają się razem.
-      Oś jest dopasowana do zakresu, nie zaczyna się od zera — w linii wartość
-      niesie położenie punktu, a nie wysokość, więc wolno ją przybliżyć.</p>
-    <div id="wykres-predkosci">${wykresPredkosci(lista, wybrany, seg)}</div>
+    <p class="podpis-wykresu">Poniżej te same próby w innych miarach. Każda ma
+      własny pas i własną oś, bo prędkość, waty i uderzenia serca nie mieszczą
+      się na jednej skali — a dwie skale na jednym rysunku pozwalają udowodnić
+      dowolną tezę samym przesunięciem zakresu. Wspólna oś pozioma i wspólne
+      zaznaczenie sprawiają, że czyta się to jak jeden wykres.
+      Pas pojawia się tylko wtedy, gdy pomiar istnieje: moc mają dziś wyłącznie
+      próby ze Zwiftu, a pas tętna zjawi się sam, gdy zacznie się zapisywać.
+      Osie tych pasów nie zaczynają się od zera — w linii wartość niesie
+      położenie punktu, a nie wysokość, więc wolno ją przybliżyć.</p>
+    <div id="wykres-serii">${wykresySerii(lista, wybrany, seg)}</div>
     <div class="info" id="info-proby">${
       panelProby(seg, lista[wybrany], najlepszy, wybrany+1, lista.length)}</div>
     <div id="notatka-miejsce">${notatkaHTML(lista[wybrany].id || "")}</div>
@@ -2024,19 +2063,21 @@ function podepnijProby(){
   const lista = probySegmentu(id);
   const najlepszy = Math.min(...lista.map(x => x.czas_s));
 
-  const pojemnikV = document.getElementById("wykres-predkosci");
+  const pojemnikV = document.getElementById("wykres-serii");
 
+  // Zaznaczenie PRZEKŁADA KLASY, nie przerysowuje wykresów. Wcześniej każde
+  // dotknięcie budowało SVG od nowa, więc animacja wyrastania grała od zera
+  // i wykres migał. Etykiety wszystkich prób są narysowane z góry i schowane
+  // przezroczystością — widoczna jest ta z klasą "wybrany".
   const wybierz = (i) => {
     if (i == null || i < 0 || i >= lista.length || i === wybranaProba) return;
     wybranaProba = i;
-    // Oba wykresy przerysowujemy razem — jedna próba, dwa spojrzenia na nią.
-    // Przewinięcie zapamiętujemy, żeby wybór nie szarpał widokiem.
-    const przewiniecie = (pojemnik.querySelector(".ramka") || {}).scrollLeft || 0;
-    pojemnik.innerHTML = wykresProb(lista, i, najlepszy);
-    pojemnikV.innerHTML = wykresPredkosci(lista, i, seg);
-    for (const r of document.querySelectorAll("#wykres-prob .ramka, #wykres-predkosci .ramka"))
-      r.scrollLeft = przewiniecie;
-    podepnijPrzewijanie();
+    for (const el of document.querySelectorAll(
+        "#wykres-prob [data-i], #wykres-serii [data-i]")){
+      const akt = +el.dataset.i === i;
+      el.classList.toggle("wybrany", akt);
+      if (el.tagName === "circle") el.setAttribute("r", akt ? 6.5 : 4.5);
+    }
     document.getElementById("info-proby").innerHTML =
       panelProby(seg, lista[i], najlepszy, i+1, lista.length);
     document.getElementById("notatka-miejsce").innerHTML =
@@ -2058,7 +2099,7 @@ function podepnijProby(){
   let wRuchu = false;
   function podepnijPrzewijanie(){
     const ramki = [...document.querySelectorAll(
-      "#wykres-prob .ramka, #wykres-predkosci .ramka")];
+      "#wykres-prob .ramka, #wykres-serii .ramka")];
     for (const r of ramki){
       r.addEventListener("scroll", () => {
         if (wRuchu) return;
@@ -2069,7 +2110,7 @@ function podepnijProby(){
     }
   }
   podepnijPrzewijanie();
-  for (const r of document.querySelectorAll("#wykres-predkosci .ramka"))
+  for (const r of document.querySelectorAll("#wykres-serii .ramka"))
     r.scrollLeft = (pojemnik.querySelector(".ramka") || {}).scrollLeft || 0;
 
   // ── notatki ──────────────────────────────────────────────────────────────

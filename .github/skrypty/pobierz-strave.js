@@ -91,7 +91,12 @@ function wyciagnijProby(jazda){
       // moc [S] — estymata Stravy. device_watts == true znaczyłoby miernik mocy,
       // którego Fryderyk nie ma; do listopada 2026 zawsze będzie tu estymata.
       moc_S: e.average_watts == null ? null : Number(e.average_watts.toFixed(1)),
-      z_miernika: e.device_watts === true ? 1 : 0
+      z_miernika: e.device_watts === true ? 1 : 0,
+      // Tętno na segmencie. Dziś puste we WSZYSTKICH próbach, bo konto Garmina
+      // było dziecięce i blokowało dane zdrowotne (odblokowanie 22.08.2026).
+      // Zapisujemy je mimo to: pierwsza jazda z pomiarem wypełni pole sama,
+      // a strona sama dorysuje pas tętna, gdy zobaczy w danych pierwszą liczbę.
+      tetno: e.average_heartrate == null ? null : Math.round(e.average_heartrate)
     });
   }
   return { proby, segmenty };

@@ -148,6 +148,29 @@ nie kolor: sylwetka roweru vs ekranu, słupek kreskowany vs pełny.
   moc i różnica do rekordu. Szara kreska = rekord, słupek kreskowany = Zwift.
   Kółko ze strzałką wraca do stanu pustego.
 
+  **Wybór próby NIE przerysowuje wykresów** (21.08.2026). Etykiety wszystkich
+  prób są narysowane od razu i schowane przezroczystością; zaznaczenie to
+  wyłącznie przełożenie klasy `wybrany`. Wcześniej każde dotknięcie budowało
+  SVG od nowa, więc animacja wyrastania grała od zera i wykres migał. **Nie
+  wracać do przerysowywania przez `innerHTML`** — panel i notatka mogą się
+  przerysowywać, bo nie mają animacji.
+
+  **Pasy serii pod wykresem czasu: prędkość, moc, tętno.** Każda miara ma
+  własny pas i własną oś. **Nigdy nie łączyć ich w jeden rysunek o dwóch czy
+  trzech osiach** — wystarczy przesunąć zakres jednej, żeby dowieść dowolnej
+  tezy o tym, że moc „idzie za" prędkością. Wspólna oś pozioma i wspólne
+  zaznaczenie sprawiają, że czyta się to jak jeden wykres. Pas pojawia się
+  tylko wtedy, gdy pomiar istnieje: moc mają dziś wyłącznie próby ze Zwiftu,
+  a **pas tętna zjawi się sam** pierwszego dnia, w którym Garmin je zapisze
+  (`tetno` w `proby`, z `average_heartrate`). Przerwa w pomiarach rozcina
+  linię, zamiast ją zmyślać.
+
+  **Zieleń na pasach wskazuje próbę, która jest rekordem CZASU** — tę samą na
+  każdym pasie, nie maksimum danej miary. Na pasie tętna zieleń przy najniższej
+  wartości oznaczałaby najczęściej po prostu wolniejszą jazdę, czyli pochwałę
+  za nic. Gdy rekordowa próba nie ma danego pomiaru, zieleni tam po prostu nie
+  ma.
+
   **Drugi wykres pod pierwszym: prędkość, linią.** Ta sama geometria pozioma
   (`G`, `xProby`), więc punkt stoi dokładnie nad słupkiem tej samej próby,
   a obie ramki przewijają się razem (strażnik `wRuchu` przeciw zapętleniu).
