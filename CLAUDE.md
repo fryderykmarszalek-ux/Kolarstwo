@@ -254,14 +254,25 @@ nie kolor: sylwetka roweru vs ekranu, słupek kreskowany vs pełny.
   odcinek jak jedno dłuższe. Ścinanie krzywej do monotonicznej zaniżałoby
   prawdziwy pomiar. Wyjaśnienie stoi na stronie, w opisie krzywej.
 
-  **ERG — znacznik przy jeździe, kryterium LICZBOWE** (21.08.2026). Strava
-  nie ma pola „to był ERG". Rozstrzyga iloraz: rekord 5-sekundowy podzielony
-  przez rekord z najdłuższego okna tej jazdy. Trenażer w ERG trzyma zadaną moc,
-  więc pięć sekund ledwie odstaje od dwudziestu minut. Zmierzone na komplecie:
-  treningi sterowane 1,05–1,48, wyścig 3,04, sesje ze sprintami 5,84–6,50 —
-  rozdział jest ostry, próg 1,5 nie jest naciągany. Wychodzi 12 jazd
-  sterowanych z 17. Nazwa treningu Zwifta (`NAZWY_PLANOW`) to tylko zapasowy
-  trop, gdy krzywej nie ma.
+  **ERG — znacznik przy jeździe, kryterium LICZBOWE** (21.08.2026, przelicznik
+  poprawiony 22.08.2026). Strava nie ma pola „to był ERG". Rozstrzyga iloraz:
+  **rekord 5-sekundowy ÷ rekord 15-minutowy tej samej jazdy**. Trenażer w ERG
+  trzyma zadaną moc, więc pięć sekund ledwie odstaje od kwadransa. Zmierzone
+  na komplecie 17 jazd: treningi sterowane **1,04–1,48**, wyścig **2,90**,
+  sesje ze sprintami **5,79–6,50**. Między grupami leży pusty pas, więc próg
+  **2,0** stoi w jego środku i ma zapas w obie strony. Wychodzi 13 jazd
+  sterowanych z 17.
+
+  Mianownikiem jest 15 min, bo to okno Zwift oddaje najczystszym pomiarem —
+  decyzja Fryderyka. Poprzednia wersja dzieliła przez najdłuższe okno jazdy
+  i przy progu 1,5 wypychała „Foundation on Sprinter's Playground" (1,69)
+  do grupy wolnej mocy, choć to trening po planie. Nowy przelicznik daje mu
+  1,48 i wkłada go tam, gdzie należy.
+
+  Gdy jazda nie ma okna 15-minutowego, bierzemy najdłuższe dostępne, ale tylko
+  powyżej 5 minut — na krótszym odcinku ten iloraz nic nie znaczy i wtedy
+  jazdy nie klasyfikujemy. Nazwa treningu Zwifta (`NAZWY_PLANOW`) to zapasowy
+  trop, gdy krzywej nie ma w ogóle.
 
   **Nie klasyfikować po nazwie.** Sesja „Strength" chodzi w ERG, ale sprint
   w środku jest prawdziwy, bo ERG puszcza przy maksymalnym wysiłku. Znacznik
@@ -289,7 +300,10 @@ nie kolor: sylwetka roweru vs ekranu, słupek kreskowany vs pełny.
   **Kontrola poprawności:** wyliczone rekordy z wyścigu 18.10.2025 zgadzają się
   z tabelą w `TRENING.md` §8.1 co do wata — 30 s 271, 10 min 157, 20 min 148,
   30 min 143; sprint z 01.11 daje 702 W, tak jak notuje `TRENING.md`.
-- **Z2–Z5** — miejsca zarezerwowane, świadomie zostawione (Fryderyk chce
+- **Prognozy** (22.08.2026) — zakładka z dwiema pustymi podzakładkami
+  „XII 2026" i „XII 2027". Treść wchodzi później; tabele prognoz i przypisane
+  im testy weryfikacyjne czekają w `STRONA.md` §11 i `TRENING.md` §10.
+- **Z3–Z5** — miejsca zarezerwowane, świadomie zostawione (Fryderyk chce
   widzieć docelowy kształt strony)
 - Ikony kolarskie w tle (7 sylwetek, losowe z ustalonego ziarna, pasy przy
   krawędziach, krycie 17% jasny / 10% ciemny)

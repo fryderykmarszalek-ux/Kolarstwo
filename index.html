@@ -1118,16 +1118,22 @@ function adresStravy(a){ return "https://www.strava.com/activities/" + a.id; }
    Strava nie ma pola „to był ERG". Rozpoznajemy go z dwóch niezależnych
    tropów, bo żaden sam nie wystarcza:
 
-   Rozstrzyga LICZBA, nie nazwa: iloraz rekordu 5-sekundowego przez rekord
-   z najdłuższego okna tej jazdy. ERG trzyma zadaną moc, więc pięć sekund
-   ledwie odstaje od dwudziestu minut. Zmierzone na tych danych:
+   Rozstrzyga LICZBA, nie nazwa: rekord 5-sekundowy podzielony przez rekord
+   15-minutowy tej samej jazdy. ERG trzyma zadaną moc, więc pięć sekund ledwie
+   odstaje od kwadransa. Zmierzone na komplecie 17 jazd:
 
-     Foundation / Tempo / Recovery / Intermittent   1,05 - 1,48   -> sterowane
-     wyścig                                          3,04         -> wolna moc
-     sesje Strength ze sprintami                     5,84 - 6,50  -> wolna moc
+     Foundation / Tempo / Recovery / Intermittent   1,04 - 1,48   -> sterowane
+     wyścig                                          2,90         -> wolna moc
+     sesje Strength ze sprintami                     5,79 - 6,50  -> wolna moc
 
-   Rozdział jest ostry, więc próg 1,5 nie jest naciągany. Nazwa treningu
-   Zwifta służy tylko jako zapasowy trop, gdy krzywej nie ma.
+   Między grupami leży pusty pas od 1,48 do 2,90, więc próg 2,0 stoi w jego
+   środku i ma zapas w obie strony. Mianownikiem jest 15 min, bo to okno
+   Zwift oddaje najczystszym pomiarem (decyzja Fryderyka z 21.08.2026).
+
+   Gdy jazda nie ma okna 15-minutowego, bierzemy najdłuższe dostępne, ale
+   tylko powyżej 5 minut — na krótszym odcinku ten iloraz nic nie znaczy
+   i wtedy jazdy po prostu nie klasyfikujemy. Nazwa treningu Zwifta służy
+   jako zapasowy trop, gdy krzywej nie ma w ogóle.
 
    Dlaczego nie po nazwie: sesja „Strength" chodzi w ERG, ale sprint w środku
    jest prawdziwy, bo ERG puszcza przy maksymalnym wysiłku. Znacznik po nazwie
@@ -1137,17 +1143,23 @@ function adresStravy(a){ return "https://www.strava.com/activities/" + a.id; }
 
 const NAZWY_PLANOW = /^Zwift\s*-\s*(Foundation|Tempo|Strength|Intermittent|Active Recovery|Recovery|Endurance|Threshold|Sweet ?Spot|VO2|Build|Base|Interval)/i;
 
+const OKNO_ODNIESIENIA = 900;      // 15 min
+const MIN_ODNIESIENIE = 300;       // poniżej 5 min iloraz nic nie znaczy
+const PROG_ERG = 2.0;              // środek pustego pasa 1,48 - 2,90
+
 const PLASKOSC = new Map((D.moc_krzywe || []).map(k => {
   const okna = Object.keys(k.w).map(Number).sort((a,b) => a-b);
   const krotkie = k.w[5] != null ? k.w[5] : k.w[okna[0]];
-  const dlugie = k.w[okna[okna.length-1]];
+  const najdluzsze = okna[okna.length-1];
+  const dlugie = k.w[OKNO_ODNIESIENIA] != null ? k.w[OKNO_ODNIESIENIA]
+    : (najdluzsze >= MIN_ODNIESIENIE ? k.w[najdluzsze] : null);
   return [k.a, dlugie ? krotkie/dlugie : null];
 }));
 
 function jestErg(jazda){
   if (!jazda || jazda.typ !== "VirtualRide") return false;
   const p = PLASKOSC.get(jazda.id);
-  if (p != null) return p < 1.5;        // profil tak równy, że musiał być trzymany
+  if (p != null) return p < PROG_ERG;   // profil tak równy, że musiał być trzymany
   return NAZWY_PLANOW.test(jazda.nazwa || "");   // brak krzywej — zostaje nazwa
 }
 
@@ -1156,7 +1168,7 @@ function znacznikErg(jazda, tytul){
   const p = PLASKOSC.get(jazda.id);
   return `<span class="znacznik-erg" title="${tytul || "Trening ze sterowaną mocą"
     } — w trybie ERG trenażer trzyma zadaną moc, więc liczba mówi, co kazał program${
-    p != null ? `. Płaskość krzywej: ${liczba(p,2)}` : ""}">ERG</span>`;
+    p != null ? `. Iloraz 5 s / 15 min: ${liczba(p,2)}` : ""}">ERG</span>`;
 }
 
 function ikonaDyscypliny(typ, rozmiar){
@@ -1179,8 +1191,7 @@ function ikonaDyscypliny(typ, rozmiar){
 const pusto = (nazwa) => `
   <div class="pusto">
     <span class="znak">${nazwa}</span>
-    Miejsce zarezerwowane. Zakładka dostanie nazwę i treść,
-    kiedy będzie co w niej pokazać.
+    Miejsce zarezerwowane. Treść pojawi się, kiedy będzie co pokazać.
   </div>`;
 
 const przegladStart = () => `
@@ -2698,11 +2709,12 @@ const daneMocy = (arg) => {
       przy maksymalnym wysiłku. Dlatego rekordy sekundowe z sesji „Strength"
       są Twoje, a rekordy dwudziestominutowe z sesji „Foundation" to plan.
       <br>Rozstrzyga liczba, nie nazwa: rekord 5-sekundowy podzielony przez
-      rekord z najdłuższego okna tej jazdy. Treningi sterowane mieszczą się
-      w 1,05–1,48, wyścig ma 3,04, a sesje ze sprintami od 5,84 do 6,50 —
-      rozdział jest ostry, więc próg 1,5 nie jest naciągany. Dzięki temu
-      sprint 702 W z sesji „Strength" NIE dostaje znacznika, choć sama sesja
-      szła po planie: liczba widzi to, czego nazwa nie widzi.
+      rekord 15-minutowy tej samej jazdy. Treningi sterowane mieszczą się
+      w 1,04–1,48, wyścig ma 2,90, a sesje ze sprintami od 5,79 do 6,50.
+      Między grupami leży pusty pas, więc próg 2,0 stoi w jego środku i ma
+      zapas w obie strony. Dzięki temu sprint 702 W z sesji „Strength" NIE
+      dostaje znacznika, choć sama sesja szła po planie: liczba widzi to,
+      czego nazwa nie widzi.
     </div>
   </section>`;
 };
@@ -2846,7 +2858,11 @@ const SEKCJE = [
       { id:"porownania", tytul:"Porównania S", rysuj: porownaniaS },
       { id:"dane", tytul:"Dane", rysuj: daneMocy }
   ]},
-  ...[2,3,4,5].map(n => ({
+  { id:"prognozy", tytul:"Prognozy", barwa:"limonka", pod:[
+      { id:"xii-2026", tytul:"XII 2026", rysuj: () => pusto("XII 2026") },
+      { id:"xii-2027", tytul:"XII 2027", rysuj: () => pusto("XII 2027") }
+  ]},
+  ...[3,4,5].map(n => ({
     id:"z"+n, tytul:"Z"+n, barwa:["fiolet","limonka","fuksja","cyjan","pomarancz"][n-1],
     pod:[1,2,3].map(m => ({
       id:"z"+n+"-"+m, tytul:"Z"+n+"."+m, rysuj: () => pusto("Z"+n+"."+m)
