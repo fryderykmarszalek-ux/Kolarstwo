@@ -36,7 +36,10 @@ const PELNE_SEGMENTY = process.env.PELNE_SEGMENTY === "true";
 // liczb na jazdę zamiast kilku tysięcy. Strumień pobieramy WYŁĄCZNIE dla jazd
 // z device_watts, czyli tam, gdzie moc jest mierzona, a nie zgadywana — dziś
 // to Zwift, a po kupnie miernika ta sama reguła obejmie szosę bez zmian w kodzie.
-const CZASY_KRZYWEJ = [1,5,10,15,30,60,120,300,480,600,720,1200,1800,2700,3600,5400];
+// 15 min zamiast 12: decyzja Fryderyka z 21.08.2026. Dwunastka nie jest
+// standardowym oknem i to na parze 10/12 min najczęściej widać, że maksimum
+// średniej kroczącej nie musi maleć z długością okna.
+const CZASY_KRZYWEJ = [1,5,10,15,30,60,120,300,480,600,900,1200,1800,2700,3600,5400];
 const PELNA_MOC = process.env.PELNA_MOC === "true";
 
 function wczytajStare(){

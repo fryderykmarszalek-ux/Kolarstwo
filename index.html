@@ -1517,6 +1517,9 @@ const SEGMENTY = (() => {
       // Zwift czy szosa — bierzemy z jazdy, w której padł najlepszy czas,
       // bo to jej dotyczą wszystkie liczby w wierszu.
       zwift: jazda ? jazda.typ === "VirtualRide" : false,
+      // Jazda, z której pochodzą wszystkie liczby w wierszu — potrzebna,
+      // żeby powiedzieć, czy ten najlepszy czas padł przy sterowanej mocy.
+      jazdaNaj: jazda || null,
       prob: proby.length,
       data: jazda ? jazda.data.slice(0,10) : null
     });
@@ -1611,7 +1614,8 @@ function wierszeSegmentow(){
         <a class="seg-nazwa" href="#postepy/porownania/${x.id}"
            title="Pokaż wszystkie próby na tym segmencie">${x.zwift
           ? `<span class="seg-zwift" title="Zwift — trenażer, nie szosa">${
-              ikonaDyscypliny("VirtualRide",14)}</span>` : ""}${bezpieczny(x.nazwa)}<span
+              ikonaDyscypliny("VirtualRide",14)}</span>` : ""}${bezpieczny(x.nazwa)}${
+          znacznikErg(x.jazdaNaj, "Najlepszy czas padł na treningu ze sterowaną mocą")}<span
           class="strzalka-wew" aria-hidden="true">›</span></a>
         <span class="seg-data">${x.zwift ? "Zwift · " : ""}${
           x.data ? "najlepsza próba " + pl(x.data) : ""}</span>
@@ -1844,12 +1848,14 @@ const DZIALKI_CZASU = [5,10,15,20,30,60,120,300,600,900,1800,3600];
    klasy. Przerysowywanie kasowało węzły SVG, więc animacja wyrastania grała
    od nowa przy każdym dotknięciu słupka i wykres "ładował się od zera". */
 function wykresProb(lista, wybrany, najlepszyCzas){
+  // Miejsce pod datą na podpis ERG — bez tego napis wchodziłby na oś.
+  const maErg = lista.some(x => jestErg(x.jazda));
   // Przy remisie rekordem jest próba, w której czas padł PIERWSZY raz.
   // Bez tego cztery jednakowe przejazdy dostawały cztery napisy „PB",
   // a na pasach niżej zieleń stała tylko przy jednym — dwie różne odpowiedzi
   // na to samo pytanie.
   const iPB = lista.findIndex(x => x.czas_s === najlepszyCzas);
-  const wys = 230, marDol = 42;
+  const wys = 230, marDol = maErg ? 56 : 42;
   const szer = szerProb(lista.length);
   const gora = Math.max(...lista.map(x => x.czas_s)) * 1.1;
   const krok = DZIALKI_CZASU.find(k => gora/k <= 6) || 3600;
@@ -1913,6 +1919,12 @@ function wykresProb(lista, wybrany, najlepszyCzas){
              font-size="9.5" font-weight="600" fill="var(--slaby)">${d.slice(0,4)}</text>`;
       rokPop = d.slice(0,4);
     }
+    // Podpis przy każdej próbie ze sterowaną mocą — na wykresie ma być widać,
+    // które słupki mówią o zawodniku, a które o tym, co kazał program.
+    if (jestErg(pr.jazda))
+      g += `<text x="${xProby(i)+G.szerSlupka/2}" y="${G.marGora+wys+45}" text-anchor="middle"
+             font-size="9" font-weight="700" letter-spacing=".04em"
+             fill="var(--seria-moc)">ERG</text>`;
   });
   g += `<line x1="0" y1="${G.marGora+wys}" x2="${szer}" y2="${G.marGora+wys}"
          stroke="var(--slaby)" stroke-width="1"/></svg>`;
@@ -2123,6 +2135,14 @@ function wnioskiSegmentu(lista, seg){
       `RPE znane dla ${rpe.length} z ${lista.length} prób, średnio `
       + `${liczba(rpe.reduce((a,b)=>a+b,0)/rpe.length,1)}`
       + (pb.jazda.rpe != null ? `; rekord przy RPE ${pb.jazda.rpe}.` : ".") });
+
+  const ergowe = lista.filter(x => jestErg(x.jazda)).length;
+  if (ergowe)
+    w.push({ etykieta:"Moc sterowana", ostrzezenie: ergowe === lista.length, tekst:
+      `${ergowe} z ${lista.length} prób pochodzi z treningu w trybie ERG, `
+      + `gdzie trenażer trzymał zadaną moc. ${ergowe === lista.length
+          ? "Wszystkie — czas na tym segmencie mówi więc o planie treningu, nie o formie."
+          : "Przy tych próbach liczba opisuje plan, nie możliwości."}` });
 
   const zMoca = lista.filter(x => x.moc_S != null);
   if (zMoca.length)
@@ -2476,8 +2496,9 @@ function podepnijProby(){
    ========================================================================== */
 
 const OKNA_OPISY = { 1:"1 s", 5:"5 s", 10:"10 s", 15:"15 s", 30:"30 s",
-  60:"1 min", 120:"2 min", 300:"5 min", 480:"8 min", 600:"10 min", 720:"12 min",
-  1200:"20 min", 1800:"30 min", 2700:"45 min", 3600:"1 h", 5400:"1,5 h" };
+  60:"1 min", 120:"2 min", 300:"5 min", 480:"8 min", 600:"10 min",
+  900:"15 min", 1200:"20 min", 1800:"30 min", 2700:"45 min", 3600:"1 h",
+  5400:"1,5 h" };
 
 function oknoNaTekst(sek){ return OKNA_OPISY[sek] || czasNaTekst(sek); }
 
