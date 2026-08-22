@@ -269,8 +269,18 @@ nie kolor: sylwetka roweru vs ekranu, słupek kreskowany vs pełny.
   `TRENING.md` §8.1 mówi „15 z 17 w ERG" i liczy zamiar; ta reguła liczy
   dowód — stąd 12, nie 15, i to jest właściwa różnica.
 
-  Znacznik stoi na liście jazd (Start), w panelu próby (Porównania S) oraz
-  w kafelkach, tabeli i historii rekordów (Dane).
+  Znacznik stoi w pięciu miejscach: lista jazd (Start), nazwa w tabeli
+  segmentów (przy najlepszej próbie), podpis pod każdym słupkiem na wykresie
+  prób, panel wybranej próby oraz kafelki, tabela i historia rekordów (Dane).
+  Wnioski mają osobną linijkę „Moc sterowana"; gdy sterowane są wszystkie
+  próby, staje się ostrzeżeniem, bo czas na takim segmencie opisuje plan
+  treningu, a nie formę.
+
+  **Okno 12 min wypadło, weszło 15 min** (21.08.2026, decyzja Fryderyka).
+  To na parze 10/12 min najczęściej wychodził tik w górę opisany niżej.
+  Zamiana usuwa tę jedną parę, nie samo zjawisko — przy innych danych tik może
+  wyjść gdzie indziej i nadal nie będzie błędem. Po zmianie krzywa rekordów
+  schodzi bez ani jednego wzrostu: 161 → 157 → 155 → 148 W.
 
   **Krzywa mocy ma drugą oś: W/kg.** To NIE jest druga seria ani drugi zakres
   — te same waty podzielone przez masę zawodnika, przez to samo zero. Zakaz
