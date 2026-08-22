@@ -300,9 +300,60 @@ nie kolor: sylwetka roweru vs ekranu, słupek kreskowany vs pełny.
   **Kontrola poprawności:** wyliczone rekordy z wyścigu 18.10.2025 zgadzają się
   z tabelą w `TRENING.md` §8.1 co do wata — 30 s 271, 10 min 157, 20 min 148,
   30 min 143; sprint z 01.11 daje 702 W, tak jak notuje `TRENING.md`.
-- **Prognozy** (22.08.2026) — zakładka z dwiema pustymi podzakładkami
-  „XII 2026" i „XII 2027". Treść wchodzi później; tabele prognoz i przypisane
-  im testy weryfikacyjne czekają w `STRONA.md` §11 i `TRENING.md` §10.
+- **Prognozy → XII 2026 i XII 2027** (22.08.2026) — krzywa mocy, której
+  jeszcze nie ma. Prognoza (zielona) i dzisiejszy rekord na to samo okno
+  (cienka bursztynowa) na jednym rysunku, pod spodem lista celów z ptaszkiem
+  i krzyżykiem, na końcu osobna karta FTP.
+
+  **Mini-zakładki biorą się z `dane.js` → `prognozy.okresy`** — kod nie zna
+  żadnej z nazwy. Dopisanie okresu tworzy zakładkę, usunięcie ją zabiera.
+  To ta sama zasada co cel 80 km: liczba wpisana w kod wykresu byłaby drugim
+  źródłem prawdy.
+
+  **Dwie krzywe na jednym rysunku to NIE złamanie zakazu dwóch osi.** Zakaz
+  dotyczy dwóch RÓŻNYCH miar na dwóch skalach. Tu jest jedna miara (waty na
+  dane okno) w dwóch momentach: dziś i za cztery miesiące. Odległość między
+  liniami jest całą treścią tego wykresu — rozdzielone na dwa rysunki nie
+  powiedziałyby nic.
+
+  **Barwy bez nowego wpisu do palety.** Prognoza JEST celem, więc jest
+  zielona (`--plan`) — ta sama rola co linia planu na C1. „Dziś" JEST
+  pomiarem mocy, więc jest bursztynowe (`--seria-moc`) — ta sama rola co na
+  krzywej rekordów. Czerwień przy krzyżyku rozszerza rolę alarmu z „przerwa
+  ponad limit" na „cel niedowieziony"; zieleń i czerwień stoją tu naprzeciw
+  siebie jako dwie odpowiedzi na to samo pytanie. Walidacja palety pozostaje
+  w mocy, bo żadnej barwy nie dołożono.
+
+  **Ptaszek/krzyżyk i bieżące FTP: dwie warstwy, jak notatki do prób.**
+  `dane.js` → `prognozy.wyniki` i `prognozy.ftp_biezace` to źródło prawdy,
+  `localStorage` (`kolarstwo-prognozy`) to brudnopis urządzenia. Brudnopis
+  zrównany z danymi kasuje się sam. Brudnopis wygrywa **także gdy trzyma
+  `null`** — inaczej nie dałoby się na urządzeniu ZDJĄĆ znaku wpisanego
+  w danych. Przycisk „Zaznaczenia dla Claude'a…" wypisuje je jako JSON do
+  wklejenia w czacie. Strona nadal nie umie pisać do repozytorium i nie ma
+  umieć: klucz do zapisu w publicznym repo byłby kluczem dla wszystkich.
+
+  **Strona sama nie stawia ptaszka**, choć wie, ile brakuje. Termin
+  (31.12.2026) nie minął, a cel osiągnięty raz na Zwifcie to nie to samo co
+  cel dowieziony — rozstrzyga Fryderyk. Wiersz pokazuje więc pomiar i różnicę,
+  a znak zostaje decyzją.
+
+  **Dwa różne FTP i to jest celowe.** `zalozenia.FTP_W` = 180 W z tagiem
+  `[E]` (estymata z modelu, przedział 170–200). `prognozy.ftp_biezace` = 150 W
+  — deklaracja Fryderyka z 22.08.2026. Zmierzone dwadzieścia minut to 148 W,
+  czyli reguła „FTP ≈ 0,95 × 20 min" daje 141 W, a własna estymata Stravy
+  też 141 W. Bliżej prawdy jest liczba niższa i strona to mówi wprost
+  w bloku pod kartą FTP. Nie zlewać tych dwóch pól w jedno.
+
+  **Okno 40 s weszło do `CZASY_KRZYWEJ`** w automacie, bo Fryderyk postawił
+  na nie cel, a celu, którego nikt nie mierzy, nie da się nigdy rozstrzygnąć.
+  Nie kosztuje ani jednego zapytania więcej — liczy się z tego samego
+  strumienia. Historia wypełnia się przy przebiegu z `pelna_moc`.
+
+  Podpis punktu na krzywej schodzi POD punkt, gdy wpadłby na poprzedni.
+  Samo rozsuwanie w pionie o stałą wartość tu nie działa: przy stromym
+  zejściu krzywej podniesiony podpis niższego punktu ląduje dokładnie na
+  wysokości podpisu wyższego (40 s i 1 min zlewały się w plamę).
 - **Z3–Z5** — miejsca zarezerwowane, świadomie zostawione (Fryderyk chce
   widzieć docelowy kształt strony)
 - Ikony kolarskie w tle (7 sylwetek, losowe z ustalonego ziarna, pasy przy

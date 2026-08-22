@@ -113,6 +113,84 @@ cele: {
   }
 },
 
+prognozy: {
+  "_opis": "Prognozy mocy — DECYZJE Fryderyka, nie pomiary. Wykres i lista na zakładce Prognozy czytają je STĄD, tak samo jak cel 80 km czy plan objętości. Liczba wpisana w kod wykresu byłaby drugim źródłem prawdy. Dopisanie okresu do listy tworzy nową mini-zakładkę — kod jej nie zna z nazwy.",
+  "ftp_biezace": {
+    "v": 150,
+    "tag": "Z",
+    "od": "2026-08-22",
+    "zrodlo": "deklaracja Fryderyka 22.08.2026",
+    "uwaga": "To NIE jest to samo co zalozenia.FTP_W (180 W, tag [E], estymata z modelu). Tu stoi liczba, którą Fryderyk uznaje za swoją; strona pozwala ją zmienić na urządzeniu, a trwale zmienia ją wpis TUTAJ."
+  },
+  "okresy": [
+    {
+      "id": "xii-2026",
+      "tytul": "XII 2026",
+      "na_kiedy": "2026-12-31",
+      "ustalone": "2026-08-22",
+      "ftp": 225,
+      "cele": [
+        {
+          "s": 5,
+          "w": 720
+        },
+        {
+          "s": 40,
+          "w": 545
+        },
+        {
+          "s": 60,
+          "w": 480
+        },
+        {
+          "s": 300,
+          "w": 300
+        },
+        {
+          "s": 1200,
+          "w": 225
+        },
+        {
+          "s": 3600,
+          "w": 212
+        }
+      ]
+    },
+    {
+      "id": "xii-2027",
+      "tytul": "XII 2027",
+      "na_kiedy": "2027-12-31",
+      "ustalone": "2026-08-22",
+      "ftp": 275,
+      "cele": [
+        {
+          "s": 5,
+          "w": 920
+        },
+        {
+          "s": 40,
+          "w": 680
+        },
+        {
+          "s": 60,
+          "w": 585
+        },
+        {
+          "s": 300,
+          "w": 390
+        },
+        {
+          "s": 1200,
+          "w": 280
+        }
+      ]
+    }
+  ],
+  "wyniki": {
+    "_opis": "Rozstrzygnięcie celu: klucz = id okresu, w środku klucz = sekundy okna albo \"ftp\", wartość \"tak\" albo \"nie\". To jest ŹRÓDŁO PRAWDY — strona pozwala zaznaczyć ptaszek na urządzeniu, ale trwały zapis to wpis tutaj (przycisk na stronie wypisuje brudnopis do wklejenia)."
+  }
+},
+
 plan_objetosci: [
   {"od":"2026-09-01","do":"2026-09-07","godziny":3,"odciazenie":false},
   {"od":"2026-09-08","do":"2026-09-14","godziny":4,"odciazenie":false},

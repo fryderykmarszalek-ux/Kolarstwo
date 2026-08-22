@@ -473,6 +473,87 @@ table.segmenty.moc{min-width:520px}
 .kroki-mocy .odn:hover{color:var(--tekst);text-decoration:underline}
 rect.proba-punkt{cursor:pointer}
 
+/* --- Prognozy: krzywa, której jeszcze nie ma ---
+   Żadnej nowej barwy. Prognoza JEST celem, więc jest zielona — ta sama rola
+   co linia planu na wykresie godzin i zielony słupek dowiezionego tygodnia.
+   Krzywa „dziś" JEST pomiarem mocy, więc jest bursztynowa — ta sama rola co
+   na krzywej rekordów. Czerwień przy krzyżyku to rozszerzenie roli alarmu
+   z „przerwa ponad limit" na „cel niedowieziony"; zieleń i czerwień stoją tu
+   naprzeciw siebie jako dwie odpowiedzi na to samo pytanie. --- */
+.cele-prognozy{list-style:none;margin:0;padding:0;display:grid;gap:1px;
+  border:1px solid var(--linia);border-radius:10px;overflow:hidden}
+.cel-wiersz{display:flex;align-items:center;gap:8px 14px;flex-wrap:wrap;
+  padding:10px 13px;background:var(--powierzchnia);
+  border-top:1px solid var(--linia);transition:background .16s ease}
+.cel-wiersz:first-child{border-top:0}
+.cel-wiersz.zrobiony{background:color-mix(in srgb,var(--plan) 9%,var(--powierzchnia))}
+.cel-czas{font-weight:600;min-width:54px;font-variant-numeric:tabular-nums}
+.cel-waty{color:var(--plan);font-weight:600;font-size:15px;min-width:70px;
+  font-variant-numeric:tabular-nums}
+.cel-wkg{color:var(--slaby);font-size:12.5px;min-width:64px;
+  font-variant-numeric:tabular-nums}
+.cel-dzis{color:var(--slaby);font-size:12.5px;flex:1 1 200px;line-height:1.45}
+.cel-dzis b{color:var(--tekst);font-weight:600}
+.cel-znak{display:flex;gap:6px;margin-left:auto;flex:0 0 auto}
+.znak-tak.wybrany{color:var(--plan);border-color:var(--plan)}
+.znak-nie.wybrany{color:var(--alarm);border-color:var(--alarm)}
+.kolko-akcja.znak-tak:hover{color:var(--plan);border-color:var(--plan)}
+.kolko-akcja.znak-nie:hover{color:var(--alarm);border-color:var(--alarm)}
+/* Znaczek przy punkcie na krzywej. Rysowany od razu dla obu odpowiedzi
+   i schowany przezroczystością — ta sama zasada co etykiety prób: dotknięcie
+   przekłada klasę, nie buduje SVG od nowa. */
+text.znak-punktu{opacity:0;transition:opacity .14s ease;pointer-events:none}
+text.znak-punktu.wybrany{opacity:1}
+
+/* FTP ma własną kartę, bo jest jedną liczbą, wokół której kręci się reszta. */
+.ftp-blok{margin-top:6px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;
+  background:var(--plyta);border:1px solid var(--linia);border-radius:12px;
+  padding:16px 18px}
+.ftp-czlon{flex:1 1 200px;min-width:0;border-radius:10px;
+  transition:background .16s ease}
+.ftp-czlon.zrobiony{background:color-mix(in srgb,var(--plan) 9%,transparent);
+  padding:8px 10px;margin:-8px -10px}
+.ftp-etykieta{font-size:12px;color:var(--slaby)}
+.ftp-liczba{font-size:36px;font-weight:600;letter-spacing:-.025em;line-height:1.12;
+  font-variant-numeric:tabular-nums}
+.ftp-liczba.cel{color:var(--plan)}
+.ftp-stopka{font-size:12px;color:var(--slaby);margin-top:2px}
+.ftp-most{display:flex;flex-direction:column;align-items:center;gap:1px;
+  flex:0 0 auto;color:var(--slaby);font-size:12px;padding:0 2px;text-align:center}
+.ftp-most .strzalka{font-size:22px;line-height:1;color:var(--plan)}
+.ftp-most b{color:var(--tekst);font-weight:600}
+.ftp-wpis{display:flex;align-items:center;gap:7px;margin-top:1px}
+.ftp-wpis input{
+  width:104px;box-sizing:border-box;font:inherit;font-size:32px;font-weight:600;
+  letter-spacing:-.025em;text-align:right;font-variant-numeric:tabular-nums;
+  color:var(--tekst);background:var(--powierzchnia);
+  border:1px solid var(--linia);border-radius:9px;padding:2px 9px;
+  appearance:textfield;-moz-appearance:textfield;
+}
+.ftp-wpis input:focus{outline:0;border-color:var(--sek-kropka)}
+.ftp-wpis input::-webkit-outer-spin-button,
+.ftp-wpis input::-webkit-inner-spin-button{appearance:none;margin:0}
+.ftp-wpis .jedn{font-size:15px;color:var(--slaby);margin-right:2px}
+.ftp-znak{display:flex;gap:6px;margin-top:7px}
+#prognoza-stan{display:block;margin-top:8px;font-size:11.5px;color:var(--slaby)}
+#prognoza-eksport-pole{margin-top:8px;font-size:11.5px;width:100%;
+  box-sizing:border-box;resize:vertical;font-family:inherit;
+  color:var(--tekst);background:var(--powierzchnia);
+  border:1px solid var(--linia);border-radius:8px;padding:8px 10px}
+.prognoza-dol{display:flex;justify-content:space-between;align-items:center;
+  gap:10px;margin-top:10px;flex-wrap:wrap}
+/* Na telefonie wiersz celu łamie się przewidywalnie: liczby i znaki w jednej
+   linii, porównanie z dziś pod spodem. Bez tego jedne wiersze łamały się po
+   „dziś", a inne nie, i lista wyglądała na krzywą. */
+@media (max-width:560px){
+  .cel-wiersz{gap:6px 10px}
+  .cel-dzis{flex:1 0 100%;order:3;margin-top:1px}
+  .cel-znak{order:2}
+  .ftp-blok{gap:10px}
+  .ftp-most{flex-direction:row;gap:8px;width:100%;justify-content:flex-start}
+  .ftp-most .strzalka{transform:rotate(90deg)}   /* cel jest POD, nie obok */
+}
+
 /* --- Notatka do próby. Dwa kółka: ptaszek zapisuje, krzyżyk cofa. --- */
 .notatka{margin-top:14px;padding:12px 14px;border-radius:10px;
   background:var(--plyta);border:1px solid var(--linia)}
@@ -2506,7 +2587,7 @@ function podepnijProby(){
    listę i wykresy sama.
    ========================================================================== */
 
-const OKNA_OPISY = { 1:"1 s", 5:"5 s", 10:"10 s", 15:"15 s", 30:"30 s",
+const OKNA_OPISY = { 1:"1 s", 5:"5 s", 10:"10 s", 15:"15 s", 30:"30 s", 40:"40 s",
   60:"1 min", 120:"2 min", 300:"5 min", 480:"8 min", 600:"10 min",
   900:"15 min", 1200:"20 min", 1800:"30 min", 2700:"45 min", 3600:"1 h",
   5400:"1,5 h" };
@@ -2838,6 +2919,455 @@ function postepMocy(sek){
 }
 
 /* ==========================================================================
+   PROGNOZY — krzywa mocy, której jeszcze nie ma
+
+   Wszystko na tej zakładce to DECYZJA, nie pomiar: liczby wpisał Fryderyk,
+   a strona je tylko rysuje i zestawia z tym, co dziś naprawdę zmierzone.
+   Dlatego cele siedzą w dane.js (blok "prognozy"), a nie w kodzie wykresu —
+   tak samo jak cel 80 km i plan objętości. Dopisanie okresu do listy tworzy
+   nową mini-zakładkę; kod nie zna żadnej z nich z nazwy.
+
+   Rozstrzygnięcie („udało się" / „nie udało się") ma dwie warstwy, dokładnie
+   jak notatki do prób: dane.js jest źródłem prawdy, localStorage brudnopisem
+   tego urządzenia. Strona jest statyczna i nie ma jak zapisać czegokolwiek do
+   repozytorium — klucz do zapisu w publicznym repo byłby kluczem dla
+   wszystkich. To samo dotyczy bieżącego FTP.
+   ========================================================================== */
+
+const KLUCZ_PROGNOZ = "kolarstwo-prognozy";
+const PROGNOZY = (D.prognozy && D.prognozy.okresy) || [];
+const okresPrognozy = (id) => PROGNOZY.find(o => o.id === id) || null;
+
+function prognozyLokalne(){
+  try {
+    const o = JSON.parse(localStorage.getItem(KLUCZ_PROGNOZ) || "{}");
+    return { znaki: o.znaki && typeof o.znaki === "object" ? o.znaki : {},
+             ftp: typeof o.ftp === "number" ? o.ftp : null };
+  } catch(e){ return { znaki:{}, ftp:null }; }
+}
+function zapiszPrognozyLokalne(o){
+  try { localStorage.setItem(KLUCZ_PROGNOZ, JSON.stringify(o)); return true; }
+  catch(e){ return false; }          // prywatne okno albo brak miejsca
+}
+function znakZRepo(idOkresu, pole){
+  const w = ((D.prognozy || {}).wyniki || {})[idOkresu] || {};
+  const z = w[pole];
+  return z === "tak" || z === "nie" ? z : null;
+}
+// Brudnopis wygrywa, jeśli w ogóle istnieje — także wtedy, gdy trzyma null.
+// Bez tego nie dałoby się na urządzeniu ZDJĄĆ znaku wpisanego w danych.
+function znakBiezacy(idOkresu, pole){
+  const l = prognozyLokalne().znaki, k = idOkresu + "/" + pole;
+  return Object.prototype.hasOwnProperty.call(l, k) ? l[k] : znakZRepo(idOkresu, pole);
+}
+function ftpZRepo(){
+  const f = (D.prognozy || {}).ftp_biezace;
+  return f && f.v != null ? f.v : null;
+}
+function ftpBiezace(){
+  const l = prognozyLokalne();
+  return l.ftp != null ? l.ftp : ftpZRepo();
+}
+// Brudnopis zrównany z danymi nie ma po co żyć — ta sama zasada co przy notatkach.
+(function sprzatnijPrognozy(){
+  const l = prognozyLokalne();
+  let zmiana = false;
+  for (const k of Object.keys(l.znaki)){
+    const ciecie = k.indexOf("/");
+    if (ciecie < 0) continue;
+    if (l.znaki[k] === znakZRepo(k.slice(0,ciecie), k.slice(ciecie+1))){
+      delete l.znaki[k]; zmiana = true;
+    }
+  }
+  if (l.ftp != null && l.ftp === ftpZRepo()){ l.ftp = null; zmiana = true; }
+  if (zmiana) zapiszPrognozyLokalne(l);
+})();
+
+const rekordOkna = (s) => REKORDY_MOCY.find(r => r.sek === s) || null;
+
+/* Krzywa prognozy. Ta sama geometria co krzywa rekordów w zakładce Dane:
+   oś czasu logarytmiczna, oś W od zera, druga podziałka w W/kg po prawej.
+   Na tym samym rysunku stoi cienka krzywa „dziś" — to NIE jest druga miara
+   ani druga skala, tylko ta sama wielkość (waty na dane okno) w innym
+   momencie w czasie. Dlatego wolno jej tu być: wykres odpowiada na pytanie
+   „ile brakuje", a to widać wyłącznie przez odległość między liniami. */
+function wykresPrognozy(okres){
+  const cele = [...okres.cele].sort((a,b) => a.s - b.s);
+  if (cele.length < 2) return "";
+  const dzis = REKORDY_MOCY;
+
+  const W = 660, H = 320, lewy = 46, prawy = 40, gora = 34, dol = 40;
+  const px = W - lewy - prawy, py = H - gora - dol;
+  const sekundy = [...cele.map(c => c.s), ...dzis.map(r => r.sek)];
+  const minS = Math.min(...sekundy), maksS = Math.max(...sekundy);
+  const maksW = Math.max(...cele.map(c => c.w), ...dzis.map(r => r.waty));
+  const goraW = Math.ceil(maksW * 1.12 / 50) * 50;
+  const x = s => lewy + (Math.log(s) - Math.log(minS)) / (Math.log(maksS) - Math.log(minS)) * px;
+  const y = w => gora + py - (w / goraW) * py;
+
+  const masa = D.zalozenia && D.zalozenia.masa_zawodnika_kg
+    ? D.zalozenia.masa_zawodnika_kg.v : null;
+  const krokW = goraW > 600 ? 200 : goraW > 300 ? 100 : 50;
+
+  let g = `<svg viewBox="0 0 ${W} ${H}" width="100%"
+    preserveAspectRatio="xMidYMid meet" role="img"
+    aria-label="Prognoza krzywej mocy na ${okres.tytul} zestawiona z dzisiejszymi rekordami">`;
+  for (let w = 0; w <= goraW; w += krokW){
+    g += `<line x1="${lewy}" y1="${y(w)}" x2="${W-prawy}" y2="${y(w)}"
+           stroke="var(--linia)" stroke-width="1"/>`;
+    g += `<text x="${lewy-8}" y="${y(w)+4}" text-anchor="end" font-size="11"
+           fill="var(--slaby)">${w}</text>`;
+  }
+  if (masa){
+    const krokWkg = goraW/masa > 8 ? 4 : goraW/masa > 4 ? 2 : 1;
+    for (let wkg = 0; wkg*masa <= goraW; wkg += krokWkg)
+      g += `<text x="${W-prawy+8}" y="${y(wkg*masa)+4}" text-anchor="start"
+             font-size="11" fill="var(--slaby)">${wkg}</text>`;
+    g += `<text x="${W-prawy+8}" y="${gora-14}" text-anchor="start" font-size="10"
+           font-weight="600" fill="var(--slaby)">W/kg</text>`;
+    g += `<text x="${lewy-8}" y="${gora-14}" text-anchor="end" font-size="10"
+           font-weight="600" fill="var(--slaby)">W</text>`;
+  }
+
+  // Podpisy osi czasu: standardowe znaczniki plus każde okno z prognozy —
+  // cel bez podpisu byłby celem, którego nie widać. Dwa podpisy bliżej niż
+  // 34 px kładziemy w dwóch rzędach zamiast któryś usuwać.
+  const znaczniki = [...new Set([...[1,5,15,60,300,1200,3600,5400], ...cele.map(c => c.s)])]
+    .filter(s => s >= minS && s <= maksS).sort((a,b) => a-b);
+  let poprzedni = -999, rzad = 0;
+  for (const s of znaczniki){
+    rzad = (x(s) - poprzedni < 34) ? 1 - rzad : 0;
+    poprzedni = x(s);
+    g += `<text x="${x(s)}" y="${H - (rzad ? 6 : 19)}" text-anchor="middle" font-size="11"
+           fill="var(--slaby)">${oknoNaTekst(s)}</text>`;
+  }
+
+  // Najpierw „dziś", cienką linią — jest tłem dla prognozy, nie jej rywalem.
+  if (dzis.length > 1){
+    const dd = dzis.map((r,i) => `${i ? "L" : "M"}${x(r.sek)} ${y(r.waty)}`).join(" ");
+    g += `<path d="${dd}" fill="none" stroke="var(--seria-moc)" stroke-width="1.6"
+           stroke-linejoin="round" stroke-linecap="round" opacity=".75"/>`;
+    for (const r of dzis)
+      g += `<circle cx="${x(r.sek)}" cy="${y(r.waty)}" r="2.4"
+             fill="var(--seria-moc)" opacity=".75"/>`;
+  }
+
+  const d = cele.map((c,i) => `${i ? "L" : "M"}${x(c.s)} ${y(c.w)}`).join(" ");
+  g += `<path d="${d} L${x(cele[cele.length-1].s)} ${y(0)} L${x(cele[0].s)} ${y(0)} Z"
+         fill="var(--plan)" opacity=".10"/>`;
+  g += `<path d="${d}" fill="none" stroke="var(--plan)" stroke-width="2.5"
+         stroke-linejoin="round" stroke-linecap="round"/>`;
+
+  // Podpis stoi nad punktem, chyba że wpadłby na poprzedni — wtedy schodzi
+  // pod punkt. Samo rozsuwanie w pionie o stałą wartość tu nie wystarcza:
+  // przy stromym zejściu krzywej podniesiony podpis niższego punktu ląduje
+  // dokładnie na wysokości podpisu wyższego (40 s i 1 min zlewały się w plamę).
+  let ostatnia = null;
+  for (const c of cele){
+    const cx = x(c.s), cy = y(c.w);
+    g += `<circle cx="${cx}" cy="${cy}" r="4.5"
+           fill="var(--plan)" stroke="var(--powierzchnia)" stroke-width="2"/>`;
+    let ly = cy - 11;
+    if (ostatnia && Math.abs(cx - ostatnia.x) < 44 && Math.abs(ly - ostatnia.y) < 15)
+      ly = cy + 20;
+    // Przy prawej krawędzi podpis wychodziłby na podziałkę W/kg, więc tam
+    // kotwiczymy go końcem, a nie środkiem.
+    const przyKrawedzi = cx + 22 > W - prawy;
+    g += `<text x="${przyKrawedzi ? cx - 4 : cx}" y="${ly}"
+           text-anchor="${przyKrawedzi ? "end" : "middle"}"
+           font-size="11.5" font-weight="600" fill="var(--tekst)">${c.w} W</text>`;
+    ostatnia = { x: cx, y: ly };
+    // Oba znaczki rysowane od razu, widoczny ten z klasą — dotknięcie
+    // przekłada klasę i nie buduje SVG od nowa.
+    const znak = znakBiezacy(okres.id, String(c.s));
+    for (const jaki of ["tak","nie"])
+      g += `<text class="znak-punktu ${jaki}${znak === jaki ? " wybrany" : ""}"
+             data-pole="${c.s}" x="${przyKrawedzi ? cx - 10 : cx + 10}" y="${cy + 5}"
+             text-anchor="${przyKrawedzi ? "end" : "start"}" font-size="12"
+             font-weight="700" fill="${jaki === "tak" ? "var(--plan)" : "var(--alarm)"}"
+             >${jaki === "tak" ? "✓" : "✗"}</text>`;
+  }
+  g += `</svg>`;
+
+  return `<div class="krzywa-mocy">${g}</div>
+    <div class="legenda">
+      <span><i style="background:var(--plan)"></i>prognoza na ${okres.tytul}</span>
+      ${dzis.length > 1
+        ? `<span><i style="background:var(--seria-moc)"></i>dziś — rekord zmierzony</span>` : ""}
+    </div>`;
+}
+
+function przyciskZnaku(jaki, biezacy){
+  const akt = biezacy === jaki;
+  return `<button class="kolko-akcja znak-${jaki}${akt ? " wybrany" : ""}"
+    data-znak="${jaki}" aria-pressed="${akt ? "true" : "false"}"
+    title="${jaki === "tak" ? "Udało się — dotknij jeszcze raz, żeby zdjąć"
+                            : "Nie udało się — dotknij jeszcze raz, żeby zdjąć"}"
+    >${jaki === "tak" ? "✓" : "✗"}</button>`;
+}
+
+/* Klasyczna reguła: FTP ≈ 95% mocy dwudziestominutowej. Liczymy ją TU, przy
+   wyświetlaniu, z liczb w dane.js — nie wpisujemy wyniku do danych. */
+function uwagaSpojnosci(okres){
+  const c20 = okres.cele.find(c => c.s === 1200);
+  if (!c20) return "";
+  const klasyk = c20.w * 0.95;
+  const c60 = okres.cele.find(c => c.s === 3600);
+  const roznica = okres.ftp - klasyk;
+  let t = `Kontrola spójności: klasyczna reguła mówi, że FTP to około 95%
+    mocy dwudziestominutowej, czyli 0,95 × ${c20.w} = <b>${liczba(klasyk,1)} W</b>.`;
+  if (c60) t += ` Prognoza godzinna to ${c60.w} W — różnica
+    ${liczba(Math.abs(c60.w - klasyk),1)} W, więc te dwie liczby mówią to samo.`;
+  t += ` Prognoza FTP ${okres.ftp} W stoi ${roznica >= 0 ? "wyżej" : "niżej"} o
+    ${liczba(Math.abs(roznica),1)} W (${liczba(Math.abs(roznica)/klasyk*100,1)}%) —
+    ${Math.abs(roznica)/klasyk < 0.08
+      ? "to mieści się w rozrzucie samej reguły, więc komplet trzyma się kupy."
+      : "to już świadomy zapas, nie zaokrąglenie."}`;
+  return t;
+}
+
+function prognozaMocy(idOkresu){
+  const okres = okresPrognozy(idOkresu);
+  if (!okres) return pusto("Prognozy");
+
+  const cele = [...okres.cele].sort((a,b) => a.s - b.s);
+  const ftpTeraz = ftpBiezace();
+  const wkg = (w) => { const q = watyNaKg(w); return q == null ? "" : liczba(q,2) + " W/kg"; };
+  const znakFtp = znakBiezacy(okres.id, "ftp");
+
+  const wiersze = cele.map(c => {
+    const r = rekordOkna(c.s);
+    const znak = znakBiezacy(okres.id, String(c.s));
+    const brak = r ? c.w - r.waty : null;
+    return `
+      <li class="cel-wiersz${znak === "tak" ? " zrobiony" : ""}" data-pole="${c.s}">
+        <span class="cel-czas">${oknoNaTekst(c.s)}</span>
+        <span class="cel-waty">${c.w} W</span>
+        <span class="cel-wkg">${wkg(c.w)}</span>
+        <span class="cel-dzis">${
+          !r ? `dziś tego okna nikt nie zmierzył`
+          : brak > 0
+            ? `dziś <b>${r.waty} W</b>${znacznikErg(r.jazda)} · brakuje
+               <b>+${brak} W</b> (+${liczba(brak / r.waty * 100, 0)}%)`
+            : `dziś <b>${r.waty} W</b>${znacznikErg(r.jazda)} ·
+               <b>pomiar już to bije</b>`
+        }</span>
+        <span class="cel-znak" data-pole="${c.s}">
+          ${przyciskZnaku("tak", znak)}${przyciskZnaku("nie", znak)}
+        </span>
+      </li>`;
+  }).join("");
+
+  const brakFtp = okres.ftp - (ftpTeraz || 0);
+
+  return `
+  <section id="prognoza" data-okres="${okres.id}">
+    <h2>Prognoza mocy — ${okres.tytul}</h2>
+    <p class="opis">
+      To nie jest pomiar i nie jest wynik żadnego modelu. To <b>Twoje
+      szacunki</b> z ${pl(okres.ustalone)}: tak ma wyglądać krzywa z zakładki
+      <a class="odn-zakladka" href="#postepy/dane">Dane</a> na koniec
+      ${okres.tytul.replace("XII ", "grudnia ")}. Strona trzyma je w danych,
+      rysuje i zestawia z tym, co naprawdę zmierzone — nic tu nie zgaduje.
+      <br>Zielona linia to prognoza, cienka bursztynowa to dzisiejszy rekord
+      na to samo okno. Odległość między nimi jest całą treścią tego wykresu.
+    </p>
+    ${wykresPrognozy(okres)}
+  </section>
+
+  <section>
+    <h2>Cele po kolei</h2>
+    <p class="opis">
+      Przy każdym celu stoi to, co dziś zmierzone, i ile do niego brakuje.
+      Ptaszek albo krzyżyk zaznaczasz sam — strona sama niczego nie rozstrzyga,
+      bo termin (${pl(okres.na_kiedy)}) jeszcze nie minął. Dotknięcie
+      zaznaczonego znaku zdejmuje go z powrotem.
+    </p>
+    <ul class="cele-prognozy">${wiersze}</ul>
+  </section>
+
+  <section>
+    <h2>FTP — liczba, wokół której kręci się reszta</h2>
+    <p class="opis">
+      FTP to moc, którą utrzymasz przez mniej więcej godzinę. Z niej biorą się
+      strefy treningowe, więc pomyłka o 20 W przesuwa cały plan.
+    </p>
+    <div class="ftp-blok">
+      <div class="ftp-czlon">
+        <div class="ftp-etykieta">FTP dziś</div>
+        <div class="ftp-wpis">
+          <input id="ftp-pole" type="number" inputmode="numeric" min="50" max="600"
+            step="1" value="${ftpTeraz == null ? "" : ftpTeraz}"
+            aria-label="Bieżące FTP w watach">
+          <span class="jedn">W</span>
+          <button class="kolko-akcja" id="ftp-zapisz" title="Zapisz">✓</button>
+          <button class="kolko-akcja" id="ftp-anuluj" title="Cofnij">✗</button>
+        </div>
+        <div class="ftp-stopka"><span id="ftp-wkg">${
+          ftpTeraz == null ? "" : wkg(ftpTeraz)}</span></div>
+      </div>
+      <div class="ftp-most">
+        <span class="strzalka">→</span>
+        <span id="ftp-brak">${brakFtp > 0 ? "+" + brakFtp + " W" : "dowiezione"}</span>
+        <span id="ftp-brak-proc">${ftpTeraz && brakFtp > 0
+          ? "(+" + liczba(brakFtp / ftpTeraz * 100, 0) + "%)" : ""}</span>
+      </div>
+      <div class="ftp-czlon${znakFtp === "tak" ? " zrobiony" : ""}">
+        <div class="ftp-etykieta">FTP — prognoza na ${okres.tytul}</div>
+        <div class="ftp-liczba cel">${okres.ftp} <span
+          style="font-size:16px;font-weight:600">W</span></div>
+        <div class="ftp-stopka">${wkg(okres.ftp)}</div>
+        <div class="ftp-znak cel-znak" data-pole="ftp">
+          ${przyciskZnaku("tak", znakFtp)}${przyciskZnaku("nie", znakFtp)}
+        </div>
+      </div>
+    </div>
+    <div class="prognoza-dol">
+      <span id="prognoza-stan"></span>
+      <button class="link-tekstowy" id="prognoza-eksport">Zaznaczenia dla Claude'a…</button>
+    </div>
+    <textarea id="prognoza-eksport-pole" rows="6" hidden readonly></textarea>
+    <div class="info">
+      ${uwagaSpojnosci(okres)}
+      <br>Bieżące FTP i wszystkie ptaszki zapisują się <b>na tym urządzeniu</b>.
+      Strona nie umie pisać do repozytorium — klucz do zapisu leżałby w publicznym
+      repo, czyli u wszystkich. Trwałe miejsce to <code>dane.js</code>
+      (<code>prognozy.ftp_biezace</code> i <code>prognozy.wyniki</code>); przycisk
+      obok wypisuje zaznaczenia w formie do wklejenia Claude'owi.
+      ${ftpZRepo() != null && D.zalozenia && D.zalozenia.FTP_W
+        ? `<br>Uwaga na dwie różne liczby: w bloku <code>zalozenia</code> stoi
+           FTP ${D.zalozenia.FTP_W.v} W z tagiem <b>[E]</b> — estymata z modelu,
+           przedział ${D.zalozenia.FTP_W.przedzial
+             ? D.zalozenia.FTP_W.przedzial.join("–") : "?"} W. Tutaj stoi
+           ${ftpZRepo()} W, bo to Twoja deklaracja. Zmierzone dwadzieścia minut
+           to ${rekordOkna(1200) ? rekordOkna(1200).waty + " W" : "—"}
+           ${rekordOkna(1200) ? `(0,95 × to daje ${liczba(rekordOkna(1200).waty*0.95,0)} W)` : ""},
+           więc bliżej prawdy jest liczba niższa.`
+        : ""}
+    </div>
+  </section>`;
+}
+
+function podepnijPrognozy(){
+  const korzen = document.getElementById("prognoza");
+  if (!korzen) return;
+  const idOkresu = korzen.dataset.okres;
+  const okres = okresPrognozy(idOkresu);
+  if (!okres) return;
+  const karta = korzen.parentNode;          // wszystkie sekcje zakładki
+
+  const stan = (t) => {
+    const e = document.getElementById("prognoza-stan");
+    if (e) e.innerHTML = t;
+  };
+  const brudnopisFtp = () => prognozyLokalne().ftp != null;
+
+  function ustawZnak(pole, znak){
+    const l = prognozyLokalne(), k = idOkresu + "/" + pole;
+    if (znak === znakZRepo(idOkresu, pole)) delete l.znaki[k];
+    else l.znaki[k] = znak;                 // także null — zdjęcie znaku z danych
+    if (!zapiszPrognozyLokalne(l))
+      stan(`<span class="stan-niezapisane">nie udało się zapisać w przeglądarce</span>`);
+    else stan(znak
+      ? `<span class="stan-brudnopis">zaznaczone na tym urządzeniu — nie ma tego jeszcze w danych</span>`
+      : `<span class="stan-brudnopis">znak zdjęty</span>`);
+  }
+
+  karta.addEventListener("click", e => {
+    const b = e.target.closest("button");
+    if (!b) return;
+
+    if (b.dataset.znak){
+      const grupa = b.closest(".cel-znak");
+      const pole = grupa.dataset.pole;
+      const teraz = znakBiezacy(idOkresu, pole);
+      const nowy = teraz === b.dataset.znak ? null : b.dataset.znak;
+      ustawZnak(pole, nowy);
+      // Przełożenie klas, nie przerysowanie — wykres ma zostać taki, jaki jest.
+      for (const p of grupa.querySelectorAll("button")){
+        const akt = p.dataset.znak === nowy;
+        p.classList.toggle("wybrany", akt);
+        p.setAttribute("aria-pressed", akt ? "true" : "false");
+      }
+      const wiersz = grupa.closest(".cel-wiersz") || grupa.closest(".ftp-czlon");
+      if (wiersz) wiersz.classList.toggle("zrobiony", nowy === "tak");
+      for (const t of karta.querySelectorAll(`text.znak-punktu[data-pole="${pole}"]`))
+        t.classList.toggle("wybrany", nowy != null && t.classList.contains(nowy));
+      return;
+    }
+
+    if (b.id === "ftp-zapisz"){
+      const pole = document.getElementById("ftp-pole");
+      const v = Math.round(Number(pole.value));
+      if (!isFinite(v) || v < 50 || v > 600){
+        stan(`<span class="stan-niezapisane">FTP poza zakresem 50–600 W</span>`);
+        return;
+      }
+      const l = prognozyLokalne();
+      l.ftp = v === ftpZRepo() ? null : v;
+      const udane = zapiszPrognozyLokalne(l);
+      pole.value = v;
+      odswiezFtp(v);
+      stan(!udane
+        ? `<span class="stan-niezapisane">nie udało się zapisać w przeglądarce</span>`
+        : brudnopisFtp()
+          ? `<span class="stan-brudnopis">FTP zapisane na tym urządzeniu — nie ma go jeszcze w danych</span>`
+          : `<span>FTP zgodne z danymi</span>`);
+      return;
+    }
+
+    if (b.id === "ftp-anuluj"){
+      const pole = document.getElementById("ftp-pole");
+      pole.value = ftpBiezace() == null ? "" : ftpBiezace();
+      odswiezFtp(ftpBiezace());
+      stan(brudnopisFtp()
+        ? `<span class="stan-brudnopis">FTP zapisane na tym urządzeniu — nie ma go jeszcze w danych</span>`
+        : "");
+      return;
+    }
+
+    if (b.id === "prognoza-eksport"){
+      const l = prognozyLokalne();
+      const wyniki = {};
+      for (const [k,v] of Object.entries(l.znaki)){
+        const ciecie = k.indexOf("/");
+        const o = k.slice(0,ciecie), pole = k.slice(ciecie+1);
+        (wyniki[o] = wyniki[o] || {})[pole] = v;
+      }
+      const eks = document.getElementById("prognoza-eksport-pole");
+      const pusteZnaki = !Object.keys(wyniki).length;
+      eks.value = pusteZnaki && l.ftp == null
+        ? "Nic nie zaznaczono na tym urządzeniu — wszystko zgadza się z danymi."
+        : JSON.stringify({ ftp_biezace: l.ftp, wyniki }, null, 1);
+      eks.hidden = false;
+      eks.select();
+      if (navigator.clipboard && navigator.clipboard.writeText)
+        navigator.clipboard.writeText(eks.value).catch(() => {});
+      return;
+    }
+  });
+
+  karta.addEventListener("input", e => {
+    if (e.target.id === "ftp-pole")
+      stan(`<span class="stan-niezapisane">niezapisane — dotknij ✓</span>`);
+  });
+
+  // Liczby zależne od FTP przeliczamy w miejscu; nie ma tu animacji, więc
+  // wolno je nadpisać, ale wykresu nie ruszamy.
+  function odswiezFtp(v){
+    const q = v == null ? null : watyNaKg(v);
+    const w = document.getElementById("ftp-wkg");
+    if (w) w.textContent = q == null ? "" : liczba(q,2) + " W/kg";
+    const brak = v == null ? null : okres.ftp - v;
+    const b1 = document.getElementById("ftp-brak");
+    const b2 = document.getElementById("ftp-brak-proc");
+    if (b1) b1.textContent = brak == null ? "" : brak > 0 ? "+" + brak + " W" : "dowiezione";
+    if (b2) b2.textContent = brak != null && brak > 0 && v
+      ? "(+" + liczba(brak / v * 100, 0) + "%)" : "";
+  }
+}
+
+/* ==========================================================================
    SEKCJE — poziom 1 i poziom 2.
    Zakładka trafia na pasek tylko gdy ma wpis tutaj. Z1–Z5 to miejsca
    zarezerwowane; dostaną nazwy, kiedy dostaną treść.
@@ -2858,10 +3388,12 @@ const SEKCJE = [
       { id:"porownania", tytul:"Porównania S", rysuj: porownaniaS },
       { id:"dane", tytul:"Dane", rysuj: daneMocy }
   ]},
-  { id:"prognozy", tytul:"Prognozy", barwa:"limonka", pod:[
-      { id:"xii-2026", tytul:"XII 2026", rysuj: () => pusto("XII 2026") },
-      { id:"xii-2027", tytul:"XII 2027", rysuj: () => pusto("XII 2027") }
-  ]},
+  // Mini-zakładki Prognoz biorą się z dane.js — dopisanie okresu tworzy nową,
+  // bez ruszania kodu. Kod nie zna żadnej z nich z nazwy.
+  { id:"prognozy", tytul:"Prognozy", barwa:"limonka",
+    pod: PROGNOZY.length
+      ? PROGNOZY.map(o => ({ id:o.id, tytul:o.tytul, rysuj: () => prognozaMocy(o.id) }))
+      : [{ id:"brak", tytul:"—", rysuj: () => pusto("Prognozy") }] },
   ...[3,4,5].map(n => ({
     id:"z"+n, tytul:"Z"+n, barwa:["fiolet","limonka","fuksja","cyjan","pomarancz"][n-1],
     pod:[1,2,3].map(m => ({
@@ -2932,6 +3464,7 @@ function pokaz(){
 
   podepnijSlupki();
   podepnijProby();
+  podepnijPrognozy();
 
   // Wykres otwiera się na najświeższym końcu — najnowsza przerwa jest
   // najważniejsza, a przy dwóch latach historii ląduje poza kadrem.

@@ -39,7 +39,10 @@ const PELNE_SEGMENTY = process.env.PELNE_SEGMENTY === "true";
 // 15 min zamiast 12: decyzja Fryderyka z 21.08.2026. Dwunastka nie jest
 // standardowym oknem i to na parze 10/12 min najczęściej widać, że maksimum
 // średniej kroczącej nie musi maleć z długością okna.
-const CZASY_KRZYWEJ = [1,5,10,15,30,60,120,300,480,600,900,1200,1800,2700,3600,5400];
+// 40 s siedzi tu przez prognozy: Fryderyk postawił cel na to okno, a celu,
+// którego nikt nie mierzy, nie da się nigdy rozstrzygnąć. Dołożenie okna
+// nie kosztuje ani jednego zapytania więcej — liczymy z tego samego strumienia.
+const CZASY_KRZYWEJ = [1,5,10,15,30,40,60,120,300,480,600,900,1200,1800,2700,3600,5400];
 const PELNA_MOC = process.env.PELNA_MOC === "true";
 
 function wczytajStare(){
