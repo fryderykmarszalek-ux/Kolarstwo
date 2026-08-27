@@ -518,7 +518,10 @@ rect.proba-punkt{cursor:pointer}
   background:var(--plan);border-radius:0 2px 2px 0;
 }
 .pasek-postepu.alarm::before{background:var(--alarm)}
-.pasek-postepu.duzy{position:static;height:9px;border-radius:99px;margin:6px 0 5px}
+/* position:relative, NIE static — wypełnienie paska jest pozycjonowane
+   absolutnie, więc przy statycznym rodzicu szukało sobie najbliższego
+   pozycjonowanego przodka i rozlewało się zielenią na pół ekranu. */
+.pasek-postepu.duzy{position:relative;height:9px;border-radius:99px;margin:6px 0 5px}
 .pasek-postepu.duzy::before{border-radius:99px}
 .postep-blok{background:var(--plyta);border:1px solid var(--linia);border-radius:10px;
   padding:11px 14px;margin-top:10px}
@@ -543,6 +546,74 @@ rect.proba-punkt{cursor:pointer}
 .info.alarmowy{border-left:3px solid var(--alarm)}
 .info.alarmowy b{color:var(--alarm)}
 .uwaga-koszulki{font-size:12.5px;line-height:1.5}
+
+/* --- Kłódka na zablokowanej koszulce --- */
+.kafel-koszulki .rysunek{position:relative}
+.znak-klodki{
+  position:absolute;right:-2px;bottom:-2px;
+  width:22px;height:22px;border-radius:99px;
+  display:flex;align-items:center;justify-content:center;
+  background:var(--powierzchnia);border:1px solid var(--linia);color:var(--slaby);
+}
+.znak-klodki .klodka{width:12px;height:12px;display:block}
+
+/* --- Panel odblokowania --- */
+.odblok-blok{
+  display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-top:10px;
+  background:var(--plyta);border:1px solid var(--linia);border-radius:12px;
+  padding:13px 16px;
+}
+.odblok-blok.gotowy{border-color:var(--plan)}
+.odblok-blok.zdobyty{border-color:var(--plan);
+  background:color-mix(in srgb,var(--plan) 8%,var(--plyta))}
+.odblok-tresc{flex:1 1 240px;min-width:0}
+.odblok-tytul{font-size:14px;font-weight:600}
+.odblok-blok.zdobyty .odblok-tytul{color:var(--plan)}
+.odblok-podpis{font-size:12px;color:var(--slaby);line-height:1.45;margin-top:3px}
+.odblok-podpis b{color:var(--tekst)}
+.przycisk-odblok{
+  appearance:none;font:inherit;font-size:13.5px;font-weight:600;cursor:pointer;
+  display:inline-flex;align-items:center;gap:7px;flex:0 0 auto;
+  min-height:44px;padding:0 18px;border-radius:99px;
+  color:#FFFFFF;background:var(--plan);border:1px solid var(--plan);
+  transition:transform .14s ease, filter .14s ease;
+}
+.przycisk-odblok:hover{filter:brightness(1.07)}
+.przycisk-odblok:active{transform:scale(.96)}
+.przycisk-odblok .klodka{width:14px;height:14px}
+.przycisk-odblok.cofnij{
+  color:var(--slaby);background:var(--powierzchnia);border-color:var(--linia);
+  font-weight:400;
+}
+.przycisk-odblok.cofnij:hover{color:var(--alarm);border-color:var(--alarm);filter:none}
+#koszulki-eksport-pole{margin-top:8px;font-size:11.5px;width:100%;
+  box-sizing:border-box;resize:vertical;font-family:inherit;
+  color:var(--tekst);background:var(--powierzchnia);
+  border:1px solid var(--linia);border-radius:8px;padding:8px 10px}
+
+/* --- Fajerwerki po odblokowaniu ---
+   Kropki rozbiegające się z trzech punktów. Warstwa nie łapie dotyku i znika
+   sama; przy systemowym „ogranicz ruch" w ogóle się nie pojawia. --- */
+#fajerwerki{position:fixed;inset:0;z-index:60;pointer-events:none;overflow:hidden}
+#fajerwerki .iskra{
+  position:absolute;width:9px;height:9px;border-radius:99px;margin:-4.5px 0 0 -4.5px;
+  opacity:0;animation:iskra 1.15s cubic-bezier(.15,.7,.3,1) forwards;
+}
+@keyframes iskra{
+  0%  {opacity:1;transform:translate(0,0) scale(.45)}
+  55% {opacity:1}
+  100%{opacity:0;transform:translate(var(--dx),calc(var(--dy) + 46px)) scale(1)}
+}
+#fajerwerki .blysk{
+  position:absolute;width:16px;height:16px;margin:-8px 0 0 -8px;border-radius:99px;
+  background:radial-gradient(circle,#FFFFFF 0%,rgba(255,255,255,0) 70%);
+  opacity:0;animation:blysk .5s ease-out forwards;
+}
+@keyframes blysk{
+  0%  {opacity:.95;transform:scale(.3)}
+  100%{opacity:0;transform:scale(4.5)}
+}
+@media (prefers-reduced-motion: reduce){ #fajerwerki{display:none} }
 @media (max-width:560px){
   .gablota-siatka{grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:8px}
   .kafel-koszulki .rysunek{width:62px}
@@ -3325,13 +3396,21 @@ function prognozaMocy(idOkresu){
   </section>`;
 }
 
+/* Nasłuch podpinamy RAZ na całe życie strony, nie przy każdym przerysowaniu.
+   Wcześniej pokaz() dokładał go za każdym wejściem w zakładkę, więc po drugiej
+   wizycie jedno kliknięcie ptaszka wykonywało się dwa razy: pierwszy raz
+   stawiało znak, drugi — widząc już postawiony — zdejmowało go z powrotem.
+   Stąd wymóg: uchwyt czyta, KTÓRY okres jest na ekranie, w chwili kliknięcia,
+   zamiast pamiętać go z chwili rysowania. */
 function podepnijPrognozy(){
-  const korzen = document.getElementById("prognoza");
-  if (!korzen) return;
-  const idOkresu = korzen.dataset.okres;
-  const okres = okresPrognozy(idOkresu);
-  if (!okres) return;
-  const karta = korzen.parentNode;          // wszystkie sekcje zakładki
+  const karta = document.getElementById("tresc");
+  if (!karta || karta.dataset.prognozyPodpiete) return;
+  karta.dataset.prognozyPodpiete = "1";
+
+  const okresZEkranu = () => {
+    const korzen = document.getElementById("prognoza");
+    return korzen ? okresPrognozy(korzen.dataset.okres) : null;
+  };
 
   const stan = (t) => {
     const e = document.getElementById("prognoza-stan");
@@ -3339,7 +3418,7 @@ function podepnijPrognozy(){
   };
   const brudnopisFtp = () => prognozyLokalne().ftp != null;
 
-  function ustawZnak(pole, znak){
+  function ustawZnak(idOkresu, pole, znak){
     const l = prognozyLokalne(), k = idOkresu + "/" + pole;
     if (znak === znakZRepo(idOkresu, pole)) delete l.znaki[k];
     else l.znaki[k] = znak;                 // także null — zdjęcie znaku z danych
@@ -3353,13 +3432,16 @@ function podepnijPrognozy(){
   karta.addEventListener("click", e => {
     const b = e.target.closest("button");
     if (!b) return;
+    const okres = okresZEkranu();
+    if (!okres) return;
+    const idOkresu = okres.id;
 
     if (b.dataset.znak){
       const grupa = b.closest(".cel-znak");
       const pole = grupa.dataset.pole;
       const teraz = znakBiezacy(idOkresu, pole);
       const nowy = teraz === b.dataset.znak ? null : b.dataset.znak;
-      ustawZnak(pole, nowy);
+      ustawZnak(idOkresu, pole, nowy);
       // Przełożenie klas, nie przerysowanie — wykres ma zostać taki, jaki jest.
       for (const p of grupa.querySelectorAll("button")){
         const akt = p.dataset.znak === nowy;
@@ -3384,7 +3466,7 @@ function podepnijPrognozy(){
       l.ftp = v === ftpZRepo() ? null : v;
       const udane = zapiszPrognozyLokalne(l);
       pole.value = v;
-      odswiezFtp(v);
+      odswiezFtp(okres, v);
       stan(!udane
         ? `<span class="stan-niezapisane">nie udało się zapisać w przeglądarce</span>`
         : brudnopisFtp()
@@ -3396,7 +3478,7 @@ function podepnijPrognozy(){
     if (b.id === "ftp-anuluj"){
       const pole = document.getElementById("ftp-pole");
       pole.value = ftpBiezace() == null ? "" : ftpBiezace();
-      odswiezFtp(ftpBiezace());
+      odswiezFtp(okres, ftpBiezace());
       stan(brudnopisFtp()
         ? `<span class="stan-brudnopis">FTP zapisane na tym urządzeniu — nie ma go jeszcze w danych</span>`
         : "");
@@ -3431,7 +3513,7 @@ function podepnijPrognozy(){
 
   // Liczby zależne od FTP przeliczamy w miejscu; nie ma tu animacji, więc
   // wolno je nadpisać, ale wykresu nie ruszamy.
-  function odswiezFtp(v){
+  function odswiezFtp(okres, v){
     const q = v == null ? null : watyNaKg(v);
     const w = document.getElementById("ftp-wkg");
     if (w) w.textContent = q == null ? "" : liczba(q,2) + " W/kg";
@@ -3465,6 +3547,55 @@ function podepnijPrognozy(){
    nie pozycja Fryderyka. Nigdy też z modelu fizycznego [E] z tego samego
    powodu, dla którego moc [E] wyleciała z tabeli segmentów.
    ========================================================================== */
+
+/* ODBLOKOWANIE JEST RĘCZNE — decyzja Fryderyka z 27.08.2026.
+   Strona liczy postęp i mówi, że warunek jest spełniony, ale koszulki NIE
+   zdobywa: klika ją człowiek. Powód jego słowami: koszulki odblokowuję
+   tylko ja sam.
+
+   Skoro klika ją człowiek na iPadzie, a strona nie umie pisać do
+   repozytorium (klucz do zapisu w publicznym repo byłby kluczem dla
+   wszystkich), zdobycie ma dwie warstwy — jak notatki i ptaszki w prognozach:
+
+   1. dane.js -> koszulki[].zdobyta — ŹRÓDŁO PRAWDY, widoczne na każdym
+      urządzeniu, przetrwa wyczyszczenie Safari.
+   2. localStorage "kolarstwo-koszulki" — brudnopis TEGO urządzenia.
+
+   Brudnopis wygrywa, gdy istnieje, także wtedy gdy trzyma null — inaczej nie
+   dałoby się cofnąć zdobycia wpisanego w danych. Przycisk „Koszulki dla
+   Claude'a…" wypisuje brudnopisy do wklejenia w czacie, żeby trafiły na stałe
+   do dane.js. Dopóki tam nie trafią, gablota żyje tylko w tej przeglądarce
+   i strona mówi to wprost przy każdej takiej koszulce. */
+const KLUCZ_KOSZULEK = "kolarstwo-koszulki";
+
+function koszulkiLokalne(){
+  try { const o = JSON.parse(localStorage.getItem(KLUCZ_KOSZULEK) || "{}");
+        return o && typeof o === "object" ? o : {}; }
+  catch(e){ return {}; }
+}
+function zapiszKoszulkiLokalne(o){
+  try { localStorage.setItem(KLUCZ_KOSZULEK, JSON.stringify(o)); return true; }
+  catch(e){ return false; }          // prywatne okno albo brak miejsca
+}
+// Zdobycie koszulki po scaleniu obu warstw. null = niezdobyta.
+function zdobycie(k){
+  const l = koszulkiLokalne();
+  if (Object.prototype.hasOwnProperty.call(l, k.id))
+    return l[k.id] ? { ...l[k.id], skad: "urzadzenie" } : null;
+  return k.zdobyta ? { ...k.zdobyta, skad: "dane" } : null;
+}
+// Brudnopis zrównany z danymi nie ma po co żyć.
+(function sprzatnijKoszulki(){
+  const l = koszulkiLokalne();
+  let zmiana = false;
+  for (const id of Object.keys(l)){
+    const k = ((D.koszulki || {}).lista || []).find(x => x.id === id);
+    const wDanych = k && k.zdobyta ? k.zdobyta.data : null;
+    const wBrudnopisie = l[id] ? l[id].data : null;
+    if (wDanych === wBrudnopisie){ delete l[id]; zmiana = true; }
+  }
+  if (zmiana) zapiszKoszulkiLokalne(l);
+})();
 
 const KOSZULKI = (D.koszulki && D.koszulki.lista) || [];
 const SERIE_K   = (D.koszulki && D.koszulki.serie) || [];
@@ -3592,7 +3723,8 @@ function progNaTekst(k){
    jest policzalny i spełniony, mówi tylko „warunek spełniony". Wpis do
    dane.js jest decyzją Fryderyka, tak samo jak ptaszek w prognozach. */
 function stanKoszulki(k){
-  if (k.zdobyta) return { stan: "zdobyta", udzial: 1 };
+  const z = zdobycie(k);
+  if (z) return { stan: "zdobyta", udzial: 1, zdobycie: z };
 
   // Koszulka „bez przerwy" bez wyznaczonego okna nie znaczy nic — wtedy
   // rozstrzyga człowiek, zamiast liczyć od początku świata.
@@ -3687,7 +3819,7 @@ function ikonaKoszulki(k, prefiks){
 
 const OPIS_STANU = {
   "zdobyta":          "zdobyta",
-  "spelniony":        "warunek spełniony",
+  "spelniony":        "warunek spełniony — odblokuj",
   "w-toku":           "w toku",
   "przed":            "jeszcze nie wystartowało",
   "przepadla":        "warunek złamany",
@@ -3696,6 +3828,15 @@ const OPIS_STANU = {
   "czeka-na-miernik": "czeka na miernik mocy",
   "brak-danych":      "brak pomiarów"
 };
+
+// Kłódka na zablokowanej koszulce. Sam wyszarzony rysunek mówi „jeszcze nie",
+// ale przy osiemnastu kafelkach naraz oko potrzebuje znaku, nie odcienia —
+// i tego znaku będzie potrzebowało tym bardziej, im więcej koszulek zdobytych.
+const IKONA_KLODKI = `<svg class="klodka" viewBox="0 0 16 16" aria-hidden="true">
+  <path d="M4.5 7V5.2a3.5 3.5 0 0 1 7 0V7" fill="none" stroke="currentColor"
+    stroke-width="1.7" stroke-linecap="round"/>
+  <rect x="2.7" y="7" width="10.6" height="7.3" rx="1.9" fill="currentColor"/>
+</svg>`;
 
 function kafelKoszulki(k){
   const s = stanKoszulki(k);
@@ -3706,10 +3847,12 @@ function kafelKoszulki(k){
   return `
     <a class="kafel-koszulki${zdobyta ? " zdobyta" : ""}"
        href="#gablota/koszulki/${k.id}" data-id="${k.id}">
-      <span class="rysunek">${ikonaKoszulki(k, "kafel")}</span>
+      <span class="rysunek">${ikonaKoszulki(k, "kafel")}${
+        zdobyta ? "" : `<span class="znak-klodki" title="Zablokowana"
+          aria-label="Zablokowana">${IKONA_KLODKI}</span>`}</span>
       <span class="nazwa-koszulki">${bezpieczny(k.nazwa)}</span>
       <span class="stan-koszulki s-${s.stan}">${
-        zdobyta ? pl(k.zdobyta.data)
+        zdobyta ? pl(s.zdobycie.data)
         : pasek ? Math.round(s.udzial*100) + "% drogi"
         : OPIS_STANU[s.stan]}</span>
       ${pasek}
@@ -3720,11 +3863,11 @@ const gablota = (arg) => {
   if (!KOSZULKI.length) return pusto("Gablota");
   if (arg) return jednaKoszulka(arg);
 
-  const zdobyte = KOSZULKI.filter(k => k.zdobyta).length;
+  const zdobyte = KOSZULKI.filter(k => zdobycie(k)).length;
   const grupy = SERIE_K.map(s => {
     const swoje = KOSZULKI.filter(k => s.zawiera.includes(k.seria));
     if (!swoje.length) return "";
-    const ile = swoje.filter(k => k.zdobyta).length;
+    const ile = swoje.filter(k => zdobycie(k)).length;
     return `
       <section>
         <div class="naglowek-serii">
@@ -3741,12 +3884,12 @@ const gablota = (arg) => {
     <h2>Gablota</h2>
     <p class="opis">
       Osiemnaście koszulek, każda za jeden ustalony z góry warunek. Koszulka
-      zablokowana jest widoczna od pierwszego dnia — masz widzieć, po co
-      jedziesz. Dotknij którejkolwiek, żeby zobaczyć pełny warunek i to, ile
-      brakuje.
-      <br>Progi i barwy siedzą w <code>dane.js</code>. Strona sama nigdy nie
-      ogłasza zdobycia: nawet gdy warunek jest policzalny i już spełniony,
-      napisze „warunek spełniony", a datę wpisujesz Ty.
+      zablokowana jest widoczna od pierwszego dnia i nosi kłódkę — masz
+      widzieć, po co jedziesz. Dotknij którejkolwiek, żeby zobaczyć pełny
+      warunek, ile brakuje i przycisk odblokowania.
+      <br><b>Kłódkę zdejmujesz wyłącznie Ty.</b> Strona liczy postęp i powie,
+      kiedy warunek padł, ale sama nigdy niczego nie odblokuje — nawet przy
+      100%. Pomyłkę cofa przycisk „Cofnij zdobycie" w tej samej koszulce.
     </p>
     <div class="kafelki">
       <div class="kafel">
@@ -3758,6 +3901,12 @@ const gablota = (arg) => {
     </div>
   </section>
   ${grupy}
+  <div class="prognoza-dol">
+    <span class="odblok-podpis">Odblokowania z tego urządzenia trzeba przenieść
+      do <code>dane.js</code>, żeby przetrwały wyczyszczenie przeglądarki.</span>
+    <button class="link-tekstowy" data-akcja="eksport">Koszulki dla Claude'a…</button>
+  </div>
+  <textarea id="koszulki-eksport-pole" rows="5" hidden readonly></textarea>
   <div class="info">
     Warunki podane w watach liczą się <b>wyłącznie z pomiaru</b>: miernika albo
     trenażera w sesji swobodnej. Nigdy z estymaty Stravy. Ta podała 975 W na
@@ -3769,6 +3918,161 @@ const gablota = (arg) => {
     <span class="znacznik-erg">ERG</span> moc trzyma program, nie zawodnik.
   </div>`;
 };
+
+/* --- Panel odblokowania -------------------------------------------------
+   Koszulki odblokowuje wyłącznie Fryderyk. Strona liczy postęp i mówi, kiedy
+   warunek jest spełniony, ale sama nie zdejmuje kłódki — nawet przy 100%.
+   Pomiar to nie decyzja, dokładnie jak przy ptaszkach w prognozach. */
+function panelOdblokowania(k, s){
+  const z = s.zdobycie || null;
+  const spelniony = s.stan === "spelniony";
+
+  if (z) return `
+    <div class="odblok-blok zdobyty">
+      <div class="odblok-tresc">
+        <div class="odblok-tytul">Zdobyta ${pl(z.data)}</div>
+        <div class="odblok-podpis">${z.skad === "urzadzenie"
+          ? `Odblokowana na tym urządzeniu. <b>Nie ma jej jeszcze w danych</b> —
+             wyślij ją do Claude'a przyciskiem na dole gabloty, wtedy przetrwa
+             wyczyszczenie przeglądarki i pokaże się na telefonie.`
+          : `Zapisana w <code>dane.js</code> — widać ją na każdym urządzeniu.`}
+        </div>
+      </div>
+      <button class="przycisk-odblok cofnij" data-akcja="zablokuj" data-id="${k.id}">
+        Cofnij zdobycie
+      </button>
+    </div>`;
+
+  return `
+    <div class="odblok-blok${spelniony ? " gotowy" : ""}">
+      <div class="odblok-tresc">
+        <div class="odblok-tytul">${spelniony
+          ? "Warunek spełniony — koszulka czeka na Ciebie"
+          : "Zablokowana"}</div>
+        <div class="odblok-podpis">${spelniony
+          ? `Dane mówią, że próg padł. Zdejmujesz kłódkę Ty, nie strona.`
+          : `Możesz ją odblokować w każdej chwili — strona nie sprawdza Ci
+             dowodu, tylko liczy postęp. Odpowiadasz za to, że warunek naprawdę
+             padł.`}</div>
+      </div>
+      <button class="przycisk-odblok" data-akcja="odblokuj" data-id="${k.id}">
+        ${IKONA_KLODKI} Odblokuj koszulkę
+      </button>
+    </div>`;
+}
+
+/* --- Fajerwerki ---------------------------------------------------------
+   Rysowane tym samym sposobem co reszta strony: kilkadziesiąt kropek w SVG,
+   rozrzuconych po okręgu i animowanych przekształceniem. Żadnej biblioteki,
+   żadnego obrazka. Warstwa jest nieklikalna i kasuje się sama po sekundzie
+   i pół, a przy włączonym „ogranicz ruch" w systemie nie odpala się wcale —
+   ta sama zasada co przy animacjach wykresów. */
+function fajerwerki(){
+  if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const stara = document.getElementById("fajerwerki");
+  if (stara) stara.remove();
+
+  const BARWY = ["#FFD400", "#E30613", "#009FE3", "#00A94F", "#F0629B", "#F07C00"];
+  const warstwa = document.createElement("div");
+  warstwa.id = "fajerwerki";
+  warstwa.setAttribute("aria-hidden", "true");
+
+  // Trzy wybuchy w różnych miejscach i o różnych porach — jeden na środku
+  // wygląda jak błąd rysowania, trzy jak fajerwerki.
+  const wybuchy = [ {x:50, y:38, t:0}, {x:26, y:52, t:180}, {x:74, y:50, t:340} ];
+  for (const w of wybuchy){
+    const ile = 26;
+    for (let i = 0; i < ile; i++){
+      const kat = (i / ile) * Math.PI * 2 + Math.random()*0.25;
+      const zasieg = 90 + Math.random()*110;
+      const iskra = document.createElement("i");
+      iskra.className = "iskra";
+      iskra.style.left = w.x + "%";
+      iskra.style.top  = w.y + "%";
+      iskra.style.background = BARWY[i % BARWY.length];
+      const r = 7 + Math.random()*7;
+      iskra.style.width = iskra.style.height = r + "px";
+      iskra.style.margin = (-r/2) + "px 0 0 " + (-r/2) + "px";
+      iskra.style.setProperty("--dx", Math.cos(kat)*zasieg + "px");
+      iskra.style.setProperty("--dy", Math.sin(kat)*zasieg + "px");
+      iskra.style.animationDelay = (w.t + Math.random()*60) + "ms";
+      warstwa.appendChild(iskra);
+    }
+    // Błysk w miejscu wybuchu — bez niego iskry wyglądają, jakby przyleciały
+    // znikąd, zamiast skądś wystrzelić.
+    const blysk = document.createElement("i");
+    blysk.className = "blysk";
+    blysk.style.left = w.x + "%";
+    blysk.style.top = w.y + "%";
+    blysk.style.animationDelay = w.t + "ms";
+    warstwa.appendChild(blysk);
+  }
+  document.body.appendChild(warstwa);
+  setTimeout(() => warstwa.remove(), 1900);
+}
+
+/* Odblokowanie i cofnięcie. Zapis idzie do brudnopisu urządzenia; dane.js
+   pozostaje źródłem prawdy i wygrywa dopiero wtedy, gdy wpis do niego trafi. */
+function podepnijGablote(){
+  const tresc = document.getElementById("tresc");
+  if (!tresc || tresc.dataset.gablotaPodpieta) return;   // raz, nie co wejście
+  tresc.dataset.gablotaPodpieta = "1";
+
+  const przerysuj = () => {
+    const [, , arg] = zHasha();
+    tresc.innerHTML = gablota(arg);
+  };
+
+  tresc.addEventListener("click", e => {
+    const b = e.target.closest("button[data-akcja]");
+    if (!b) return;
+    // Przycisk eksportu nie dotyczy żadnej pojedynczej koszulki, więc szukanie
+    // jej po data-id musi siedzieć w gałęziach, które jej naprawdę używają.
+    const k = b.dataset.id ? KOSZULKI.find(x => x.id === b.dataset.id) : null;
+    const l = koszulkiLokalne();
+
+    if (b.dataset.akcja === "odblokuj" && k){
+      // Data z zegara urządzenia, nie z meta.pobrano: to moment DECYZJI,
+      // a nie pomiar, więc liczy się dzień, w którym klikasz.
+      l[k.id] = { data: new Date().toISOString().slice(0,10), skad: "urzadzenie" };
+      if (k.zdobyta && k.zdobyta.data === l[k.id].data) delete l[k.id];
+      if (!zapiszKoszulkiLokalne(l)){
+        alert("Nie udało się zapisać w tej przeglądarce (prywatne okno?).");
+        return;
+      }
+      przerysuj();
+      fajerwerki();
+      return;
+    }
+
+    if (b.dataset.akcja === "zablokuj" && k){
+      // Zapisujemy null, a nie kasujemy wpis: null jest jawnym „zdjęte na tym
+      // urządzeniu" i wygrywa nad datą wpisaną w dane.js. Bez tego nie dałoby
+      // się cofnąć pomyłki, która trafiła już do repozytorium.
+      if (k.zdobyta) l[k.id] = null; else delete l[k.id];
+      zapiszKoszulkiLokalne(l);
+      przerysuj();
+      return;
+    }
+
+    if (b.dataset.akcja === "eksport"){
+      const pelne = {};
+      for (const [id,v] of Object.entries(koszulkiLokalne())){
+        const kk = KOSZULKI.find(x => x.id === id);
+        pelne[id] = v ? { nazwa: kk ? kk.nazwa : "?", data: v.data }
+                      : { nazwa: kk ? kk.nazwa : "?", zdjeta: true };
+      }
+      const eks = document.getElementById("koszulki-eksport-pole");
+      eks.value = Object.keys(pelne).length
+        ? JSON.stringify(pelne, null, 1)
+        : "Na tym urządzeniu nic nie odblokowano poza tym, co już jest w danych.";
+      eks.hidden = false;
+      eks.select();
+      if (navigator.clipboard && navigator.clipboard.writeText)
+        navigator.clipboard.writeText(eks.value).catch(() => {});
+    }
+  });
+}
 
 function jednaKoszulka(id){
   const k = KOSZULKI.find(x => x.id === id);
@@ -3787,8 +4091,9 @@ function jednaKoszulka(id){
     ? `<div class="wiersz-szczegolu"><span class="etykieta">${etykieta}</span>
        <span class="tresc">${tresc}</span></div>` : "";
 
-  const dowod = zdobyta && k.zdobyta.dowod
-    ? `<a class="odn" href="${bezpieczny(k.zdobyta.dowod)}" target="_blank"
+  const z = s.zdobycie || null;
+  const dowod = z && z.dowod
+    ? `<a class="odn" href="${bezpieczny(z.dowod)}" target="_blank"
         rel="noopener">dowód &#8599;</a>` : "";
 
   const postep = (() => {
@@ -3803,10 +4108,10 @@ function jednaKoszulka(id){
       </div>`;
     if (s.stan === "reczna") return `
       <div class="info">
-        Tego warunku nie da się policzyć z danych, które daje Strava. Sprawdzasz
-        go sam i wpisujesz do <code>dane.js</code> razem z linkiem jako dowodem.
-        Strona nie będzie zgadywać z nazwy jazdy — domysł w miejscu pomiaru
-        to dokładnie ten błąd, przez który z tabeli segmentów wyleciała moc [E].
+        Tego warunku strona nie policzy — Strava nie oddaje takich danych przez
+        API. Sprawdzasz go sam i odblokowujesz przyciskiem wyżej. Strona nie
+        będzie zgadywać z nazwy jazdy: domysł w miejscu pomiaru to dokładnie
+        ten błąd, przez który z tabeli segmentów wyleciała moc [E].
       </div>`;
     if (s.stan === "brak-danych") return `
       <div class="info">
@@ -3854,15 +4159,17 @@ function jednaKoszulka(id){
         <p class="warunek">${bezpieczny(k.warunek_opis)}</p>
         ${wiersz("Seria", seria ? bezpieczny(seria.nazwa) : "")}
         ${wiersz("Stan", `<b class="s-${s.stan}">${
-          zdobyta ? "zdobyta " + pl(k.zdobyta.data) : OPIS_STANU[s.stan]}</b>`)}
-        ${wiersz("Weryfikacja", k.weryfikacja === "auto"
-          ? "liczona przez stronę z danych"
-          : "rozstrzygasz sam i wpisujesz do <code>dane.js</code>")}
+          zdobyta ? "zdobyta " + pl(z.data) : OPIS_STANU[s.stan]}</b>`)}
+        ${wiersz("Postęp", k.weryfikacja === "auto"
+          ? "liczony przez stronę z danych"
+          : "sprawdzasz sam — strona tego nie policzy")}
+        ${wiersz("Odblokowanie", "zawsze ręczne — klikasz Ty")}
         ${wiersz("Dowód", zdobyta
-          ? (k.zdobyta.tag ? `<b>[${bezpieczny(k.zdobyta.tag)}]</b> ` : "") + dowod
+          ? (z.tag ? `<b>[${bezpieczny(z.tag)}]</b> ` : "") + dowod
           : "")}
       </div>
     </div>
+    ${panelOdblokowania(k, s)}
     ${ostrzezenieOkna}
     ${postep}
     ${s.pomiar && s.pomiar.jazda ? `
@@ -3984,6 +4291,7 @@ function pokaz(){
   podepnijSlupki();
   podepnijProby();
   podepnijPrognozy();
+  podepnijGablote();
 
   // Wykres otwiera się na najświeższym końcu — najnowsza przerwa jest
   // najważniejsza, a przy dwóch latach historii ląduje poza kadrem.

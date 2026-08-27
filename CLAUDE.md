@@ -359,14 +359,33 @@ nie kolor: sylwetka roweru vs ekranu, słupek kreskowany vs pełny.
   i wyszarzona, zdobyta świeci pełną barwą z datą. Grupowanie po seriach od
   najłatwiejszej (TdP) do najtrudniejszej (mistrzostwa).
 
-  **`dane.js` → `koszulki` jest JEDYNYM źródłem prawdy o zdobyciu.** Tu nie ma
-  brudnopisu w `localStorage` — inaczej niż notatki i ptaszki w prognozach.
-  Powód: wyczyszczenie danych strony w Safari skasowałoby dorobek dwóch lat.
-  Wygoda nie jest warta tej ceny. Nie dodawać.
+  **ODBLOKOWANIE JEST ZAWSZE RĘCZNE** — decyzja Fryderyka z 27.08.2026,
+  po zobaczeniu pierwszej wersji. Strona liczy postęp i mówi „warunek
+  spełniony", ale kłódki nie zdejmuje nigdy, nawet przy 100%. Robi to przycisk
+  w szczegółach koszulki, a pomyłkę cofa „Cofnij zdobycie". Ta sama granica co
+  przy ptaszkach w prognozach: pomiar to nie decyzja.
 
-  **Strona nigdy nie ogłasza zdobycia sama.** Nawet gdy warunek jest policzalny
-  i już spełniony, pisze „warunek spełniony", a datę wpisuje Fryderyk. Ta sama
-  zasada co ptaszek w prognozach: pomiar to nie to samo co decyzja.
+  **Zdobycie ma dwie warstwy — poprawka tego samego dnia, wcześniejszy wpis
+  mówił inaczej i był nie do pogodzenia z przyciskiem.** Skoro klika człowiek
+  na iPadzie, a strona nie umie pisać do repozytorium, zdobycie działa jak
+  notatki do prób: `dane.js` → `koszulki[].zdobyta` to źródło prawdy (widać na
+  każdym urządzeniu, przeżyje wyczyszczenie Safari), a `localStorage`
+  (`kolarstwo-koszulki`) to brudnopis tego urządzenia. Brudnopis wygrywa, gdy
+  istnieje — także gdy trzyma `null`, bo inaczej nie dałoby się cofnąć
+  zdobycia wpisanego już w danych. Ryzyko wyczyszczenia Safari zostaje realne,
+  więc strona mówi przy każdej takiej koszulce wprost, że nie ma jej jeszcze
+  w danych, a przycisk „Koszulki dla Claude'a…" wypisuje brudnopisy do
+  wklejenia w czacie. **Bez tego przeniesienia dorobek żyje w jednej
+  przeglądarce** — to jedyna cena za odblokowywanie z telefonu i Fryderyk
+  ją zna.
+
+  **Zablokowana koszulka nosi kłódkę**, nie tylko wyszarzenie. Przy osiemnastu
+  kafelkach naraz oko potrzebuje znaku, nie odcienia — i będzie go potrzebowało
+  tym bardziej, im więcej koszulek zdobytych.
+
+  **Fajerwerki po odblokowaniu** — kilkadziesiąt kropek w trzech wybuchach,
+  czysty CSS, warstwa kasuje się sama po 1,9 s. Przy systemowym „ogranicz
+  ruch" nie odpalają się wcale, tak jak animacje wykresów.
 
   **Warunek w watach liczy się wyłącznie z pomiaru `[Z]`.** Nigdy z estymaty
   Stravy `[S]`, nigdy z modelu `[E]`. Strava podała 975 W na Bump 2
@@ -400,6 +419,17 @@ nie kolor: sylwetka roweru vs ekranu, słupek kreskowany vs pełny.
   na segmencie ani kategorii podjazdu **nie da się** wyciągnąć z API i nie
   wolno ich domyślać z nazwy jazdy. Dziewięć koszulek rozstrzyga Fryderyk
   ręcznie i to jest uczciwy stan, nie brak funkcji.
+- **Dwa błędy naprawione 27.08.2026 — nie cofać wzorca:**
+  - `.pasek-postepu.duzy` ma `position:relative`, nie `static`. Wypełnienie
+    paska jest pozycjonowane absolutnie, więc przy statycznym rodzicu szukało
+    najbliższego pozycjonowanego przodka i rozlewało zieleń na pół ekranu.
+  - **Nasłuchy kliknięć podpina się RAZ, nie przy każdym przerysowaniu.**
+    `pokaz()` woła `podepnij*()` za każdym wejściem w zakładkę, a te wieszały
+    uchwyt na `#tresc`, który przeżywa przerysowanie. Po drugiej wizycie jedno
+    kliknięcie ptaszka w Prognozach wykonywało się dwa razy: stawiało znak
+    i od razu go zdejmowało. Stąd wartownik `dataset` na `#tresc` oraz wymóg,
+    żeby uchwyt czytał stan z DOM w chwili kliknięcia, a nie pamiętał go
+    z chwili rysowania.
 - **Z3–Z5** — miejsca zarezerwowane, świadomie zostawione (Fryderyk chce
   widzieć docelowy kształt strony)
 - Ikony kolarskie w tle (7 sylwetek, losowe z ustalonego ziarna, pasy przy
