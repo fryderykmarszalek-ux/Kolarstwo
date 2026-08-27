@@ -634,6 +634,85 @@ koszulki: {
   ]
 },
 
+strefy: {
+  "_opis": "Rozkład czasu po strefach — DANE, nie decyzje. Strona sumuje sekundy z okna (7, 30 albo 90 dni) i dzieli przez sumę całkowitą, więc dwie jazdy po godzinie, jedna 70% w Z2 i druga 60% w Z2, dają na wykresie 65%. Wykres nie pokazuje pojedynczej jazdy — od tego jest Strava.",
+  "_stan": "GRANICE STREF JESZCZE NIE USTALONE — Fryderyk poda własny przelicznik. Dopóki pole granice jest puste, automat nie ma z czego liczyć rozkładów i wykres stoi pusty. Nazwy stref pochodzą z TRENING.md §6 i nie są zgadywane.",
+  "okna_dni": [
+    7,
+    30,
+    90
+  ],
+  "okno_domyslne": 7,
+  "tetno": {
+    "_opis": "Pięć stref, tyle samo co daje Strava dla tętna.",
+    "od_daty": "2026-09-01",
+    "od_daty_powod": "Pas piersiowy wchodzi do jazd 1.09.2026 — wcześniejsze jazdy nie mają zapisu tętna, więc nie wchodzą do rozkładu.",
+    "granice": null,
+    "strefy": [
+      {
+        "id": "z1",
+        "nazwa": "Z1 regeneracja"
+      },
+      {
+        "id": "z2",
+        "nazwa": "Z2 baza"
+      },
+      {
+        "id": "z3",
+        "nazwa": "Z3 tempo"
+      },
+      {
+        "id": "z4",
+        "nazwa": "Z4 próg"
+      },
+      {
+        "id": "z5",
+        "nazwa": "Z5 VO2"
+      }
+    ]
+  },
+  "moc": {
+    "_opis": "Siedem stref, tyle samo co daje Strava dla mocy (model Coggana).",
+    "od_daty": null,
+    "od_daty_powod": "Moc jest mierzona wyłącznie na Zwifcie do czasu miernika; sesje ERG opisują plan, nie zawodnika, więc do rozkładu nie wchodzą.",
+    "granice": null,
+    "strefy": [
+      {
+        "id": "z1",
+        "nazwa": "Z1 regeneracja"
+      },
+      {
+        "id": "z2",
+        "nazwa": "Z2 baza"
+      },
+      {
+        "id": "z3",
+        "nazwa": "Z3 tempo"
+      },
+      {
+        "id": "z4",
+        "nazwa": "Z4 próg"
+      },
+      {
+        "id": "z5",
+        "nazwa": "Z5 VO2"
+      },
+      {
+        "id": "z6",
+        "nazwa": "Z6 beztlenowa"
+      },
+      {
+        "id": "z7",
+        "nazwa": "Z7 neuromięśniowa"
+      }
+    ]
+  },
+  "rozklady": {
+    "_opis": "Sekundy spędzone w każdej strefie, jedna pozycja na jazdę. Klucz = id jazdy, wartość = { tetno: [s1..s5], moc: [s1..s7] }, brakująca miara = null. Wypełnia to automat ze strumieni, gdy granice stref będą ustalone.",
+    "jazdy": {}
+  }
+},
+
 plan_objetosci: [
   {"od":"2026-09-01","do":"2026-09-07","godziny":3,"odciazenie":false},
   {"od":"2026-09-08","do":"2026-09-14","godziny":4,"odciazenie":false},

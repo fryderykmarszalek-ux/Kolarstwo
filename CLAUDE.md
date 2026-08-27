@@ -354,6 +354,41 @@ nie kolor: sylwetka roweru vs ekranu, słupek kreskowany vs pełny.
   Samo rozsuwanie w pionie o stałą wartość tu nie działa: przy stromym
   zejściu krzywej podniesiony podpis niższego punktu ląduje dokładnie na
   wysokości podpisu wyższego (40 s i 1 min zlewały się w plamę).
+- **Objętość → Tętno i Moc** (27.08.2026) — pierścień z rozkładem czasu po
+  strefach. To ten sam wykres, który Strava rysuje po każdej jeździe, z jedną
+  różnicą, która jest całym sensem zakładki: **nie dotyczy jednej jazdy, tylko
+  okna 7, 30 albo 90 dni.** Pojedynczą jazdę Fryderyk ma na Stravie.
+
+  **Liczenie: suma sekund w strefie ÷ suma sekund wszystkich.** Dwie jazdy po
+  godzinie, jedna 70% w Z2 i druga 60% w Z2, dają 65% — sprawdzone na
+  podstawionych danych, wychodzi 65,0%. Przy jazdach różnej długości waży je
+  sam czas i tak ma zostać: godzina w Z2 waży więcej niż dziesięć minut w Z2.
+
+  **Pięć stref tętna i siedem stref mocy** — tyle samo, co daje Strava (moc
+  w modelu Coggana). Nazwy z `TRENING.md` §6, nie wymyślone.
+
+  **Barwy: rampa JASNOŚCI jednego odcienia, nie tęcza.** Strefy są
+  uporządkowane (Z1 < Z2 < …), więc ciemniej znaczy ciężej — skill `dataviz`
+  nazywa to skalą porządkową i zakazuje tam tęczy. Odcień jest ten sam, który
+  w projekcie już znaczy tętno (fuksja) i moc (bursztyn), więc **żadnej nowej
+  roli barwnej nie przybyło** i walidacja palety zostaje w mocy. Rampy
+  przeszły `validate_palette.js --ordinal` w OBU motywach: jasność
+  monotoniczna, odstęp ≥ 0,06, najjaśniejszy (w ciemnym: najciemniejszy)
+  stopień ≥ 2:1 do tła. Nie przestawiać stopni bez ponownej walidacji.
+
+  **Wybrane okno żyje w adresie** — `#objetosc/tetno/30`, jak wybór segmentu
+  w Porównaniach. Wstecz i odświeżenie działają bez dodatkowego stanu, a złe
+  okno w adresie spada na domyślne 7 dni zamiast wywalić wykres.
+
+  **Okno liczy się wstecz od `meta.pobrano`, nie od zegara urządzenia** — jak
+  cała reszta strony poza paskiem świeżości danych.
+
+  **Granice stref jeszcze nie istnieją** (`strefy.tetno.granice` i
+  `strefy.moc.granice` = `null`) — czekają na przelicznik Fryderyka. Do tego
+  czasu `strefy.rozklady.jazdy` jest puste, a wykres pokazuje pusty pierścień
+  i mówi wprost dlaczego. **Nie wypełniać go zerami** — koło pełne zer wygląda
+  jak wynik. Tętno wchodzi do jazd od 1.09.2026 (pas piersiowy), moc ma dziś
+  wyłącznie Zwift i tylko z sesji swobodnych.
 - **Gablota → Koszulki** (27.08.2026) — osiemnaście koszulek z zawodowego
   kolarstwa, każda za jeden z góry ustalony warunek. Zablokowana jest widoczna
   i wyszarzona, zdobyta świeci pełną barwą z datą. Grupowanie po seriach od
@@ -430,6 +465,11 @@ nie kolor: sylwetka roweru vs ekranu, słupek kreskowany vs pełny.
     i od razu go zdejmowało. Stąd wartownik `dataset` na `#tresc` oraz wymóg,
     żeby uchwyt czytał stan z DOM w chwili kliknięcia, a nie pamiętał go
     z chwili rysowania.
+- **Kolejność zakładek: Gablota jest ostatnia** (decyzja Fryderyka z
+  27.08.2026). **Barwa idzie za POZYCJĄ, nie za zakładką** — siedem miejsc ma
+  na stałe bursztyn, turkus, fiolet, limonkę, fuksję, cyjan i pomarańcz.
+  Gablota przenosząc się z piątego miejsca na siódme zmieniła barwę
+  z fuksjowej na pomarańczową i tak ma być; fuksję przejęła Objętość.
 - **Z3–Z5** — miejsca zarezerwowane, świadomie zostawione (Fryderyk chce
   widzieć docelowy kształt strony)
 - Ikony kolarskie w tle (7 sylwetek, losowe z ustalonego ziarna, pasy przy

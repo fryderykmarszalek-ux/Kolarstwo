@@ -34,6 +34,16 @@
   --seria-predkosc:#0d9488;
   --seria-moc:#b45309;
   --seria-tetno:#b02893;
+  /* Strefy: rampa JASNOŚCI jednego odcienia, nie tęcza — strefy są
+     uporządkowane, więc ciemniej ma znaczyć ciężej. Odcień jest ten sam, który
+     w tym projekcie już znaczy tętno i moc, więc żadnej nowej roli barwnej nie
+     przybyło. Sprawdzone walidatorem skilla dataviz (--ordinal) przy tle
+     #eef2f9: jasność monotoniczna, odstępy >= 0,06, najjaśniejszy stopień 2,1:1. */
+  --strefa-tetno-1:#fc7ada; --strefa-tetno-2:#dd5dbd; --strefa-tetno-3:#be40a0;
+  --strefa-tetno-4:#9f1e84; --strefa-tetno-5:#7d0067;
+  --strefa-moc-1:#f38c51; --strefa-moc-2:#dd783c; --strefa-moc-3:#c86526;
+  --strefa-moc-4:#b25105; --strefa-moc-5:#984300; --strefa-moc-6:#7d3600;
+  --strefa-moc-7:#642a00;
   --plan:#12895f;         /* DANE: plan i cel       */
   --alarm:#d03b3b;        /* DANE: ponad limit      */
   --odciazenie:#e2e8f2;
@@ -49,6 +59,13 @@
     --plan:#199e70; --alarm:#e66767;
     --seria-czas:#3987e5; --seria-predkosc:#22a99a;
     --seria-moc:#c07f28; --seria-tetno:#cf5aab;
+    /* Rampy stref w ciemnym: własne stopnie, nie odwrócenie jasnych.
+       Sprawdzone walidatorem przy tle #1f242e — najciemniejszy stopień 2,1:1. */
+    --strefa-tetno-1:#ffa0de; --strefa-tetno-2:#ec7ac7; --strefa-tetno-3:#ce5fab;
+    --strefa-tetno-4:#b04490; --strefa-tetno-5:#932776;
+    --strefa-moc-1:#ffc481; --strefa-moc-2:#f0ac5b; --strefa-moc-3:#da9744;
+    --strefa-moc-4:#c4822c; --strefa-moc-5:#ae6e0b; --strefa-moc-6:#955c00;
+    --strefa-moc-7:#7b4c00;
     --odciazenie:#232936; --cien:rgba(0,0,0,.35); --ikona-krycie:.10;
   }
 }
@@ -60,6 +77,13 @@
   --plan:#199e70; --alarm:#e66767;
   --seria-czas:#3987e5; --seria-predkosc:#22a99a;
   --seria-moc:#c07f28; --seria-tetno:#cf5aab;
+  /* Rampy stref w ciemnym: własne stopnie, nie odwrócenie jasnych.
+     Sprawdzone walidatorem przy tle #1f242e — najciemniejszy stopień 2,1:1. */
+  --strefa-tetno-1:#ffa0de; --strefa-tetno-2:#ec7ac7; --strefa-tetno-3:#ce5fab;
+  --strefa-tetno-4:#b04490; --strefa-tetno-5:#932776;
+  --strefa-moc-1:#ffc481; --strefa-moc-2:#f0ac5b; --strefa-moc-3:#da9744;
+  --strefa-moc-4:#c4822c; --strefa-moc-5:#ae6e0b; --strefa-moc-6:#955c00;
+  --strefa-moc-7:#7b4c00;
   --odciazenie:#232936; --cien:rgba(0,0,0,.35); --ikona-krycie:.10;
 }
 
@@ -546,6 +570,64 @@ rect.proba-punkt{cursor:pointer}
 .info.alarmowy{border-left:3px solid var(--alarm)}
 .info.alarmowy b{color:var(--alarm)}
 .uwaga-koszulki{font-size:12.5px;line-height:1.5}
+
+/* --- Objętość: pierścień stref ---
+   Środek zostaje pusty i niesie liczbę zbiorczą. Wycinki rysowane obwodem koła
+   (stroke-dasharray), więc łuk ma stałą grubość, a przerwa między strefami
+   bierze się z samego dasharray — 2 px tła, żeby dwa sąsiednie stopnie rampy
+   nie zlały się w jeden łuk. --- */
+.okna-przelacznik{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 14px}
+.okna-przelacznik .okno{
+  min-height:38px;padding:0 16px;border-radius:99px;
+  display:inline-flex;align-items:center;justify-content:center;
+  font-size:13px;text-decoration:none;color:var(--slaby);
+  background:var(--plyta);border:1px solid transparent;
+  transition:color .16s ease, border-color .16s ease, background .16s ease;
+}
+.okna-przelacznik .okno:hover{color:var(--tekst)}
+.okna-przelacznik .okno.akt{
+  color:var(--tekst);font-weight:600;border-color:var(--sek-kropka);
+  background:var(--powierzchnia);
+}
+.strefy-uklad{display:flex;gap:22px;align-items:center;flex-wrap:wrap;
+  background:var(--plyta);border:1px solid var(--linia);border-radius:12px;
+  padding:16px 18px}
+.pierscien-obudowa{position:relative;flex:0 0 auto;width:260px;max-width:100%}
+.pierscien{display:block;width:100%;height:auto;overflow:visible}
+.pierscien circle.wycinek{cursor:pointer;transition:opacity .14s ease}
+.pierscien circle.wycinek:hover{opacity:.82}
+.pierscien circle.wycinek.wybrany{stroke-width:38}
+.pierscien-srodek{
+  position:absolute;inset:26%;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;text-align:center;gap:1px;
+  pointer-events:none;
+}
+.srodek-etykieta{font-size:11.5px;color:var(--slaby)}
+.srodek-glowna{font-size:26px;font-weight:600;letter-spacing:-.02em;line-height:1.1;
+  font-variant-numeric:tabular-nums}
+.srodek-podpis{font-size:11.5px;color:var(--slaby);line-height:1.35}
+.srodek-brak{opacity:.75}
+.strefy-bok{flex:1 1 250px;min-width:0;max-width:400px}
+/* Bez ograniczenia szerokości nazwa i procent rozjeżdżały się na przeciwne
+   krańce karty i oko musiało wędrować przez pół ekranu. */
+.legenda-stref{list-style:none;margin:0;padding:0;display:grid;gap:1px}
+.wiersz-strefy{
+  display:flex;align-items:center;gap:10px;padding:7px 8px;border-radius:8px;
+  font-size:13px;cursor:pointer;transition:background .14s ease;
+}
+.wiersz-strefy:hover{background:var(--powierzchnia)}
+.wiersz-strefy.wybrany{background:var(--powierzchnia);font-weight:600}
+.wiersz-strefy.pusty{opacity:.5;cursor:default}
+.wiersz-strefy .prostokat{width:12px;height:12px;border-radius:3px;flex:0 0 auto}
+.nazwa-strefy{flex:1 1 auto;min-width:0}
+.udzial-strefy{font-variant-numeric:tabular-nums;min-width:52px;text-align:right}
+.czas-strefy{color:var(--slaby);font-size:12px;font-variant-numeric:tabular-nums;
+  min-width:62px;text-align:right}
+@media (max-width:560px){
+  .strefy-uklad{gap:14px;padding:14px}
+  .pierscien-obudowa{width:100%;max-width:240px;margin:0 auto}
+  .czas-strefy{min-width:54px}
+}
 
 /* --- Kłódka na zablokowanej koszulce --- */
 .kafel-koszulki .rysunek{position:relative}
@@ -4191,6 +4273,243 @@ function jednaKoszulka(id){
 }
 
 /* ==========================================================================
+   OBJĘTOŚĆ — rozkład czasu po strefach
+
+   Pierścień, nie tort: środek zostaje pusty, bo niesie liczbę zbiorczą, a oko
+   i tak porównuje DŁUGOŚCI łuków, nie pola wycinków. To ten sam wykres, który
+   Strava rysuje po każdej jeździe — z jedną różnicą, która jest całym sensem
+   tej zakładki: NIE dotyczy jednej jazdy, tylko okna 7, 30 albo 90 dni.
+   Pojedynczą jazdę Fryderyk ma na Stravie i nie potrzebuje jej drugi raz.
+
+   Liczenie: sumujemy sekundy w każdej strefie ze wszystkich jazd w oknie
+   i dzielimy przez sumę całkowitą. Dwie jazdy po godzinie, jedna 70% w Z2
+   i druga 60% w Z2, dają 65% — bo (0,7 + 0,6) / 2 = 0,65. Przy jazdach
+   różnej długości waży je sam czas, i tak ma być: godzina w Z2 waży więcej
+   niż dziesięć minut w Z2.
+
+   BARWY. Strefy są uporządkowane (Z1 < Z2 < …), więc niosą JASNOŚĆ jednego
+   odcienia, a nie tęczę: ciemniej = ciężej. Odcień mówi, o którą miarę chodzi,
+   i jest dokładnie ten, który w tym projekcie już znaczy tętno (fuksja) i moc
+   (bursztyn). Zero nowych znaczeń barwnych. Rampy przeszły walidator skilla
+   dataviz w trybie --ordinal, w obu motywach: jasność monotoniczna, odstęp
+   między stopniami ≥ 0,06, najjaśniejszy stopień ≥ 2:1 do tła.
+   ========================================================================== */
+
+const STREFY = D.strefy || null;
+
+// Okno liczone WSTECZ od dnia pobrania danych, nie od zegara urządzenia —
+// tak jak reszta strony. Strona wie tylko tyle, ile jest w pliku.
+function jazdyOkna(dni){
+  const granica = dzienNaTekst(naDzien(DZIS) - (dni - 1) * 86400000);
+  return JAZDY_GABLOTA.filter(a => a.data.slice(0,10) >= granica
+    && a.data.slice(0,10) <= DZIS);
+}
+
+/* Rozkład sekund po strefach dla okna. Zwraca null, gdy nie ma ani jednej
+   jazdy z tym pomiarem — puste koło z podpisem jest uczciwsze niż koło
+   wypełnione zerami, które wygląda jak wynik. */
+function rozkladStref(miara, dni){
+  const def = STREFY && STREFY[miara];
+  if (!def) return null;
+  const ile = def.strefy.length;
+  const sumy = new Array(ile).fill(0);
+  const jazdy = (STREFY.rozklady && STREFY.rozklady.jazdy) || {};
+  let zPomiarem = 0, wszystkich = 0;
+
+  for (const a of jazdyOkna(dni)){
+    wszystkich++;
+    const r = jazdy[a.id];
+    const sek = r && r[miara];
+    if (!Array.isArray(sek) || sek.length !== ile) continue;
+    zPomiarem++;
+    for (let i = 0; i < ile; i++) sumy[i] += sek[i] || 0;
+  }
+  const suma = sumy.reduce((x,y) => x+y, 0);
+  return { sumy, suma, zPomiarem, wszystkich, ile };
+}
+
+/* Pierścień. Wycinki rysowane obwodem koła (stroke-dasharray), nie ścieżkami:
+   łuk o stałej grubości wychodzi wtedy idealnie, a przerwa między wycinkami
+   bierze się z samego dasharray. Między wycinkami zostaje 2 px tła, żeby dwa
+   sąsiednie stopnie rampy nie zlewały się w jeden łuk. */
+function pierscienStref(miara, rozklad){
+  const W = 260, S = 130, R = 92, GRUBOSC = 30, PRZERWA = 2;
+  const OBWOD = 2 * Math.PI * R;
+  const def = STREFY[miara];
+  const puste = !rozklad || !rozklad.suma;
+
+  let g = `<svg viewBox="0 0 ${W} ${W}" width="100%" class="pierscien"
+    preserveAspectRatio="xMidYMid meet" role="img"
+    aria-label="Rozkład czasu po strefach ${miara === "tetno" ? "tętna" : "mocy"}">
+    <g transform="rotate(-90 ${S} ${S})">`;
+
+  if (puste){
+    g += `<circle cx="${S}" cy="${S}" r="${R}" fill="none" stroke="var(--linia)"
+           stroke-width="${GRUBOSC}"/>`;
+  } else {
+    let start = 0;
+    def.strefy.forEach((z,i) => {
+      const udzial = rozklad.sumy[i] / rozklad.suma;
+      const dlugosc = udzial * OBWOD;
+      if (dlugosc <= 0.4){ start += dlugosc; return; }   // strefa bez czasu
+      // Przerwa zjada wycinek od obu stron; przy bardzo wąskim wycinku
+      // rezygnujemy z niej, bo inaczej zniknąłby zupełnie.
+      const p = dlugosc > PRZERWA * 3 ? PRZERWA : 0;
+      g += `<circle class="wycinek" data-i="${i}" cx="${S}" cy="${S}" r="${R}"
+             fill="none" stroke="var(--strefa-${miara}-${i+1})"
+             stroke-width="${GRUBOSC}"
+             stroke-dasharray="${(dlugosc - p).toFixed(2)} ${(OBWOD - dlugosc + p).toFixed(2)}"
+             stroke-dashoffset="${(-(start + p/2)).toFixed(2)}"><title>${
+             bezpieczny(z.nazwa)} — ${liczba(udzial*100,1)}%</title></circle>`;
+      start += dlugosc;
+    });
+  }
+  g += `</g></svg>`;
+  return g;
+}
+
+function srodekPierscienia(miara, rozklad, dni){
+  if (!rozklad || !rozklad.suma) return `
+    <div class="srodek-glowna">—</div>
+    <div class="srodek-podpis">brak pomiarów<br>w tym oknie</div>`;
+  return `
+    <div class="srodek-etykieta">${dni} dni</div>
+    <div class="srodek-glowna">${czasNaTekst(Math.round(rozklad.suma))}</div>
+    <div class="srodek-podpis">${rozklad.zPomiarem} ${
+      rozklad.zPomiarem === 1 ? "jazda" : rozklad.zPomiarem < 5 ? "jazdy" : "jazd"}
+      ${rozklad.zPomiarem < rozklad.wszystkich
+        ? `<br><span class="srodek-brak">z ${rozklad.wszystkich} w oknie</span>` : ""}</div>`;
+}
+
+function legendaStref(miara, rozklad){
+  const def = STREFY[miara];
+  return `<ul class="legenda-stref">` + def.strefy.map((z,i) => {
+    const sek = rozklad ? rozklad.sumy[i] : 0;
+    const udzial = rozklad && rozklad.suma ? sek / rozklad.suma : 0;
+    return `
+      <li class="wiersz-strefy${udzial ? "" : " pusty"}" data-i="${i}">
+        <span class="prostokat" style="background:var(--strefa-${miara}-${i+1})"></span>
+        <span class="nazwa-strefy">${bezpieczny(z.nazwa)}</span>
+        <span class="udzial-strefy">${udzial ? liczba(udzial*100,1) + "%" : "—"}</span>
+        <span class="czas-strefy">${sek ? czasNaTekst(Math.round(sek)) : ""}</span>
+      </li>`;
+  }).join("") + `</ul>`;
+}
+
+// Przełącznik okna żyje w adresie (#objetosc/tetno/30), nie w zmiennej —
+// dzięki temu wstecz i odświeżenie działają bez dodatkowego stanu, tak samo
+// jak wybór segmentu w Porównaniach.
+function przelacznikOkien(miara, dni){
+  return `<div class="okna-przelacznik" role="group" aria-label="Zakres dni">` +
+    STREFY.okna_dni.map(d => `
+      <a class="okno${d === dni ? " akt" : ""}" href="#objetosc/${miara}/${d}"
+         ${d === dni ? 'aria-current="true"' : ""}>${d} dni</a>`).join("") + `</div>`;
+}
+
+function objetosc(miara, arg){
+  if (!STREFY) return pusto("Objętość");
+  const def = STREFY[miara];
+  const dozwolone = STREFY.okna_dni;
+  const dni = dozwolone.includes(Number(arg)) ? Number(arg)
+    : (STREFY.okno_domyslne || dozwolone[0]);
+  const rozklad = rozkladStref(miara, dni);
+  const tetno = miara === "tetno";
+
+  return `
+  <section id="objetosc" data-miara="${miara}" data-dni="${dni}">
+    <h2>${tetno ? "Strefy tętna" : "Strefy mocy"}</h2>
+    <p class="opis">
+      Ile czasu spędziłeś w każdej strefie ${tetno ? "tętna" : "mocy"} przez
+      ostatnie ${dni} dni — wszystkie jazdy razem, nie pojedyncza.
+      ${tetno
+        ? `Pojedynczą jazdę pokazuje Strava; tutaj chodzi o to, czy <b>cały
+           tydzień albo miesiąc</b> wygląda tak, jak miał wyglądać.`
+        : `Moc jest mierzona tylko tam, gdzie naprawdę ją zmierzono — dziś
+           znaczy to trenażer, a sesje ERG odpadają, bo opisują plan, a nie Ciebie.`}
+      <br>Ciemniejszy odcień to cięższa strefa. Barwa mówi też, którą miarę
+      oglądasz: ${tetno ? "fuksja to tętno" : "bursztyn to moc"} — ta sama, co na
+      pasach w Porównaniach.
+    </p>
+    ${przelacznikOkien(miara, dni)}
+    <div class="strefy-uklad">
+      <div class="pierscien-obudowa">
+        ${pierscienStref(miara, rozklad)}
+        <div class="pierscien-srodek" id="srodek-stref">
+          ${srodekPierscienia(miara, rozklad, dni)}
+        </div>
+      </div>
+      <div class="strefy-bok">
+        ${legendaStref(miara, rozklad)}
+      </div>
+    </div>
+    ${!rozklad || !rozklad.suma ? `
+      <div class="info">
+        <b>Nie ma jeszcze czego rysować.</b>
+        ${tetno
+          ? `Pas piersiowy wchodzi do jazd <b>${pl(def.od_daty)}</b> — dopiero
+             od tego dnia jazdy niosą zapis tętna. Wykres wypełni się sam,
+             bez zmiany w kodzie: automat dopisze sekundy w strefach do
+             <code>dane.js</code>, a strona je zsumuje.`
+          : `Granice stref mocy nie są jeszcze ustalone — czekają na Twój
+             przelicznik. Do tego czasu nie ma z czego liczyć rozkładu i strona
+             nie będzie niczego zgadywać.`}
+        <br>Sam podział jest już gotowy: ${def.strefy.length} stref, tyle samo
+        co daje Strava${tetno ? "" : " (model Coggana)"}, nazwy z
+        <code>TRENING.md</code>.
+      </div>` : ""}
+    <div class="info">
+      <b>Jak liczony jest procent.</b> Sumujemy sekundy w danej strefie ze
+      wszystkich jazd w oknie i dzielimy przez sumę wszystkich sekund. Dwie
+      jazdy po godzinie, jedna 70% w Z2 i druga 60% w Z2, dają
+      (0,7 + 0,6) / 2 = <b>65%</b>. Przy jazdach różnej długości waży je sam
+      czas — i tak ma być: godzina w Z2 waży więcej niż dziesięć minut w Z2.
+    </div>
+  </section>`;
+}
+
+// Dotknięcie wycinka albo wiersza legendy wkłada szczegół strefy do środka
+// pierścienia. Klasy przekładamy, nie przerysowujemy — wykres ma zostać.
+function podepnijStrefy(){
+  const tresc = document.getElementById("tresc");
+  if (!tresc || tresc.dataset.strefyPodpiete) return;
+  tresc.dataset.strefyPodpiete = "1";
+
+  const wybierz = (i) => {
+    const korzen = document.getElementById("objetosc");
+    if (!korzen) return;
+    const miara = korzen.dataset.miara, dni = +korzen.dataset.dni;
+    const rozklad = rozkladStref(miara, dni);
+    const srodek = document.getElementById("srodek-stref");
+    if (!srodek || !rozklad || !rozklad.suma) return;
+
+    for (const el of tresc.querySelectorAll("[data-i]"))
+      el.classList.toggle("wybrany", i != null && +el.dataset.i === i);
+
+    if (i == null){
+      srodek.innerHTML = srodekPierscienia(miara, rozklad, dni);
+      return;
+    }
+    const z = STREFY[miara].strefy[i];
+    const sek = rozklad.sumy[i];
+    srodek.innerHTML = `
+      <div class="srodek-etykieta">${bezpieczny(z.nazwa)}</div>
+      <div class="srodek-glowna">${liczba(sek / rozklad.suma * 100, 1)}%</div>
+      <div class="srodek-podpis">${czasNaTekst(Math.round(sek))} przez ${dni} dni</div>`;
+  };
+
+  const zZdarzenia = e => {
+    const cel = e.target.closest("circle.wycinek, li.wiersz-strefy");
+    return cel ? +cel.dataset.i : null;
+  };
+  tresc.addEventListener("click", e => {
+    if (!document.getElementById("objetosc")) return;
+    const i = zZdarzenia(e);
+    const juz = e.target.closest(".wybrany");
+    wybierz(i != null && !juz ? i : null);
+  });
+}
+
+/* ==========================================================================
    SEKCJE — poziom 1 i poziom 2.
    Zakładka trafia na pasek tylko gdy ma wpis tutaj. Z1–Z5 to miejsca
    zarezerwowane; dostaną nazwy, kiedy dostaną treść.
@@ -4217,15 +4536,18 @@ const SEKCJE = [
     pod: PROGNOZY.length
       ? PROGNOZY.map(o => ({ id:o.id, tytul:o.tytul, rysuj: () => prognozaMocy(o.id) }))
       : [{ id:"brak", tytul:"—", rysuj: () => pusto("Prognozy") }] },
-  { id:"gablota", tytul:"Gablota", barwa:"fuksja", pod:[
-      { id:"koszulki", tytul:"Koszulki", rysuj: gablota }
+  { id:"objetosc", tytul:"Objętość", barwa:"fuksja", pod:[
+      { id:"tetno", tytul:"Tętno", rysuj: (arg) => objetosc("tetno", arg) },
+      { id:"moc",   tytul:"Moc",   rysuj: (arg) => objetosc("moc", arg) }
   ]},
-  ...[4,5].map(n => ({
-    id:"z"+n, tytul:"Z"+n, barwa:["fiolet","limonka","fuksja","cyjan","pomarancz"][n-1],
-    pod:[1,2,3].map(m => ({
-      id:"z"+n+"-"+m, tytul:"Z"+n+"."+m, rysuj: () => pusto("Z"+n+"."+m)
-    }))
-  }))
+  { id:"z4", tytul:"Z4", barwa:"cyjan", pod:[1,2,3].map(m => ({
+      id:"z4-"+m, tytul:"Z4."+m, rysuj: () => pusto("Z4."+m)
+  }))},
+  // Gablota na końcu — decyzja Fryderyka z 27.08.2026. Barwa idzie za pozycją,
+  // nie za zakładką: siódme miejsce ma pomarańcz.
+  { id:"gablota", tytul:"Gablota", barwa:"pomarancz", pod:[
+      { id:"koszulki", tytul:"Koszulki", rysuj: gablota }
+  ]}
 ];
 
 /* ==========================================================================
@@ -4292,6 +4614,7 @@ function pokaz(){
   podepnijProby();
   podepnijPrognozy();
   podepnijGablote();
+  podepnijStrefy();
 
   // Wykres otwiera się na najświeższym końcu — najnowsza przerwa jest
   // najważniejsza, a przy dwóch latach historii ląduje poza kadrem.
