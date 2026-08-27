@@ -367,14 +367,24 @@ nie kolor: sylwetka roweru vs ekranu, słupek kreskowany vs pełny.
   **Pięć stref tętna i siedem stref mocy** — tyle samo, co daje Strava (moc
   w modelu Coggana). Nazwy z `TRENING.md` §6, nie wymyślone.
 
-  **Barwy: rampa JASNOŚCI jednego odcienia, nie tęcza.** Strefy są
-  uporządkowane (Z1 < Z2 < …), więc ciemniej znaczy ciężej — skill `dataviz`
-  nazywa to skalą porządkową i zakazuje tam tęczy. Odcień jest ten sam, który
-  w projekcie już znaczy tętno (fuksja) i moc (bursztyn), więc **żadnej nowej
-  roli barwnej nie przybyło** i walidacja palety zostaje w mocy. Rampy
-  przeszły `validate_palette.js --ordinal` w OBU motywach: jasność
-  monotoniczna, odstęp ≥ 0,06, najjaśniejszy (w ciemnym: najciemniejszy)
-  stopień ≥ 2:1 do tła. Nie przestawiać stopni bez ponownej walidacji.
+  **Barwy: rampa CIEPLNA, poprawka z 27.08.2026 — nie wracać do odcieni
+  jednego koloru.** Pierwsza wersja była skalą porządkową (jasność jednej
+  fuksji / jednego bursztynu), zgodnie z regułą skilla `dataviz`. Fryderyk
+  powiedział wprost, że za słabo odróżnia sąsiednie strefy — i miał rację:
+  przy pięciu wycinkach stykających się na pierścieniu sama jasność to za
+  mało. Teraz idzie od chłodnego niebieskiego (lekko) do czerwieni
+  (maksymalnie).
+
+  Hexy generowane w OKLCH i **przeszukane**, nie dobrane okiem: walidator
+  skilla na parach SĄSIEDNICH (tylko takie się stykają), progi CVD ΔE ≥ 8
+  i normalne widzenie ΔE ≥ 15. Wynik: tętno 8,9 / 18,0 w jasnym i 8,7 / 16,8
+  w ciemnym; moc 13,6 / 16,5 i 12,9 / 15,5. **Szósta strefa mocy jest
+  fuksjowa, a nie pomarańczowa**, bo para żółty–pomarańcz zapadała się przy
+  protanopii do ΔE 0,1. Nie przestawiać stopni bez ponownego przepuszczenia
+  przez walidator.
+
+  Koszt tej zmiany, świadomy: barwa strefy nie mówi już, którą miarę
+  oglądasz. Mówi to zakładka i podpis — a rozróżnialność stref była ważniejsza.
 
   **Wybrane okno żyje w adresie** — `#objetosc/tetno/30`, jak wybór segmentu
   w Porównaniach. Wstecz i odświeżenie działają bez dodatkowego stanu, a złe
@@ -383,12 +393,31 @@ nie kolor: sylwetka roweru vs ekranu, słupek kreskowany vs pełny.
   **Okno liczy się wstecz od `meta.pobrano`, nie od zegara urządzenia** — jak
   cała reszta strony poza paskiem świeżości danych.
 
-  **Granice stref jeszcze nie istnieją** (`strefy.tetno.granice` i
-  `strefy.moc.granice` = `null`) — czekają na przelicznik Fryderyka. Do tego
-  czasu `strefy.rozklady.jazdy` jest puste, a wykres pokazuje pusty pierścień
-  i mówi wprost dlaczego. **Nie wypełniać go zerami** — koło pełne zer wygląda
-  jak wynik. Tętno wchodzi do jazd od 1.09.2026 (pas piersiowy), moc ma dziś
-  wyłącznie Zwift i tylko z sesji swobodnych.
+  **Progi stref są DATOWANE i działają tylko w przód** (27.08.2026, decyzja
+  Fryderyka). `strefy.tetno.tabele` i `strefy.moc.tabele` to listy wersji, każda
+  z polem `od`. Rozkład jazdy liczy się tabelą obowiązującą **w dniu tej
+  jazdy** i zostaje zapisany na stałe, więc podniesienie progu w listopadzie
+  nie rusza jazd z września. Automat musi trzymać tę samą regułę i zapisywać
+  przy jeździe, której tabeli użył. Jazda starsza niż najstarsza tabela bierze
+  tę najstarszą — innej nie ma, a odmowa policzenia byłaby gorsza niż jawne
+  założenie.
+
+  Tabelę wpisuje się **na stronie**, każdą strefę osobno; przy tętnie stoi
+  serce, przy mocy błyskawica. Zapis idzie do `localStorage`
+  (`kolarstwo-strefy`) jako nowa wersja z datą dzisiejszą, a przycisk „Progi
+  dla Claude'a…" wypisuje je do wklejenia w czacie — `dane.js` zostaje źródłem
+  prawdy. Wersja z urządzenia o tej samej dacie nadpisuje tę z danych, bo dwie
+  sprzeczne tabele na jeden dzień nie mają sensu. Zapis odmawia, gdy dolny próg
+  nie jest mniejszy od górnego albo strefy zachodzą na siebie.
+
+  Wpisane dziś tabele to **propozycje Claude'a do nadpisania**: tętno z HRmax
+  201 (`TRENING.md` §6), moc z modelu Coggana przy FTP 150 W.
+
+  `strefy.rozklady.jazdy` jest wciąż puste — automat dopisze sekundy w strefach,
+  gdy będzie co liczyć. Wykres pokazuje wtedy pusty pierścień i mówi wprost
+  dlaczego. **Nie wypełniać go zerami** — koło pełne zer wygląda jak wynik.
+  Tętno wchodzi do jazd od 1.09.2026 (pas piersiowy), moc ma dziś wyłącznie
+  Zwift i tylko z sesji swobodnych.
 - **Gablota → Koszulki** (27.08.2026) — osiemnaście koszulek z zawodowego
   kolarstwa, każda za jeden z góry ustalony warunek. Zablokowana jest widoczna
   i wyszarzona, zdobyta świeci pełną barwą z datą. Grupowanie po seriach od

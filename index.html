@@ -34,16 +34,22 @@
   --seria-predkosc:#0d9488;
   --seria-moc:#b45309;
   --seria-tetno:#b02893;
-  /* Strefy: rampa JASNOŚCI jednego odcienia, nie tęcza — strefy są
-     uporządkowane, więc ciemniej ma znaczyć ciężej. Odcień jest ten sam, który
-     w tym projekcie już znaczy tętno i moc, więc żadnej nowej roli barwnej nie
-     przybyło. Sprawdzone walidatorem skilla dataviz (--ordinal) przy tle
-     #eef2f9: jasność monotoniczna, odstępy >= 0,06, najjaśniejszy stopień 2,1:1. */
-  --strefa-tetno-1:#fc7ada; --strefa-tetno-2:#dd5dbd; --strefa-tetno-3:#be40a0;
-  --strefa-tetno-4:#9f1e84; --strefa-tetno-5:#7d0067;
-  --strefa-moc-1:#f38c51; --strefa-moc-2:#dd783c; --strefa-moc-3:#c86526;
-  --strefa-moc-4:#b25105; --strefa-moc-5:#984300; --strefa-moc-6:#7d3600;
-  --strefa-moc-7:#642a00;
+  /* Strefy: rampa CIEPLNA — od chłodnego niebieskiego (lekko) do czerwieni
+     (maksymalnie). Pierwsza wersja była odcieniami jednego koloru; Fryderyk
+     powiedział wprost, że za słabo je od siebie odróżnia, i miał rację: przy
+     pięciu wycinkach obok siebie sama jasność to za mało.
+     Dobrane przeszukiwaniem, nie okiem — hexy generowane w OKLCH przy stałym
+     odcieniu i sprawdzane walidatorem skilla dataviz na parach SĄSIEDNICH
+     (tylko takie się stykają na pierścieniu). Progi: CVD ΔE >= 8, normalne
+     widzenie ΔE >= 15. Wynik: tętno 8,9 / 18,0 · moc 13,6 / 16,5 w jasnym.
+     Para żółty-pomarańcz przy 7 strefach zapadała się przy protanopii
+     (ΔE 0,1), dlatego szósta strefa mocy jest fuksjowa, a nie pomarańczowa.
+     NIE przestawiać stopni bez ponownego przepuszczenia przez walidator. */
+  --strefa-tetno-1:#4d82fc; --strefa-tetno-2:#00c0d4; --strefa-tetno-3:#00985f;
+  --strefa-tetno-4:#bb9d00; --strefa-tetno-5:#ce343a;
+  --strefa-moc-1:#558aff; --strefa-moc-2:#00c6e2; --strefa-moc-3:#009f79;
+  --strefa-moc-4:#84bd00; --strefa-moc-5:#997b00; --strefa-moc-6:#ec5fcb;
+  --strefa-moc-7:#d6242e;
   --plan:#12895f;         /* DANE: plan i cel       */
   --alarm:#d03b3b;        /* DANE: ponad limit      */
   --odciazenie:#e2e8f2;
@@ -59,13 +65,14 @@
     --plan:#199e70; --alarm:#e66767;
     --seria-czas:#3987e5; --seria-predkosc:#22a99a;
     --seria-moc:#c07f28; --seria-tetno:#cf5aab;
-    /* Rampy stref w ciemnym: własne stopnie, nie odwrócenie jasnych.
-       Sprawdzone walidatorem przy tle #1f242e — najciemniejszy stopień 2,1:1. */
-    --strefa-tetno-1:#ffa0de; --strefa-tetno-2:#ec7ac7; --strefa-tetno-3:#ce5fab;
-    --strefa-tetno-4:#b04490; --strefa-tetno-5:#932776;
-    --strefa-moc-1:#ffc481; --strefa-moc-2:#f0ac5b; --strefa-moc-3:#da9744;
-    --strefa-moc-4:#c4822c; --strefa-moc-5:#ae6e0b; --strefa-moc-6:#955c00;
-    --strefa-moc-7:#7b4c00;
+    /* Rampy stref w ciemnym: własne stopnie dobrane pod ciemne tło, nie
+       odwrócenie jasnych. Walidator: tętno CVD ΔE 8,7 / normalne 16,8;
+       moc 12,9 / 15,5 — obie ponad progami 8 i 15. */
+    --strefa-tetno-1:#3e6cd5; --strefa-tetno-2:#00a5b6; --strefa-tetno-3:#007f4e;
+    --strefa-tetno-4:#a28700; --strefa-tetno-5:#ae282e;
+    --strefa-moc-1:#3b69d2; --strefa-moc-2:#00a2b9; --strefa-moc-3:#007d5e;
+    --strefa-moc-4:#6d9c00; --strefa-moc-5:#7a6200; --strefa-moc-6:#c255a8;
+    --strefa-moc-7:#aa2428;
     --odciazenie:#232936; --cien:rgba(0,0,0,.35); --ikona-krycie:.10;
   }
 }
@@ -77,13 +84,14 @@
   --plan:#199e70; --alarm:#e66767;
   --seria-czas:#3987e5; --seria-predkosc:#22a99a;
   --seria-moc:#c07f28; --seria-tetno:#cf5aab;
-  /* Rampy stref w ciemnym: własne stopnie, nie odwrócenie jasnych.
-     Sprawdzone walidatorem przy tle #1f242e — najciemniejszy stopień 2,1:1. */
-  --strefa-tetno-1:#ffa0de; --strefa-tetno-2:#ec7ac7; --strefa-tetno-3:#ce5fab;
-  --strefa-tetno-4:#b04490; --strefa-tetno-5:#932776;
-  --strefa-moc-1:#ffc481; --strefa-moc-2:#f0ac5b; --strefa-moc-3:#da9744;
-  --strefa-moc-4:#c4822c; --strefa-moc-5:#ae6e0b; --strefa-moc-6:#955c00;
-  --strefa-moc-7:#7b4c00;
+  /* Rampy stref w ciemnym: własne stopnie dobrane pod ciemne tło, nie
+     odwrócenie jasnych. Walidator: tętno CVD ΔE 8,7 / normalne 16,8;
+     moc 12,9 / 15,5 — obie ponad progami 8 i 15. */
+  --strefa-tetno-1:#3e6cd5; --strefa-tetno-2:#00a5b6; --strefa-tetno-3:#007f4e;
+  --strefa-tetno-4:#a28700; --strefa-tetno-5:#ae282e;
+  --strefa-moc-1:#3b69d2; --strefa-moc-2:#00a2b9; --strefa-moc-3:#007d5e;
+  --strefa-moc-4:#6d9c00; --strefa-moc-5:#7a6200; --strefa-moc-6:#c255a8;
+  --strefa-moc-7:#aa2428;
   --odciazenie:#232936; --cien:rgba(0,0,0,.35); --ikona-krycie:.10;
 }
 
@@ -623,6 +631,55 @@ rect.proba-punkt{cursor:pointer}
 .udzial-strefy{font-variant-numeric:tabular-nums;min-width:52px;text-align:right}
 .czas-strefy{color:var(--slaby);font-size:12px;font-variant-numeric:tabular-nums;
   min-width:62px;text-align:right}
+
+/* --- Tabela przeliczników stref --- */
+.tabela-stref{margin-top:30px}
+.tabela-naglowek{display:flex;align-items:baseline;justify-content:space-between;
+  gap:10px;flex-wrap:wrap;margin-bottom:4px}
+.tabela-naglowek h2{display:flex;align-items:center;gap:8px;margin:0}
+.ikona-tabeli{width:17px;height:17px;flex:0 0 auto;vertical-align:-2px}
+#tabela-stref .ikona-tabeli{color:var(--strefa-tetno-5)}
+#tabela-stref[data-miara="moc"] .ikona-tabeli{color:var(--strefa-moc-7)}
+.tabela-od{font-size:12px;color:var(--slaby)}
+.tabela-od b{color:var(--tekst)}
+.strefy-wiersze{list-style:none;margin:0;padding:0;display:grid;gap:1px;
+  border:1px solid var(--linia);border-radius:10px;overflow:hidden}
+.wiersz-progu{display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+  padding:9px 13px;background:var(--powierzchnia);border-top:1px solid var(--linia)}
+.wiersz-progu:first-child{border-top:0}
+.wiersz-progu .prostokat{width:12px;height:12px;border-radius:3px;flex:0 0 auto}
+.nazwa-progu{flex:1 1 130px;min-width:0;font-size:13px}
+.pola-progu{display:flex;align-items:center;gap:6px;flex:0 0 auto}
+.pola-progu input.prog{
+  width:74px;min-height:38px;box-sizing:border-box;font:inherit;font-size:15px;
+  font-weight:600;text-align:center;font-variant-numeric:tabular-nums;
+  color:var(--tekst);background:var(--plyta);
+  border:1px solid var(--linia);border-radius:8px;padding:2px 6px;
+  appearance:textfield;-moz-appearance:textfield;
+}
+.pola-progu input.prog:focus{outline:0;border-color:var(--sek-kropka)}
+.pola-progu input.prog::-webkit-outer-spin-button,
+.pola-progu input.prog::-webkit-inner-spin-button{appearance:none;margin:0}
+.myslnik{color:var(--slaby)}
+.jednostka-progu{font-size:12px;color:var(--slaby);min-width:26px}
+.tabela-dol{display:flex;justify-content:space-between;align-items:center;
+  gap:10px;margin-top:10px;flex-wrap:wrap}
+#tabela-stan{font-size:11.5px;color:var(--slaby)}
+.tabela-przyciski{display:flex;gap:8px}
+#tabela-zapisz:hover{color:var(--plan);border-color:var(--plan)}
+#tabela-anuluj:hover{color:var(--alarm);border-color:var(--alarm)}
+.historia-tabel{list-style:none;margin:6px 0 0;padding:0;display:grid;gap:4px}
+.historia-tabel li{display:flex;gap:10px;flex-wrap:wrap;align-items:baseline;
+  font-size:12px;font-variant-numeric:tabular-nums}
+#strefy-eksport-pole{margin-top:8px;font-size:11.5px;width:100%;
+  box-sizing:border-box;resize:vertical;font-family:inherit;
+  color:var(--tekst);background:var(--powierzchnia);
+  border:1px solid var(--linia);border-radius:8px;padding:8px 10px}
+@media (max-width:560px){
+  .nazwa-progu{flex:1 1 100%}
+  .pola-progu{width:100%}
+  .pola-progu input.prog{flex:1 1 auto;width:auto}
+}
 @media (max-width:560px){
   .strefy-uklad{gap:14px;padding:14px}
   .pierscien-obudowa{width:100%;max-width:240px;margin:0 auto}
@@ -4297,6 +4354,209 @@ function jednaKoszulka(id){
 
 const STREFY = D.strefy || null;
 
+/* --- Tabele przeliczników stref ------------------------------------------
+   Progi są DATOWANE i działają tylko w przód. Rozkład jazdy liczy się tabelą
+   obowiązującą w dniu tej jazdy i zapisuje na stałe, więc podniesienie progu
+   w listopadzie nie rusza jazd z września — inaczej historia zmieniałaby się
+   pod ręką i żaden wykres nie znaczyłby tego samego dwa razy.
+
+   Zapis ma dwie warstwy, jak notatki i koszulki: dane.js jest źródłem prawdy,
+   localStorage brudnopisem tego urządzenia. Strona nie umie pisać do
+   repozytorium, więc nowa tabela wpisana na iPadzie czeka tam, aż przycisk
+   wypisze ją do wklejenia w czacie. */
+const KLUCZ_STREF = "kolarstwo-strefy";
+
+function strefyLokalne(){
+  try { const o = JSON.parse(localStorage.getItem(KLUCZ_STREF) || "{}");
+        return o && typeof o === "object" ? o : {}; }
+  catch(e){ return {}; }
+}
+function zapiszStrefyLokalne(o){
+  try { localStorage.setItem(KLUCZ_STREF, JSON.stringify(o)); return true; }
+  catch(e){ return false; }
+}
+// Wszystkie wersje tabeli, po dacie rosnąco. Brudnopis o tej samej dacie
+// nadpisuje wersję z danych — inaczej poprawka wpisana dwa razy tego samego
+// dnia zakładałaby dwie sprzeczne tabele na jeden dzień.
+function tabeleStref(miara){
+  const zDanych = ((STREFY[miara] || {}).tabele || []).map(t => ({ ...t, skad: "dane" }));
+  const zUrzadzenia = (strefyLokalne()[miara] || []).map(t => ({ ...t, skad: "urzadzenie" }));
+  const po = new Map();
+  for (const t of [...zDanych, ...zUrzadzenia]) po.set(t.od, t);
+  return [...po.values()].sort((a,b) => a.od < b.od ? -1 : 1);
+}
+// Tabela obowiązująca danego dnia. Jazda starsza niż najstarsza tabela bierze
+// tę najstarszą — innej nie ma, a odmowa policzenia byłaby gorsza niż jawne
+// założenie. Tę samą regułę musi zastosować automat.
+function tabelaNaDzien(miara, data){
+  const lista = tabeleStref(miara);
+  if (!lista.length) return null;
+  let wynik = lista[0];
+  for (const t of lista) if (t.od <= data) wynik = t;
+  return wynik;
+}
+const tabelaBiezaca = (miara) => {
+  const lista = tabeleStref(miara);
+  return lista.length ? lista[lista.length-1] : null;
+};
+const strefyMiary = (miara) => {
+  const t = tabelaBiezaca(miara);
+  return t ? t.strefy : [];
+};
+
+const IKONA_SERCA = `<svg class="ikona-tabeli" viewBox="0 0 20 20" aria-hidden="true">
+  <path d="M10 17S2.8 12.4 2.8 7.6A4 4 0 0 1 10 5.2a4 4 0 0 1 7.2 2.4C17.2 12.4 10 17 10 17Z"
+    fill="currentColor"/></svg>`;
+const IKONA_BLYSKAWICY = `<svg class="ikona-tabeli" viewBox="0 0 20 20" aria-hidden="true">
+  <path d="M11.4 2 4.6 11.2h4.2L8.2 18l7.2-9.6h-4.4L11.4 2Z" fill="currentColor"/></svg>`;
+
+function tabelaStrefHTML(miara){
+  const def = STREFY[miara];
+  const biezaca = tabelaBiezaca(miara);
+  if (!biezaca) return "";
+  const tetno = miara === "tetno";
+  const wersje = tabeleStref(miara);
+  const brudnopis = biezaca.skad === "urzadzenie";
+
+  return `
+  <section class="tabela-stref" id="tabela-stref" data-miara="${miara}">
+    <div class="tabela-naglowek">
+      <h2>${tetno ? IKONA_SERCA : IKONA_BLYSKAWICY}
+        Przelicznik stref ${tetno ? "tętna" : "mocy"}</h2>
+      <span class="tabela-od">obowiązuje od <b>${pl(biezaca.od)}</b></span>
+    </div>
+    <p class="opis">
+      Tu wpisujesz swoje progi. Każda strefa osobno, w ${tetno ? "uderzeniach na minutę" : "watach"}.
+      <br><b>Zmiana działa tylko w przód.</b> Jazda jest liczona tabelą, która
+      obowiązywała w <b>dniu tej jazdy</b>, i jej rozkład zostaje zapisany na
+      stałe. Jeśli w listopadzie podniesiesz Z2, wrześniowe jazdy zostaną takie,
+      jakie były — inaczej historia zmieniałaby się pod ręką i żaden wykres nie
+      znaczyłby tego samego dwa razy.
+    </p>
+    <ul class="strefy-wiersze">
+      ${biezaca.strefy.map((z,i) => `
+        <li class="wiersz-progu">
+          <span class="prostokat" style="background:var(--strefa-${miara}-${i+1})"></span>
+          <span class="nazwa-progu">${bezpieczny(z.nazwa)}</span>
+          <span class="pola-progu">
+            <input type="number" inputmode="numeric" class="prog" data-i="${i}" data-pole="min"
+              value="${z.min}" min="0" max="999" step="1"
+              aria-label="${bezpieczny(z.nazwa)} — dolny próg">
+            <span class="myslnik">–</span>
+            <input type="number" inputmode="numeric" class="prog" data-i="${i}" data-pole="max"
+              value="${z.max}" min="0" max="999" step="1"
+              aria-label="${bezpieczny(z.nazwa)} — górny próg">
+            <span class="jednostka-progu">${def.jednostka}</span>
+          </span>
+        </li>`).join("")}
+    </ul>
+    <div class="tabela-dol">
+      <span id="tabela-stan">${brudnopis
+        ? `<span class="stan-brudnopis">ta tabela jest zapisana tylko na tym urządzeniu</span>`
+        : ""}</span>
+      <span class="tabela-przyciski">
+        <button class="kolko-akcja" id="tabela-zapisz" title="Zapisz jako nową tabelę od dziś">✓</button>
+        <button class="kolko-akcja" id="tabela-anuluj" title="Cofnij zmiany">✗</button>
+      </span>
+    </div>
+    ${wersje.length > 1 ? `
+      <div class="info">
+        <b>Historia progów.</b> Każda jazda liczy się tą tabelą, która
+        obowiązywała w jej dniu.
+        <ul class="historia-tabel">
+          ${[...wersje].reverse().map(t => `
+            <li><span class="kroki-data">od ${pl(t.od)}</span>
+              <span>${t.strefy.map(z => z.min + "–" + z.max).join(" · ")}</span>
+              ${t.skad === "urzadzenie"
+                ? `<span class="stan-brudnopis">tylko na tym urządzeniu</span>` : ""}</li>`).join("")}
+        </ul>
+      </div>` : ""}
+    <div class="prognoza-dol">
+      <span class="odblok-podpis">Nowe progi zapisują się na tym urządzeniu —
+        wyślij je do Claude'a, żeby trafiły do <code>dane.js</code> i liczyły się
+        w automacie.</span>
+      <button class="link-tekstowy" id="strefy-eksport">Progi dla Claude'a…</button>
+    </div>
+    <textarea id="strefy-eksport-pole" rows="6" hidden readonly></textarea>
+  </section>`;
+}
+
+function podepnijTabeleStref(){
+  const tresc = document.getElementById("tresc");
+  if (!tresc || tresc.dataset.tabeleStrefPodpiete) return;
+  tresc.dataset.tabeleStrefPodpiete = "1";
+
+  const stan = (t) => { const e = document.getElementById("tabela-stan"); if (e) e.innerHTML = t; };
+
+  tresc.addEventListener("input", e => {
+    if (e.target.classList && e.target.classList.contains("prog"))
+      stan(`<span class="stan-niezapisane">niezapisane — dotknij ✓</span>`);
+  });
+
+  tresc.addEventListener("click", e => {
+    const b = e.target.closest("button");
+    const korzen = document.getElementById("tabela-stref");
+    if (!b || !korzen) return;
+    const miara = korzen.dataset.miara;
+
+    if (b.id === "tabela-zapisz"){
+      const biezaca = tabelaBiezaca(miara);
+      const strefy = biezaca.strefy.map((z,i) => {
+        const we = (pole) => korzen.querySelector(`.prog[data-i="${i}"][data-pole="${pole}"]`);
+        return { ...z, min: Math.round(+we("min").value), max: Math.round(+we("max").value) };
+      });
+      // Kontrola sensu: dolny próg poniżej górnego, strefy rosnące.
+      for (let i = 0; i < strefy.length; i++){
+        if (!isFinite(strefy[i].min) || !isFinite(strefy[i].max) || strefy[i].min >= strefy[i].max){
+          stan(`<span class="stan-niezapisane">${bezpieczny(strefy[i].nazwa)}: dolny próg musi być mniejszy od górnego</span>`);
+          return;
+        }
+        if (i && strefy[i].min <= strefy[i-1].max){
+          stan(`<span class="stan-niezapisane">${bezpieczny(strefy[i].nazwa)} zachodzi na ${bezpieczny(strefy[i-1].nazwa)}</span>`);
+          return;
+        }
+      }
+      const bezZmian = strefy.every((z,i) =>
+        z.min === biezaca.strefy[i].min && z.max === biezaca.strefy[i].max);
+      if (bezZmian){ stan(`<span>bez zmian wobec obecnej tabeli</span>`); return; }
+
+      // Nowa tabela obowiązuje OD DZIŚ — data z zegara urządzenia, bo to
+      // moment decyzji, a nie pomiar.
+      const dzis = new Date().toISOString().slice(0,10);
+      const l = strefyLokalne();
+      l[miara] = (l[miara] || []).filter(t => t.od !== dzis);
+      l[miara].push({ od: dzis, zrodlo: "wpisane na urządzeniu", strefy });
+      if (!zapiszStrefyLokalne(l)){
+        stan(`<span class="stan-niezapisane">nie udało się zapisać w przeglądarce</span>`);
+        return;
+      }
+      const [, , arg] = zHasha();
+      tresc.innerHTML = objetosc(miara, arg);
+      stan(`<span class="stan-brudnopis">zapisane na tym urządzeniu — obowiązuje od ${pl(dzis)}</span>`);
+      return;
+    }
+
+    if (b.id === "tabela-anuluj"){
+      const [, , arg] = zHasha();
+      tresc.innerHTML = objetosc(miara, arg);
+      return;
+    }
+
+    if (b.id === "strefy-eksport"){
+      const l = strefyLokalne();
+      const eks = document.getElementById("strefy-eksport-pole");
+      eks.value = Object.keys(l).length
+        ? JSON.stringify(l, null, 1)
+        : "Na tym urządzeniu nie ma własnych progów — obowiązują te z danych.";
+      eks.hidden = false;
+      eks.select();
+      if (navigator.clipboard && navigator.clipboard.writeText)
+        navigator.clipboard.writeText(eks.value).catch(() => {});
+    }
+  });
+}
+
+
 // Okno liczone WSTECZ od dnia pobrania danych, nie od zegara urządzenia —
 // tak jak reszta strony. Strona wie tylko tyle, ile jest w pliku.
 function jazdyOkna(dni){
@@ -4311,7 +4571,7 @@ function jazdyOkna(dni){
 function rozkladStref(miara, dni){
   const def = STREFY && STREFY[miara];
   if (!def) return null;
-  const ile = def.strefy.length;
+  const ile = strefyMiary(miara).length;
   const sumy = new Array(ile).fill(0);
   const jazdy = (STREFY.rozklady && STREFY.rozklady.jazdy) || {};
   let zPomiarem = 0, wszystkich = 0;
@@ -4348,7 +4608,7 @@ function pierscienStref(miara, rozklad){
            stroke-width="${GRUBOSC}"/>`;
   } else {
     let start = 0;
-    def.strefy.forEach((z,i) => {
+    strefyMiary(miara).forEach((z,i) => {
       const udzial = rozklad.sumy[i] / rozklad.suma;
       const dlugosc = udzial * OBWOD;
       if (dlugosc <= 0.4){ start += dlugosc; return; }   // strefa bez czasu
@@ -4382,8 +4642,7 @@ function srodekPierscienia(miara, rozklad, dni){
 }
 
 function legendaStref(miara, rozklad){
-  const def = STREFY[miara];
-  return `<ul class="legenda-stref">` + def.strefy.map((z,i) => {
+  return `<ul class="legenda-stref">` + strefyMiary(miara).map((z,i) => {
     const sek = rozklad ? rozklad.sumy[i] : 0;
     const udzial = rozklad && rozklad.suma ? sek / rozklad.suma : 0;
     return `
@@ -4426,9 +4685,9 @@ function objetosc(miara, arg){
            tydzień albo miesiąc</b> wygląda tak, jak miał wyglądać.`
         : `Moc jest mierzona tylko tam, gdzie naprawdę ją zmierzono — dziś
            znaczy to trenażer, a sesje ERG odpadają, bo opisują plan, a nie Ciebie.`}
-      <br>Ciemniejszy odcień to cięższa strefa. Barwa mówi też, którą miarę
-      oglądasz: ${tetno ? "fuksja to tętno" : "bursztyn to moc"} — ta sama, co na
-      pasach w Porównaniach.
+      <br>Barwy idą od chłodnej do gorącej: niebieski to najlżejsza strefa,
+      czerwony najcięższa. Dobrane tak, żeby dwie sąsiednie dało się rozróżnić
+      także przy daltonizmie — sprawdzone liczbowo, nie okiem.
     </p>
     ${przelacznikOkien(miara, dni)}
     <div class="strefy-uklad">
@@ -4453,10 +4712,11 @@ function objetosc(miara, arg){
           : `Granice stref mocy nie są jeszcze ustalone — czekają na Twój
              przelicznik. Do tego czasu nie ma z czego liczyć rozkładu i strona
              nie będzie niczego zgadywać.`}
-        <br>Sam podział jest już gotowy: ${def.strefy.length} stref, tyle samo
+        <br>Sam podział jest już gotowy: ${strefyMiary(miara).length} stref, tyle samo
         co daje Strava${tetno ? "" : " (model Coggana)"}, nazwy z
         <code>TRENING.md</code>.
       </div>` : ""}
+    ${tabelaStrefHTML(miara)}
     <div class="info">
       <b>Jak liczony jest procent.</b> Sumujemy sekundy w danej strefie ze
       wszystkich jazd w oknie i dzielimy przez sumę wszystkich sekund. Dwie
@@ -4489,7 +4749,7 @@ function podepnijStrefy(){
       srodek.innerHTML = srodekPierscienia(miara, rozklad, dni);
       return;
     }
-    const z = STREFY[miara].strefy[i];
+    const z = strefyMiary(miara)[i];
     const sek = rozklad.sumy[i];
     srodek.innerHTML = `
       <div class="srodek-etykieta">${bezpieczny(z.nazwa)}</div>
@@ -4615,6 +4875,7 @@ function pokaz(){
   podepnijPrognozy();
   podepnijGablote();
   podepnijStrefy();
+  podepnijTabeleStref();
 
   // Wykres otwiera się na najświeższym końcu — najnowsza przerwa jest
   // najważniejsza, a przy dwóch latach historii ląduje poza kadrem.

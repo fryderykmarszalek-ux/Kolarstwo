@@ -636,7 +636,6 @@ koszulki: {
 
 strefy: {
   "_opis": "Rozkład czasu po strefach — DANE, nie decyzje. Strona sumuje sekundy z okna (7, 30 albo 90 dni) i dzieli przez sumę całkowitą, więc dwie jazdy po godzinie, jedna 70% w Z2 i druga 60% w Z2, dają na wykresie 65%. Wykres nie pokazuje pojedynczej jazdy — od tego jest Strava.",
-  "_stan": "GRANICE STREF JESZCZE NIE USTALONE — Fryderyk poda własny przelicznik. Dopóki pole granice jest puste, automat nie ma z czego liczyć rozkładów i wykres stoi pusty. Nazwy stref pochodzą z TRENING.md §6 i nie są zgadywane.",
   "okna_dni": [
     7,
     30,
@@ -647,27 +646,43 @@ strefy: {
     "_opis": "Pięć stref, tyle samo co daje Strava dla tętna.",
     "od_daty": "2026-09-01",
     "od_daty_powod": "Pas piersiowy wchodzi do jazd 1.09.2026 — wcześniejsze jazdy nie mają zapisu tętna, więc nie wchodzą do rozkładu.",
-    "granice": null,
-    "strefy": [
+    "jednostka": "bpm",
+    "tabele": [
       {
-        "id": "z1",
-        "nazwa": "Z1 regeneracja"
-      },
-      {
-        "id": "z2",
-        "nazwa": "Z2 baza"
-      },
-      {
-        "id": "z3",
-        "nazwa": "Z3 tempo"
-      },
-      {
-        "id": "z4",
-        "nazwa": "Z4 próg"
-      },
-      {
-        "id": "z5",
-        "nazwa": "Z5 VO2"
+        "od": "2026-08-27",
+        "zrodlo": "Propozycja Claude z HRmax 201 (TRENING.md §6). Do nadpisania przez Fryderyka.",
+        "strefy": [
+          {
+            "id": "z1",
+            "nazwa": "Z1 regeneracja",
+            "min": 100,
+            "max": 120
+          },
+          {
+            "id": "z2",
+            "nazwa": "Z2 baza",
+            "min": 121,
+            "max": 140
+          },
+          {
+            "id": "z3",
+            "nazwa": "Z3 tempo",
+            "min": 141,
+            "max": 160
+          },
+          {
+            "id": "z4",
+            "nazwa": "Z4 próg",
+            "min": 161,
+            "max": 180
+          },
+          {
+            "id": "z5",
+            "nazwa": "Z5 VO2",
+            "min": 181,
+            "max": 201
+          }
+        ]
       }
     ]
   },
@@ -675,42 +690,63 @@ strefy: {
     "_opis": "Siedem stref, tyle samo co daje Strava dla mocy (model Coggana).",
     "od_daty": null,
     "od_daty_powod": "Moc jest mierzona wyłącznie na Zwifcie do czasu miernika; sesje ERG opisują plan, nie zawodnika, więc do rozkładu nie wchodzą.",
-    "granice": null,
-    "strefy": [
+    "jednostka": "W",
+    "tabele": [
       {
-        "id": "z1",
-        "nazwa": "Z1 regeneracja"
-      },
-      {
-        "id": "z2",
-        "nazwa": "Z2 baza"
-      },
-      {
-        "id": "z3",
-        "nazwa": "Z3 tempo"
-      },
-      {
-        "id": "z4",
-        "nazwa": "Z4 próg"
-      },
-      {
-        "id": "z5",
-        "nazwa": "Z5 VO2"
-      },
-      {
-        "id": "z6",
-        "nazwa": "Z6 beztlenowa"
-      },
-      {
-        "id": "z7",
-        "nazwa": "Z7 neuromięśniowa"
+        "od": "2026-08-27",
+        "zrodlo": "Propozycja Claude z modelu Coggana przy FTP 150 W (prognozy.ftp_biezace). Do nadpisania przez Fryderyka.",
+        "strefy": [
+          {
+            "id": "z1",
+            "nazwa": "Z1 regeneracja",
+            "min": 0,
+            "max": 82
+          },
+          {
+            "id": "z2",
+            "nazwa": "Z2 baza",
+            "min": 83,
+            "max": 112
+          },
+          {
+            "id": "z3",
+            "nazwa": "Z3 tempo",
+            "min": 113,
+            "max": 135
+          },
+          {
+            "id": "z4",
+            "nazwa": "Z4 próg",
+            "min": 136,
+            "max": 157
+          },
+          {
+            "id": "z5",
+            "nazwa": "Z5 VO2",
+            "min": 158,
+            "max": 180
+          },
+          {
+            "id": "z6",
+            "nazwa": "Z6 beztlenowa",
+            "min": 181,
+            "max": 225
+          },
+          {
+            "id": "z7",
+            "nazwa": "Z7 neuromięśniowa",
+            "min": 226,
+            "max": 999
+          }
+        ]
       }
     ]
   },
   "rozklady": {
     "_opis": "Sekundy spędzone w każdej strefie, jedna pozycja na jazdę. Klucz = id jazdy, wartość = { tetno: [s1..s5], moc: [s1..s7] }, brakująca miara = null. Wypełnia to automat ze strumieni, gdy granice stref będą ustalone.",
     "jazdy": {}
-  }
+  },
+  "_przelicznik": "Tabele stref są DATOWANE i działają tylko w przód. Rozkład jazdy liczy się tabelą obowiązującą W DNIU tej jazdy i zapisuje na stałe, więc zmiana progów w listopadzie NIE przelicza jazd z września. Jazda wcześniejsza niż najstarsza tabela bierze tę najstarszą — innej nie ma, a odmowa policzenia byłaby gorsza niż jawne założenie."
 },
 
 plan_objetosci: [
