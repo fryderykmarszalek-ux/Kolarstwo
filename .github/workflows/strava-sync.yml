@@ -5,8 +5,16 @@ name: Strava — aktualizacja danych
 
 on:
   schedule:
-    # 20:00 UTC = 22:00 w Polsce latem, 21:00 zimą. Cron GitHuba chodzi na UTC.
-    - cron: "0 20 * * *"
+    # 20:37 UTC = 22:37 w Polsce latem, 21:37 zimą. Cron GitHuba chodzi na UTC.
+    #
+    # DWA ODPALENIA I MINUTA 37 — poprawka z 27.08.2026, nie cofać.
+    # Przebieg z 26.08 w ogóle się nie odbył: GitHub gubi zadania z crona przy
+    # obciążeniu, a najgorsza jest pełna godzina, bo wtedy startuje pół świata.
+    # Minuta 37 omija ten szczyt, a poranne odpalenie łapie wieczorne, które
+    # przepadło. Kosztuje kilka zapytań dziennie, bo skrypt i tak dociąga
+    # wyłącznie to, czego nie ma.
+    - cron: "37 20 * * *"
+    - cron: "37 5 * * *"
   workflow_dispatch:        # pozwala odpalić ręcznie przyciskiem
     inputs:
       pelne_opisy:

@@ -42,7 +42,12 @@ const PELNE_SEGMENTY = process.env.PELNE_SEGMENTY === "true";
 // 40 s siedzi tu przez prognozy: Fryderyk postawił cel na to okno, a celu,
 // którego nikt nie mierzy, nie da się nigdy rozstrzygnąć. Dołożenie okna
 // nie kosztuje ani jednego zapytania więcej — liczymy z tego samego strumienia.
-const CZASY_KRZYWEJ = [1,5,10,15,30,40,60,120,300,480,600,900,1200,1800,2700,3600,5400];
+// 3 s i 40 s siedzą tu przez cele: Fryderyk postawił na nie warunki (koszulka
+// Giro sprinterska liczy się ze ŚREDNIEJ z 3 s, nie ze szczytu sekundowego,
+// bo szczyt bywa artefaktem próbkowania). Celu, którego nikt nie mierzy, nie
+// da się nigdy rozstrzygnąć. Nie kosztuje ani jednego zapytania więcej —
+// liczymy z tego samego strumienia.
+const CZASY_KRZYWEJ = [1,3,5,10,15,30,40,60,120,300,480,600,900,1200,1800,2700,3600,5400];
 const PELNA_MOC = process.env.PELNA_MOC === "true";
 
 function wczytajStare(){

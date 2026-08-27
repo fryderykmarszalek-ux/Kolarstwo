@@ -354,6 +354,52 @@ nie kolor: sylwetka roweru vs ekranu, słupek kreskowany vs pełny.
   Samo rozsuwanie w pionie o stałą wartość tu nie działa: przy stromym
   zejściu krzywej podniesiony podpis niższego punktu ląduje dokładnie na
   wysokości podpisu wyższego (40 s i 1 min zlewały się w plamę).
+- **Gablota → Koszulki** (27.08.2026) — osiemnaście koszulek z zawodowego
+  kolarstwa, każda za jeden z góry ustalony warunek. Zablokowana jest widoczna
+  i wyszarzona, zdobyta świeci pełną barwą z datą. Grupowanie po seriach od
+  najłatwiejszej (TdP) do najtrudniejszej (mistrzostwa).
+
+  **`dane.js` → `koszulki` jest JEDYNYM źródłem prawdy o zdobyciu.** Tu nie ma
+  brudnopisu w `localStorage` — inaczej niż notatki i ptaszki w prognozach.
+  Powód: wyczyszczenie danych strony w Safari skasowałoby dorobek dwóch lat.
+  Wygoda nie jest warta tej ceny. Nie dodawać.
+
+  **Strona nigdy nie ogłasza zdobycia sama.** Nawet gdy warunek jest policzalny
+  i już spełniony, pisze „warunek spełniony", a datę wpisuje Fryderyk. Ta sama
+  zasada co ptaszek w prognozach: pomiar to nie to samo co decyzja.
+
+  **Warunek w watach liczy się wyłącznie z pomiaru `[Z]`.** Nigdy z estymaty
+  Stravy `[S]`, nigdy z modelu `[E]`. Strava podała 975 W na Bump 2
+  (13.08.2026) — 25 W od warunku Giro sprinterskiej. Odwrócenie jej modelu
+  daje CdA ≈ 0,257, czyli sylwetkę czasówkową, a nie pozycję Fryderyka.
+  Bez tej reguły pierwsza koszulka padłaby za cudze założenie. Waty
+  z trenażera są pomiarem, ale **tylko z sesji swobodnych** — `jestErg()`
+  odsiewa treningi sterowane. Koszulka bez ani jednego pomiaru na swoim oknie
+  pokazuje „czeka na miernik mocy", a nie pasek postępu.
+
+  **Kod nie zna żadnej koszulki z nazwy.** Progi, barwy, daty i teksty są
+  w danych; w kodzie stoi tylko słownik `MIARY` — sześć nazw mówiących, JAK
+  liczyć (`najdluzsza_jazda_m`, `km_w_miesiacu_m`, `dlugi_szybki`,
+  `segment_czas_s`, `bez_przerwy_dni`, `moc_okno_w`). Dopisanie koszulki do
+  `dane.js` dokłada ją do gabloty.
+
+  **Koszulki liczą się z CAŁEJ historii**, nie od `meta.liczone_od` jak
+  wykresy: jazda z 2024 odbyła się naprawdę. Zawężenie robi się per koszulka,
+  polami `od_daty` / `do_daty`.
+
+  **Postęp przy warunku „nie więcej niż" liczy się odwrotnie**: `prog / wynik`.
+  Cel 45 s wobec rekordu 50 s to 90% drogi, a nie 111%.
+
+  **TdP górala nagradza czas na Lipkowskiej (7,5%, 294 m) w 45 s**, nie FTP
+  200 W — decyzja Fryderyka z 27.08.2026. Powód: koszulka jest górska, a FTP
+  to parametr płaski; do tego FTP trzymałoby ją zablokowaną do miernika.
+  Powstaje drabinka: Lipkowska 45 s → Bump 2 35 s (Vuelta górala).
+  Okno żółtej TdP to **1.09–24.12.2026** (też jego decyzja, nie 31.12).
+
+  Zgadywanie jest zakazane: wyników wyścigów Zwifta, KOM-ów, liczby zawodników
+  na segmencie ani kategorii podjazdu **nie da się** wyciągnąć z API i nie
+  wolno ich domyślać z nazwy jazdy. Dziewięć koszulek rozstrzyga Fryderyk
+  ręcznie i to jest uczciwy stan, nie brak funkcji.
 - **Z3–Z5** — miejsca zarezerwowane, świadomie zostawione (Fryderyk chce
   widzieć docelowy kształt strony)
 - Ikony kolarskie w tle (7 sylwetek, losowe z ustalonego ziarna, pasy przy
@@ -509,6 +555,13 @@ tego jedna awaria sieci zjadałaby dane o wietrze i tętnie.
 Zabezpieczenia: pusta odpowiedź przerywa przebieg zamiast kasować dane; przed
 commitem plik musi się sparsować i mieć niezerową liczbę aktywności; commit
 tylko przy faktycznej zmianie.
+
+**Cron: dwa odpalenia i minuta 37 — poprawka z 27.08.2026, nie cofać.**
+Przebieg z 26.08 w ogóle się nie odbył. Zadania z crona GitHub gubi przy
+obciążeniu, a najgorsza jest pełna godzina, bo wtedy startuje pół świata.
+Stąd `37 20 * * *` zamiast `0 20 * * *` plus drugie odpalenie `37 5 * * *`,
+które łapie wieczorne, jeśli przepadło. Kosztuje kilka zapytań dziennie —
+skrypt i tak dociąga wyłącznie to, czego nie ma.
 
 **Wyścig o push — naprawiony 20.08.2026, nie usuwać.** Zadanie potrafi stać
 w kolejce GitHuba kilka minut. Jeśli w tym czasie ktokolwiek wypchnie coś na

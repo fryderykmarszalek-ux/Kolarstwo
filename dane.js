@@ -191,6 +191,449 @@ prognozy: {
   }
 },
 
+koszulki: {
+  "_opis": "Gablota koszulek. To są DECYZJE, nie pomiary: progi wybrał Fryderyk, a strona tylko sprawdza, czy dane już je spełniają. Zdobycie koszulki jest faktem zapisanym TUTAJ — localStorage nie jest i nie będzie źródłem prawdy (brudnopis w przeglądarce ginie razem z wyczyszczeniem danych strony). Warunki liczone automatycznie biorą CAŁĄ historię z pliku, nie tylko okres od meta.liczone_od: koszulka zdobyta w 2024 byłaby zdobyta naprawdę. Wyjątek to koszulki z własnym polem od_daty.",
+  "_zasada_watow": "Każdy warunek podany w watach liczy się WYŁĄCZNIE z pomiaru miernikiem, tag [Z]. Nigdy z estymaty Stravy [S] ani z modelu fizycznego [E]. Powód: Strava podała 975 W na Bump 2 (13.08.2026) — 25 W od warunku Giro sprinterskiej. Odwrócenie modelu Stravy daje CdA ok. 0,257, czyli pozycję czasówkową, a nie pozycję Fryderyka. Bez tej reguły pierwsza koszulka zostałaby przyznana za cudzy model. Waty z trenażera Zwift są pomiarem i liczą się jako [Z], ale tylko z sesji SWOBODNYCH — w trybie ERG trenażer trzyma zadaną moc, więc liczba mówi, co kazał program.",
+  "_miary": "Pole 'miara' mówi kodowi, JAK liczyć — same progi stoją w danych. najdluzsza_jazda_m, km_w_miesiacu_m, dlugi_szybki, segment_czas_s, bez_przerwy_dni, moc_okno_w. Puste = warunek rozstrzyga Fryderyk.",
+  "serie": [
+    {
+      "id": "tdp",
+      "nazwa": "Tour de Pologne",
+      "zawiera": [
+        "tdp"
+      ],
+      "podpis": "Pierwsze piętro — najbliżej"
+    },
+    {
+      "id": "giro",
+      "nazwa": "Giro d'Italia",
+      "zawiera": [
+        "giro"
+      ],
+      "podpis": "Wyścig i cudzy segment"
+    },
+    {
+      "id": "vuelta",
+      "nazwa": "Vuelta a España",
+      "zawiera": [
+        "vuelta"
+      ],
+      "podpis": "Dystans, podjazd, sprint"
+    },
+    {
+      "id": "tdf",
+      "nazwa": "Tour de France",
+      "zawiera": [
+        "tdf"
+      ],
+      "podpis": "Najtrudniejsze"
+    },
+    {
+      "id": "ms",
+      "nazwa": "Mistrzostwa",
+      "zawiera": [
+        "ms",
+        "mp"
+      ],
+      "podpis": "Raz w życiu"
+    }
+  ],
+  "_barwy_uwaga": "Barwy koszulek Wielkich Tourów są oryginalne. Barwy Tour de Pologne są przybliżone — zmiana ich tutaj zmienia je na stronie.",
+  "lista": [
+    {
+      "id": "tdp-zolta",
+      "seria": "tdp",
+      "nazwa": "Żółta koszulka",
+      "warunek_opis": "Od 1 września do 24 grudnia 2026 żadna przerwa w jeżdżeniu dłuższa niż 14 dni.",
+      "weryfikacja": "auto",
+      "miara": "bez_przerwy_dni",
+      "prog": 14,
+      "jednostka": "dni",
+      "porownanie": "<=",
+      "od_daty": "2026-09-01",
+      "do_daty": "2026-12-24",
+      "wymaga_miernika": false,
+      "segment_id": null,
+      "barwy": {
+        "tlo": "#FFD400",
+        "wzor": "gladka"
+      },
+      "zdobyta": null,
+      "_uwaga": "To jedyne uzgodnione kryterium sezonu (wariant B). Dopóki okno trwa, status brzmi 'w toku' — koszulki nie da się jeszcze ani zdobyć, ani stracić. Wyjazdy bez roweru zgłoszone z góry nie liczą się jako przerwa, dokładnie jak w kryterium_przerwy."
+    },
+    {
+      "id": "tdp-gorala",
+      "seria": "tdp",
+      "nazwa": "Koszulka górska",
+      "warunek_opis": "Podjazd Lipkowska (7,5% na 294 m) w 45 sekund albo szybciej.",
+      "weryfikacja": "auto",
+      "miara": "segment_czas_s",
+      "prog": 45,
+      "jednostka": "s",
+      "porownanie": "<=",
+      "od_daty": null,
+      "do_daty": null,
+      "wymaga_miernika": false,
+      "segment_id": "12320217",
+      "barwy": {
+        "tlo": "#0067B1",
+        "wzor": "gladka"
+      },
+      "zdobyta": null,
+      "_uwaga": "Decyzja Fryderyka z 27.08.2026: warunek zmieniony z FTP 200 W na czas na podjeździe. Powód: koszulka jest górska, a FTP to parametr płaski — i FTP wymagałoby miernika, czyli koszulka stałaby zablokowana do Bożego Narodzenia. Rekord w chwili ustalenia progu: 50 s z 8 prób."
+    },
+    {
+      "id": "tdp-sprinterska",
+      "seria": "tdp",
+      "nazwa": "Koszulka sprinterska",
+      "warunek_opis": "Obory-Opacz (6,94 km po płaskim) w 12:35 albo szybciej.",
+      "weryfikacja": "auto",
+      "miara": "segment_czas_s",
+      "prog": 755,
+      "jednostka": "s",
+      "porownanie": "<=",
+      "od_daty": null,
+      "do_daty": null,
+      "wymaga_miernika": false,
+      "segment_id": "6804424",
+      "barwy": {
+        "tlo": "#F07C00",
+        "wzor": "gladka"
+      },
+      "zdobyta": null,
+      "_uwaga": null
+    },
+    {
+      "id": "tdp-mlodziezowa",
+      "seria": "tdp",
+      "nazwa": "Koszulka młodzieżowa",
+      "warunek_opis": "Pierwsza jazda o długości co najmniej 80 km.",
+      "weryfikacja": "auto",
+      "miara": "najdluzsza_jazda_m",
+      "prog": 80000,
+      "jednostka": "m",
+      "porownanie": ">=",
+      "od_daty": null,
+      "do_daty": null,
+      "wymaga_miernika": false,
+      "segment_id": null,
+      "barwy": {
+        "tlo": "#FFFFFF",
+        "wzor": "gladka"
+      },
+      "zdobyta": null,
+      "_uwaga": "Ten sam próg co cele.dluga_jazda_km — jeśli tam się zmieni, tutaj trzeba zmienić świadomie, a nie przez zapomnienie."
+    },
+    {
+      "id": "tdp-waleczny",
+      "seria": "tdp",
+      "nazwa": "Koszulka walecznego",
+      "warunek_opis": "Podium — miejsce w pierwszej trójce w wyścigu na Zwifcie.",
+      "weryfikacja": "reczna",
+      "miara": null,
+      "prog": 3,
+      "jednostka": "miejsce",
+      "porownanie": "<=",
+      "od_daty": null,
+      "do_daty": null,
+      "wymaga_miernika": false,
+      "segment_id": null,
+      "barwy": {
+        "tlo": "#D0021B",
+        "wzor": "gladka"
+      },
+      "zdobyta": null,
+      "_uwaga": "Strava nie oddaje wyników wyścigów Zwifta. Zgadywanie z nazwy aktywności byłoby wpisaniem domysłu w miejsce pomiaru."
+    },
+    {
+      "id": "giro-rozowa",
+      "seria": "giro",
+      "nazwa": "Maglia rosa",
+      "warunek_opis": "KOM (najlepszy czas w historii) na segmencie NIE założonym przez Ciebie, mającym co najmniej 200 prób i 100 różnych zawodników.",
+      "weryfikacja": "reczna",
+      "miara": null,
+      "prog": 1,
+      "jednostka": "miejsce",
+      "porownanie": "<=",
+      "od_daty": null,
+      "do_daty": null,
+      "wymaga_miernika": false,
+      "segment_id": null,
+      "barwy": {
+        "tlo": "#F0629B",
+        "wzor": "gladka"
+      },
+      "zdobyta": null,
+      "_uwaga": "Strava nie oddaje przez API ani tabeli wyników segmentu, ani liczby zawodników, ani autora segmentu. Warunek sprawdza się na stronie segmentu i wpisuje ręcznie, z linkiem jako dowodem."
+    },
+    {
+      "id": "giro-gorala",
+      "seria": "giro",
+      "nazwa": "Maglia azzurra",
+      "warunek_opis": "Wygrany wyścig na Zwifcie z metą na podjeździe.",
+      "weryfikacja": "reczna",
+      "miara": null,
+      "prog": 1,
+      "jednostka": "miejsce",
+      "porownanie": "<=",
+      "od_daty": null,
+      "do_daty": null,
+      "wymaga_miernika": false,
+      "segment_id": null,
+      "barwy": {
+        "tlo": "#009FE3",
+        "wzor": "gladka"
+      },
+      "zdobyta": null,
+      "_uwaga": null
+    },
+    {
+      "id": "giro-sprinterska",
+      "seria": "giro",
+      "nazwa": "Maglia ciclamino",
+      "warunek_opis": "1000 W jako średnia z trzech sekund — nie szczyt sekundowy, bo ten jest artefaktem próbkowania.",
+      "weryfikacja": "reczna",
+      "miara": "moc_okno_w",
+      "prog": 1000,
+      "jednostka": "W",
+      "porownanie": ">=",
+      "okno_s": 3,
+      "od_daty": null,
+      "do_daty": null,
+      "wymaga_miernika": true,
+      "segment_id": null,
+      "barwy": {
+        "tlo": "#C6007E",
+        "wzor": "gladka"
+      },
+      "zdobyta": null,
+      "_uwaga": "Postęp liczony wyłącznie z sesji swobodnych na Zwifcie (tryb ERG odpada — trenażer trzyma tam zadaną moc). Szosa dołączy sama w dniu, w którym pojawi się miernik. Strava podała 975 W na Bump 2, ale to estymata [S] i nie liczy się do tej koszulki."
+    },
+    {
+      "id": "vuelta-lidera",
+      "seria": "vuelta",
+      "nazwa": "Maillot rojo",
+      "warunek_opis": "Jazda co najmniej 100 km w czasie CAŁKOWITYM do 4 godzin — licząc postoje.",
+      "weryfikacja": "auto",
+      "miara": "dlugi_szybki",
+      "prog": 100000,
+      "jednostka": "m",
+      "porownanie": ">=",
+      "limit_czas_s": 14400,
+      "od_daty": null,
+      "do_daty": null,
+      "wymaga_miernika": false,
+      "segment_id": null,
+      "barwy": {
+        "tlo": "#E2001A",
+        "wzor": "gladka"
+      },
+      "zdobyta": null,
+      "_uwaga": "Czas całkowity, nie czas w ruchu: kawa w połowie trasy też się liczy. To warunek na średnią 25 km/h drzwi w drzwi."
+    },
+    {
+      "id": "vuelta-gorala",
+      "seria": "vuelta",
+      "nazwa": "Maillot de lunares",
+      "warunek_opis": "Bump 2 (5,4% na 310 m) w 35 sekund albo szybciej.",
+      "weryfikacja": "auto",
+      "miara": "segment_czas_s",
+      "prog": 35,
+      "jednostka": "s",
+      "porownanie": "<=",
+      "od_daty": null,
+      "do_daty": null,
+      "wymaga_miernika": false,
+      "segment_id": "21315567",
+      "barwy": {
+        "tlo": "#FFFFFF",
+        "wzor": "grochy",
+        "dodatek": "#0072BC"
+      },
+      "zdobyta": null,
+      "_uwaga": "Wyższe piętro tej samej drabinki co koszulka górska TdP: Lipkowska 45 s, potem Bump 2 35 s."
+    },
+    {
+      "id": "vuelta-sprinterska",
+      "seria": "vuelta",
+      "nazwa": "Maillot verde",
+      "warunek_opis": "500 W utrzymane przez pełną minutę.",
+      "weryfikacja": "reczna",
+      "miara": "moc_okno_w",
+      "prog": 500,
+      "jednostka": "W",
+      "porownanie": ">=",
+      "okno_s": 60,
+      "od_daty": null,
+      "do_daty": null,
+      "wymaga_miernika": true,
+      "segment_id": null,
+      "barwy": {
+        "tlo": "#5FBB46",
+        "wzor": "gladka"
+      },
+      "zdobyta": null,
+      "_uwaga": "Postęp z sesji swobodnych na Zwifcie; ERG się nie liczy."
+    },
+    {
+      "id": "tdf-super-combative",
+      "seria": "tdf",
+      "nazwa": "Super combatif",
+      "warunek_opis": "1000 km w jednym miesiącu kalendarzowym — szosa i Zwift razem.",
+      "weryfikacja": "auto",
+      "miara": "km_w_miesiacu_m",
+      "prog": 1000000,
+      "jednostka": "m",
+      "porownanie": ">=",
+      "od_daty": null,
+      "do_daty": null,
+      "wymaga_miernika": false,
+      "segment_id": null,
+      "barwy": {
+        "tlo": "#E30613",
+        "wzor": "gladka"
+      },
+      "zdobyta": null,
+      "_uwaga": "Najaktywniejszy kolarz Touru nosi czerwony numer startowy, nie koszulkę — tutaj dostaje czerwoną koszulkę, żeby gablota była spójna."
+    },
+    {
+      "id": "tdf-zolta",
+      "seria": "tdf",
+      "nazwa": "Maillot jaune",
+      "warunek_opis": "FTP co najmniej 250 W, zmierzone miernikiem mocy.",
+      "weryfikacja": "reczna",
+      "miara": null,
+      "prog": 250,
+      "jednostka": "W",
+      "porownanie": ">=",
+      "od_daty": null,
+      "do_daty": null,
+      "wymaga_miernika": true,
+      "segment_id": null,
+      "barwy": {
+        "tlo": "#FFE300",
+        "wzor": "gladka"
+      },
+      "zdobyta": null,
+      "_uwaga": "FTP nie jest pomiarem pojedynczej liczby, tylko wynikiem testu, więc nawet po kupnie miernika wpisuje się je ręcznie. Deklaracja z prognoz (prognozy.ftp_biezace) NIE otwiera tej koszulki."
+    },
+    {
+      "id": "tdf-grochowa",
+      "seria": "tdf",
+      "nazwa": "Maillot à pois",
+      "warunek_opis": "Alpe d'Zwift w 65 minut albo szybciej.",
+      "weryfikacja": "reczna",
+      "miara": "segment_czas_s",
+      "prog": 3900,
+      "jednostka": "s",
+      "porownanie": "<=",
+      "od_daty": null,
+      "do_daty": null,
+      "wymaga_miernika": false,
+      "segment_id": null,
+      "barwy": {
+        "tlo": "#FFFFFF",
+        "wzor": "grochy",
+        "dodatek": "#E30613"
+      },
+      "zdobyta": null,
+      "_uwaga": "segment_id jest pusty, bo Alpe d'Zwift nie ma jeszcze ani jednej próby w danych. Po pierwszym podjeździe wystarczy wpisać tu numer segmentu ze Stravy i koszulka zacznie liczyć się sama."
+    },
+    {
+      "id": "tdf-sprinterska",
+      "seria": "tdf",
+      "nazwa": "Maillot vert",
+      "warunek_opis": "Pierwsza dziesiątka w historii segmentu płaskiego (nachylenie do 1% w obie strony), na którym jest co najmniej 1000 prób.",
+      "weryfikacja": "reczna",
+      "miara": null,
+      "prog": 10,
+      "jednostka": "miejsce",
+      "porownanie": "<=",
+      "od_daty": null,
+      "do_daty": null,
+      "wymaga_miernika": false,
+      "segment_id": null,
+      "barwy": {
+        "tlo": "#00A94F",
+        "wzor": "gladka"
+      },
+      "zdobyta": null,
+      "_uwaga": "Tabela wyników segmentu nie przychodzi przez API — sprawdza się na stronie segmentu i wpisuje ręcznie, z linkiem."
+    },
+    {
+      "id": "tdf-mlodziezowca",
+      "seria": "tdf",
+      "nazwa": "Maillot blanc",
+      "warunek_opis": "Trzy wygrane wyścigi na Zwifcie pod rząd.",
+      "weryfikacja": "reczna",
+      "miara": null,
+      "prog": 3,
+      "jednostka": "wygrane",
+      "porownanie": ">=",
+      "od_daty": null,
+      "do_daty": null,
+      "wymaga_miernika": false,
+      "segment_id": null,
+      "barwy": {
+        "tlo": "#FFFFFF",
+        "wzor": "gladka"
+      },
+      "zdobyta": null,
+      "_uwaga": null
+    },
+    {
+      "id": "ms-teczowa",
+      "seria": "ms",
+      "nazwa": "Tęczowa koszulka",
+      "warunek_opis": "Wjazd na podjazd kategorii HC, który występuje w oficjalnym profilu etapu Tour de France, Giro albo Vuelty — dowolny rocznik.",
+      "weryfikacja": "reczna",
+      "miara": null,
+      "prog": null,
+      "jednostka": null,
+      "porownanie": null,
+      "od_daty": null,
+      "do_daty": null,
+      "wymaga_miernika": false,
+      "segment_id": null,
+      "barwy": {
+        "tlo": "#FFFFFF",
+        "wzor": "tecza",
+        "pasy": [
+          "#0055A4",
+          "#E30613",
+          "#111111",
+          "#FFD700",
+          "#009B3A"
+        ]
+      },
+      "zdobyta": null,
+      "_uwaga": "Kategoria podjazdu nie jest polem w danych Stravy w sposób, któremu da się ufać, a lista podjazdów HC z profili etapów nie jest dostępna maszynowo. Rozstrzyga Fryderyk, dowodem jest link do jazdy."
+    },
+    {
+      "id": "mp-mistrz-polski",
+      "seria": "mp",
+      "nazwa": "Mistrz Polski",
+      "warunek_opis": "Ukończenie Tour de Pologne Amatorów.",
+      "weryfikacja": "reczna",
+      "miara": null,
+      "prog": null,
+      "jednostka": null,
+      "porownanie": null,
+      "od_daty": null,
+      "do_daty": null,
+      "wymaga_miernika": false,
+      "segment_id": null,
+      "barwy": {
+        "tlo": "#FFFFFF",
+        "wzor": "pas",
+        "dodatek": "#DC143C"
+      },
+      "zdobyta": null,
+      "_uwaga": null
+    }
+  ]
+},
+
 plan_objetosci: [
   {"od":"2026-09-01","do":"2026-09-07","godziny":3,"odciazenie":false},
   {"od":"2026-09-08","do":"2026-09-14","godziny":4,"odciazenie":false},

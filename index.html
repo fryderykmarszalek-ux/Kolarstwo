@@ -473,6 +473,83 @@ table.segmenty.moc{min-width:520px}
 .kroki-mocy .odn:hover{color:var(--tekst);text-decoration:underline}
 rect.proba-punkt{cursor:pointer}
 
+/* --- Gablota koszulek ---
+   Barwy koszulek NIE pochodzą z palety motywu — maglia rosa ma być różowa
+   i w jasnym, i w ciemnym. Paleta --seria-* zostaje zarezerwowana dla danych,
+   a te rysunki danymi nie są. Jedyny wyjątek to obrys (--linia): biała
+   koszulka na białym tle byłaby niewidzialna, a krawędź rysunku nie jest
+   barwą koszulki. --- */
+.gablota-siatka{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(136px,1fr));gap:10px;
+}
+.kafel-koszulki{
+  display:flex;flex-direction:column;align-items:center;gap:5px;
+  min-height:44px;padding:12px 8px 10px;text-decoration:none;color:inherit;
+  background:var(--plyta);border:1px solid transparent;border-radius:12px;
+  transition:border-color .16s ease, transform .16s ease;
+  position:relative;overflow:hidden;
+}
+.kafel-koszulki:hover{border-color:var(--sek-kropka);transform:translateY(-1px)}
+.kafel-koszulki:active{transform:scale(.98)}
+.kafel-koszulki .rysunek{display:block;width:78px}
+/* Zablokowana ma być WIDOCZNA, tylko przygaszona: gablota bez zamkniętych
+   półek nie mówiłaby, po co się jedzie. */
+.kafel-koszulki .koszulka .barwa{filter:grayscale(1);opacity:.35;
+  transition:opacity .2s ease, filter .2s ease}
+.kafel-koszulki.zdobyta .koszulka .barwa{filter:none;opacity:1}
+.koszulka{display:block;width:100%;height:auto}
+.nazwa-koszulki{font-size:12.5px;font-weight:600;text-align:center;line-height:1.25}
+.stan-koszulki{font-size:11px;color:var(--slaby);text-align:center;line-height:1.3}
+.s-zdobyta,.s-spelniony{color:var(--plan);font-weight:600}
+.s-przepadla{color:var(--alarm);font-weight:600}
+.s-w-toku{color:var(--tekst)}
+.naglowek-serii{display:flex;align-items:baseline;justify-content:space-between;
+  gap:10px;margin:0 0 2px}
+.naglowek-serii h2{margin:0}
+.licznik-serii{font-size:12px;color:var(--slaby);font-variant-numeric:tabular-nums}
+
+/* Pasek postępu. Zieleń, bo to ta sama rola co linia planu i dowieziony
+   tydzień: droga do celu. Czerwień tylko wtedy, gdy przerwa robi się groźna. */
+.pasek-postepu{
+  position:absolute;left:0;right:0;bottom:0;height:3px;background:var(--linia);
+}
+.pasek-postepu::before{
+  content:"";position:absolute;inset:0;right:auto;width:var(--udzial);
+  background:var(--plan);border-radius:0 2px 2px 0;
+}
+.pasek-postepu.alarm::before{background:var(--alarm)}
+.pasek-postepu.duzy{position:static;height:9px;border-radius:99px;margin:6px 0 5px}
+.pasek-postepu.duzy::before{border-radius:99px}
+.postep-blok{background:var(--plyta);border:1px solid var(--linia);border-radius:10px;
+  padding:11px 14px;margin-top:10px}
+.postep-gora{display:flex;justify-content:space-between;align-items:baseline;
+  gap:10px;flex-wrap:wrap;font-size:13px}
+.postep-procent{font-weight:600;font-variant-numeric:tabular-nums}
+.postep-dol{font-size:12px;color:var(--slaby)}
+
+.szczegol-koszulki{display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap;
+  background:var(--plyta);border:1px solid var(--linia);border-radius:12px;
+  padding:14px 16px;margin-top:4px}
+.rysunek-duzy{flex:0 0 auto;width:110px}
+.rysunek-duzy .koszulka .barwa{filter:grayscale(1);opacity:.35}
+.rysunek-duzy.zdobyta .koszulka .barwa{filter:none;opacity:1}
+.szczegol-tresc{flex:1 1 240px;min-width:0}
+.warunek{margin:0 0 10px;font-size:14px;line-height:1.45}
+.wiersz-szczegolu{display:flex;gap:10px;align-items:baseline;font-size:12.5px;
+  padding:4px 0;border-top:1px solid var(--linia)}
+.wiersz-szczegolu:first-of-type{border-top:0}
+.wiersz-szczegolu .etykieta{color:var(--slaby);flex:0 0 88px}
+.wiersz-szczegolu .tresc{flex:1 1 auto;min-width:0}
+.info.alarmowy{border-left:3px solid var(--alarm)}
+.info.alarmowy b{color:var(--alarm)}
+.uwaga-koszulki{font-size:12.5px;line-height:1.5}
+@media (max-width:560px){
+  .gablota-siatka{grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:8px}
+  .kafel-koszulki .rysunek{width:62px}
+  .rysunek-duzy{width:88px}
+  .wiersz-szczegolu .etykieta{flex:0 0 76px}
+}
+
 /* --- Prognozy: krzywa, której jeszcze nie ma ---
    Żadnej nowej barwy. Prognoza JEST celem, więc jest zielona — ta sama rola
    co linia planu na wykresie godzin i zielony słupek dowiezionego tygodnia.
@@ -3368,6 +3445,445 @@ function podepnijPrognozy(){
 }
 
 /* ==========================================================================
+   GABLOTA — koszulki
+
+   Osiemnaście koszulek z zawodowego kolarstwa, każda za jeden z góry
+   ustalony warunek. Wszystkie progi, warunki, barwy i daty siedzą w dane.js
+   w bloku "koszulki" — w kodzie nie ma ani jednej liczby z tej listy.
+   Dopisanie koszulki do danych dokłada ją do gabloty; kod nie zna żadnej
+   z nazwy.
+
+   ZDOBYCIE JEST FAKTEM Z REPOZYTORIUM. Pole "zdobyta" w dane.js jest jedynym
+   źródłem prawdy — inaczej niż notatki i ptaszki w prognozach, tutaj NIE MA
+   brudnopisu w przeglądarce. Wyczyszczenie danych strony w Safari skasowałoby
+   wtedy dorobek dwóch lat, a to nie jest cena, którą warto płacić za wygodę.
+
+   ZASADA WATÓW. Warunek podany w watach liczy się wyłącznie z pomiaru [Z]:
+   miernik albo trenażer w sesji SWOBODNEJ. Nigdy z estymaty Stravy [S] —
+   ta podała 975 W na Bump 2, 25 W od warunku Giro sprinterskiej, przy CdA
+   0,257 wyliczonym wstecz z jej własnego modelu. To pozycja czasówkowa,
+   nie pozycja Fryderyka. Nigdy też z modelu fizycznego [E] z tego samego
+   powodu, dla którego moc [E] wyleciała z tabeli segmentów.
+   ========================================================================== */
+
+const KOSZULKI = (D.koszulki && D.koszulki.lista) || [];
+const SERIE_K   = (D.koszulki && D.koszulki.serie) || [];
+
+// Koszulki liczą się z CAŁEJ historii, nie od meta.liczone_od jak wykresy:
+// jazda z 2024 roku odbyła się naprawdę. Zawężenie robi się per koszulka,
+// polem od_daty / do_daty.
+const JAZDY_GABLOTA = D.aktywnosci.filter(a => D.meta.typy_kolarskie.includes(a.typ));
+
+const wOknie = (k, data) => {
+  const d = data.slice(0,10);
+  return (!k.od_daty || d >= k.od_daty) && (!k.do_daty || d <= k.do_daty);
+};
+
+/* --- pojedyncze miary. Każda zwraca { v, tekst, jazda } albo null --------- */
+
+function mNajdluzszaJazda(k){
+  let naj = null;
+  for (const a of JAZDY_GABLOTA)
+    if (wOknie(k, a.data) && (!naj || a.dystans_m > naj.dystans_m)) naj = a;
+  return naj ? { v: naj.dystans_m, jazda: naj,
+    tekst: `najdłuższa jazda ${liczba(naj.dystans_m/1000,1)} km` } : null;
+}
+
+function mKmWMiesiacu(k){
+  const suma = new Map();
+  for (const a of JAZDY_GABLOTA){
+    if (!wOknie(k, a.data)) continue;
+    const m = a.data.slice(0,7);
+    suma.set(m, (suma.get(m) || 0) + a.dystans_m);
+  }
+  let naj = null;
+  for (const [m,v] of suma) if (!naj || v > naj.v) naj = { m, v };
+  return naj ? { v: naj.v, jazda: null,
+    tekst: `najlepszy miesiąc ${liczba(naj.v/1000,0)} km (${miesiacNaTekst(naj.m)})` } : null;
+}
+
+// Dwa warunki naraz: dystans ORAZ czas całkowity. Postęp liczymy z jazd, które
+// mieszczą się w czasie — jazda ponad limit nie zbliża do celu, choćby była
+// najdłuższa.
+function mDlugiSzybki(k){
+  let naj = null;
+  for (const a of JAZDY_GABLOTA){
+    if (!wOknie(k, a.data)) continue;
+    if (a.czas_calkowity_s > k.limit_czas_s) continue;
+    if (!naj || a.dystans_m > naj.dystans_m) naj = a;
+  }
+  return naj ? { v: naj.dystans_m, jazda: naj,
+    tekst: `najdłuższa jazda w czasie do ${czasNaTekst(k.limit_czas_s)} — `
+      + `${liczba(naj.dystans_m/1000,1)} km` } : null;
+}
+
+function mSegmentCzas(k){
+  if (!k.segment_id) return null;
+  const lista = (D.proby || []).filter(p => p.s === k.segment_id);
+  if (!lista.length) return null;
+  const naj = lista.reduce((a,b) => b.czas_s < a.czas_s ? b : a);
+  return { v: naj.czas_s, jazda: JAZDA_PO_ID.get(naj.a),
+    tekst: `najlepszy czas ${naj.czas_s < 60 ? naj.czas_s + " s" : czasNaTekst(naj.czas_s)}`
+      + ` z ${lista.length} `
+      + `${lista.length === 1 ? "próby" : "prób"}` };
+}
+
+// Moc: tylko pomiar i tylko sesje swobodne. jestErg() już wie, jak odróżnić
+// trening sterowany od prawdziwego wysiłku.
+function mMocOkna(k){
+  let naj = null;
+  for (const kr of (D.moc_krzywe || [])){
+    const j = JAZDA_PO_ID.get(kr.a);
+    if (!j || jestErg(j) || !wOknie(k, j.data)) continue;
+    const w = kr.w[k.okno_s];
+    if (w == null) continue;
+    if (!naj || w > naj.v) naj = { v: w, jazda: j };
+  }
+  return naj ? { ...naj,
+    tekst: `najlepszy pomiar ${naj.v} W przez ${oknoNaTekst(k.okno_s)}` } : null;
+}
+
+/* Przerwy w oknie koszulki. Liczymy przerwę, której KONIEC wpada w okno —
+   czyli tę, która naprawdę przecina wyznaczony czas. Zgłoszone z góry wyjazdy
+   bez roweru nie liczą się jako przerwa, dokładnie jak w kryterium sezonu:
+   dwie różne odpowiedzi na to samo pytanie byłyby gorsze niż jedna surowsza. */
+function mBezPrzerwy(k){
+  const dni = [...new Set(JAZDY_GABLOTA
+    .filter(a => !k.do_daty || a.data.slice(0,10) <= k.do_daty)
+    .map(a => a.data.slice(0,10)))].sort();
+  let najwieksza = 0, ktora = null;
+  for (let i = 1; i < dni.length; i++){
+    if (k.od_daty && dni[i] < k.od_daty) continue;
+    if (wyjazdDla(dni[i-1], dni[i])) continue;
+    const g = roznicaDni(naDzien(dni[i-1]), naDzien(dni[i]));
+    if (g > najwieksza){ najwieksza = g; ktora = { od: dni[i-1], do: dni[i] }; }
+  }
+  const ostatni = dni[dni.length-1] || null;
+  const koniecLiczenia = k.do_daty && DZIS > k.do_daty ? k.do_daty : DZIS;
+  const trwa = ostatni && (!k.od_daty || koniecLiczenia >= k.od_daty)
+    ? roznicaDni(naDzien(ostatni), naDzien(koniecLiczenia)) : 0;
+  return { najwieksza, ktora, ostatni, trwa,
+    przed: k.od_daty ? DZIS < k.od_daty : false,
+    po: k.do_daty ? DZIS > k.do_daty : false };
+}
+
+const MIARY = {
+  najdluzsza_jazda_m: mNajdluzszaJazda,
+  km_w_miesiacu_m:    mKmWMiesiacu,
+  dlugi_szybki:       mDlugiSzybki,
+  segment_czas_s:     mSegmentCzas,
+  moc_okno_w:         mMocOkna
+};
+
+function miesiacNaTekst(rm){
+  const N = ["I","II","III","IV","V","VI","VII","VIII","IX","X","XI","XII"];
+  return N[+rm.slice(5,7) - 1] + " " + rm.slice(0,4);
+}
+function progNaTekst(k){
+  if (k.prog == null) return "";
+  if (k.jednostka === "m")  return liczba(k.prog/1000, k.prog % 1000 ? 1 : 0) + " km";
+  if (k.jednostka === "s")  return k.prog < 60 ? k.prog + " s" : czasNaTekst(k.prog);
+  if (k.jednostka === "W")  return k.prog + " W";
+  if (k.jednostka === "dni")return k.prog + " dni";
+  return k.prog + (k.jednostka ? " " + k.jednostka : "");
+}
+
+/* Stan koszulki. Strona NIGDY nie ogłasza zdobycia sama — nawet gdy warunek
+   jest policzalny i spełniony, mówi tylko „warunek spełniony". Wpis do
+   dane.js jest decyzją Fryderyka, tak samo jak ptaszek w prognozach. */
+function stanKoszulki(k){
+  if (k.zdobyta) return { stan: "zdobyta", udzial: 1 };
+
+  // Koszulka „bez przerwy" bez wyznaczonego okna nie znaczy nic — wtedy
+  // rozstrzyga człowiek, zamiast liczyć od początku świata.
+  if (k.miara === "bez_przerwy_dni" && k.od_daty && k.do_daty){
+    const p = mBezPrzerwy(k);
+    const dlugosc = roznicaDni(naDzien(k.od_daty), naDzien(k.do_daty));
+    if (p.przed) return { stan: "przed", udzial: 0, przerwa: p,
+      tekst: `okno startuje ${pl(k.od_daty)} — do startu `
+        + `${roznicaDni(naDzien(DZIS), naDzien(k.od_daty))} dni` };
+    if (p.po) return p.najwieksza > k.prog
+      ? { stan: "przepadla", udzial: 1, przerwa: p,
+          tekst: `najdłuższa przerwa w oknie: ${p.najwieksza} dni` }
+      : { stan: "spelniony", udzial: 1, przerwa: p,
+          tekst: `najdłuższa przerwa w oknie: ${p.najwieksza} dni` };
+    const minelo = roznicaDni(naDzien(k.od_daty), naDzien(DZIS));
+    return { stan: p.najwieksza > k.prog ? "przepadla" : "w-toku",
+      udzial: Math.max(0, Math.min(1, minelo / dlugosc)),
+      przerwa: p,
+      alarm: p.trwa >= 10,
+      tekst: `${p.trwa} ${p.trwa === 1 ? "dzień" : "dni"} od ostatniej jazdy · `
+        + `najdłuższa przerwa w oknie: ${p.najwieksza} dni` };
+  }
+
+  const licz = MIARY[k.miara];
+  if (!licz) return { stan: "reczna", udzial: 0 };
+
+  const w = licz(k);
+  if (k.wymaga_miernika && !w) return { stan: "czeka-na-miernik", udzial: 0 };
+  if (!w) return { stan: "brak-danych", udzial: 0 };
+
+  const spelniony = k.porownanie === "<=" ? w.v <= k.prog : w.v >= k.prog;
+  // Przy warunku „nie więcej niż" bliżej celu znaczy MNIEJ, więc udział liczy
+  // się odwrotnie: 45 s celu wobec 50 s rekordu to 90% drogi, nie 111%.
+  const udzial = k.porownanie === "<=" ? k.prog / w.v : w.v / k.prog;
+  return { stan: spelniony ? "spelniony" : "postep",
+    udzial: Math.max(0, Math.min(1, udzial)),
+    pomiar: w, tekst: w.tekst };
+}
+
+/* --- koszulka jako rysunek ------------------------------------------------
+   Barwy pochodzą z definicji koszulki w dane.js, nie z palety motywu:
+   maglia rosa ma być różowa w obu motywach. Obrys jest jedynym wyjątkiem —
+   bierze --linia, bo biała koszulka na białym tle byłaby niewidzialna, a to
+   nie jest barwa koszulki, tylko krawędź rysunku. */
+/* Sylwetka koszulki KOLARSKIEJ, nie koszulki gimnastycznej: rękaw opada
+   skośnie i kończy się mankietem, bok zwęża się w talii, z przodu biegnie
+   zamek. Bez tych trzech rzeczy rysunek czyta się jak zwykły t-shirt. */
+const KSZTALT_KOSZULKI =
+  "M36 13 L26 15 L7 32 L15 52 L31 46 Q28 76 31 100 Q50 106 69 100 "
+  + "Q72 76 69 46 L85 52 L93 32 L74 15 L64 13 Q50 24 36 13 Z";
+const DETALE_KOSZULKI =
+  '<path d="M36 13 Q50 24 64 13"/>'                      // kołnierz
+  + '<path d="M50 24 L50 101" opacity=".5"/>'            // zamek
+  + '<path d="M11 35 L19 54" opacity=".45"/>'            // mankiet lewy
+  + '<path d="M89 35 L81 54" opacity=".45"/>'            // mankiet prawy
+  + '<path d="M31 94 Q50 100 69 94" opacity=".45"/>';    // dolna lamówka
+
+function ikonaKoszulki(k, prefiks){
+  const b = k.barwy || {};
+  const id = (prefiks || "g") + "-" + k.id;
+  let wnetrze = "";
+
+  if (b.wzor === "grochy"){
+    for (let y = 26; y < 102; y += 15)
+      for (let x = 4 + (((y - 26)/15) % 2 ? 7 : 0); x < 100; x += 15)
+        wnetrze += `<circle cx="${x}" cy="${y}" r="4.4" fill="${b.dodatek}"/>`;
+  } else if (b.wzor === "tecza"){
+    (b.pasy || []).forEach((barwa,i) =>
+      wnetrze += `<rect x="0" y="${46 + i*7}" width="100" height="7" fill="${barwa}"/>`);
+  } else if (b.wzor === "pas"){
+    wnetrze += `<rect x="0" y="50" width="100" height="16" fill="${b.dodatek}"/>`;
+  }
+
+  // Barwa i wzór siedzą w osobnej grupie, obrys poza nią. Dzięki temu
+  // przygaszenie zablokowanej koszulki gasi kolor, a nie sylwetkę — biała
+  // koszulka na białym tle inaczej znikałaby zupełnie.
+  return `<svg class="koszulka" viewBox="0 0 100 112" role="img"
+    aria-label="Koszulka: ${bezpieczny(k.nazwa)}">
+    <title>${bezpieczny(k.nazwa)}</title>
+    ${wnetrze ? `<clipPath id="${id}"><path d="${KSZTALT_KOSZULKI}"/></clipPath>` : ""}
+    <g class="barwa">
+      <path d="${KSZTALT_KOSZULKI}" fill="${b.tlo || "#CCCCCC"}"/>
+      ${wnetrze ? `<g clip-path="url(#${id})">${wnetrze}</g>` : ""}
+    </g>
+    <g fill="none" stroke="var(--linia)" stroke-width="1.7" stroke-linejoin="round"
+       stroke-linecap="round">
+      <path d="${KSZTALT_KOSZULKI}"/>
+      ${DETALE_KOSZULKI}
+    </g>
+  </svg>`;
+}
+
+const OPIS_STANU = {
+  "zdobyta":          "zdobyta",
+  "spelniony":        "warunek spełniony",
+  "w-toku":           "w toku",
+  "przed":            "jeszcze nie wystartowało",
+  "przepadla":        "warunek złamany",
+  "postep":           "zablokowana",
+  "reczna":           "rozstrzygasz sam",
+  "czeka-na-miernik": "czeka na miernik mocy",
+  "brak-danych":      "brak pomiarów"
+};
+
+function kafelKoszulki(k){
+  const s = stanKoszulki(k);
+  const zdobyta = s.stan === "zdobyta";
+  const pasek = (s.stan === "postep" || s.stan === "w-toku")
+    ? `<div class="pasek-postepu${s.alarm ? " alarm" : ""}"
+         style="--udzial:${Math.round(s.udzial*100)}%"></div>` : "";
+  return `
+    <a class="kafel-koszulki${zdobyta ? " zdobyta" : ""}"
+       href="#gablota/koszulki/${k.id}" data-id="${k.id}">
+      <span class="rysunek">${ikonaKoszulki(k, "kafel")}</span>
+      <span class="nazwa-koszulki">${bezpieczny(k.nazwa)}</span>
+      <span class="stan-koszulki s-${s.stan}">${
+        zdobyta ? pl(k.zdobyta.data)
+        : pasek ? Math.round(s.udzial*100) + "% drogi"
+        : OPIS_STANU[s.stan]}</span>
+      ${pasek}
+    </a>`;
+}
+
+const gablota = (arg) => {
+  if (!KOSZULKI.length) return pusto("Gablota");
+  if (arg) return jednaKoszulka(arg);
+
+  const zdobyte = KOSZULKI.filter(k => k.zdobyta).length;
+  const grupy = SERIE_K.map(s => {
+    const swoje = KOSZULKI.filter(k => s.zawiera.includes(k.seria));
+    if (!swoje.length) return "";
+    const ile = swoje.filter(k => k.zdobyta).length;
+    return `
+      <section>
+        <div class="naglowek-serii">
+          <h2>${bezpieczny(s.nazwa)}</h2>
+          <span class="licznik-serii">${ile} z ${swoje.length}</span>
+        </div>
+        <p class="opis">${bezpieczny(s.podpis || "")}</p>
+        <div class="gablota-siatka">${swoje.map(kafelKoszulki).join("")}</div>
+      </section>`;
+  }).join("");
+
+  return `
+  <section>
+    <h2>Gablota</h2>
+    <p class="opis">
+      Osiemnaście koszulek, każda za jeden ustalony z góry warunek. Koszulka
+      zablokowana jest widoczna od pierwszego dnia — masz widzieć, po co
+      jedziesz. Dotknij którejkolwiek, żeby zobaczyć pełny warunek i to, ile
+      brakuje.
+      <br>Progi i barwy siedzą w <code>dane.js</code>. Strona sama nigdy nie
+      ogłasza zdobycia: nawet gdy warunek jest policzalny i już spełniony,
+      napisze „warunek spełniony", a datę wpisujesz Ty.
+    </p>
+    <div class="kafelki">
+      <div class="kafel">
+        <div class="etykieta">Zdobyte</div>
+        <div class="liczba">${zdobyte} <span
+          style="font-size:16px;font-weight:600;color:var(--slaby)">z ${KOSZULKI.length}</span></div>
+        <div class="stopka">stan na ${pl(DZIS)}</div>
+      </div>
+    </div>
+  </section>
+  ${grupy}
+  <div class="info">
+    Warunki podane w watach liczą się <b>wyłącznie z pomiaru</b>: miernika albo
+    trenażera w sesji swobodnej. Nigdy z estymaty Stravy. Ta podała 975 W na
+    Bump 2 — 25 W od warunku Giro sprinterskiej. Gdyby liczyć jej model,
+    pierwsza koszulka padłaby za cudze założenie o pozycji na rowerze
+    (wychodzi z niego CdA 0,257, czyli sylwetka czasówkowa), a nie za Twoją moc.
+    Dlatego koszulki wattowe stoją zablokowane do miernika, a z trenażera
+    liczą się <b>tylko sesje swobodne</b> — w trybie
+    <span class="znacznik-erg">ERG</span> moc trzyma program, nie zawodnik.
+  </div>`;
+};
+
+function jednaKoszulka(id){
+  const k = KOSZULKI.find(x => x.id === id);
+  if (!k) return `
+    <div class="pusto">
+      <span class="znak">Nie znam takiej koszulki</span>
+      Wróć do <a class="odn-zakladka" href="#gablota/koszulki">gabloty</a>.
+    </div>`;
+
+  const s = stanKoszulki(k);
+  const seria = SERIE_K.find(x => x.zawiera.includes(k.seria));
+  const zdobyta = s.stan === "zdobyta";
+  const p = s.przerwa;
+
+  const wiersz = (etykieta, tresc) => tresc
+    ? `<div class="wiersz-szczegolu"><span class="etykieta">${etykieta}</span>
+       <span class="tresc">${tresc}</span></div>` : "";
+
+  const dowod = zdobyta && k.zdobyta.dowod
+    ? `<a class="odn" href="${bezpieczny(k.zdobyta.dowod)}" target="_blank"
+        rel="noopener">dowód &#8599;</a>` : "";
+
+  const postep = (() => {
+    if (zdobyta) return "";
+    if (s.stan === "czeka-na-miernik") return `
+      <div class="info">
+        <b>Czeka na miernik mocy.</b> Ten warunek jest w watach, a wat bez
+        pomiaru to nie wat. Estymata Stravy <b>[S]</b> i model fizyczny
+        <b>[E]</b> nie liczą się tutaj ani trochę — dopiero miernik albo sesja
+        swobodna na trenażerze. Pasek postępu pojawi się sam w dniu pierwszego
+        pomiaru na tym oknie.
+      </div>`;
+    if (s.stan === "reczna") return `
+      <div class="info">
+        Tego warunku nie da się policzyć z danych, które daje Strava. Sprawdzasz
+        go sam i wpisujesz do <code>dane.js</code> razem z linkiem jako dowodem.
+        Strona nie będzie zgadywać z nazwy jazdy — domysł w miejscu pomiaru
+        to dokładnie ten błąd, przez który z tabeli segmentów wyleciała moc [E].
+      </div>`;
+    if (s.stan === "brak-danych") return `
+      <div class="info">
+        Nie ma jeszcze ani jednego pomiaru, z którego dałoby się to policzyć.
+        ${k.segment_id ? "" : "Gdy pojawi się numer segmentu w danych, "
+          + "koszulka zacznie liczyć się sama."}
+      </div>`;
+
+    const procent = Math.round(s.udzial * 100);
+    return `
+      <div class="postep-blok">
+        <div class="postep-gora">
+          <span>${s.tekst || ""}</span>
+          <span class="postep-procent">${procent}%</span>
+        </div>
+        <div class="pasek-postepu duzy${s.alarm ? " alarm" : ""}"
+             style="--udzial:${procent}%"></div>
+        <div class="postep-dol">${k.miara === "bez_przerwy_dni"
+          ? `limit przerwy: ${progNaTekst(k)} · okno ${pl(k.od_daty)} – ${pl(k.do_daty)}`
+          : `cel: ${progNaTekst(k)}`}</div>
+      </div>`;
+  })();
+
+  const ostrzezenieOkna = p && s.alarm ? `
+    <div class="info alarmowy">
+      <b>${p.trwa} dni od ostatniej jazdy.</b> Limit to ${k.prog} dni — zostało
+      ${k.prog - p.trwa}. To jedyne uzgodnione kryterium sezonu i jedyna
+      koszulka, którą można stracić przez nic-nie-robienie.
+    </div>` : "";
+
+  return `
+  <section>
+    <div class="proba-tytul">
+      <h2>${bezpieczny(k.nazwa)}</h2>
+      <a class="kolko-reset" href="#gablota/koszulki"
+         title="Wróć do gabloty" aria-label="Wróć do gabloty">
+        <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor"
+          stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M13.5 8a5.5 5.5 0 1 1-1.6-3.9"/><path d="M13.6 2v3.2h-3.2"/></svg>
+      </a>
+    </div>
+    <div class="szczegol-koszulki">
+      <div class="rysunek-duzy${zdobyta ? " zdobyta" : ""}">${ikonaKoszulki(k, "duzy")}</div>
+      <div class="szczegol-tresc">
+        <p class="warunek">${bezpieczny(k.warunek_opis)}</p>
+        ${wiersz("Seria", seria ? bezpieczny(seria.nazwa) : "")}
+        ${wiersz("Stan", `<b class="s-${s.stan}">${
+          zdobyta ? "zdobyta " + pl(k.zdobyta.data) : OPIS_STANU[s.stan]}</b>`)}
+        ${wiersz("Weryfikacja", k.weryfikacja === "auto"
+          ? "liczona przez stronę z danych"
+          : "rozstrzygasz sam i wpisujesz do <code>dane.js</code>")}
+        ${wiersz("Dowód", zdobyta
+          ? (k.zdobyta.tag ? `<b>[${bezpieczny(k.zdobyta.tag)}]</b> ` : "") + dowod
+          : "")}
+      </div>
+    </div>
+    ${ostrzezenieOkna}
+    ${postep}
+    ${s.pomiar && s.pomiar.jazda ? `
+      <div class="info">
+        Najlepszy wynik do dziś:
+        <a class="odn" href="${adresStravy(s.pomiar.jazda)}" target="_blank"
+           rel="noopener">${ikonaDyscypliny(s.pomiar.jazda.typ,15)}
+           <b>${bezpieczny(s.pomiar.jazda.nazwa)}</b> &#8599;</a>${
+           znacznikErg(s.pomiar.jazda)} · ${pl(s.pomiar.jazda.data)}
+      </div>` : ""}
+    ${p && p.ktora ? `
+      <div class="info">
+        Najdłuższa przerwa w oknie: <b>${p.najwieksza} dni</b>,
+        od ${pl(p.ktora.od)} do ${pl(p.ktora.do)}.
+      </div>` : ""}
+    ${k._uwaga ? `<div class="info uwaga-koszulki">
+        <b>Zastrzeżenie:</b> ${bezpieczny(k._uwaga)}</div>` : ""}
+  </section>`;
+}
+
+/* ==========================================================================
    SEKCJE — poziom 1 i poziom 2.
    Zakładka trafia na pasek tylko gdy ma wpis tutaj. Z1–Z5 to miejsca
    zarezerwowane; dostaną nazwy, kiedy dostaną treść.
@@ -3394,7 +3910,10 @@ const SEKCJE = [
     pod: PROGNOZY.length
       ? PROGNOZY.map(o => ({ id:o.id, tytul:o.tytul, rysuj: () => prognozaMocy(o.id) }))
       : [{ id:"brak", tytul:"—", rysuj: () => pusto("Prognozy") }] },
-  ...[3,4,5].map(n => ({
+  { id:"gablota", tytul:"Gablota", barwa:"fuksja", pod:[
+      { id:"koszulki", tytul:"Koszulki", rysuj: gablota }
+  ]},
+  ...[4,5].map(n => ({
     id:"z"+n, tytul:"Z"+n, barwa:["fiolet","limonka","fuksja","cyjan","pomarancz"][n-1],
     pod:[1,2,3].map(m => ({
       id:"z"+n+"-"+m, tytul:"Z"+n+"."+m, rysuj: () => pusto("Z"+n+"."+m)
