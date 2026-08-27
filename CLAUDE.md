@@ -393,6 +393,24 @@ nie kolor: sylwetka roweru vs ekranu, słupek kreskowany vs pełny.
   **Okno liczy się wstecz od `meta.pobrano`, nie od zegara urządzenia** — jak
   cała reszta strony poza paskiem świeżości danych.
 
+  **Skrajności stref są NIEZMIENNE: 0 i nieskończoność.** Pierwsza strefa
+  zaczyna się od zera, ostatnia nie ma górnego końca, i tych dwóch pól nie da
+  się edytować na stronie. Bez tego tętno 90 przy Z1 od 100 albo sprint 1000 W
+  przy Z7 do 999 wypadałyby poza wszystkie strefy i **cicho znikały** z wykresu,
+  zaniżając sumę. Reguła klasyfikacji: wartość trafia do pierwszej strefy,
+  której górny próg jest od niej nie mniejszy; ostatnia łapie resztę. Automat
+  musi użyć dokładnie tej samej.
+
+  **Efektywność w środku pierścienia (0–100%).** Ocenia KSZTAŁT rozkładu, nie
+  ilość treningu. Wzorzec to model spolaryzowany Seilera: ok. 80% czasu poniżej
+  progu tlenowego, ok. 5% progowo, 15–20% powyżej progu. Widełki na każdą
+  strefę siedzą w `dane.js` → `strefy.efektywnosc.widelki`; punkt procentowy
+  poza widełkami kosztuje `waga` punktu oceny. Sprawdzone: 90% czasu w Z1 daje
+  **0%** (przykład Fryderyka — „dużo jeżdżenia" to nie to samo co dobry
+  trening), rozkład 10/68/5/12/5 daje **100%**, a sama baza (100% Z2) **51%**.
+  Obok liczymy wskaźnik polaryzacji PI = log10(Z1/Z2 × Z3 × 100) z ułamków
+  czasu, próg 2,00 (Treff i in. 2019) — kontrola krzyżowa dla samej oceny.
+
   **Progi stref są DATOWANE i działają tylko w przód** (27.08.2026, decyzja
   Fryderyka). `strefy.tetno.tabele` i `strefy.moc.tabele` to listy wersji, każda
   z polem `od`. Rozkład jazdy liczy się tabelą obowiązującą **w dniu tej
@@ -418,6 +436,23 @@ nie kolor: sylwetka roweru vs ekranu, słupek kreskowany vs pełny.
   dlaczego. **Nie wypełniać go zerami** — koło pełne zer wygląda jak wynik.
   Tętno wchodzi do jazd od 1.09.2026 (pas piersiowy), moc ma dziś wyłącznie
   Zwift i tylko z sesji swobodnych.
+- **Objętość → Stan wytrenowania** (27.08.2026) — krzywa formy. Gruba linia to
+  wytrenowanie (42 dni), cienka przerywana zmęczenie (7 dni), różnica to forma.
+  Obie w tych samych jednostkach, więc jedna oś — zakaz dwóch osi dotyczy
+  dwóch RÓŻNYCH miar. Dotknięcie albo przesunięcie palcem odczytuje dowolny
+  dzień (krzyżyk + panel nad wykresem).
+
+  **Strava NIE oddaje swojej krzywej Fitness przez API** — nie ma takiego
+  zapytania, więc to nie jest „przeniesienie", tylko policzenie tą samą metodą
+  u siebie. Obciążenie dnia = minuty ruchu × RPE (session-RPE, Foster 1998),
+  z niego dwie średnie wykładnicze o stałych z `dane.js`
+  (`stan_wytrenowania.ctl_dni` / `atl_dni`). **Skala jest własna** i strona mówi
+  to wprost: porównywalny jest wyłącznie przebieg w czasie, nie sama liczba.
+
+  Wykres startuje 1.03.2026, bo **od tego dnia każda jazda ma RPE** (35 z 35 od
+  1.05.2026). Wcześniejsze jazdy bez RPE liczone jako zero dawałyby fałszywy
+  dołek, a zgadywane byłyby zmyśleniem. Po pasie tętna obciążenie policzymy
+  z TRIMP, po mierniku z TSS — metoda siedzi w danych, nie w kodzie wykresu.
 - **Gablota → Koszulki** (27.08.2026) — osiemnaście koszulek z zawodowego
   kolarstwa, każda za jeden z góry ustalony warunek. Zablokowana jest widoczna
   i wyszarzona, zdobyta świeci pełną barwą z datą. Grupowanie po seriach od

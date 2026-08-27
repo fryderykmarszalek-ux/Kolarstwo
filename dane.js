@@ -655,7 +655,7 @@ strefy: {
           {
             "id": "z1",
             "nazwa": "Z1 regeneracja",
-            "min": 100,
+            "min": 0,
             "max": 120
           },
           {
@@ -680,7 +680,7 @@ strefy: {
             "id": "z5",
             "nazwa": "Z5 VO2",
             "min": 181,
-            "max": 201
+            "max": null
           }
         ]
       }
@@ -736,7 +736,7 @@ strefy: {
             "id": "z7",
             "nazwa": "Z7 neuromięśniowa",
             "min": 226,
-            "max": 999
+            "max": null
           }
         ]
       }
@@ -746,9 +746,111 @@ strefy: {
     "_opis": "Sekundy spędzone w każdej strefie, jedna pozycja na jazdę. Klucz = id jazdy, wartość = { tetno: [s1..s5], moc: [s1..s7] }, brakująca miara = null. Wypełnia to automat ze strumieni, gdy granice stref będą ustalone.",
     "jazdy": {}
   },
-  "_przelicznik": "Tabele stref są DATOWANE i działają tylko w przód. Rozkład jazdy liczy się tabelą obowiązującą W DNIU tej jazdy i zapisuje na stałe, więc zmiana progów w listopadzie NIE przelicza jazd z września. Jazda wcześniejsza niż najstarsza tabela bierze tę najstarszą — innej nie ma, a odmowa policzenia byłaby gorsza niż jawne założenie."
+  "_przelicznik": "Tabele stref są DATOWANE i działają tylko w przód. Rozkład jazdy liczy się tabelą obowiązującą W DNIU tej jazdy i zapisuje na stałe, więc zmiana progów w listopadzie NIE przelicza jazd z września. Jazda wcześniejsza niż najstarsza tabela bierze tę najstarszą — innej nie ma, a odmowa policzenia byłaby gorsza niż jawne założenie.",
+  "_skrajnosci": "Dolny próg pierwszej strefy to zawsze 0, a górny ostatniej to null (nieskończoność) — tych dwóch NIE da się zmienić na stronie. Inaczej tętno 90 przy Z1 od 100 albo sprint 1000 W przy Z7 do 999 wypadałyby poza wszystkie strefy i cicho znikały z wykresu. Każda sekunda musi trafić do dokładnie jednej strefy.",
+  "_klasyfikacja": "Wartość trafia do pierwszej strefy, której górny próg jest od niej nie mniejszy; ostatnia strefa (max = null) łapie całą resztę. Automat musi użyć DOKŁADNIE tej reguły.",
+  "efektywnosc": {
+    "_opis": "Ocena rozkładu, nie ilości treningu. 100% znaczy: rozkład mieści się w widełkach dla treningu spolaryzowanego. Każdy punkt procentowy poza widełkami kosztuje waga punktów wyniku.",
+    "_zrodlo": "Model spolaryzowany Seilera: ok. 80% czasu poniżej progu tlenowego, ok. 5% w strefie progowej, 15–20% powyżej progu. Wskaźnik polaryzacji PI = log10(Z1/Z2 × Z3 × 100) z fracji czasu, wartość > 2,00 = trening spolaryzowany (Treff i in. 2019).",
+    "waga": 1.5,
+    "widelki": {
+      "tetno": [
+        [
+          0,
+          15
+        ],
+        [
+          58,
+          75
+        ],
+        [
+          0,
+          10
+        ],
+        [
+          5,
+          12
+        ],
+        [
+          3,
+          8
+        ]
+      ],
+      "moc": [
+        [
+          0,
+          25
+        ],
+        [
+          45,
+          68
+        ],
+        [
+          0,
+          12
+        ],
+        [
+          3,
+          10
+        ],
+        [
+          2,
+          8
+        ],
+        [
+          0,
+          5
+        ],
+        [
+          0,
+          3
+        ]
+      ]
+    },
+    "_widelki_moc_uwaga": "Przy mocy widełki Z1 są szersze, bo zjazd i wybieg to 0 W, czyli czas w Z1 rośnie sam z siebie, bez pedałowania.",
+    "grupy_seilera": {
+      "tetno": [
+        [
+          0,
+          1
+        ],
+        [
+          2
+        ],
+        [
+          3,
+          4
+        ]
+      ],
+      "moc": [
+        [
+          0,
+          1
+        ],
+        [
+          2,
+          3
+        ],
+        [
+          4,
+          5,
+          6
+        ]
+      ]
+    },
+    "_grupy_opis": "Mapowanie stref na trzy zakresy Seilera: niska (poniżej progu tlenowego), progowa, wysoka (powyżej progu). Potrzebne do wskaźnika polaryzacji."
+  }
 },
 
+stan_wytrenowania: {
+  "_opis": "Krzywa formy liczona z obciążenia sesyjnego (session-RPE, Foster 1998): obciążenie dnia = minuty ruchu × RPE. Z niego dwie średnie wykładnicze: wytrenowanie (długa, 42 dni) i zmęczenie (krótka, 7 dni). Różnica to forma.",
+  "_dlaczego_nie_ze_stravy": "Strava rysuje własną krzywą Fitness, ale NIE oddaje jej przez API — nie ma takiego zapytania. Liczymy więc u siebie, tą samą metodą, z danych, które API oddaje. Gdy pojawi się pas tętna, obciążenie policzymy dokładniej (TRIMP), a po mierniku mocy jeszcze dokładniej (TSS).",
+  "metoda": "sRPE",
+  "ctl_dni": 42,
+  "atl_dni": 7,
+  "od_daty": "2026-03-01",
+  "od_daty_powod": "Od marca 2026 KAŻDA jazda ma wpisane RPE (sprawdzone: 35 z 35 od 1.05.2026). Wcześniej są jazdy bez RPE — liczone jako zero dawałyby fałszywy dołek, a zgadywane byłyby zmyśleniem."
+},
 plan_objetosci: [
   {"od":"2026-09-01","do":"2026-09-07","godziny":3,"odciazenie":false},
   {"od":"2026-09-08","do":"2026-09-14","godziny":4,"odciazenie":false},

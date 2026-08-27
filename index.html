@@ -632,6 +632,45 @@ rect.proba-punkt{cursor:pointer}
 .czas-strefy{color:var(--slaby);font-size:12px;font-variant-numeric:tabular-nums;
   min-width:62px;text-align:right}
 
+
+
+/* --- Stan wytrenowania --- */
+.wykres-formy{margin-top:4px;background:var(--plyta);border:1px solid var(--linia);
+  border-radius:10px;padding:10px 12px 4px;cursor:crosshair;touch-action:pan-y}
+.wykres-formy svg{display:block;width:100%;height:260px}
+.odczyt-formy{display:flex;gap:8px 18px;flex-wrap:wrap;align-items:baseline;
+  padding:9px 13px;background:var(--powierzchnia);border:1px solid var(--linia);
+  border-radius:10px;font-size:13px;min-height:20px}
+.odczyt-data{color:var(--slaby);font-variant-numeric:tabular-nums;min-width:82px}
+.odczyt-liczba{font-variant-numeric:tabular-nums}
+.odczyt-liczba b{font-size:15px}
+.odczyt-zmeczenie{color:var(--slaby)}
+.odczyt-forma.dodatnia{color:var(--plan);font-weight:600}
+.odczyt-forma.ujemna{color:var(--alarm);font-weight:600}
+.odczyt-jazda{color:var(--slaby);font-size:12px;margin-left:auto}
+.odczyt-jazda.pusty{opacity:.6}
+@media (max-width:560px){
+  .wykres-formy svg{height:210px}
+  .odczyt-jazda{margin-left:0}
+}
+/* --- Ocena efektywności --- */
+.srodek-glowna.ocena{font-size:30px}
+.srodek-glowna.ocena.o-0{color:var(--alarm)}
+.srodek-glowna.ocena.o-1{color:var(--strefa-moc-5)}
+.srodek-glowna.ocena.o-2{color:var(--tekst)}
+.srodek-glowna.ocena.o-3,.srodek-glowna.ocena.o-4{color:var(--plan)}
+.ocena-blok{margin-top:30px}
+.wzorzec-lista{list-style:none;margin:0;padding:0;display:grid;gap:1px;
+  border:1px solid var(--linia);border-radius:10px;overflow:hidden}
+.wzorzec-lista li{display:flex;align-items:center;gap:10px;padding:8px 13px;
+  font-size:13px;background:var(--powierzchnia);border-top:1px solid var(--linia)}
+.wzorzec-lista li:first-child{border-top:0}
+.wzorzec-lista li.poza .wzorzec-teraz{color:var(--alarm);font-weight:600}
+.wzorzec-lista .prostokat{width:12px;height:12px;border-radius:3px;flex:0 0 auto}
+.wzorzec-widelki{color:var(--slaby);font-size:12px;min-width:76px;text-align:right;
+  font-variant-numeric:tabular-nums}
+.wzorzec-teraz{min-width:60px;text-align:right;font-variant-numeric:tabular-nums;
+  font-weight:600}
 /* --- Tabela przeliczników stref --- */
 .tabela-stref{margin-top:30px}
 .tabela-naglowek{display:flex;align-items:baseline;justify-content:space-between;
@@ -660,6 +699,12 @@ rect.proba-punkt{cursor:pointer}
 .pola-progu input.prog:focus{outline:0;border-color:var(--sek-kropka)}
 .pola-progu input.prog::-webkit-outer-spin-button,
 .pola-progu input.prog::-webkit-inner-spin-button{appearance:none;margin:0}
+.prog-staly{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:74px;min-height:38px;box-sizing:border-box;font-size:15px;font-weight:600;
+  color:var(--slaby);background:var(--plyta);border:1px dashed var(--linia);
+  border-radius:8px;cursor:help;
+}
 .myslnik{color:var(--slaby)}
 .jednostka-progu{font-size:12px;color:var(--slaby);min-width:26px}
 .tabela-dol{display:flex;justify-content:space-between;align-items:center;
@@ -4439,13 +4484,19 @@ function tabelaStrefHTML(miara){
           <span class="prostokat" style="background:var(--strefa-${miara}-${i+1})"></span>
           <span class="nazwa-progu">${bezpieczny(z.nazwa)}</span>
           <span class="pola-progu">
-            <input type="number" inputmode="numeric" class="prog" data-i="${i}" data-pole="min"
-              value="${z.min}" min="0" max="999" step="1"
-              aria-label="${bezpieczny(z.nazwa)} — dolny próg">
+            ${i === 0
+              ? `<span class="prog-staly" title="Nie do zmiany: wszystko poniżej musi
+                   gdzieś trafić">0</span>`
+              : `<input type="number" inputmode="numeric" class="prog" data-i="${i}"
+                   data-pole="min" value="${z.min}" min="0" max="9999" step="1"
+                   aria-label="${bezpieczny(z.nazwa)} — dolny próg">`}
             <span class="myslnik">–</span>
-            <input type="number" inputmode="numeric" class="prog" data-i="${i}" data-pole="max"
-              value="${z.max}" min="0" max="999" step="1"
-              aria-label="${bezpieczny(z.nazwa)} — górny próg">
+            ${z.max == null
+              ? `<span class="prog-staly" title="Nie do zmiany: wszystko powyżej musi
+                   gdzieś trafić">∞</span>`
+              : `<input type="number" inputmode="numeric" class="prog" data-i="${i}"
+                   data-pole="max" value="${z.max}" min="0" max="9999" step="1"
+                   aria-label="${bezpieczny(z.nazwa)} — górny próg">`}
             <span class="jednostka-progu">${def.jednostka}</span>
           </span>
         </li>`).join("")}
@@ -4466,7 +4517,7 @@ function tabelaStrefHTML(miara){
         <ul class="historia-tabel">
           ${[...wersje].reverse().map(t => `
             <li><span class="kroki-data">od ${pl(t.od)}</span>
-              <span>${t.strefy.map(z => z.min + "–" + z.max).join(" · ")}</span>
+              <span>${t.strefy.map(z => z.min + "–" + (z.max == null ? "∞" : z.max)).join(" · ")}</span>
               ${t.skad === "urzadzenie"
                 ? `<span class="stan-brudnopis">tylko na tym urządzeniu</span>` : ""}</li>`).join("")}
         </ul>
@@ -4501,13 +4552,20 @@ function podepnijTabeleStref(){
 
     if (b.id === "tabela-zapisz"){
       const biezaca = tabelaBiezaca(miara);
+      const ostatnia = biezaca.strefy.length - 1;
       const strefy = biezaca.strefy.map((z,i) => {
         const we = (pole) => korzen.querySelector(`.prog[data-i="${i}"][data-pole="${pole}"]`);
-        return { ...z, min: Math.round(+we("min").value), max: Math.round(+we("max").value) };
+        // Skrajności NIE są polami: pierwsza strefa zaczyna się od zera, ostatnia
+        // nie ma końca. Inaczej tętno 90 albo sprint 1000 W wypadałyby poza
+        // wszystkie strefy i cicho znikały z wykresu.
+        return { ...z,
+          min: i === 0 ? 0 : Math.round(+we("min").value),
+          max: i === ostatnia ? null : Math.round(+we("max").value) };
       });
-      // Kontrola sensu: dolny próg poniżej górnego, strefy rosnące.
       for (let i = 0; i < strefy.length; i++){
-        if (!isFinite(strefy[i].min) || !isFinite(strefy[i].max) || strefy[i].min >= strefy[i].max){
+        const gora = strefy[i].max == null ? Infinity : strefy[i].max;
+        if (!isFinite(strefy[i].min) || (strefy[i].max != null && !isFinite(strefy[i].max))
+            || strefy[i].min >= gora){
           stan(`<span class="stan-niezapisane">${bezpieczny(strefy[i].nazwa)}: dolny próg musi być mniejszy od górnego</span>`);
           return;
         }
@@ -4588,6 +4646,114 @@ function rozkladStref(miara, dni){
   return { sumy, suma, zPomiarem, wszystkich, ile };
 }
 
+/* --- Efektywność rozkładu -------------------------------------------------
+   Liczba w środku pierścienia. Ocenia KSZTAŁT rozkładu, nie ilość treningu:
+   pięć godzin źle rozłożonych dostanie mniej niż dwie dobrze.
+
+   Skąd widełki. Model spolaryzowany Seilera: około 80% czasu poniżej progu
+   tlenowego, około 5% w strefie progowej i 15–20% powyżej progu. Rozpisane na
+   strefy Stravy siedzą w dane.js (strefy.efektywnosc.widelki) — w kodzie nie
+   ma ani jednej z tych liczb. Każdy punkt procentowy poza widełkami kosztuje
+   „wagę" punktów wyniku, więc 90% czasu w strefie regeneracyjnej daje zero,
+   a nie „prawie sto, bo dużo jeździłeś".
+
+   Osobno liczymy wskaźnik polaryzacji PI = log10(Z1/Z2 × Z3 × 100) z ułamków
+   czasu w trzech zakresach Seilera; powyżej 2,00 rozkład uchodzi za
+   spolaryzowany (Treff i in. 2019). To kontrola krzyżowa dla samej oceny. */
+function efektywnoscRozkladu(miara, rozklad){
+  const cfg = STREFY.efektywnosc;
+  if (!cfg || !rozklad || !rozklad.suma) return null;
+  const widelki = cfg.widelki[miara];
+  const strefy = strefyMiary(miara);
+  if (!widelki || widelki.length !== strefy.length) return null;
+
+  const udzialy = rozklad.sumy.map(s => s / rozklad.suma * 100);
+  let kara = 0;
+  const odchylenia = udzialy.map((u,i) => {
+    const [lo,hi] = widelki[i];
+    const poza = u < lo ? lo - u : u > hi ? u - hi : 0;
+    kara += poza * cfg.waga;
+    return { i, udzial: u, lo, hi, poza, zaMalo: u < lo };
+  });
+  const wynik = Math.max(0, Math.min(100, Math.round(100 - kara)));
+
+  // Trzy zakresy Seilera i wskaźnik polaryzacji.
+  const grupy = (cfg.grupy_seilera || {})[miara];
+  let pi = null, trzy = null;
+  if (grupy){
+    trzy = grupy.map(g => g.reduce((s,i) => s + udzialy[i], 0) / 100);
+    const [z1, z2, z3] = trzy;
+    if (z1 > 0 && z3 > 0) pi = Math.log10((z1 / (z2 || 0.01)) * z3 * 100);
+  }
+  const najgorsze = odchylenia.filter(o => o.poza > 0).sort((a,b) => b.poza - a.poza)[0] || null;
+  return { wynik, odchylenia, najgorsze, pi, trzy };
+}
+
+/* Rozwinięcie oceny pod wykresem: skąd ta liczba i co ją najbardziej ciągnie
+   w dół. Bez tego procent w środku byłby wyrocznią bez uzasadnienia — a to
+   ten sam błąd co moc [E] udająca pomiar. */
+function blokEfektywnosci(miara, rozklad){
+  const e = efektywnoscRozkladu(miara, rozklad);
+  const cfg = STREFY.efektywnosc;
+  if (!cfg) return "";
+  const strefy = strefyMiary(miara);
+  const widelki = cfg.widelki[miara];
+
+  const wzorzec = `<ul class="wzorzec-lista">${strefy.map((z,i) => {
+    const [lo,hi] = widelki[i];
+    const o = e && e.odchylenia[i];
+    return `<li${o && o.poza > 0 ? ' class="poza"' : ""}>
+      <span class="prostokat" style="background:var(--strefa-${miara}-${i+1})"></span>
+      <span class="nazwa-strefy">${bezpieczny(z.nazwa)}</span>
+      <span class="wzorzec-widelki">${lo}–${hi}%</span>
+      <span class="wzorzec-teraz">${o ? liczba(o.udzial,1) + "%" : "—"}</span>
+    </li>`;
+  }).join("")}</ul>`;
+
+  return `
+  <section class="ocena-blok">
+    <h2>Efektywność rozkładu</h2>
+    <p class="opis">
+      To ocena <b>kształtu</b> rozkładu, nie ilości treningu: pięć godzin źle
+      rozłożonych dostanie mniej niż dwie dobrze. Wzorcem jest trening
+      <b>spolaryzowany</b> — około 80% czasu lekko, poniżej progu tlenowego,
+      około 5% w strefie progowej i 15–20% mocno, powyżej progu. Sto procent
+      znaczy: wszystkie strefy mieszczą się w widełkach. Każdy punkt procentowy
+      poza widełkami kosztuje ${liczba(cfg.waga,1).replace(",0","")} punktu oceny.
+      <br>Dlatego 90% czasu w strefie regeneracyjnej daje wynik bliski zeru —
+      dużo jeżdżenia to nie to samo co dobry trening.
+    </p>
+    ${wzorzec}
+    ${e ? `
+      <div class="info">
+        ${e.najgorsze
+          ? `Najmocniej ciągnie w dół <b>${bezpieczny(strefy[e.najgorsze.i].nazwa)}</b>:
+             ${liczba(e.najgorsze.udzial,1)}% wobec widełek
+             ${e.najgorsze.lo}–${e.najgorsze.hi}%, czyli
+             ${e.najgorsze.zaMalo ? "za mało" : "za dużo"} o
+             ${liczba(e.najgorsze.poza,1)} punktu.`
+          : `Każda strefa mieści się w widełkach.`}
+        ${e.pi != null ? `
+          <br>Wskaźnik polaryzacji: <b>${liczba(e.pi,2)}</b> —
+          ${e.pi > 2 ? "rozkład jest spolaryzowany" : "rozkład NIE jest spolaryzowany"}
+          (próg 2,00). Liczony jako log10(niska ÷ progowa × wysoka × 100)
+          z ułamków czasu: ${e.trzy.map(x => liczba(x*100,0) + "%").join(" · ")}
+          w zakresach niska / progowa / wysoka.` : ""}
+      </div>` : `
+      <div class="info">
+        Ocena pojawi się razem z pierwszymi pomiarami — nie ma czego oceniać.
+      </div>`}
+  </section>`;
+}
+
+function opisEfektywnosci(w){
+  if (w >= 85) return "rozkład jak z podręcznika";
+  if (w >= 70) return "blisko wzorca";
+  if (w >= 50) return "da się poprawić";
+  if (w >= 25) return "rozkład rozjechany";
+  return "to nie jest trening spolaryzowany";
+}
+
 /* Pierścień. Wycinki rysowane obwodem koła (stroke-dasharray), nie ścieżkami:
    łuk o stałej grubości wychodzi wtedy idealnie, a przerwa między wycinkami
    bierze się z samego dasharray. Między wycinkami zostaje 2 px tła, żeby dwa
@@ -4632,13 +4798,13 @@ function srodekPierscienia(miara, rozklad, dni){
   if (!rozklad || !rozklad.suma) return `
     <div class="srodek-glowna">—</div>
     <div class="srodek-podpis">brak pomiarów<br>w tym oknie</div>`;
+  const e = efektywnoscRozkladu(miara, rozklad);
   return `
-    <div class="srodek-etykieta">${dni} dni</div>
-    <div class="srodek-glowna">${czasNaTekst(Math.round(rozklad.suma))}</div>
-    <div class="srodek-podpis">${rozklad.zPomiarem} ${
-      rozklad.zPomiarem === 1 ? "jazda" : rozklad.zPomiarem < 5 ? "jazdy" : "jazd"}
-      ${rozklad.zPomiarem < rozklad.wszystkich
-        ? `<br><span class="srodek-brak">z ${rozklad.wszystkich} w oknie</span>` : ""}</div>`;
+    <div class="srodek-etykieta">efektywność</div>
+    <div class="srodek-glowna${e ? " ocena o-" + Math.floor(e.wynik/25) : ""}">${
+      e ? e.wynik + "%" : "—"}</div>
+    <div class="srodek-podpis">${e ? bezpieczny(opisEfektywnosci(e.wynik)) : ""}
+      <br><span class="srodek-brak">${czasNaTekst(Math.round(rozklad.suma))} · ${dni} dni</span></div>`;
 }
 
 function legendaStref(miara, rozklad){
@@ -4716,6 +4882,7 @@ function objetosc(miara, arg){
         co daje Strava${tetno ? "" : " (model Coggana)"}, nazwy z
         <code>TRENING.md</code>.
       </div>` : ""}
+    ${blokEfektywnosci(miara, rozklad)}
     ${tabelaStrefHTML(miara)}
     <div class="info">
       <b>Jak liczony jest procent.</b> Sumujemy sekundy w danej strefie ze
@@ -4751,10 +4918,17 @@ function podepnijStrefy(){
     }
     const z = strefyMiary(miara)[i];
     const sek = rozklad.sumy[i];
+    const e = efektywnoscRozkladu(miara, rozklad);
+    const o = e && e.odchylenia[i];
     srodek.innerHTML = `
       <div class="srodek-etykieta">${bezpieczny(z.nazwa)}</div>
       <div class="srodek-glowna">${liczba(sek / rozklad.suma * 100, 1)}%</div>
-      <div class="srodek-podpis">${czasNaTekst(Math.round(sek))} przez ${dni} dni</div>`;
+      <div class="srodek-podpis">${czasNaTekst(Math.round(sek))}
+        <br><span class="srodek-brak">${o
+          ? (o.poza > 0
+              ? `${o.zaMalo ? "za mało" : "za dużo"} · wzorzec ${o.lo}–${o.hi}%`
+              : `w widełkach ${o.lo}–${o.hi}%`)
+          : ""}</span></div>`;
   };
 
   const zZdarzenia = e => {
@@ -4766,6 +4940,233 @@ function podepnijStrefy(){
     const i = zZdarzenia(e);
     const juz = e.target.closest(".wybrany");
     wybierz(i != null && !juz ? i : null);
+  });
+}
+
+
+/* ==========================================================================
+   STAN WYTRENOWANIA
+
+   Strava rysuje własną krzywą Fitness, ale NIE oddaje jej przez API — nie ma
+   takiego zapytania. Liczymy więc u siebie, tą samą metodą co ona, z danych,
+   które API oddaje.
+
+   Obciążenie dnia = minuty ruchu × RPE (session-RPE, Foster 1998). Przy braku
+   miernika mocy i pasa tętna to najlepsza dostępna miara wysiłku — tak samo
+   mówi TRENING.md §8.6. Z obciążenia dwie średnie wykładnicze:
+
+     wytrenowanie (42 dni)  — ile pracy siedzi w nogach
+     zmęczenie   (7 dni)    — ile z tego jeszcze boli
+     forma = wytrenowanie − zmęczenie
+
+   Obie linie są w TYCH SAMYCH jednostkach, więc wolno im stać na jednym
+   rysunku i jednej osi — zakaz dwóch osi dotyczy dwóch RÓŻNYCH miar.
+   Zmęczenie jest cienkie i szare, bo to tło dla wytrenowania, nie druga
+   opowieść.
+   ========================================================================== */
+
+const KONF_FORMY = D.stan_wytrenowania || null;
+
+function seriaFormy(){
+  if (!KONF_FORMY) return null;
+  const od = KONF_FORMY.od_daty;
+  const jazdyF = JAZDY_GABLOTA.filter(a => a.data.slice(0,10) >= od
+    && a.data.slice(0,10) <= DZIS && a.rpe != null && a.czas_ruchu_s);
+  if (!jazdyF.length) return null;
+
+  // Obciążenie na dzień. Dwie jazdy tego samego dnia sumują się.
+  const obciazenie = new Map();
+  for (const a of jazdyF){
+    const d = a.data.slice(0,10);
+    obciazenie.set(d, (obciazenie.get(d) || 0) + (a.czas_ruchu_s / 60) * a.rpe);
+  }
+  const bezRPE = JAZDY_GABLOTA.filter(a => a.data.slice(0,10) >= od
+    && a.data.slice(0,10) <= DZIS && a.rpe == null).length;
+
+  // Średnia wykładnicza: dzisiejsza wartość to wczorajsza plus ułamek różnicy.
+  // Ułamek 1 − e^(−1/τ) to klasyczna postać, ta sama, której używa model
+  // Banistera i za nim wszystkie liczniki formy.
+  const kCTL = 1 - Math.exp(-1 / KONF_FORMY.ctl_dni);
+  const kATL = 1 - Math.exp(-1 / KONF_FORMY.atl_dni);
+  const dni = [];
+  let ctl = 0, atl = 0;
+  for (let t = naDzien(od); t <= naDzien(DZIS); t += 86400000){
+    const d = dzienNaTekst(t);
+    const l = obciazenie.get(d) || 0;
+    ctl += (l - ctl) * kCTL;
+    atl += (l - atl) * kATL;
+    dni.push({ data: d, obciazenie: l, ctl, atl, forma: ctl - atl });
+  }
+  return { dni, jazd: jazdyF.length, bezRPE,
+    szczyt: dni.reduce((a,b) => b.ctl > a.ctl ? b : a) };
+}
+
+function wykresFormy(seria){
+  const W = 720, H = 300, lewy = 44, prawy = 16, gora = 18, dol = 34;
+  const px = W - lewy - prawy, py = H - gora - dol;
+  const d = seria.dni;
+  const maks = Math.max(...d.map(x => Math.max(x.ctl, x.atl)), 1);
+  const goraY = Math.ceil(maks * 1.15 / 10) * 10;
+  const x = i => lewy + (d.length === 1 ? px/2 : (i / (d.length - 1)) * px);
+  const y = v => gora + py - (v / goraY) * py;
+  const krok = goraY > 200 ? 50 : goraY > 100 ? 25 : 10;
+
+  let g = `<svg viewBox="0 0 ${W} ${H}" width="100%" id="svg-formy"
+    preserveAspectRatio="none" role="img"
+    aria-label="Stan wytrenowania w czasie">`;
+  for (let v = 0; v <= goraY; v += krok){
+    g += `<line x1="${lewy}" y1="${y(v)}" x2="${W-prawy}" y2="${y(v)}"
+           stroke="var(--linia)" stroke-width="1" vector-effect="non-scaling-stroke"/>`;
+    g += `<text x="${lewy-7}" y="${y(v)+4}" text-anchor="end" font-size="11"
+           fill="var(--slaby)">${v}</text>`;
+  }
+  // Podpis miesiąca przy pierwszym dniu każdego miesiąca.
+  let poprzedniX = -99;
+  d.forEach((p,i) => {
+    if (p.data.slice(8,10) !== "01" || x(i) - poprzedniX < 52) return;
+    poprzedniX = x(i);
+    g += `<text x="${x(i)}" y="${H-12}" text-anchor="middle" font-size="11"
+           fill="var(--slaby)">${miesiacNaTekst(p.data.slice(0,7))}</text>`;
+  });
+  // Kreska pod osią w dniu każdej jazdy — widać, skąd biorą się wzrosty.
+  for (let i = 0; i < d.length; i++)
+    if (d[i].obciazenie > 0)
+      g += `<line x1="${x(i)}" y1="${gora+py}" x2="${x(i)}" y2="${gora+py+5}"
+             stroke="var(--akcent)" stroke-width="1.5" opacity=".45"
+             vector-effect="non-scaling-stroke"/>`;
+
+  const sciezka = (pole) => d.map((p,i) => `${i ? "L" : "M"}${x(i).toFixed(1)} ${y(p[pole]).toFixed(1)}`).join(" ");
+  g += `<path d="${sciezka("ctl")} L${x(d.length-1)} ${y(0)} L${x(0)} ${y(0)} Z"
+         fill="var(--akcent)" opacity=".10"/>`;
+  g += `<path d="${sciezka("atl")}" fill="none" stroke="var(--slaby)" stroke-width="1.4"
+         stroke-dasharray="4 3" opacity=".8" vector-effect="non-scaling-stroke"/>`;
+  g += `<path d="${sciezka("ctl")}" fill="none" stroke="var(--akcent)" stroke-width="2.4"
+         stroke-linejoin="round" vector-effect="non-scaling-stroke"/>`;
+  g += `<line id="krzyzyk-formy" x1="0" y1="${gora}" x2="0" y2="${gora+py}"
+         stroke="var(--tekst)" stroke-width="1" opacity="0"
+         vector-effect="non-scaling-stroke"/>`;
+  g += `<circle id="punkt-formy" r="4.5" fill="var(--akcent)"
+         stroke="var(--powierzchnia)" stroke-width="2" opacity="0"/>`;
+  g += `<line x1="${lewy}" y1="${gora+py}" x2="${W-prawy}" y2="${gora+py}"
+         stroke="var(--slaby)" stroke-width="1" vector-effect="non-scaling-stroke"/></svg>`;
+  return { svg: g, geometria: { W, H, lewy, prawy, gora, dol, px, py, goraY } };
+}
+
+function odczytFormy(p){
+  return `
+    <span class="odczyt-data">${pl(p.data)}</span>
+    <span class="odczyt-liczba"><b>${Math.round(p.ctl)}</b> wytrenowanie</span>
+    <span class="odczyt-liczba odczyt-zmeczenie">${Math.round(p.atl)} zmęczenie</span>
+    <span class="odczyt-liczba odczyt-forma ${p.forma >= 0 ? "dodatnia" : "ujemna"}"
+      >${p.forma >= 0 ? "+" : "−"}${Math.abs(Math.round(p.forma))} forma</span>
+    ${p.obciazenie > 0
+      ? `<span class="odczyt-jazda">jazda · obciążenie ${Math.round(p.obciazenie)}</span>`
+      : `<span class="odczyt-jazda pusty">bez jazdy</span>`}`;
+}
+
+function stanWytrenowania(){
+  if (!KONF_FORMY) return pusto("Stan wytrenowania");
+  const seria = seriaFormy();
+  if (!seria) return `
+    <div class="pusto">
+      <span class="znak">Stan wytrenowania</span>
+      Nie ma jeszcze jazd z wpisanym RPE po ${pl(KONF_FORMY.od_daty)}.
+    </div>`;
+
+  const w = wykresFormy(seria);
+  const dzis = seria.dni[seria.dni.length-1];
+
+  return `
+  <section id="forma" data-od="${KONF_FORMY.od_daty}">
+    <h2>Stan wytrenowania</h2>
+    <p class="opis">
+      Gruba linia to <b>wytrenowanie</b> — ile pracy siedzi w nogach po
+      ${KONF_FORMY.ctl_dni} dniach. Cienka przerywana to <b>zmęczenie</b> z ostatnich
+      ${KONF_FORMY.atl_dni} dni. Różnica między nimi to <b>forma</b>: dodatnia znaczy
+      wypoczęty, ujemna — obciążony. Kreski pod osią to dni z jazdą.
+      <br>Dotknij wykresu albo przesuń po nim palcem, żeby odczytać dowolny dzień.
+    </p>
+    <div class="odczyt-formy" id="odczyt-formy">${odczytFormy(dzis)}</div>
+    <div class="wykres-formy" id="wykres-formy">${w.svg}</div>
+    <div class="legenda">
+      <span><i style="background:var(--akcent)"></i>wytrenowanie (${KONF_FORMY.ctl_dni} dni)</span>
+      <span><i class="kreska" style="color:var(--slaby)"></i>zmęczenie (${KONF_FORMY.atl_dni} dni)</span>
+    </div>
+    <div class="kafelki" style="margin-top:16px">
+      <div class="kafel">
+        <div class="etykieta">Wytrenowanie dziś</div>
+        <div class="liczba">${Math.round(dzis.ctl)}</div>
+        <div class="stopka">szczyt ${Math.round(seria.szczyt.ctl)} · ${pl(seria.szczyt.data)}</div>
+      </div>
+      <div class="kafel">
+        <div class="etykieta">Forma dziś</div>
+        <div class="liczba">${dzis.forma >= 0 ? "+" : "−"}${Math.abs(Math.round(dzis.forma))}</div>
+        <div class="stopka">${dzis.forma >= 0 ? "wypoczęty" : "obciążony"}</div>
+      </div>
+      <div class="kafel">
+        <div class="etykieta">Jazd w wykresie</div>
+        <div class="liczba">${seria.jazd}</div>
+        <div class="stopka">od ${pl(KONF_FORMY.od_daty)}</div>
+      </div>
+    </div>
+    <div class="info">
+      <b>To nie jest liczba ze Stravy.</b> Strava rysuje własną krzywą Fitness, ale
+      nie oddaje jej przez API — nie ma takiego zapytania. Liczymy ją u siebie tą
+      samą metodą: obciążenie dnia to <b>minuty ruchu × RPE</b> (session-RPE,
+      Foster 1998), a z niego dwie średnie wykładnicze o stałych
+      ${KONF_FORMY.ctl_dni} i ${KONF_FORMY.atl_dni} dni.
+      <br>Skala jest więc <b>własna</b> i nie da się jej porównywać z liczbą ze
+      Stravy ani z cudzą — porównywalny jest wyłącznie jej przebieg w czasie.
+      Wykres startuje ${pl(KONF_FORMY.od_daty)}, bo od tego dnia każda jazda ma
+      wpisane RPE${seria.bezRPE ? ` (${seria.bezRPE} bez RPE zostało pominiętych)` : ""};
+      wcześniejsze jazdy liczone jako zero dawałyby fałszywy dołek.
+      <br>Gdy ruszy pas tętna, obciążenie policzymy dokładniej (TRIMP), a po
+      mierniku mocy jeszcze dokładniej (TSS) — metoda siedzi w
+      <code>dane.js</code>, więc zmiana nie wymaga ruszania wykresu.
+    </div>
+  </section>`;
+}
+
+// Odczyt punktu: mysz i palec obsłużone tym samym zdarzeniem wskaźnika.
+function podepnijForme(){
+  const tresc = document.getElementById("tresc");
+  if (!tresc || tresc.dataset.formaPodpieta) return;
+  tresc.dataset.formaPodpieta = "1";
+
+  let seria = null;
+  const pokaz = (klientX) => {
+    const svg = document.getElementById("svg-formy");
+    const odczyt = document.getElementById("odczyt-formy");
+    if (!svg || !odczyt) return;
+    if (!seria) seria = seriaFormy();
+    if (!seria) return;
+    const r = svg.getBoundingClientRect();
+    const W = 720, lewy = 44, prawy = 16, gora = 18, dol = 34, H = 300;
+    const px = W - lewy - prawy, py = H - gora - dol;
+    // preserveAspectRatio="none" — skala pozioma i pionowa liczą się osobno.
+    const uX = (klientX - r.left) / r.width * W;
+    const i = Math.max(0, Math.min(seria.dni.length - 1,
+      Math.round((uX - lewy) / px * (seria.dni.length - 1))));
+    const p = seria.dni[i];
+    odczyt.innerHTML = odczytFormy(p);
+
+    const maks = Math.max(...seria.dni.map(x => Math.max(x.ctl, x.atl)), 1);
+    const goraY = Math.ceil(maks * 1.15 / 10) * 10;
+    const xi = lewy + (seria.dni.length === 1 ? px/2 : (i / (seria.dni.length - 1)) * px);
+    const yi = gora + py - (p.ctl / goraY) * py;
+    const kreska = document.getElementById("krzyzyk-formy");
+    const punkt = document.getElementById("punkt-formy");
+    kreska.setAttribute("x1", xi); kreska.setAttribute("x2", xi);
+    kreska.setAttribute("opacity", ".35");
+    punkt.setAttribute("cx", xi); punkt.setAttribute("cy", yi);
+    punkt.setAttribute("opacity", "1");
+  };
+
+  tresc.addEventListener("pointermove", e => {
+    if (e.target.closest && e.target.closest("#wykres-formy")) pokaz(e.clientX);
+  });
+  tresc.addEventListener("pointerdown", e => {
+    if (e.target.closest && e.target.closest("#wykres-formy")) pokaz(e.clientX);
   });
 }
 
@@ -4798,7 +5199,8 @@ const SEKCJE = [
       : [{ id:"brak", tytul:"—", rysuj: () => pusto("Prognozy") }] },
   { id:"objetosc", tytul:"Objętość", barwa:"fuksja", pod:[
       { id:"tetno", tytul:"Tętno", rysuj: (arg) => objetosc("tetno", arg) },
-      { id:"moc",   tytul:"Moc",   rysuj: (arg) => objetosc("moc", arg) }
+      { id:"moc",   tytul:"Moc",   rysuj: (arg) => objetosc("moc", arg) },
+      { id:"stan",  tytul:"Stan wytrenowania", rysuj: stanWytrenowania }
   ]},
   { id:"z4", tytul:"Z4", barwa:"cyjan", pod:[1,2,3].map(m => ({
       id:"z4-"+m, tytul:"Z4."+m, rysuj: () => pusto("Z4."+m)
@@ -4876,6 +5278,7 @@ function pokaz(){
   podepnijGablote();
   podepnijStrefy();
   podepnijTabeleStref();
+  podepnijForme();
 
   // Wykres otwiera się na najświeższym końcu — najnowsza przerwa jest
   // najważniejsza, a przy dwóch latach historii ląduje poza kadrem.
