@@ -649,6 +649,21 @@ rect.proba-punkt{cursor:pointer}
 
 
 
+
+/* --- Analiza AI --- */
+.analiza-stempel{font-size:12px;color:var(--slaby);white-space:nowrap}
+.analiza-tresc{margin-top:6px}
+.analiza-naglowek{font-size:14px;font-weight:600;margin:22px 0 6px}
+.analiza-naglowek:first-child{margin-top:4px}
+.analiza-akapit{font-size:14px;line-height:1.6;margin:0 0 11px}
+.analiza-lista{margin:0 0 12px;padding-left:20px;font-size:13.5px;line-height:1.55;
+  list-style:disc}
+.analiza-lista li{margin:3px 0}
+.analiza-tresc .kafelki{margin:4px 0 14px}
+.analiza-wykres{margin:14px 0 18px}
+.analiza-wykres-tytul{font-size:12.5px;font-weight:600;color:var(--slaby);
+  margin-bottom:4px}
+.analiza-tresc .info{margin-bottom:12px}
 /* --- Regeneracja --- */
 .regen-uklad{display:flex;gap:22px;align-items:center;flex-wrap:wrap;
   background:var(--plyta);border:1px solid var(--linia);border-radius:12px;
@@ -1109,6 +1124,9 @@ footer{color:var(--slaby);font-size:12px;padding:14px 20px 34px;max-width:1000px
      272-kilobajtowego dane.js, którego automat i tak przepisuje co noc.
      Gdyby pliku nie było, strona działa dalej — patrz TRESCI niżej. -->
 <script src="claude.js"></script>
+<!-- Analiza pisana przez model, wygenerowana nocą przez automat. Brak pliku
+     nie psuje strony — zakładka pokazuje wtedy pusty stan. -->
+<script src="analiza.js"></script>
 <script>
 "use strict";
 
@@ -5531,6 +5549,199 @@ function podepnijRegeneracje(){
   }, 1000);
 }
 
+
+/* ==========================================================================
+   ANALIZA AI
+
+   Jedyne miejsce na stronie, gdzie tekst NAPRAWDĘ pisze model. Reszta
+   „wniosków" to reguły liczone w przeglądarce — i tak ma zostać, bo nazwa,
+   która obiecuje więcej, niż jest, to ten sam błąd co moc [E] udająca pomiar.
+
+   Skąd się tu bierze treść: strona jest statyczna i nie ma jak zapytać
+   modelu. Robi to automat na serwerze GitHuba, po nocnym pobraniu danych ze
+   Stravy, i zapisuje wynik do `analiza.js`. Strona tylko go rysuje.
+
+   BEZPIECZEŃSTWO. Model nie wstawia HTML-a. Oddaje listę bloków z zamkniętego
+   słownika, a strona rysuje je sama — każdy tekst przez `bezpieczny()`. Blok
+   nieznanego typu jest po cichu pomijany. Dzięki temu model może pokazać
+   wykres, ale nie może wstrzyknąć niczego do strony.
+   ========================================================================== */
+
+const ANALIZA = (typeof window !== "undefined" && window.ANALIZA) ? window.ANALIZA : null;
+
+// Wykresy, które model może przywołać. Klucz = nazwa w bloku, wartość rysuje.
+// Nowy wykres na tej liście = nowe narzędzie dla modelu, bez zmian w promptcie.
+const WYKRESY_ANALIZY = {
+  wykres_segment: (b) => {
+    const seg = (D.segmenty || []).find(s => s.id === String(b.segment));
+    if (!seg) return "";
+    const lista = probySegmentu(seg.id);
+    if (!lista.length) return "";
+    const naj = Math.min(...lista.map(x => x.czas_s));
+    return `<div class="analiza-wykres">
+      <div class="analiza-wykres-tytul">${bezpieczny(b.tytul || seg.nazwa)}</div>
+      ${wykresProb(lista, -1, naj)}
+      <div class="podpis-wykresu">${bezpieczny(seg.nazwa)} · ${lista.length}
+        ${lista.length === 1 ? "próba" : "prób"} · najlepszy
+        ${czasNaTekst(naj)}</div></div>`;
+  },
+  wykres_porownanie: (b) => {
+    const idy = (b.segmenty || []).map(String).slice(0, 4);
+    const zestaw = idy.map(id => {
+      const seg = (D.segmenty || []).find(s => s.id === id);
+      const lista = seg ? probySegmentu(id) : [];
+      return seg && lista.length ? { seg, lista } : null;
+    }).filter(Boolean);
+    if (zestaw.length < 2) return "";
+    return `<div class="analiza-wykres">
+      <div class="analiza-wykres-tytul">${bezpieczny(b.tytul || "Porównanie segmentów")}</div>
+      ${porownanieSegmentow(zestaw)}</div>`;
+  },
+  wykres_moc: (b) => !REKORDY_MOCY.length ? "" : `<div class="analiza-wykres">
+      <div class="analiza-wykres-tytul">${bezpieczny(b.tytul || "Krzywa mocy")}</div>
+      ${wykresKrzywejMocy()}</div>`,
+  wykres_strefy: (b) => {
+    const miara = b.miara === "moc" ? "moc" : "tetno";
+    const dni = [7,30,90].includes(+b.dni) ? +b.dni : 30;
+    const r = rozkladStref(miara, dni);
+    if (!r || !r.suma) return "";
+    return `<div class="analiza-wykres">
+      <div class="analiza-wykres-tytul">${bezpieczny(b.tytul
+        || `Strefy ${miara === "moc" ? "mocy" : "tętna"}, ${dni} dni`)}</div>
+      <div class="strefy-uklad">
+        <div class="pierscien-obudowa">${pierscienStref(miara, r)}
+          <div class="pierscien-srodek">${srodekPierscienia(miara, r, dni)}</div></div>
+        <div class="strefy-bok">${legendaStref(miara, r)}</div></div></div>`;
+  },
+  wykres_forma: (b) => {
+    const s = seriaFormy();
+    if (!s) return "";
+    return `<div class="analiza-wykres">
+      <div class="analiza-wykres-tytul">${bezpieczny(b.tytul || "Stan wytrenowania")}</div>
+      <div class="wykres-formy">${wykresFormy(s).svg}</div>
+      <div class="podpis-wykresu">Gruba linia — wytrenowanie, przerywana — zmęczenie.</div>
+      </div>`;
+  },
+  wykres_tygodnie: (b) => `<div class="analiza-wykres">
+      <div class="analiza-wykres-tytul">${bezpieczny(b.tytul || "Godziny w tygodniach")}</div>
+      ${wykresGodzin()}</div>`,
+  wykres_dlugie: (b) => `<div class="analiza-wykres">
+      <div class="analiza-wykres-tytul">${bezpieczny(b.tytul || "Najdłuższa jazda w miesiącu")}</div>
+      ${wykresDlugich()}</div>`
+};
+
+/* Porównanie kilku segmentów naraz. Czasy są nieporównywalne wprost (inna
+   długość, inne nachylenie), więc rysujemy je jako PROCENT rekordu danego
+   segmentu — 100% to najlepszy przejazd, wyżej znaczy wolniej. Inaczej
+   wykres mówiłby wyłącznie to, który segment jest dłuższy. */
+function porownanieSegmentow(zestaw){
+  const W = 660, H = 260, lewy = 44, prawy = 14, gora = 20, dol = 46;
+  const px = W - lewy - prawy, py = H - gora - dol;
+  const serie = zestaw.map(({seg, lista}) => {
+    const naj = Math.min(...lista.map(x => x.czas_s));
+    const po = [...lista].sort((a,b) => {
+      const ja = JAZDA_PO_ID.get(a.a), jb = JAZDA_PO_ID.get(b.a);
+      return (ja ? ja.data : "") < (jb ? jb.data : "") ? -1 : 1;
+    });
+    return { seg, naj, punkty: po.map((p,i) => ({ i, v: p.czas_s / naj * 100 })) };
+  });
+  const maks = Math.max(...serie.flatMap(s => s.punkty.map(p => p.v)), 105);
+  const dlugoscMaks = Math.max(...serie.map(s => s.punkty.length));
+  const goraY = Math.ceil(maks / 10) * 10;
+  const x = (i,n) => lewy + (n <= 1 ? px/2 : (i/(n-1)) * px);
+  const y = v => gora + py - ((v - 95) / (goraY - 95)) * py;
+
+  let g = `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img"
+    aria-label="Porównanie segmentów w procentach rekordu">`;
+  for (let v = 100; v <= goraY; v += Math.max(5, Math.round((goraY-100)/4/5)*5)){
+    g += `<line x1="${lewy}" y1="${y(v)}" x2="${W-prawy}" y2="${y(v)}"
+           stroke="var(--linia)" stroke-width="1"/>
+      <text x="${lewy-7}" y="${y(v)+4}" text-anchor="end" font-size="11"
+        fill="var(--slaby)">${v}%</text>`;
+  }
+  const BARWY = ["var(--seria-czas)","var(--seria-predkosc)","var(--seria-moc)","var(--seria-tetno)"];
+  serie.forEach((s,si) => {
+    const d = s.punkty.map((p,i) => `${i?"L":"M"}${x(p.i,s.punkty.length)} ${y(p.v)}`).join(" ");
+    g += `<path d="${d}" fill="none" stroke="${BARWY[si%4]}" stroke-width="2.2"
+           stroke-linejoin="round"/>`;
+    for (const p of s.punkty)
+      g += `<circle cx="${x(p.i,s.punkty.length)}" cy="${y(p.v)}" r="3.2"
+             fill="${BARWY[si%4]}"/>`;
+  });
+  g += `<text x="${lewy}" y="${H-24}" font-size="11" fill="var(--slaby)"
+    >kolejne przejazdy →</text></svg>`;
+  return `<div class="krzywa-mocy">${g}</div>
+    <div class="legenda">${serie.map((s,i) => `<span><i style="background:${
+      BARWY[i%4]}"></i>${bezpieczny(s.seg.nazwa)} · rekord ${czasNaTekst(s.naj)}</span>`).join("")}</div>
+    <div class="podpis-wykresu">Czas każdego przejazdu jako procent rekordu tego
+      segmentu — 100% to najlepszy wynik, wyżej znaczy wolniej. Bez tego
+      przeliczenia wykres mówiłby tylko, który segment jest dłuższy.</div>`;
+}
+
+// Bloki tekstowe. Każdy tekst przechodzi przez bezpieczny() — model nie
+// wstawia znaczników, tylko treść.
+const BLOKI_ANALIZY = {
+  naglowek:   (b) => `<h3 class="analiza-naglowek">${bezpieczny(b.tekst || "")}</h3>`,
+  akapit:     (b) => `<p class="analiza-akapit">${bezpieczny(b.tekst || "")}</p>`,
+  lista:      (b) => !Array.isArray(b.punkty) ? "" :
+    `<ul class="analiza-lista">${b.punkty.map(p =>
+      `<li>${bezpieczny(String(p))}</li>`).join("")}</ul>`,
+  ostrzezenie:(b) => `<div class="info alarmowy"><b>Uwaga.</b>
+    ${bezpieczny(b.tekst || "")}</div>`,
+  kafelki:    (b) => !Array.isArray(b.pozycje) ? "" :
+    `<div class="kafelki">${b.pozycje.slice(0,6).map(k => `
+      <div class="kafel">
+        <div class="etykieta">${bezpieczny(k.etykieta || "")}</div>
+        <div class="liczba">${bezpieczny(String(k.wartosc ?? "—"))}</div>
+        <div class="stopka">${bezpieczny(k.stopka || "")}</div>
+      </div>`).join("")}</div>`,
+  ...WYKRESY_ANALIZY
+};
+
+function analizaAI(){
+  if (!ANALIZA || !Array.isArray(ANALIZA.bloki) || !ANALIZA.bloki.length) return `
+    <div class="pusto">
+      <span class="znak">Analiza AI</span>
+      Nie ma jeszcze żadnej analizy. Powstaje w nocy, po pobraniu danych ze
+      Stravy — i tylko wtedy, gdy w danych faktycznie coś się zmieniło.
+      ${!ANALIZA ? "<br>Pliku <code>analiza.js</code> nie ma jeszcze w repozytorium."
+        : ""}
+    </div>`;
+
+  const nieznane = ANALIZA.bloki.filter(b => !BLOKI_ANALIZY[b && b.t]).length;
+  const tresc = ANALIZA.bloki.map(b => {
+    const rys = b && BLOKI_ANALIZY[b.t];
+    if (!rys) return "";                       // nieznany typ — pomijamy w ciszy
+    try { return rys(b); } catch(e){ return ""; }
+  }).join("");
+
+  return `
+  <section>
+    <div class="proba-tytul">
+      <h2>Analiza AI</h2>
+      <span class="analiza-stempel">${ANALIZA.utworzono
+        ? pl(ANALIZA.utworzono) + " · " + bezpieczny(ANALIZA.utworzono.slice(11,16)) : ""}</span>
+    </div>
+    <p class="opis">
+      To jedyne miejsce na stronie, gdzie tekst pisze <b>model</b>, a nie reguła.
+      Powstaje w nocy, po pobraniu danych ze Stravy, i zmienia się tylko wtedy,
+      gdy w danych coś się zmieniło — po dniu bez jazdy zostaje ten sam.
+      ${ANALIZA.jazd_w_danych ? `Ostatnio liczone z ${ANALIZA.jazd_w_danych} jazd.` : ""}
+    </p>
+    <div class="analiza-tresc">${tresc}</div>
+    <div class="info">
+      Napisał to <b>${bezpieczny(ANALIZA.model || "model Claude")}</b> na podstawie
+      danych z <code>dane.js</code> — tych samych, które widzisz na wykresach.
+      Model nie zna niczego spoza tego pliku: nie wie, jak się czułeś, jaka była
+      pogoda ani co masz w planach, jeśli tego nie zapisałeś.
+      <br>Traktuj to jak zdanie trenera, który widział tylko liczby. Jeśli coś
+      brzmi nietrafnie — najpewniej jest nietrafne, bo brakowało mu kontekstu.
+      ${nieznane ? `<br>Pominięto ${nieznane} ${nieznane === 1 ? "blok"
+        : "bloki"} nieznanego typu.` : ""}
+    </div>
+  </section>`;
+}
+
 /* ==========================================================================
    SEKCJE — poziom 1 i poziom 2.
    Zakładka trafia na pasek tylko gdy ma wpis tutaj. Z1–Z5 to miejsca
@@ -5550,7 +5761,8 @@ const SEKCJE = [
   { id:"postepy", tytul:"Postępy", barwa:"fiolet", pod:[
       { id:"segmenty", tytul:"Segmenty", rysuj: tabelaSegmentow },
       { id:"porownania", tytul:"Porównania S", rysuj: porownaniaS },
-      { id:"dane", tytul:"Dane", rysuj: daneMocy }
+      { id:"dane", tytul:"Dane", rysuj: daneMocy },
+      { id:"analiza", tytul:"Analiza AI", rysuj: analizaAI }
   ]},
   // Mini-zakładki Prognoz biorą się z dane.js — dopisanie okresu tworzy nową,
   // bez ruszania kodu. Kod nie zna żadnej z nich z nazwy.

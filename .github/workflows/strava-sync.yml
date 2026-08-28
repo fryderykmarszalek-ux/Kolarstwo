@@ -32,6 +32,10 @@ on:
         description: "Przelicz rozkłady stref dla wszystkich jazd"
         default: false
         type: boolean
+      wymus_analize:
+        description: "Napisz analizę AI nawet bez zmian w danych"
+        default: false
+        type: boolean
         default: false
 
 permissions:
@@ -71,16 +75,25 @@ jobs:
              if(!n) { console.error('Pusta lista — nie commituję.'); process.exit(1); }
              console.log('Plik poprawny, aktywności:', n);"
 
+      # Analiza AI. Sama pilnuje kosztu: liczy odcisk danych i woła model tylko
+      # wtedy, gdy coś się naprawdę zmieniło. Bez klucza albo przy błędzie
+      # kończy się zerem — komentarz zostaje ten, co był, a przebieg leci dalej.
+      - name: Napisz analizę AI
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          WYMUS_ANALIZE: ${{ inputs.wymus_analize }}
+        run: node .github/skrypty/analiza.js
+
       - name: Commituj, jeśli są zmiany
         run: |
-          if git diff --quiet dane.js; then
+          if git diff --quiet dane.js analiza.js && [ -z "$(git status --porcelain analiza.js)" ]; then
             echo "Bez zmian — nic do zrobienia."
             exit 0
           fi
 
           git config user.name "Automat Stravy"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add dane.js
+          git add dane.js analiza.js
           git commit -m "Dane ze Stravy — $(date -u +%Y-%m-%d)"
 
           # Zadanie potrafi stać w kolejce GitHuba kilka minut. Jeśli w tym

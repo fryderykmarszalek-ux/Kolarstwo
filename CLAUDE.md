@@ -672,6 +672,40 @@ pliku** (sprawdzone): `TRESCI` spada wtedy na pusty obiekt.
 
 ---
 
+## 6b. Analiza AI — jedyne miejsce, gdzie pisze model
+
+Zakładka `Postępy → Analiza AI` (28.08.2026). Tekst pisze tam **naprawdę
+model**, w odróżnieniu od „Wniosków" w Porównaniach, które są regułami
+liczonymi w przeglądarce. Ta różnica jest powodem, dla którego wolno tu użyć
+nazwy „Analiza AI", a tam nie było wolno.
+
+**Jak to działa.** Strona jest statyczna i nie ma jak zapytać modelu. Robi to
+automat: `.github/skrypty/analiza.js` po nocnym pobraniu ze Stravy woła
+Messages API (`claude-opus-5`, raw `fetch`, zero zależności — tak jak reszta
+automatu) i zapisuje wynik do `analiza.js`. Strona tylko go rysuje.
+
+**Odcisk danych zamiast codziennego wydatku.** Przed wywołaniem liczymy skrót
+z briefingu. Ten sam odcisk = nic się nie zmieniło = nie wołamy modelu i
+zostawiamy poprzedni komentarz. Dzień bez jazdy nie kosztuje ani grosza.
+
+**Model NIE wstawia HTML-a.** Oddaje listę bloków z zamkniętego słownika
+(nagłówek, akapit, lista, kafelki, ostrzeżenie i siedem typów wykresów),
+sprawdzaną dwa razy: w automacie przed zapisem i na stronie przed
+narysowaniem. Nieznany typ albo złe pole wylatuje po cichu, a każdy tekst
+przechodzi przez `bezpieczny()`. Sprawdzone: `<script>` w treści renderuje się
+jako tekst i niczego nie uruchamia.
+
+**Awaria analizy nie może zepsuć przebiegu.** Skrypt kończy się zerem przy
+każdym błędzie — bez klucza, przy odmowie modelu, przy niepoprawnym JSON-ie.
+Zostaje wtedy poprzedni komentarz, a pobieranie danych leci dalej.
+
+Briefing to **wyciąg**, nie całe `dane.js`: 23 kB zamiast 272 kB. Model widzi
+to samo co Fryderyk na wykresach — plus progi i decyzje, nie więcej.
+
+Wymaga sekretu `ANTHROPIC_API_KEY` w repozytorium.
+
+---
+
 ## 7a. Dostęp do Stravy — trzy różne drogi, nie mylić
 
 Nowa sesja łatwo wyciąga błędny wniosek: widzi, że serwer z `.mcp.json`
