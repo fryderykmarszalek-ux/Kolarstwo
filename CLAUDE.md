@@ -811,6 +811,16 @@ Stąd `37 20 * * *` zamiast `0 20 * * *` plus drugie odpalenie `37 5 * * *`,
 które łapie wieczorne, jeśli przepadło. Kosztuje kilka zapytań dziennie —
 skrypt i tak dociąga wyłącznie to, czego nie ma.
 
+**Powtórzony klucz w YAML kasuje CAŁY workflow — pułapka z 28.08.2026.**
+Przy dodawaniu przełącznika `pelne_strefy` wejście `wymus_analize` dostało
+`default` dwa razy. Skutek: przez pięć godzin ani jeden przebieg nie
+wystartował — cztery odpalenia z pusha skończyły się porażką w zero sekund
+i z zerem zadań, a GitHub pokazywał zamiast nazwy workflow surową ścieżkę
+pliku. Ze strony nie było tego widać: dane po prostu stanęły. Parser GitHuba
+odrzuca cały plik, nie samo wejście. Po każdej zmianie w `.yml` warto
+przepuścić go parserem odrzucającym duplikaty kluczy — `yaml.safe_load`
+w Pythonie ich NIE łapie, bo pozwala ostatniemu wygrać.
+
 **Wyścig o push — naprawiony 20.08.2026, nie usuwać.** Zadanie potrafi stać
 w kolejce GitHuba kilka minut. Jeśli w tym czasie ktokolwiek wypchnie coś na
 `main`, push automatu leci na nieaktualny stan i GitHub go odrzuca
