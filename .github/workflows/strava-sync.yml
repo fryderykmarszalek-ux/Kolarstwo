@@ -28,13 +28,13 @@ on:
       pelna_moc:
         description: "Przelicz krzywe mocy od nowa dla wszystkich jazd z miernikiem"
         type: boolean
+        default: false
       pelne_strefy:
         description: "Przelicz rozkłady stref dla wszystkich jazd"
-        default: false
         type: boolean
+        default: false
       wymus_analize:
         description: "Napisz analizę AI nawet bez zmian w danych"
-        default: false
         type: boolean
         default: false
 
