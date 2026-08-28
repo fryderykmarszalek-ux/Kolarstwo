@@ -5,7 +5,7 @@
 
 window.DANE = {
 
-meta: {"pobrano":"2026-08-27T10:24","zrodlo":"Strava API (GitHub Actions): /athlete/activities + /activities/{id}","athlete_id":143761800,"liczba_aktywnosci":100,"zakres":["2024-07-31","2026-08-19"],"liczone_od":"2025-08-31","liczone_od_powod":"Decyzja Fryderyka z 19.08.2026: wcześniejsze daty nieistotne. Historia zostaje w pliku w całości — po prostu nie jest liczona. Zmiana tej jednej daty przywraca wszystko.","linia_podzialu":"2026-08-19","linia_podzialu_opis":"Przed tą datą jazdy mają tylko to, co daje Strava — bez wiatru, składu grupy i tętna. Nie uzupełniać wstecz.","typy_kolarskie":["Ride","VirtualRide"],"typy_kolarskie_opis":"Tylko te przerywają przerwę. E-bike, spacery, treki i biegi — nie.","pola_pominiete":["pr_count","achievement_count","kudos_count"],"pola_pominiete_powod":"Zmienne w czasie — stan na moment pobrania, nie fakt historyczny (13.08: 60 -> 59 w kilkanaście minut). Zapisać dopiero z datą pobrania obok.","segmenty_od":"2025-08-01","liczba_segmentow":365,"liczba_prob":1717,"jazd_z_moca":17},
+meta: {"pobrano":"2026-08-28T19:04","zrodlo":"Strava API (GitHub Actions): /athlete/activities + /activities/{id}","athlete_id":143761800,"liczba_aktywnosci":100,"zakres":["2024-07-31","2026-08-19"],"liczone_od":"2025-08-31","liczone_od_powod":"Decyzja Fryderyka z 19.08.2026: wcześniejsze daty nieistotne. Historia zostaje w pliku w całości — po prostu nie jest liczona. Zmiana tej jednej daty przywraca wszystko.","linia_podzialu":"2026-08-19","linia_podzialu_opis":"Przed tą datą jazdy mają tylko to, co daje Strava — bez wiatru, składu grupy i tętna. Nie uzupełniać wstecz.","typy_kolarskie":["Ride","VirtualRide"],"typy_kolarskie_opis":"Tylko te przerywają przerwę. E-bike, spacery, treki i biegi — nie.","pola_pominiete":["pr_count","achievement_count","kudos_count"],"pola_pominiete_powod":"Zmienne w czasie — stan na moment pobrania, nie fakt historyczny (13.08: 60 -> 59 w kilkanaście minut). Zapisać dopiero z datą pobrania obok.","segmenty_od":"2025-08-01","liczba_segmentow":365,"liczba_prob":1717,"jazd_z_moca":17,"jazd_z_rozkladem":17},
 
 zalozenia: {
   "_opis": "Wariant B: tu i tylko tu żyją stałe modelu. Nigdy nie wpisywać ich w kod wykresu. Zmiana jednej liczby przelicza całą historię.",
@@ -744,7 +744,246 @@ strefy: {
   },
   "rozklady": {
     "_opis": "Sekundy spędzone w każdej strefie, jedna pozycja na jazdę. Klucz = id jazdy, wartość = { tetno: [s1..s5], moc: [s1..s7] }, brakująca miara = null. Wypełnia to automat ze strumieni, gdy granice stref będą ustalone.",
-    "jazdy": {}
+    "jazdy": {
+      "16130454908": {
+        "tetno": null,
+        "moc": [
+          1215,
+          1691,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "tabela_tetno": null,
+        "tabela_moc": "2026-08-27"
+      },
+      "16152610580": {
+        "tetno": null,
+        "moc": [
+          2313,
+          594,
+          208,
+          13,
+          9,
+          7,
+          114
+        ],
+        "tabela_tetno": null,
+        "tabela_moc": "2026-08-27"
+      },
+      "16182099651": {
+        "tetno": null,
+        "moc": [
+          1025,
+          1881,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "tabela_tetno": null,
+        "tabela_moc": "2026-08-27"
+      },
+      "16183714130": {
+        "tetno": null,
+        "moc": [
+          236,
+          340,
+          717,
+          547,
+          292,
+          174,
+          65
+        ],
+        "tabela_tetno": null,
+        "tabela_moc": "2026-08-27"
+      },
+      "16194964157": {
+        "tetno": null,
+        "moc": [
+          1184,
+          995,
+          1486,
+          364,
+          0,
+          0,
+          0
+        ],
+        "tabela_tetno": null,
+        "tabela_moc": "2026-08-27"
+      },
+      "16215300750": {
+        "tetno": null,
+        "moc": [
+          1013,
+          2177,
+          8,
+          0,
+          0,
+          0,
+          0
+        ],
+        "tabela_tetno": null,
+        "tabela_moc": "2026-08-27"
+      },
+      "16225978401": {
+        "tetno": null,
+        "moc": [
+          2541,
+          642,
+          181,
+          12,
+          9,
+          10,
+          129
+        ],
+        "tabela_tetno": null,
+        "tabela_moc": "2026-08-27"
+      },
+      "16266432121": {
+        "tetno": null,
+        "moc": [
+          1077,
+          2428,
+          12,
+          0,
+          1,
+          0,
+          1
+        ],
+        "tabela_tetno": null,
+        "tabela_moc": "2026-08-27"
+      },
+      "16286281071": {
+        "tetno": null,
+        "moc": [
+          2315,
+          355,
+          1781,
+          485,
+          0,
+          0,
+          0
+        ],
+        "tabela_tetno": null,
+        "tabela_moc": "2026-08-27"
+      },
+      "16296395304": {
+        "tetno": null,
+        "moc": [
+          845,
+          2416,
+          10,
+          0,
+          0,
+          0,
+          0
+        ],
+        "tabela_tetno": null,
+        "tabela_moc": "2026-08-27"
+      },
+      "16306020934": {
+        "tetno": null,
+        "moc": [
+          943,
+          252,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "tabela_tetno": null,
+        "tabela_moc": "2026-08-27"
+      },
+      "16325922529": {
+        "tetno": null,
+        "moc": [
+          3309,
+          488,
+          197,
+          10,
+          12,
+          21,
+          128
+        ],
+        "tabela_tetno": null,
+        "tabela_moc": "2026-08-27"
+      },
+      "16336493568": {
+        "tetno": null,
+        "moc": [
+          854,
+          2366,
+          61,
+          0,
+          0,
+          0,
+          0
+        ],
+        "tabela_tetno": null,
+        "tabela_moc": "2026-08-27"
+      },
+      "16377663365": {
+        "tetno": null,
+        "moc": [
+          2472,
+          373,
+          1696,
+          646,
+          0,
+          0,
+          0
+        ],
+        "tabela_tetno": null,
+        "tabela_moc": "2026-08-27"
+      },
+      "16479980049": {
+        "tetno": null,
+        "moc": [
+          909,
+          3009,
+          120,
+          1,
+          2,
+          1,
+          0
+        ],
+        "tabela_tetno": null,
+        "tabela_moc": "2026-08-27"
+      },
+      "16547212377": {
+        "tetno": null,
+        "moc": [
+          1470,
+          816,
+          694,
+          802,
+          11,
+          0,
+          0
+        ],
+        "tabela_tetno": null,
+        "tabela_moc": "2026-08-27"
+      },
+      "16566037541": {
+        "tetno": null,
+        "moc": [
+          1169,
+          3006,
+          112,
+          0,
+          0,
+          0,
+          0
+        ],
+        "tabela_tetno": null,
+        "tabela_moc": "2026-08-27"
+      }
+    }
   },
   "_przelicznik": "Tabele stref są DATOWANE i działają tylko w przód. Rozkład jazdy liczy się tabelą obowiązującą W DNIU tej jazdy i zapisuje na stałe, więc zmiana progów w listopadzie NIE przelicza jazd z września. Jazda wcześniejsza niż najstarsza tabela bierze tę najstarszą — innej nie ma, a odmowa policzenia byłaby gorsza niż jawne założenie.",
   "_skrajnosci": "Dolny próg pierwszej strefy to zawsze 0, a górny ostatniej to null (nieskończoność) — tych dwóch NIE da się zmienić na stronie. Inaczej tętno 90 przy Z1 od 100 albo sprint 1000 W przy Z7 do 999 wypadałyby poza wszystkie strefy i cicho znikały z wykresu. Każda sekunda musi trafić do dokładnie jednej strefy.",
@@ -911,6 +1150,7 @@ regeneracja: {
     }
   ]
 },
+
 stan_wytrenowania: {
   "_opis": "Krzywa formy liczona z obciążenia sesyjnego (session-RPE, Foster 1998): obciążenie dnia = minuty ruchu × RPE. Z niego dwie średnie wykładnicze: wytrenowanie (długa, 42 dni) i zmęczenie (krótka, 7 dni). Różnica to forma.",
   "_dlaczego_nie_ze_stravy": "Strava rysuje własną krzywą Fitness, ale NIE oddaje jej przez API — nie ma takiego zapytania. Liczymy więc u siebie, tą samą metodą, z danych, które API oddaje. Gdy pojawi się pas tętna, obciążenie policzymy dokładniej (TRIMP), a po mierniku mocy jeszcze dokładniej (TSS).",
@@ -920,6 +1160,7 @@ stan_wytrenowania: {
   "od_daty": "2026-03-01",
   "od_daty_powod": "Od marca 2026 KAŻDA jazda ma wpisane RPE (sprawdzone: 35 z 35 od 1.05.2026). Wcześniej są jazdy bez RPE — liczone jako zero dawałyby fałszywy dołek, a zgadywane byłyby zmyśleniem."
 },
+
 plan_objetosci: [
   {"od":"2026-09-01","do":"2026-09-07","godziny":3,"odciazenie":false},
   {"od":"2026-09-08","do":"2026-09-14","godziny":4,"odciazenie":false},
