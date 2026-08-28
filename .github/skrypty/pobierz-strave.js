@@ -54,6 +54,124 @@ const PELNA_MOC = process.env.PELNA_MOC === "true";
 // jest datowana i z definicji nie rusza przeszłości.
 const PELNE_STREFY = process.env.PELNE_STREFY === "true";
 
+/* ── Trasy (zakładka Teren → Mapa) ─────────────────────────────────────────
+   Kształt jazdy przychodzi ZA DARMO w liście aktywności, jako
+   map.summary_polyline — ten sam algorytm kodowania, którym zapisany jest
+   zarys świata w swiat.js. Nie kosztuje ani jednego zapytania więcej.
+
+   Osobny plik, nie dane.js: sto tras to grubo ponad sto kilobajtów, a zmieniają
+   się tylko wtedy, gdy dojdzie nowa jazda. Wrzucone do dane.js puchłyby nocny
+   diff bez powodu — dokładnie ten sam powód, dla którego osobno stoi claude.js.
+
+   STREFA PRYWATNOŚCI. Repozytorium jest PUBLICZNE, a ślad jazdy zaczyna się
+   i kończy pod domem. Dlatego każdy ślad jest przycinany: punkty w promieniu
+   PROMIEN_PRYWATNOSCI_M od domu wypadają z początku i z końca. Dom nie jest
+   nigdzie zapisywany — liczymy go przy każdym przebiegu z punktów startowych,
+   więc do pliku trafiają wyłącznie ślady już przycięte. To ta sama ochrona,
+   którą Strava nazywa strefą prywatności. */
+const PLIK_TRAS = path.join(__dirname, "..", "..", "trasy.js");
+const PELNE_TRASY = process.env.PELNE_TRASY === "true";
+const PROMIEN_PRYWATNOSCI_M = 500;
+
+function wczytajTrasy(){
+  if (!fs.existsSync(PLIK_TRAS)) return {};
+  try {
+    global.window = {};
+    delete require.cache[require.resolve(PLIK_TRAS)];
+    require(PLIK_TRAS);
+    return (global.window.TRASY || {}).slady || {};
+  } catch (e){ return {}; }
+}
+
+function dekodujTrase(s){
+  const p = []; let i = 0, lat = 0, lng = 0;
+  while (i < s.length){
+    let b, sh = 0, r = 0;
+    do { b = s.charCodeAt(i++) - 63; r |= (b & 0x1f) << sh; sh += 5; } while (b >= 0x20);
+    lat += (r & 1) ? ~(r >> 1) : (r >> 1);
+    sh = 0; r = 0;
+    do { b = s.charCodeAt(i++) - 63; r |= (b & 0x1f) << sh; sh += 5; } while (b >= 0x20);
+    lng += (r & 1) ? ~(r >> 1) : (r >> 1);
+    p.push([lat / 1e5, lng / 1e5]);
+  }
+  return p;
+}
+
+function kodujLiczbe(v){
+  v = v < 0 ? ~(v << 1) : (v << 1);
+  let out = "";
+  while (v >= 0x20){ out += String.fromCharCode((0x20 | (v & 0x1f)) + 63); v >>= 5; }
+  return out + String.fromCharCode(v + 63);
+}
+
+function kodujTrase(punkty){
+  let out = "", pla = 0, plo = 0;
+  for (const [lat, lng] of punkty){
+    const la = Math.round(lat * 1e5), lo = Math.round(lng * 1e5);
+    out += kodujLiczbe(la - pla) + kodujLiczbe(lo - plo);
+    pla = la; plo = lo;
+  }
+  return out;
+}
+
+// Przybliżenie płaskie — na dystansie kilkuset metrów różnica wobec wzoru
+// haversine jest poniżej metra, a chodzi o próg 500 m.
+function metry(a, b){
+  const dLat = (a[0] - b[0]) * 111320;
+  const dLng = (a[1] - b[1]) * 111320 * Math.cos(a[0] * Math.PI / 180);
+  return Math.hypot(dLat, dLng);
+}
+
+/* Dom = punkt startowy, wokół którego gęsto stoją inne punkty startowe.
+   Nie średnia: jeden wyjazd do Francji przesunąłby średnią o setki kilometrów
+   i strefa prywatności wylądowałaby w polu pod Paryżem. */
+function znajdzDom(slady){
+  const starty = Object.values(slady).map(s => dekodujTrase(s)[0]).filter(Boolean);
+  if (starty.length < 3) return null;
+  let naj = null, najIle = 0;
+  for (const p of starty){
+    const ile = starty.filter(q => metry(p, q) < PROMIEN_PRYWATNOSCI_M * 2).length;
+    if (ile > najIle){ najIle = ile; naj = p; }
+  }
+  return najIle >= 3 ? naj : null;    // mniej niż trzy starty w kupie to nie dom
+}
+
+function utnijPrywatne(slad, dom){
+  if (!dom) return slad;
+  const p = dekodujTrase(slad);
+  let a = 0, b = p.length - 1;
+  while (a <= b && metry(p[a], dom) < PROMIEN_PRYWATNOSCI_M) a++;
+  while (b >= a && metry(p[b], dom) < PROMIEN_PRYWATNOSCI_M) b--;
+  const wynik = p.slice(a, b + 1);
+  return wynik.length >= 2 ? kodujTrase(wynik) : null;   // cała jazda pod domem
+}
+
+function zapiszTrasy(slady, dom, meta){
+  const idy = Object.keys(slady).sort();
+  const L = [];
+  L.push("// trasy.js — kształty przejechanych jazd, do zakładki Teren → Mapa.");
+  L.push("// Źródło: Strava, pole map.summary_polyline z listy aktywności.");
+  L.push("// PLIK GENEROWANY przez .github/skrypty/pobierz-strave.js — nie edytować ręcznie.");
+  L.push("//");
+  L.push("// Ślady są PRZYCIĘTE: punkty w promieniu " + PROMIEN_PRYWATNOSCI_M + " m od domu");
+  L.push("// wypadają z początku i końca każdej jazdy, bo to repozytorium jest publiczne.");
+  L.push("// Samego punktu domowego nie ma w tym pliku ani nigdzie indziej w repo.");
+  L.push("//");
+  L.push("// Kodowanie: Google encoded polyline, mnożnik 100000 — ten sam algorytm,");
+  L.push("// co w swiat.js, tam tylko z mnożnikiem 100.");
+  L.push("");
+  L.push("window.TRASY = {");
+  L.push(' "wersja": 1,');
+  L.push(' "przycinanie_m": ' + PROMIEN_PRYWATNOSCI_M + ',');
+  L.push(' "z_domem": ' + (dom ? "true" : "false") + ",");
+  L.push(' "policzono": ' + JSON.stringify(meta.pobrano) + ",");
+  L.push(' "slady": {');
+  L.push(idy.map(id => `  ${JSON.stringify(id)}: ${JSON.stringify(slady[id])}`).join(",\n"));
+  L.push(" }");
+  L.push("};");
+  fs.writeFileSync(PLIK_TRAS, L.join("\n") + "\n", "utf8");
+}
+
 function wczytajStare(){
   global.window = {};
   delete require.cache[require.resolve(PLIK)];
@@ -277,6 +395,13 @@ function zapisz(D){
   fs.writeFileSync(PLIK, L.join("\n") + "\n", "utf8");
 }
 
+/* Jako program robi przebieg; przy `require` z testu udostępnia same funkcje.
+   Ta sama sztuczka co w analiza.js — pozwala sprawdzić przycinanie strefą
+   prywatności bez sieci i bez drugiej kopii logiki. */
+module.exports = { dekodujTrase, kodujTrase, metry, znajdzDom, utnijPrywatne,
+  krzywaMocy, czasWStrefach, ktoraStrefa, tabelaNaDzien };
+if (require.main !== module) return;
+
 (async () => {
   const stare = wczytajStare();
   const bylo = stare.aktywnosci.length;
@@ -305,6 +430,17 @@ function zapisz(D){
     console.error("Strava zwróciła pustą listę — przerywam, żeby nie skasować danych.");
     process.exit(1);
   }
+
+  /* Ślady z listy aktywności — za darmo, przy każdym przebiegu, dla wszystkich
+     jazd. Dzięki temu przycinanie liczy się zawsze na surowych danych: gdyby
+     źródłem był plik trasy.js, w którym ślady są już ucięte, drugi przebieg
+     szukałby domu w pierścieniu wokół dziury, a nie w punkcie. */
+  const surowe = new Map();
+  for (const a of zeStravy){
+    const linia = a.map && (a.map.summary_polyline || a.map.polyline);
+    if (linia) surowe.set(String(a.id), linia);
+  }
+  const trasyStare = wczytajTrasy();
 
   const opisy = new Map(stare.aktywnosci.map(a => [a.id, a.opis]));
   // RPE (perceived_exertion) — jak opis: nie ma go w liście aktywności,
@@ -363,20 +499,24 @@ function zapisz(D){
 
     // Rozkład stref: potrzebny, gdy jazda ma tętno albo moc, a jeszcze go nie
     // policzyliśmy. Tętno wchodzi tu samo, w dniu w którym Strava je zapisze.
+    // Ślad z listy zwykle jest. Gdy go nie ma, można go wziąć ze szczegółów
+    // jazdy — ale tylko na żądanie, bo to jedno zapytanie na jazdę.
+    const chceTrase = kolarska && PELNE_TRASY && !surowe.has(a.id);
+
     const strefyMozliwe = kolarska && (a.ma_tetno === 1 || mocMozliwa);
     let chceStrefy = strefyMozliwe && (!rozklady[a.id] || PELNE_STREFY);
     if (chceStrefy) chceMoc = chceMoc || mocMozliwa;   // i tak pytamy o strumień
 
-    if (!chceOpis && !chceSegmenty && !chceMoc && !chceStrefy){
+    if (!chceOpis && !chceSegmenty && !chceMoc && !chceStrefy && !chceTrase){
       if (stary) a.opis = stary;               // nic do pytania — zachowaj, co mamy
       if (staryRpe != null) a.rpe = staryRpe;
       continue;
     }
 
     // Szczegółów nie pobieramy dla samej mocy — strumień jest osobnym adresem.
-    const jazda = (chceOpis || chceSegmenty)
+    const jazda = (chceOpis || chceSegmenty || chceTrase)
       ? await dociagnijJazde(a.id, access, chceSegmenty) : null;
-    if (chceOpis || chceSegmenty) zapytan++;
+    if (chceOpis || chceSegmenty || chceTrase) zapytan++;
 
     if (jazda === undefined){                  // zapytanie padło — nie ruszamy niczego
       if (stary) a.opis = stary;
@@ -392,6 +532,11 @@ function zapisz(D){
     // wiedzą — nowa jazda z miernikiem trafia tu przy pierwszym spotkaniu.
     if (jazda && jazda.device_watts === true && (!mocPobrana.has(a.id) || PELNA_MOC))
       chceMoc = true;
+
+    if (jazda && jazda.map){
+      const linia = jazda.map.polyline || jazda.map.summary_polyline;
+      if (linia && !surowe.has(a.id)) surowe.set(a.id, linia);
+    }
 
     // Strava jest masterem również tutaj: skasowany RPE znika też u nas.
     if (jazda && jazda.perceived_exertion != null) a.rpe = jazda.perceived_exertion;
@@ -458,6 +603,37 @@ function zapisz(D){
   console.log(`Zapytań o jazdy: ${zapytan}. Opisów zmienionych: ${zmienionych}. `
     + `Prób na segmentach dociągniętych: ${nowychProb}. `
     + `Rozkładów stref policzonych: ${nowychRozkladow}.`);
+
+  /* Ślady: dom liczony z surowych startów, potem przycięcie, potem zapis.
+     Jazdy, dla których lista nie dała śladu, biorą to, co już leżało w pliku —
+     tamto jest przycięte od dawna, więc drugi raz go nie tniemy. */
+  const ROWEROWE = new Set(stare.meta.typy_kolarskie || ["Ride","VirtualRide"]);
+  const doPrzyciecia = {};
+  for (const a of nowe)
+    if (ROWEROWE.has(a.typ) && surowe.has(a.id)) doPrzyciecia[a.id] = surowe.get(a.id);
+  const dom = znajdzDom(doPrzyciecia);
+
+  const trasy = {};
+  let uciete = 0;
+  for (const a of nowe){
+    if (!ROWEROWE.has(a.typ)) continue;
+    if (doPrzyciecia[a.id]){
+      const t = utnijPrywatne(doPrzyciecia[a.id], dom);
+      if (t){ trasy[a.id] = t; if (t !== doPrzyciecia[a.id]) uciete++; }
+    } else if (trasyStare[a.id]){
+      trasy[a.id] = trasyStare[a.id];
+    }
+  }
+  const bylyTrasy = JSON.stringify(trasyStare);
+  if (JSON.stringify(trasy) !== bylyTrasy){
+    zapiszTrasy(trasy, dom, { pobrano: new Date().toISOString().slice(0,16) });
+    console.log(`Trasy: ${Object.keys(trasy).length} śladów`
+      + (dom ? `, ${uciete} przyciętych strefą prywatności ${PROMIEN_PRYWATNOSCI_M} m`
+             : ", BEZ przycinania — nie udało się wyznaczyć domu"));
+  } else {
+    console.log(`Trasy: ${Object.keys(trasy).length} śladów, bez zmian.`);
+  }
+  stare.meta.jazd_z_trasa = Object.keys(trasy).length;
 
   proby.sort((x,y) => x.s === y.s ? (x.a < y.a ? -1 : 1) : (x.s < y.s ? -1 : 1));
   stare.segmenty = [...segmenty.values()].sort((x,y) =>
