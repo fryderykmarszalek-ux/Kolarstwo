@@ -842,6 +842,75 @@ strefy: {
   }
 },
 
+regeneracja: {
+  "_opis": "Czas regeneracji po jeździe i wynikający z niego stan zmęczenia. Odliczanie idzie od ZEGARA URZĄDZENIA — to jedyne miejsce poza paskiem świeżości danych, gdzie strona pyta o realny czas, bo licznik, który stoi, nie jest licznikiem.",
+  "_zrodla": "Garmin liczy to z EPOC, czyli z tętna — tego jeszcze nie ma, więc liczymy z RPE, które Fryderyk wpisuje sam. Wzór zakotwiczony w tym, co mówią źródła: lekka godzina to kilka godzin regeneracji, mocna jednostka 48-72 h (dla zawodnika poniżej 40 lat raczej 48), a wynik do 24 h oznacza trening, który ciało wchłania szybko.",
+  "wzor": "godziny = wspolczynnik × minuty_ruchu × (RPE / 10) ^ wykladnik_rpe",
+  "wspolczynnik": 0.8,
+  "wykladnik_rpe": 1.9,
+  "maks_godzin": 96,
+  "udzial_zaleglosci": 0.5,
+  "_zaleglosc_opis": "Jazda zaczęta przed końcem poprzedniej regeneracji dolicza połowę zaległych godzin. Nie całość, bo część regeneracji biegnie równolegle; nie zero, bo wtedy dwa mocne dni pod rząd wyglądałyby jak jeden.",
+  "poziom": {
+    "_opis": "Stan 1-10 w kierunku indeksu Hoopera (1 = bardzo dobrze, 10 = bardzo źle), ale LICZONY z danych, a nie z ankiety. Składa się z dwóch części: ile regeneracji zostało do odrobienia oraz napięcia zmęczenie/wytrenowanie.",
+    "waga_zaleglosci": 5.4,
+    "waga_napiecia": 3.6,
+    "napiecie_od": 0.7,
+    "napiecie_do": 1.5
+  },
+  "skala": [
+    {
+      "poziom": 1,
+      "nazwa": "pełen luz",
+      "opis": "Zero zaległości. Ciało gotowe na mocny trening."
+    },
+    {
+      "poziom": 2,
+      "nazwa": "świeżo",
+      "opis": "Praktycznie wypoczęty. Można uderzyć."
+    },
+    {
+      "poziom": 3,
+      "nazwa": "gotowy",
+      "opis": "Resztka zmęczenia, ale nie przeszkadza."
+    },
+    {
+      "poziom": 4,
+      "nazwa": "lekko zmęczony",
+      "opis": "Normalny stan w bloku treningowym. Jakość jeszcze jest."
+    },
+    {
+      "poziom": 5,
+      "nazwa": "robocze zmęczenie",
+      "opis": "Środek tygodnia. Mocny trening wyjdzie gorzej niż zwykle."
+    },
+    {
+      "poziom": 6,
+      "nazwa": "wyraźnie zmęczony",
+      "opis": "Dziś raczej spokojnie. Intensywność da mniej, niż kosztuje."
+    },
+    {
+      "poziom": 7,
+      "nazwa": "mocno obciążony",
+      "opis": "Twarde jednostki odpadają. Luźna jazda albo wolne."
+    },
+    {
+      "poziom": 8,
+      "nazwa": "na rezerwie",
+      "opis": "Ciało prosi o dzień wolny. Kolejny mocny trening kopie dołek."
+    },
+    {
+      "poziom": 9,
+      "nazwa": "przeciążony",
+      "opis": "Wolne. Trening tutaj to już nie bodziec, tylko szkoda."
+    },
+    {
+      "poziom": 10,
+      "nazwa": "wykończenie",
+      "opis": "Pełny odpoczynek. Sen, jedzenie, zero roweru."
+    }
+  ]
+},
 stan_wytrenowania: {
   "_opis": "Krzywa formy liczona z obciążenia sesyjnego (session-RPE, Foster 1998): obciążenie dnia = minuty ruchu × RPE. Z niego dwie średnie wykładnicze: wytrenowanie (długa, 42 dni) i zmęczenie (krótka, 7 dni). Różnica to forma.",
   "_dlaczego_nie_ze_stravy": "Strava rysuje własną krzywą Fitness, ale NIE oddaje jej przez API — nie ma takiego zapytania. Liczymy więc u siebie, tą samą metodą, z danych, które API oddaje. Gdy pojawi się pas tętna, obciążenie policzymy dokładniej (TRIMP), a po mierniku mocy jeszcze dokładniej (TSS).",

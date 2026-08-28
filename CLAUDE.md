@@ -453,6 +453,33 @@ nie kolor: sylwetka roweru vs ekranu, słupek kreskowany vs pełny.
   1.05.2026). Wcześniejsze jazdy bez RPE liczone jako zero dawałyby fałszywy
   dołek, a zgadywane byłyby zmyśleniem. Po pasie tętna obciążenie policzymy
   z TRIMP, po mierniku z TSS — metoda siedzi w danych, nie w kodzie wykresu.
+- **Objętość → Regeneracja** (27.08.2026) — ile godzin do pełnej gotowości po
+  ostatniej jeździe, licznik tykający **na żywo**, plus stan zmęczenia 1–10.
+
+  **Wzór:** `godziny = 0,8 × minuty_ruchu × (RPE/10)^1,9`, wszystko z `dane.js`
+  → `regeneracja`. Wykładnik przy RPE sprawia, że intensywność waży mocniej niż
+  czas. Garmin liczy to z EPOC, czyli z tętna — tego jeszcze nie ma, więc
+  liczymy z RPE, które Fryderyk wpisuje sam. Zakotwiczenie w regule „48–72 h
+  między twardymi treningami": 90 min przy RPE 8 wychodzi 47 h, lekka godzina
+  przy RPE 3 — 5 h.
+
+  **Zaległość: połowa, nie całość i nie zero.** Jazda zaczęta przed końcem
+  poprzedniej regeneracji dolicza połowę zaległych godzin — część regeneracji
+  biegnie równolegle, ale przy zerze dwa mocne dni pod rząd wyglądałyby jak
+  jeden. Sprawdzone: interwały RPE 8 (47 h), a po nich tempo RPE 6 z 23 h
+  zaległości → 18 + 11 = **30 h**.
+
+  **Licznik odlicza od ZEGARA URZĄDZENIA** — to drugie i ostatnie takie miejsce
+  na stronie (pierwsze to pasek świeżości danych). Licznik, który stoi, nie jest
+  licznikiem. Reszta strony nadal liczy względem `meta.pobrano`.
+
+  **Stan 1–10 w kierunku indeksu Hoopera** (1 = najlepiej, 10 = najgorzej), ale
+  LICZONY z danych, nie z ankiety: z zaległej regeneracji i z napięcia
+  zmęczenie/wytrenowanie (ATL/CTL). Każdy stopień ma nazwę i opis w `dane.js` —
+  barwa nigdy nie występuje sama. Rampa zieleń → bursztyn → czerwień, kontrast
+  do tła sprawdzony (najsłabszy stopień 3,27:1 w jasnym, 3,36:1 w ciemnym).
+
+  Jazda bez RPE jest pomijana — zgadywanie wysiłku byłoby zmyśleniem.
 - **Gablota → Koszulki** (27.08.2026) — osiemnaście koszulek z zawodowego
   kolarstwa, każda za jeden z góry ustalony warunek. Zablokowana jest widoczna
   i wyszarzona, zdobyta świeci pełną barwą z datą. Grupowanie po seriach od

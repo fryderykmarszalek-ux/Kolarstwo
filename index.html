@@ -50,6 +50,12 @@
   --strefa-moc-1:#558aff; --strefa-moc-2:#00c6e2; --strefa-moc-3:#009f79;
   --strefa-moc-4:#84bd00; --strefa-moc-5:#997b00; --strefa-moc-6:#ec5fcb;
   --strefa-moc-7:#d6242e;
+  /* Skala stanu 1-10: zieleń (luz) → bursztyn → czerwień (wykończenie).
+     To skala STATUSU, więc barwie ZAWSZE towarzyszy numer i nazwa — nigdy sam
+     kolor. Kontrast do tła sprawdzony: najsłabszy stopień 3,27:1 przy progu 3:1. */
+  --stan-1:#0e9a3f; --stan-2:#578f00; --stan-3:#778200; --stan-4:#887700;
+  --stan-5:#936c00; --stan-6:#9b6100; --stan-7:#a15600; --stan-8:#a94800;
+  --stan-9:#b23308; --stan-10:#b02a2d;
   --plan:#12895f;         /* DANE: plan i cel       */
   --alarm:#d03b3b;        /* DANE: ponad limit      */
   --odciazenie:#e2e8f2;
@@ -73,6 +79,10 @@
     --strefa-moc-1:#3b69d2; --strefa-moc-2:#00a2b9; --strefa-moc-3:#007d5e;
     --strefa-moc-4:#6d9c00; --strefa-moc-5:#7a6200; --strefa-moc-6:#c255a8;
     --strefa-moc-7:#aa2428;
+    /* Skala stanu w ciemnym: własne stopnie, najsłabszy kontrast 3,36:1. */
+    --stan-1:#44aa5a; --stan-2:#6ca235; --stan-3:#8a9600; --stan-4:#9e8b00;
+    --stan-5:#ad7f00; --stan-6:#b77400; --stan-7:#c06800; --stan-8:#c55e1f;
+    --stan-9:#c55637; --stan-10:#c34f4b;
     --odciazenie:#232936; --cien:rgba(0,0,0,.35); --ikona-krycie:.10;
   }
 }
@@ -92,6 +102,10 @@
   --strefa-moc-1:#3b69d2; --strefa-moc-2:#00a2b9; --strefa-moc-3:#007d5e;
   --strefa-moc-4:#6d9c00; --strefa-moc-5:#7a6200; --strefa-moc-6:#c255a8;
   --strefa-moc-7:#aa2428;
+  /* Skala stanu w ciemnym: własne stopnie, najsłabszy kontrast 3,36:1. */
+  --stan-1:#44aa5a; --stan-2:#6ca235; --stan-3:#8a9600; --stan-4:#9e8b00;
+  --stan-5:#ad7f00; --stan-6:#b77400; --stan-7:#c06800; --stan-8:#c55e1f;
+  --stan-9:#c55637; --stan-10:#c34f4b;
   --odciazenie:#232936; --cien:rgba(0,0,0,.35); --ikona-krycie:.10;
 }
 
@@ -634,6 +648,55 @@ rect.proba-punkt{cursor:pointer}
 
 
 
+
+/* --- Regeneracja --- */
+.regen-uklad{display:flex;gap:22px;align-items:center;flex-wrap:wrap;
+  background:var(--plyta);border:1px solid var(--linia);border-radius:12px;
+  padding:16px 18px}
+.regen-bok{flex:1 1 260px;min-width:0}
+.regen-licznik{font-variant-numeric:tabular-nums;letter-spacing:-.03em;font-size:27px}
+.regen-zrodlo .etykieta{font-size:11.5px;color:var(--slaby)}
+.regen-rozbicie{display:flex;gap:6px 16px;flex-wrap:wrap;margin:7px 0 10px;
+  font-size:12.5px;font-variant-numeric:tabular-nums}
+.regen-skladniki{list-style:none;margin:0;padding:0;display:grid;gap:1px;
+  border:1px solid var(--linia);border-radius:10px;overflow:hidden}
+.regen-skladniki li{display:flex;justify-content:space-between;gap:12px;
+  align-items:baseline;padding:7px 12px;font-size:12.5px;
+  background:var(--powierzchnia);border-top:1px solid var(--linia)}
+.regen-skladniki li:first-child{border-top:0}
+.regen-skladniki li span{color:var(--slaby)}
+.regen-skladniki b{font-variant-numeric:tabular-nums;white-space:nowrap}
+.regen-skladniki li.suma{background:var(--plyta)}
+.regen-skladniki li.suma span{color:var(--tekst)}
+.regen-skladniki li.suma b{font-size:14px}
+
+.stan-blok{margin-top:30px}
+.miernik-stanu{display:flex;gap:4px;margin:2px 0 12px}
+/* Każdy stopień nosi SWOJĄ barwę, także ten powyżej obecnego — inaczej skala
+   urywałaby się w połowie i nie byłoby widać, dokąd jeszcze można zajść.
+   Stopnie poniżej obecnego są mocniejsze, obecny pełny i powiększony. */
+.miernik-stanu .stopien{
+  flex:1 1 0;min-width:0;height:38px;border-radius:7px;
+  display:flex;align-items:center;justify-content:center;
+  background:var(--barwa);color:#fff;font-size:12px;opacity:.26;
+  border:1px solid transparent;transition:transform .16s ease, opacity .16s ease;
+}
+.miernik-stanu .stopien.zapalony{opacity:.6}
+.miernik-stanu .stopien.akt{opacity:1;transform:scaleY(1.22);
+  border-color:var(--tekst);font-weight:700}
+.stan-opis{display:flex;align-items:center;gap:14px;
+  background:var(--plyta);border:1px solid var(--linia);border-radius:12px;
+  border-left:4px solid var(--barwa);padding:14px 16px}
+.stan-numer{font-size:36px;font-weight:600;letter-spacing:-.03em;color:var(--barwa);
+  min-width:44px;text-align:center;flex:0 0 auto}
+.stan-nazwa{font-size:15px;font-weight:600}
+.stan-tekst{font-size:13px;color:var(--slaby);line-height:1.45;margin-top:2px}
+@media (max-width:560px){
+  .regen-uklad{gap:14px;padding:14px}
+  .miernik-stanu{gap:3px}
+  .miernik-stanu .stopien{height:34px;font-size:11px}
+  .stan-numer{font-size:30px;min-width:36px}
+}
 /* --- Stan wytrenowania --- */
 .wykres-formy{margin-top:4px;background:var(--plyta);border:1px solid var(--linia);
   border-radius:10px;padding:10px 12px 4px;cursor:crosshair;touch-action:pan-y}
@@ -5170,6 +5233,253 @@ function podepnijForme(){
   });
 }
 
+
+/* ==========================================================================
+   REGENERACJA
+
+   Garmin liczy czas regeneracji z EPOC, czyli z tętna — tego jeszcze nie ma,
+   więc liczymy z RPE, które Fryderyk wpisuje po każdej jeździe. Wzór:
+
+     godziny = 0,8 × minuty_ruchu × (RPE / 10) ^ 1,9
+
+   Wykładnik przy RPE jest po to, żeby intensywność ważyła mocniej niż czas:
+   pół godziny na maksa kosztuje więcej niż dwie godziny spokojnej jazdy.
+   Zakotwiczenie: lekka godzina daje ~5 h, mocna jednostka 90 min ~47 h, co
+   zgadza się z regułą „48-72 h między twardymi treningami".
+
+   ZALEGŁOŚĆ. Jazda zaczęta przed końcem poprzedniej regeneracji dolicza
+   POŁOWĘ zaległych godzin — nie całość, bo część regeneracji biegnie
+   równolegle, i nie zero, bo wtedy dwa mocne dni pod rząd wyglądałyby jak
+   jeden. Wszystkie te liczby siedzą w dane.js.
+
+   ODLICZANIE IDZIE OD ZEGARA URZĄDZENIA. To drugie i ostatnie miejsce na
+   stronie, gdzie pytamy o realny czas (pierwsze to pasek świeżości danych) —
+   licznik, który stoi, nie jest licznikiem.
+   ========================================================================== */
+
+const KONF_REGEN = D.regeneracja || null;
+const czasJazdyMs = (a) => new Date(a.data).getTime();
+
+function planRegeneracji(){
+  if (!KONF_REGEN) return null;
+  const jazdyR = JAZDY_GABLOTA
+    .filter(a => a.rpe != null && a.czas_ruchu_s)
+    .sort((x,y) => x.data < y.data ? -1 : 1);
+  if (!jazdyR.length) return null;
+
+  const wpisy = [];
+  let poprzedniKoniec = 0;                    // moment końca poprzedniej regeneracji
+  for (const a of jazdyR){
+    const start = czasJazdyMs(a);
+    const koniecJazdy = start + (a.czas_calkowity_s || a.czas_ruchu_s) * 1000;
+    const bazowe = Math.min(KONF_REGEN.maks_godzin,
+      KONF_REGEN.wspolczynnik * (a.czas_ruchu_s / 60)
+        * Math.pow(a.rpe / 10, KONF_REGEN.wykladnik_rpe));
+    // Ile regeneracji zostało niedokończonej w chwili STARTU tej jazdy.
+    const zalegleGodz = poprzedniKoniec > start
+      ? (poprzedniKoniec - start) / 3600000 : 0;
+    const razem = Math.min(KONF_REGEN.maks_godzin,
+      bazowe + zalegleGodz * KONF_REGEN.udzial_zaleglosci);
+    poprzedniKoniec = koniecJazdy + razem * 3600000;
+    wpisy.push({ jazda: a, koniecJazdy, bazowe, zalegleGodz, razem,
+      wygasa: poprzedniKoniec });
+  }
+  return wpisy;
+}
+
+function stanRegeneracji(teraz){
+  const plan = planRegeneracji();
+  if (!plan) return null;
+  const ostatni = plan[plan.length-1];
+  const zostaloMs = Math.max(0, ostatni.wygasa - teraz);
+  const calosc = ostatni.razem * 3600000;
+  const udzial = calosc ? Math.max(0, Math.min(1, zostaloMs / calosc)) : 0;
+
+  // Napięcie: zmęczenie wobec wytrenowania. Obie liczby już mamy z krzywej formy.
+  const seria = seriaFormy();
+  const dzis = seria ? seria.dni[seria.dni.length-1] : null;
+  const napiecie = dzis && dzis.ctl > 1 ? dzis.atl / dzis.ctl : 0;
+  const k = KONF_REGEN.poziom;
+  const n = Math.max(0, Math.min(1,
+    (napiecie - k.napiecie_od) / (k.napiecie_do - k.napiecie_od)));
+  const poziom = Math.max(1, Math.min(10,
+    Math.round(1 + k.waga_zaleglosci * udzial + k.waga_napiecia * n)));
+  const opis = KONF_REGEN.skala.find(s => s.poziom === poziom) || KONF_REGEN.skala[0];
+
+  return { plan, ostatni, zostaloMs, udzial, poziom, opis, napiecie,
+    ctl: dzis ? dzis.ctl : null, atl: dzis ? dzis.atl : null };
+}
+
+function godzinyNaTekst(ms){
+  if (ms <= 0) return "0:00:00";
+  const s = Math.floor(ms / 1000);
+  return Math.floor(s/3600) + ":" + String(Math.floor(s%3600/60)).padStart(2,"0")
+    + ":" + String(s%60).padStart(2,"0");
+}
+const godzinyKrotko = (h) => h >= 10 ? Math.round(h) + " h"
+  : (Math.round(h*10)/10).toFixed(1).replace(".", ",") + " h";
+
+/* Pierścień odliczania. Ta sama forma co pierścień stref — pusty środek niesie
+   liczbę. Wypełnienie kurczy się w miarę upływu czasu, więc widać, ile jeszcze
+   zostało, bez czytania cyfr. */
+function pierscienRegeneracji(udzial, poziom){
+  const S = 130, R = 92, G = 30, OBWOD = 2 * Math.PI * R;
+  const dl = OBWOD * udzial;
+  return `<svg viewBox="0 0 260 260" width="100%" class="pierscien" role="img"
+    aria-label="Pozostały czas regeneracji">
+    <g transform="rotate(-90 ${S} ${S})">
+      <circle cx="${S}" cy="${S}" r="${R}" fill="none" stroke="var(--linia)"
+        stroke-width="${G}"/>
+      ${udzial > 0 ? `<circle id="luk-regeneracji" cx="${S}" cy="${S}" r="${R}"
+        fill="none" stroke="var(--stan-${poziom})" stroke-width="${G}"
+        stroke-linecap="butt"
+        stroke-dasharray="${dl.toFixed(2)} ${(OBWOD-dl).toFixed(2)}"/>` : ""}
+    </g></svg>`;
+}
+
+function miernikStanu(poziom){
+  return `<div class="miernik-stanu" role="img"
+      aria-label="Zmęczenie ${poziom} na 10">
+    ${KONF_REGEN.skala.map(s => `<span class="stopien${
+      s.poziom === poziom ? " akt" : ""}${s.poziom <= poziom ? " zapalony" : ""}"
+      style="--barwa:var(--stan-${s.poziom})" title="${s.poziom}. ${bezpieczny(s.nazwa)}"
+      ><b>${s.poziom}</b></span>`).join("")}
+  </div>`;
+}
+
+function regeneracja(){
+  if (!KONF_REGEN) return pusto("Regeneracja");
+  const teraz = Date.now();
+  const st = stanRegeneracji(teraz);
+  if (!st) return `
+    <div class="pusto">
+      <span class="znak">Regeneracja</span>
+      Nie ma jeszcze jazdy z wpisanym RPE — bez niej nie ma z czego liczyć.
+    </div>`;
+
+  const o = st.ostatni, gotowe = st.zostaloMs <= 0;
+  const kiedyGotowy = new Date(o.wygasa);
+  const dataGotowy = kiedyGotowy.toISOString().slice(0,10);
+  const godzGotowy = String(kiedyGotowy.getHours()).padStart(2,"0") + ":"
+    + String(kiedyGotowy.getMinutes()).padStart(2,"0");
+
+  return `
+  <section id="regeneracja" data-wygasa="${o.wygasa}" data-razem="${o.razem}">
+    <h2>Regeneracja</h2>
+    <p class="opis">
+      Ile godzin dzieli Cię od pełnej gotowości po ostatniej jeździe. Licznik
+      idzie <b>na żywo</b> — wejdziesz za pięć godzin, zobaczysz o pięć mniej.
+      Nowa jazda przelicza go od nowa i <b>dolicza to, czego nie odrobiłeś</b>.
+    </p>
+    <div class="regen-uklad">
+      <div class="pierscien-obudowa">
+        ${pierscienRegeneracji(st.udzial, st.poziom)}
+        <div class="pierscien-srodek">
+          <div class="srodek-etykieta">${gotowe ? "stan" : "zostało"}</div>
+          <div class="srodek-glowna regen-licznik" id="licznik-regeneracji">${
+            gotowe ? "gotowy" : godzinyNaTekst(st.zostaloMs)}</div>
+          <div class="srodek-podpis" id="licznik-podpis">${gotowe
+            ? "regeneracja zakończona"
+            : `pełna gotowość<br>${pl(dataGotowy)} o ${godzGotowy}`}</div>
+        </div>
+      </div>
+      <div class="regen-bok">
+        <div class="regen-zrodlo">
+          <div class="etykieta">Po jeździe</div>
+          <a class="odn" href="${adresStravy(o.jazda)}" target="_blank" rel="noopener"
+            >${ikonaDyscypliny(o.jazda.typ,15)}
+            <b>${bezpieczny(o.jazda.nazwa)}</b> &#8599;</a>${znacznikErg(o.jazda)}
+          <div class="regen-rozbicie">
+            <span><span class="etykieta">kiedy</span> ${pl(o.jazda.data)}</span>
+            <span><span class="etykieta">czas</span> ${czasNaTekst(o.jazda.czas_ruchu_s)}</span>
+            <span><span class="etykieta">RPE</span> ${o.jazda.rpe}/10</span>
+          </div>
+          <ul class="regen-skladniki">
+            <li><span>za samą jazdę</span><b>${godzinyKrotko(o.bazowe)}</b></li>
+            ${o.zalegleGodz > 0.05 ? `
+              <li><span>zaległość z poprzedniej (połowa z
+                ${godzinyKrotko(o.zalegleGodz)})</span>
+                <b>+${godzinyKrotko(o.zalegleGodz * KONF_REGEN.udzial_zaleglosci)}</b></li>` : ""}
+            <li class="suma"><span>przyznane łącznie</span><b>${godzinyKrotko(o.razem)}</b></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <section class="stan-blok">
+      <h2>Twoje zmęczenie</h2>
+      <p class="opis">
+        Skala od 1 do 10 w kierunku indeksu Hoopera: <b>1 znaczy najlepiej,
+        10 najgorzej</b>. Liczona z dwóch rzeczy — ile regeneracji zostało do
+        odrobienia oraz jak zmęczenie z ostatnich ${KONF_FORMY.atl_dni} dni ma się
+        do wytrenowania z ${KONF_FORMY.ctl_dni}.
+      </p>
+      ${miernikStanu(st.poziom)}
+      <div class="stan-opis" style="--barwa:var(--stan-${st.poziom})">
+        <div class="stan-numer">${st.poziom}</div>
+        <div>
+          <div class="stan-nazwa">${bezpieczny(st.opis.nazwa)}</div>
+          <div class="stan-tekst">${bezpieczny(st.opis.opis)}</div>
+        </div>
+      </div>
+      ${st.ctl != null ? `
+        <div class="info">
+          Napięcie zmęczenie / wytrenowanie: <b>${liczba(st.napiecie,2)}</b>
+          (${Math.round(st.atl)} do ${Math.round(st.ctl)}).
+          Powyżej 1,0 nabierasz zmęczenia szybciej, niż je odrabiasz; poniżej —
+          odpoczywasz. Samo w sobie nie jest ani dobre, ani złe: w bloku
+          treningowym ma być powyżej, przed startem poniżej.
+        </div>` : ""}
+    </section>
+
+    <div class="info">
+      <b>Skąd te godziny.</b> Garmin liczy regenerację z EPOC, czyli z tętna —
+      tego jeszcze nie masz, więc liczymy z RPE, które wpisujesz sam:
+      <code>0,8 × minuty × (RPE/10)^1,9</code>. Wykładnik sprawia, że
+      intensywność waży mocniej niż czas: pół godziny na maksa kosztuje więcej
+      niż dwie godziny spokojnej jazdy. Zakotwiczenie jest w regule „48–72 h
+      między twardymi treningami" — mocna jednostka 90 minut przy RPE 8 wychodzi
+      na ${godzinyKrotko(KONF_REGEN.wspolczynnik * 90 * Math.pow(0.8, KONF_REGEN.wykladnik_rpe))}.
+      <br>Licznik odlicza od <b>zegara tego urządzenia</b> — to jedyne miejsce
+      poza paskiem świeżości danych, gdzie strona pyta o realny czas. Sama jazda
+      pojawia się tu dopiero po nocnej aktualizacji danych ze Stravy.
+      <br>Jazda bez wpisanego RPE nie da się policzyć i jest pomijana — zgadywanie
+      wysiłku byłoby zmyśleniem.
+    </div>
+  </section>`;
+}
+
+// Licznik tyka co sekundę. Jeden strażnik na całą stronę: jeśli zakładka nie
+// jest otwarta, tick nie ma czego szukać i nic nie robi.
+function podepnijRegeneracje(){
+  if (window.__tykaRegeneracja) return;
+  window.__tykaRegeneracja = setInterval(() => {
+    const korzen = document.getElementById("regeneracja");
+    if (!korzen) return;
+    const wygasa = +korzen.dataset.wygasa, razem = +korzen.dataset.razem;
+    const zostalo = Math.max(0, wygasa - Date.now());
+    const licznik = document.getElementById("licznik-regeneracji");
+    if (!licznik) return;
+    if (zostalo <= 0){
+      if (licznik.textContent !== "gotowy"){
+        licznik.textContent = "gotowy";
+        const p = document.getElementById("licznik-podpis");
+        if (p) p.innerHTML = "regeneracja zakończona";
+        const luk = document.getElementById("luk-regeneracji");
+        if (luk) luk.remove();
+      }
+      return;
+    }
+    licznik.textContent = godzinyNaTekst(zostalo);
+    const luk = document.getElementById("luk-regeneracji");
+    if (luk && razem){
+      const OBWOD = 2 * Math.PI * 92;
+      const dl = OBWOD * Math.max(0, Math.min(1, zostalo / (razem * 3600000)));
+      luk.setAttribute("stroke-dasharray", dl.toFixed(2) + " " + (OBWOD - dl).toFixed(2));
+    }
+  }, 1000);
+}
+
 /* ==========================================================================
    SEKCJE — poziom 1 i poziom 2.
    Zakładka trafia na pasek tylko gdy ma wpis tutaj. Z1–Z5 to miejsca
@@ -5200,7 +5510,8 @@ const SEKCJE = [
   { id:"objetosc", tytul:"Objętość", barwa:"fuksja", pod:[
       { id:"tetno", tytul:"Tętno", rysuj: (arg) => objetosc("tetno", arg) },
       { id:"moc",   tytul:"Moc",   rysuj: (arg) => objetosc("moc", arg) },
-      { id:"stan",  tytul:"Stan wytrenowania", rysuj: stanWytrenowania }
+      { id:"stan",  tytul:"Stan wytrenowania", rysuj: stanWytrenowania },
+      { id:"regeneracja", tytul:"Regeneracja", rysuj: regeneracja }
   ]},
   { id:"z4", tytul:"Z4", barwa:"cyjan", pod:[1,2,3].map(m => ({
       id:"z4-"+m, tytul:"Z4."+m, rysuj: () => pusto("Z4."+m)
@@ -5279,6 +5590,7 @@ function pokaz(){
   podepnijStrefy();
   podepnijTabeleStref();
   podepnijForme();
+  podepnijRegeneracje();
 
   // Wykres otwiera się na najświeższym końcu — najnowsza przerwa jest
   // najważniejsza, a przy dwóch latach historii ląduje poza kadrem.
