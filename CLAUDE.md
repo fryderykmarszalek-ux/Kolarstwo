@@ -77,6 +77,8 @@ cel jeszcze długo po zmianie planu.
 ```
 index.html   cała strona: układ, style, wykresy, interakcja
 dane.js      100 aktywności ze Stravy + założenia + plan + kryterium
+trasy.js     kształty jazd (Strava), przycięte strefą prywatności 500 m
+swiat.js     zarys granic świata, Natural Earth 110m, domena publiczna
 STRONA.md    jak budować stronę (źródło prawdy)
 TRENING.md   fizjologia, historia, prognozy (źródło prawdy)
 .mcp.json    serwer MCP Stravy (wymaga logowania przez /mcp)
@@ -545,6 +547,85 @@ nie kolor: sylwetka roweru vs ekranu, słupek kreskowany vs pełny.
   na segmencie ani kategorii podjazdu **nie da się** wyciągnąć z API i nie
   wolno ich domyślać z nazwy jazdy. Dziewięć koszulek rozstrzyga Fryderyk
   ręcznie i to jest uczciwy stan, nie brak funkcji.
+- **Teren → Mapa** (28.08.2026) — mapa cieplna wszystkich przejechanych dróg,
+  rysowana od zera. Zarys świata (`swiat.js`) plus ślady jazd (`trasy.js`).
+  Przesuwanie palcem, szczypanie dwoma, przyciski +/−, „wszystkie jazdy"
+  i „cały świat". Pod mapą kafelki, lista rejonów i wyjaśnienie, czego na
+  mapie nie ma.
+
+  **Zero kafelków z cudzego serwera.** Podkład to Natural Earth 1:110m
+  (domena publiczna) leżący w repozytorium: 176 krajów, 9927 punktów, 41 kB,
+  z polskimi nazwami. Kafelki z sieci byłyby dokładnie tą zależnością
+  zewnętrzną, której projekt unika od pierwszego dnia — i mapa umarłaby
+  w dniu, w którym ktoś ten serwer wyłączy. Teraz działa też bez zasięgu.
+
+  **Współrzędne kodowane algorytmem Google encoded polyline — tym samym, co
+  trasy Stravy.** Różni je wyłącznie mnożnik: świat 100 (0,01°), Strava
+  100000. Jeden dekoder na oba źródła; dwie kopie rozjechałyby się przy
+  pierwszej poprawce.
+
+  **CANVAS, NIE SVG — jedyne takie miejsce na stronie.** Reszta wykresów
+  zostaje w SVG. Tutaj jest 27 tysięcy punktów śladów plus 10 tysięcy punktów
+  granic, przerysowywanych kilkadziesiąt razy na sekundę przy przesuwaniu
+  palcem; 37 tysięcy elementów DOM w takim tempie zatrzymałoby iPada.
+  Zmierzone: 3,2 ms na klatkę. Nadal rysowane od zera i bez bibliotek.
+
+  **KAŻDY ŚLAD OSOBNYM `stroke()` — nie łączyć w jedną ścieżkę.** Pierwsza
+  wersja wrzucała wszystkie 66 tras do jednego `beginPath()`. Rysuje szybciej,
+  ale canvas składa taką ścieżkę z tłem RAZ, więc droga przejechana dwadzieścia
+  razy wychodziła dokładnie tak samo blada jak przejechana raz. Mapa cieplna
+  po prostu nie istniała, choć wyglądała na narysowaną. Osobne `stroke`'y
+  nakładają krycie na siebie: jedna jazda 0,32, trzy 0,69, dziesięć prawie 1.
+
+  **Częstość niesie NASYCENIE, nie nowa barwa.** Cała mapa jest w `--akcent`,
+  czyli w barwie danych. Do palety dołożono wyłącznie podkład
+  (`--mapa-woda`, `--mapa-lad`, `--mapa-granica`, `--mapa-napis`) — to chrom
+  mapy, jak linie siatki na wykresie, a nie rola danych.
+
+  **ZWIFT NIE STOI NA MAPIE.** Jazdy z trenażera mają PRAWDZIWE współrzędne
+  i ZMYŚLONE miejsce: Watopia leży na Morzu Salomona, Ven-Top koło Nowej
+  Kaledonii, a w danych są jeszcze Nowy Jork i Richmond. Postawienie ich na
+  mapie twierdziłoby, że Fryderyk tam był — ten sam błąd co moc `[E]` udająca
+  pomiar. Liczba pominiętych jazd stoi pod mapą, żeby nie wyglądało to na zgubę.
+
+  **Skupianie pinezek zależy od PRZYBLIŻENIA, rejony od GEOGRAFII.** To dwie
+  różne rzeczy i mylenie ich dałoby listę zmieniającą się przy każdym ruchu
+  palca. Pinezki: siatka o boku 96 px w pikselach ekranu, więc przy oddalaniu
+  sąsiednie skupiska same wpadają do jednej kratki i się scalają. Do tego
+  **drugi przebieg scalający** pinezki bliższe niż 58 px — bez niego granica
+  kratki potrafiła przeciąć jedno miasto na pół i stawiać nad nim dwie pinezki.
+  Rejony pod mapą: jazdy, których starty dzieli mniej niż 35 km.
+
+  **Nazwa rejonu ze słowa WYRÓŻNIAJĄCEGO, nie najczęstszego** — udział rejonu
+  w wystąpieniach słowa, próg 0,6. Przy najczęstszym każdy rejon nazywałby się
+  „ride" albo „gravel". Wychodzi „Gassy · Polska" i „Swory · Polska", co się
+  zgadza. Kraj z punktu-w-wielokącie na zarysie świata.
+
+  **Mapa liczy CAŁĄ historię**, nie od `meta.liczone_od` — jak koszulki
+  w Gablocie, bo jazda z 2024 odbyła się naprawdę.
+
+  Ślady rysujemy ZAWSZE, także pod pinezką; wcześniej skupisko zamienione
+  w pinezkę znikało z podkładu i przy średnim oddaleniu mapa wyglądała pusto.
+  Uchwyty płótna podpina się przy KAŻDYM wejściu w zakładkę (płótno jest nowym
+  elementem), a wartownik `dataset` obejmuje wyłącznie uchwyty na `#tresc`
+  i na oknie, które przeżywają przerysowanie.
+- **STREFA PRYWATNOŚCI PRZY TRASACH — nie osłabiać.** Repozytorium jest
+  publiczne, a nieprzycięty ślad prowadzi pod drzwi szesnastolatka. Automat
+  wycina z początku i z końca każdej jazdy punkty bliższe niż **500 m** od
+  domu. **Punkt domowy nie jest zapisywany nigdzie w repo** — liczy się przy
+  każdym przebiegu z surowych startów i od razu znika.
+
+  Dom to punkt startowy z największą liczbą sąsiadów, **nie średnia**:
+  średnią jeden wyjazd do Francji przesunąłby o setki kilometrów i strefa
+  wylądowałaby w polu pod Paryżem.
+
+  Ślady bierzemy z listy aktywności przy KAŻDYM przebiegu, nie z `trasy.js`.
+  Gdyby źródłem był własny plik, w którym ślady są już ucięte, drugi przebieg
+  szukałby domu w pierścieniu wokół dziury zamiast w punkcie.
+
+  Sprawdzone bez sieci, 13 kontroli, w tym: dom trafiony co do metra mimo
+  jazdy we Francji w zbiorze, ani jeden punkt bliżej niż 500 m nie przetrwał
+  na końcach, środek jazdy nietknięty, jazda w całości pod domem wypada.
 - **Dwa błędy naprawione 27.08.2026 — nie cofać wzorca:**
   - `.pasek-postepu.duzy` ma `position:relative`, nie `static`. Wypełnienie
     paska jest pozycjonowane absolutnie, więc przy statycznym rodzicu szukało
