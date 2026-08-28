@@ -717,6 +717,22 @@ Zabezpieczenia: pusta odpowiedź przerywa przebieg zamiast kasować dane; przed
 commitem plik musi się sparsować i mieć niezerową liczbę aktywności; commit
 tylko przy faktycznej zmianie.
 
+**Automat liczy rozkłady stref — dodane 28.08.2026 po audycie.** Do tego dnia
+`grep strefy` w skrypcie dawał ZERO trafień: pierścienie Tętno i Moc nigdy nie
+wypełniłyby się same, choćby Fryderyk wgrał sto jazd. Skrypt pyta teraz o
+strumień `time,watts,heartrate` jednym zapytaniem (waty i tętno przychodzą
+razem, więc pytanie osobno kosztowałoby dwa razy tyle), klasyfikuje sekundy
+tabelą obowiązującą W DNIU JAZDY i zapisuje wynik razem z datą użytej tabeli.
+
+Reguła klasyfikacji jest DOKŁADNIE ta sama co na stronie: wartość trafia do
+pierwszej strefy, której górny próg jest od niej nie mniejszy, a ostatnia
+(max = null) łapie resztę. Dziura w zapisie dłuższa niż 10 s to postój i nie
+liczy się do żadnej strefy; brak pomiaru nie jest zerem.
+
+`has_heartrate` ze Stravy zapisujemy przy jeździe jako `ma_tetno` — bez tego
+faktu skrypt musiałby pytać o strumień każdej jazdy albo żadnej. Rozkład raz
+policzony zostaje; `PELNE_STREFY` jest wyłącznie na wypadek zmiany samej metody.
+
 **Cron: dwa odpalenia i minuta 37 — poprawka z 27.08.2026, nie cofać.**
 Przebieg z 26.08 w ogóle się nie odbył. Zadania z crona GitHub gubi przy
 obciążeniu, a najgorsza jest pełna godzina, bo wtedy startuje pół świata.

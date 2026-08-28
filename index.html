@@ -1115,7 +1115,11 @@ footer{color:var(--slaby);font-size:12px;padding:14px 20px 34px;max-width:1000px
 // Daty trzymamy jako "RRRR-MM-DD". Do liczenia różnic używamy południa UTC,
 // żeby zmiana czasu letni/zimowy nigdy nie przesunęła doby o jeden.
 function naDzien(tekst){
-  const [r,m,d] = tekst.slice(0,10).split("-").map(Number);
+  // Pusty argument zdarza się tylko przy pliku bez ani jednej jazdy — automat
+  // odmawia zapisania takiego, ale gdyby powstał ręcznie, strona ma pokazać
+  // komunikat, a nie wysypać się już przy wczytywaniu.
+  const [r,m,d] = String(tekst || (window.DANE && window.DANE.meta.pobrano) || "2000-01-01")
+    .slice(0,10).split("-").map(Number);
   return Date.UTC(r, m-1, d, 12);
 }
 function roznicaDni(a,b){ return Math.round((b-a)/86400000); }
@@ -1131,6 +1135,26 @@ function liczba(x, miejsc){ return x.toFixed(miejsc).replace(".", ","); }
    ========================================================================== */
 
 const D = window.DANE;
+
+/* Bramka na plik bez jazd. Automat odmawia zapisania pustej listy (i mówi to
+   wprost w logu), więc realnie może to powstać tylko ręcznie. Gdyby jednak
+   powstało, strona ma to powiedzieć jednym zdaniem — a nie wysypać się na
+   pierwszej z kilkunastu funkcji liczących coś z ostatniej jazdy. Wyjątek
+   zatrzymuje resztę skryptu, komunikat wstawia się, gdy DOM będzie gotowy. */
+if (!D || !Array.isArray(D.aktywnosci) || !D.aktywnosci.length){
+  const powiedz = () => { document.body.innerHTML =
+    `<div style="max-width:640px;margin:80px auto;padding:0 20px;font:16px/1.6
+      system-ui,sans-serif;color:#333">
+      <h1 style="font-size:20px">Brak danych</h1>
+      <p>Plik <code>dane.js</code> nie zawiera ani jednej aktywności, więc nie ma
+      czego pokazać. Odpal ręcznie przebieg automatu w zakładce <b>Actions</b>
+      na GitHubie albo przywróć poprzednią wersję pliku z historii repozytorium.</p>
+    </div>`; };
+  if (document.readyState === "loading")
+    document.addEventListener("DOMContentLoaded", powiedz);
+  else powiedz();
+  throw new Error("dane.js bez aktywności — strona zatrzymana świadomie");
+}
 
 // Decyzja Fryderyka: liczymy dopiero od tej daty. Historia sprzed niej
 // zostaje w pliku nietknięta, ale nie wchodzi do żadnego wykresu.
@@ -1888,9 +1912,14 @@ const c3Dlugie = () => {
     <h2>C3 · Najdłuższa jazda w miesiącu</h2>
     <p class="opis">
       Jeden słupek = najdłuższy przejazd w danym miesiącu. Oś jest ciągła,
-      więc miesiąc bez ani jednej jazdy zostaje pusty — zima 2025/26 ma trzy
-      takie z rzędu. Słupek kreskowany oznacza, że rekordem miesiąca była
-      sesja na Zwifcie; 41 km na trenażerze to nie to samo co 41 km na szosie.
+      więc miesiąc bez ani jednej jazdy zostaje pusty${(() => {
+        // Liczone, nie wpisane: zdanie o pustych miesiącach ma zostać prawdziwe
+        // także wtedy, gdy zima 2025/26 przestanie być najnowszą historią.
+        let naj = 0, biez = 0;
+        for (const m of miesiace) { if (m.naj) biez = 0; else naj = Math.max(naj, ++biez); }
+        return naj >= 2 ? ` — najdłuższa taka cisza to ${naj} miesiące pod rząd` : "";
+      })()}. Słupek kreskowany oznacza, że rekordem miesiąca była
+      sesja na Zwifcie; kilometr na trenażerze to nie to samo co kilometr na szosie.
       Zielona linia to cel ${CEL_KM} km z planu, szara — Twój obecny rekord.
     </p>
     ${wykresDlugich()}
@@ -1918,8 +1947,9 @@ const c3Dlugie = () => {
         <div class="stopka">km · niedzielna długa</div>
       </div>
       <div class="kafel">
-        <div class="etykieta">Brakuje do celu</div>
-        <div class="liczba">${liczba(brakuje,1)}</div>
+        <div class="etykieta">${brakuje > 0 ? "Brakuje do celu" : "Cel dowieziony"}</div>
+        <div class="liczba">${brakuje > 0 ? liczba(brakuje,1)
+          : "+" + liczba(rekordKm - CEL_KM, 1)}</div>
         <div class="stopka">km · ${liczba(100*rekordKm/CEL_KM,0)}% celu</div>
       </div>
       <div class="kafel">
@@ -2982,7 +3012,7 @@ function podepnijProby(){
    listę i wykresy sama.
    ========================================================================== */
 
-const OKNA_OPISY = { 1:"1 s", 5:"5 s", 10:"10 s", 15:"15 s", 30:"30 s", 40:"40 s",
+const OKNA_OPISY = { 1:"1 s", 3:"3 s", 5:"5 s", 10:"10 s", 15:"15 s", 30:"30 s", 40:"40 s",
   60:"1 min", 120:"2 min", 300:"5 min", 480:"8 min", 600:"10 min",
   900:"15 min", 1200:"20 min", 1800:"30 min", 2700:"45 min", 3600:"1 h",
   5400:"1,5 h" };
@@ -4697,8 +4727,12 @@ function rozkladStref(miara, dni){
   const jazdy = (STREFY.rozklady && STREFY.rozklady.jazdy) || {};
   let zPomiarem = 0, wszystkich = 0;
 
+  let odsianeErg = 0;
   for (const a of jazdyOkna(dni)){
     wszystkich++;
+    // Moc sterowana opisuje plan treningu, nie zawodnika — do rozkładu stref
+    // mocy nie wchodzi. Ta sama reguła co wszędzie indziej na stronie.
+    if (miara === "moc" && jestErg(a)){ odsianeErg++; continue; }
     const r = jazdy[a.id];
     const sek = r && r[miara];
     if (!Array.isArray(sek) || sek.length !== ile) continue;
@@ -4706,7 +4740,7 @@ function rozkladStref(miara, dni){
     for (let i = 0; i < ile; i++) sumy[i] += sek[i] || 0;
   }
   const suma = sumy.reduce((x,y) => x+y, 0);
-  return { sumy, suma, zPomiarem, wszystkich, ile };
+  return { sumy, suma, zPomiarem, wszystkich, ile, odsianeErg };
 }
 
 /* --- Efektywność rozkładu -------------------------------------------------
@@ -4930,6 +4964,13 @@ function objetosc(miara, arg){
         ${legendaStref(miara, rozklad)}
       </div>
     </div>
+    ${rozklad && rozklad.odsianeErg ? `
+      <div class="info">
+        Pominięto <b>${rozklad.odsianeErg}</b> ${rozklad.odsianeErg === 1
+          ? "sesję sterowaną" : "sesji sterowanych"}
+        <span class="znacznik-erg">ERG</span> — w tym trybie trenażer trzyma
+        zadaną moc, więc rozkład stref opisywałby plan treningu, a nie Ciebie.
+      </div>` : ""}
     ${!rozklad || !rozklad.suma ? `
       <div class="info">
         <b>Nie ma jeszcze czego rysować.</b>

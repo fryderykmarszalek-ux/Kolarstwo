@@ -28,6 +28,10 @@ on:
       pelna_moc:
         description: "Przelicz krzywe mocy od nowa dla wszystkich jazd z miernikiem"
         type: boolean
+      pelne_strefy:
+        description: "Przelicz rozkłady stref dla wszystkich jazd"
+        default: false
+        type: boolean
         default: false
 
 permissions:
@@ -58,6 +62,7 @@ jobs:
           PELNE_OPISY: ${{ inputs.pelne_opisy }}
           PELNE_SEGMENTY: ${{ inputs.pelne_segmenty }}
           PELNA_MOC: ${{ inputs.pelna_moc }}
+          PELNE_STREFY: ${{ inputs.pelne_strefy }}
         run: node .github/skrypty/pobierz-strave.js
 
       - name: Sprawdź, czy plik się parsuje

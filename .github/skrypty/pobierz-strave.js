@@ -49,6 +49,10 @@ const PELNE_SEGMENTY = process.env.PELNE_SEGMENTY === "true";
 // liczymy z tego samego strumienia.
 const CZASY_KRZYWEJ = [1,3,5,10,15,30,40,60,120,300,480,600,900,1200,1800,2700,3600,5400];
 const PELNA_MOC = process.env.PELNA_MOC === "true";
+// Rozkłady stref liczymy RAZ na jazdę i zostawiamy. Przełącznik jest wyłącznie
+// na wypadek zmiany samej metody liczenia — nie na zmianę progów, bo tabela
+// jest datowana i z definicji nie rusza przeszłości.
+const PELNE_STREFY = process.env.PELNE_STREFY === "true";
 
 function wczytajStare(){
   global.window = {};
@@ -73,17 +77,64 @@ async function dociagnijJazde(id, access, zSegmentami){
   }
 }
 
-async function dociagnijStrumienMocy(id, access){
+// Jedno zapytanie po oba strumienie: waty do krzywej mocy, tętno do rozkładu
+// stref. Pytanie o nie osobno kosztowałoby dwa razy tyle, a przychodzą razem.
+async function dociagnijStrumienie(id, access){
   try {
     const s = await zapytaj(
-      `${STRAVA}/api/v3/activities/${id}/streams?keys=time,watts&key_by_type=true`,
+      `${STRAVA}/api/v3/activities/${id}/streams?keys=time,watts,heartrate&key_by_type=true`,
       { headers: { Authorization: `Bearer ${access}` } });
-    if (!s || !s.watts || !s.watts.data) return null;
-    return { watts: s.watts.data, czas: s.time && s.time.data ? s.time.data : null };
+    if (!s) return null;
+    const watts = s.watts && s.watts.data ? s.watts.data : null;
+    const hr = s.heartrate && s.heartrate.data ? s.heartrate.data : null;
+    if (!watts && !hr) return null;
+    return { watts, hr, czas: s.time && s.time.data ? s.time.data : null };
   } catch (e){
-    console.log(`  (nie udało się pobrać mocy ${id}: ${e.message.split("\n")[0]})`);
+    console.log(`  (nie udało się pobrać strumieni ${id}: ${e.message.split("\n")[0]})`);
     return undefined;
   }
+}
+
+/* ── Czas w strefach ───────────────────────────────────────────────────────
+   Reguła klasyfikacji MUSI być identyczna z tą na stronie: wartość trafia do
+   pierwszej strefy, której górny próg jest od niej nie mniejszy; ostatnia
+   strefa (max = null) łapie całą resztę. Dzięki temu żadna sekunda nie ginie —
+   ani tętno 90 poniżej pierwszego progu, ani sprint 1000 W powyżej ostatniego.
+
+   Tabela progów jest DATOWANA: bierzemy tę, która obowiązywała W DNIU JAZDY,
+   i zapisujemy przy wyniku, której użyliśmy. Rozkład raz policzony zostaje na
+   zawsze — zmiana progów w listopadzie nie rusza jazd z września. */
+const MAKS_ODSTEP_S = 10;   // dłuższa dziura w zapisie to postój, nie jazda
+
+function ktoraStrefa(v, strefy){
+  for (let i = 0; i < strefy.length; i++){
+    const gora = strefy[i].max;
+    if (gora == null || v <= gora) return i;
+  }
+  return strefy.length - 1;
+}
+
+function tabelaNaDzien(tabele, data){
+  if (!tabele || !tabele.length) return null;
+  let wynik = tabele[0];
+  for (const t of tabele) if (t.od <= data) wynik = t;
+  return wynik;                       // jazda starsza od wszystkich tabel bierze najstarszą
+}
+
+function czasWStrefach(wartosci, czas, strefy){
+  if (!wartosci || !wartosci.length || !strefy || !strefy.length) return null;
+  const sek = new Array(strefy.length).fill(0);
+  const maOs = czas && czas.length === wartosci.length;
+  for (let i = 0; i < wartosci.length; i++){
+    const v = wartosci[i];
+    if (v == null) continue;           // brak pomiaru nie jest zerem
+    let dt = 1;
+    if (maOs && i + 1 < czas.length)
+      dt = Math.max(0, Math.min(MAKS_ODSTEP_S, czas[i+1] - czas[i]));
+    sek[ktoraStrefa(v, strefy)] += dt;
+  }
+  const suma = sek.reduce((a,b) => a+b, 0);
+  return suma > 0 ? sek.map(x => Math.round(x)) : null;
 }
 
 // Maksimum średniej kroczącej dla każdego okna. Strumień rozkładamy najpierw
@@ -175,7 +226,10 @@ function naNasz(a){
     czas_ruchu_s: a.moving_time,
     czas_calkowity_s: a.elapsed_time,
     przewyzszenie_m: Number((a.total_elevation_gain || 0).toFixed(1)),
-    nazwa: a.name
+    nazwa: a.name,
+    // Fakt ze Stravy, nie domysł: mówi, czy w ogóle warto pytać o strumień
+    // tętna. Bez niego pytalibyśmy o każdą jazdę albo o żadną.
+    ...(a.has_heartrate === true ? { ma_tetno: 1 } : {})
   };
 }
 
@@ -277,6 +331,13 @@ function zapisz(D){
   const proby = (stare.proby || []).filter(p => wszystkieId.has(p.a));
   const mocPobrana = new Set(stare.moc_pobrana || []);
   const krzywe = (stare.moc_krzywe || []).filter(k => wszystkieId.has(k.a));
+  // Rozkłady stref: co już policzone, zostaje. Blok mógł jeszcze nie istnieć.
+  stare.strefy = stare.strefy || {};
+  stare.strefy.rozklady = stare.strefy.rozklady || { jazdy: {} };
+  stare.strefy.rozklady.jazdy = stare.strefy.rozklady.jazdy || {};
+  const rozklady = stare.strefy.rozklady.jazdy;
+  for (const id of Object.keys(rozklady)) if (!wszystkieId.has(id)) delete rozklady[id];
+  let nowychRozkladow = 0;
   const segmenty = new Map((stare.segmenty || []).map(x => [x.id, x]));
 
   let zapytan = 0, zmienionych = 0, nowychProb = 0;
@@ -300,7 +361,13 @@ function zapisz(D){
       || proby.some(x => x.a === a.id && x.z_miernika === 1);
     let chceMoc = mocMozliwa && (!mocPobrana.has(a.id) || PELNA_MOC);
 
-    if (!chceOpis && !chceSegmenty && !chceMoc){
+    // Rozkład stref: potrzebny, gdy jazda ma tętno albo moc, a jeszcze go nie
+    // policzyliśmy. Tętno wchodzi tu samo, w dniu w którym Strava je zapisze.
+    const strefyMozliwe = kolarska && (a.ma_tetno === 1 || mocMozliwa);
+    let chceStrefy = strefyMozliwe && (!rozklady[a.id] || PELNE_STREFY);
+    if (chceStrefy) chceMoc = chceMoc || mocMozliwa;   // i tak pytamy o strumień
+
+    if (!chceOpis && !chceSegmenty && !chceMoc && !chceStrefy){
       if (stary) a.opis = stary;               // nic do pytania — zachowaj, co mamy
       if (staryRpe != null) a.rpe = staryRpe;
       continue;
@@ -341,18 +408,38 @@ function zapisz(D){
     }
     if (!chceOpis && staryRpe != null && a.rpe == null) a.rpe = staryRpe;
 
-    if (chceMoc){
-      const str = await dociagnijStrumienMocy(a.id, access);
+    if (chceMoc || chceStrefy){
+      const str = await dociagnijStrumienie(a.id, access);
       zapytan++;
       if (str !== undefined){
-        mocPobrana.add(a.id);
-        const k = str ? krzywaMocy(str.watts, str.czas) : null;
-        for (let i = krzywe.length - 1; i >= 0; i--)
-          if (krzywe[i].a === a.id) krzywe.splice(i, 1);
-        if (k){
-          krzywe.push({ a: a.id, w: k });
-          console.log(`  krzywa mocy: ${a.data.slice(0,10)} ${a.nazwa} — `
-            + `${Object.keys(k).length} okien, szczyt ${Math.max(...Object.values(k))} W`);
+        if (chceMoc){
+          mocPobrana.add(a.id);
+          const k = str && str.watts ? krzywaMocy(str.watts, str.czas) : null;
+          for (let i = krzywe.length - 1; i >= 0; i--)
+            if (krzywe[i].a === a.id) krzywe.splice(i, 1);
+          if (k){
+            krzywe.push({ a: a.id, w: k });
+            console.log(`  krzywa mocy: ${a.data.slice(0,10)} ${a.nazwa} — `
+              + `${Object.keys(k).length} okien, szczyt ${Math.max(...Object.values(k))} W`);
+          }
+        }
+        if (chceStrefy && str){
+          const dzien = a.data.slice(0,10);
+          const tabT = tabelaNaDzien(((stare.strefy || {}).tetno || {}).tabele, dzien);
+          const tabM = tabelaNaDzien(((stare.strefy || {}).moc || {}).tabele, dzien);
+          const wT = tabT && str.hr ? czasWStrefach(str.hr, str.czas, tabT.strefy) : null;
+          const wM = tabM && str.watts ? czasWStrefach(str.watts, str.czas, tabM.strefy) : null;
+          if (wT || wM){
+            rozklady[a.id] = {
+              tetno: wT, moc: wM,
+              tabela_tetno: wT ? tabT.od : null,
+              tabela_moc: wM ? tabM.od : null
+            };
+            nowychRozkladow++;
+            const opisT = wT ? `tętno ${Math.round(wT.reduce((x,y)=>x+y,0)/60)} min` : "";
+            const opisM = wM ? `moc ${Math.round(wM.reduce((x,y)=>x+y,0)/60)} min` : "";
+            console.log(`  strefy: ${dzien} ${a.nazwa} — ${[opisT,opisM].filter(Boolean).join(", ")}`);
+          }
         }
       }
     }
@@ -369,7 +456,8 @@ function zapisz(D){
     }
   }
   console.log(`Zapytań o jazdy: ${zapytan}. Opisów zmienionych: ${zmienionych}. `
-    + `Prób na segmentach dociągniętych: ${nowychProb}.`);
+    + `Prób na segmentach dociągniętych: ${nowychProb}. `
+    + `Rozkładów stref policzonych: ${nowychRozkladow}.`);
 
   proby.sort((x,y) => x.s === y.s ? (x.a < y.a ? -1 : 1) : (x.s < y.s ? -1 : 1));
   stare.segmenty = [...segmenty.values()].sort((x,y) =>
@@ -387,6 +475,7 @@ function zapisz(D){
   stare.meta.liczba_segmentow = stare.segmenty.length;
   stare.meta.liczba_prob = stare.proby.length;
   stare.meta.jazd_z_moca = stare.moc_krzywe.length;
+  stare.meta.jazd_z_rozkladem = Object.keys(stare.strefy.rozklady.jazdy).length;
   stare.meta.zakres = [nowe[0].data.slice(0,10), nowe[nowe.length-1].data.slice(0,10)];
 
   zapisz(stare);
