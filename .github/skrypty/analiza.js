@@ -306,11 +306,21 @@ function zapisz(bloki, odcisk, D, uzycie){
     + (uzycie ? `, tokeny ${uzycie.input_tokens} → ${uzycie.output_tokens}` : ""));
 }
 
+/* Wywoływane jako program przez workflow; przy `require` z innego skryptu
+   udostępnia briefing i odcisk, żeby dało się policzyć DOKŁADNIE ten sam
+   skrót bez powtarzania logiki w drugim miejscu (dwie kopie rozjechałyby
+   się przy pierwszej zmianie briefingu). */
+function odciskDanych(br){
+  return crypto.createHash("sha256")
+    .update(JSON.stringify(br)).digest("hex").slice(0,16);
+}
+module.exports = { wczytaj, briefing, odciskDanych };
+if (require.main !== module) return;
+
 (async () => {
   const D = wczytaj();
   const br = briefing(D);
-  const odcisk = crypto.createHash("sha256")
-    .update(JSON.stringify(br)).digest("hex").slice(0,16);
+  const odcisk = odciskDanych(br);
   const stara = poprzednia();
 
   if (stara && stara.odcisk === odcisk && !WYMUS){

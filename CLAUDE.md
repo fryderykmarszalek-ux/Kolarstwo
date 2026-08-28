@@ -702,7 +702,22 @@ Zostaje wtedy poprzedni komentarz, a pobieranie danych leci dalej.
 Briefing to **wyciąg**, nie całe `dane.js`: 23 kB zamiast 272 kB. Model widzi
 to samo co Fryderyk na wykresach — plus progi i decyzje, nie więcej.
 
-Wymaga sekretu `ANTHROPIC_API_KEY` w repozytorium.
+Wymaga sekretu `ANTHROPIC_API_KEY` w repozytorium. **Dopóki sekretu nie ma,
+skrypt wypisuje „Brak ANTHROPIC_API_KEY — pomijam analizę” i kończy się zerem** —
+nie kasuje tego, co stoi w `analiza.js`, i nie psuje pobierania danych.
+
+**Pierwsza analiza jest napisana ręcznie w czacie** (28.08.2026) i to jedyny
+taki wpis. Powstała, bo zakładka bez sekretu stałaby pusta, a Fryderyk poprosił,
+żeby analiza „zawsze tam była”. Pole `odcisk` jest prawdziwym skrótem briefingu
+z tego dnia, więc automat uzna dane za niezmienione i zostawi ten tekst
+w spokoju aż do pierwszej nowej jazdy. Pole `model` mówi wprost „asystent
+w sesji czatu” — plik nie ma udawać, że napisał go automat.
+
+`briefing()` i `odciskDanych()` są eksportowane z `.github/skrypty/analiza.js`
+(`module.exports` + `if (require.main !== module) return;`), żeby dało się
+policzyć **dokładnie ten sam** skrót bez drugiej kopii logiki. Dwie kopie
+rozjechałyby się przy pierwszej zmianie briefingu i automat nadpisywałby
+analizę bez powodu.
 
 ---
 
