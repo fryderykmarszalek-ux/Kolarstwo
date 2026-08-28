@@ -650,6 +650,28 @@ w roku. Lista w `dane.js` → `kryterium_przerwy.wyjazdy_bez_roweru`.
 
 ---
 
+## 6a. `claude.js` — treści pisane przez Claude'a w czacie
+
+Osobny plik w korzeniu, ładowany zaraz po `dane.js`. Powstał 28.08.2026, żeby
+Claude z **zwykłego czatu** (przez konektor GitHuba) mógł dopisywać notatki
+i komentarze bez ruszania 272-kilobajtowego `dane.js`, który automat i tak
+przepisuje co noc. Dwa mechanizmy piszące po jednym pliku to gwarantowany
+konflikt; dwa pliki to zero konfliktów.
+
+**Zakres jest twardo ograniczony do TREŚCI** — decyzja Fryderyka z 28.08.2026.
+`claude.js` trzyma `notatki`, `analizy` i `teksty`, czyli słowa. Progi stref,
+zdobyte koszulki, ptaszki w prognozach i pomiary zostają w `dane.js`, poza
+zasięgiem czatu: pomyłka w rozmowie ma móc zepsuć najwyżej zdanie.
+
+Pierwszeństwo: **brudnopis urządzenia > `claude.js` > `dane.js`**. Ostatnie
+słowo ma zawsze Fryderyk przy swoim ekranie.
+
+Instrukcja dla Claude'a w czacie siedzi w komentarzu na początku `claude.js` —
+plik tłumaczy sam siebie temu, kto go otworzy. Strona działa też **bez tego
+pliku** (sprawdzone): `TRESCI` spada wtedy na pusty obiekt.
+
+---
+
 ## 7a. Dostęp do Stravy — trzy różne drogi, nie mylić
 
 Nowa sesja łatwo wyciąga błędny wniosek: widzi, że serwer z `.mcp.json`

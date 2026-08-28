@@ -1105,6 +1105,10 @@ footer{color:var(--slaby);font-size:12px;padding:14px 20px 34px;max-width:1000px
 <footer id="stopka"></footer>
 
 <script src="dane.js"></script>
+<!-- Treści pisane przez Claude'a w czacie. Osobny plik, żeby nie ruszał
+     272-kilobajtowego dane.js, którego automat i tak przepisuje co noc.
+     Gdyby pliku nie było, strona działa dalej — patrz TRESCI niżej. -->
+<script src="claude.js"></script>
 <script>
 "use strict";
 
@@ -2673,7 +2677,7 @@ function wnioskiSegmentu(lista, seg){
 
 function panelAnalizy(lista, seg){
   const w = wnioskiSegmentu(lista, seg);
-  const recznie = (D.analizy || {})[seg.id];
+  const recznie = (TRESCI.analizy || {})[seg.id] ?? (D.analizy || {})[seg.id];
   return `
     <aside class="analiza">
       <div class="analiza-gora">
@@ -2746,8 +2750,14 @@ function zapiszLokalne(obj){
   try { localStorage.setItem(KLUCZ_NOTATEK, JSON.stringify(obj)); return true; }
   catch(e){ return false; }          // prywatne okno albo brak miejsca
 }
+/* Treści pisane przez Claude'a w czacie. Trzeci plik obok dane.js i
+   localStorage; gdy go nie ma (albo nie zdążył się wczytać), wszystko działa
+   jak wcześniej. Pierwszeństwo: brudnopis urządzenia > claude.js > dane.js —
+   ostatnie słowo ma zawsze Fryderyk przy swoim ekranie. */
+const TRESCI = (typeof window !== "undefined" && window.CLAUDE) ? window.CLAUDE : {};
+
 function notatkaZRepo(id){
-  const n = (D.notatki || {})[id];
+  const n = (TRESCI.notatki || {})[id] ?? (D.notatki || {})[id];
   if (!n) return "";
   return typeof n === "string" ? n : (n.tekst || "");
 }
