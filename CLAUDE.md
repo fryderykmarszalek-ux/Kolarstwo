@@ -77,7 +77,7 @@ cel jeszcze długo po zmianie planu.
 ```
 index.html   cała strona: układ, style, wykresy, interakcja
 dane.js      100 aktywności ze Stravy + założenia + plan + kryterium
-przebiegi.js prędkość, moc i tętno w czasie każdej jazdy (próbkowane, 71 kB)
+przebiegi.js INDEKS przebiegów; dane w przebiegi/<id>.js, pełne 1 Hz
 trasy.js     kształty jazd (Strava), przycięte strefą prywatności 500 m — dziś nieużywane
 swiat.js     zarys granic świata, Natural Earth 110m — dziś nieużywane
 STRONA.md    jak budować stronę (źródło prawdy)
@@ -459,8 +459,23 @@ nie kolor: sylwetka roweru vs ekranu, słupek kreskowany vs pełny.
 - **Objętość → Regeneracja** (27.08.2026) — ile godzin do pełnej gotowości po
   ostatniej jeździe, licznik tykający **na żywo**, plus stan zmęczenia 1–10.
 
-  **Wzór:** `godziny = 0,8 × minuty_ruchu × (RPE/10)^1,9`, wszystko z `dane.js`
-  → `regeneracja`. Wykładnik przy RPE sprawia, że intensywność waży mocniej niż
+  **WYSIŁEK JAZDY LICZY SIĘ Z TĘTNA, gdy pas był założony** (30.08.2026).
+  Czas w strefach przeliczamy metodą Edwardsa (suma minut w strefie razy waga
+  strefy), tyle że wagi są w skali RPE 1–10, a nie 1–5, żeby wynik wchodził do
+  TEGO SAMEGO wzoru — dzięki temu jazdy sprzed pasa i po nim leżą na jednej
+  skali i nic nie skacze w dniu, w którym doszedł czujnik. Wagi
+  (`regeneracja.rpe_ze_stref.wagi`) siedzą w `dane.js`, bo to założenie, nie kod.
+  **Tętno wygrywa z RPE, bo pomiar wygrywa z deklaracją**, ale panel pokazuje
+  obie liczby: pierwsza jazda z pasem (44 min Z2, 17 min Z3) daje wysiłek
+  4,1/10 i 8,8 h, a wpisane RPE 2 dałoby 2,3 h.
+
+  **Krzywa formy używa DOKŁADNIE TEJ SAMEJ miary** (`wysilekJazdy()`). Dwie
+  definicje wysiłku na jednej stronie rozjechałyby wykres formy z licznikiem
+  regeneracji i nie dałoby się powiedzieć, który ma rację.
+
+  **Wzór:** `godziny = 0,8 × minuty_ruchu × (wysiłek/10)^1,9`, wszystko z
+  `dane.js` → `regeneracja`. Kotwice nietknięte po zmianie: lekka godzina przy
+  wysiłku 3 daje 4,9 h, a 90 minut przy 8 — 47,1 h. Wykładnik przy RPE sprawia, że intensywność waży mocniej niż
   czas. Garmin liczy to z EPOC, czyli z tętna — tego jeszcze nie ma, więc
   liczymy z RPE, które Fryderyk wpisuje sam. Zakotwiczenie w regule „48–72 h
   między twardymi treningami": 90 min przy RPE 8 wychodzi 47 h, lekka godzina
@@ -626,52 +641,56 @@ nie kolor: sylwetka roweru vs ekranu, słupek kreskowany vs pełny.
   pokazywała punkty na KOLEJNYCH JAZDACH, bez osi czasu i bez odczytu —
   Fryderyk słusznie odrzucił to w całości.
 
-  **Dane: `przebiegi.js`, nowy rodzaj danych.** Strava oddaje strumienie
-  sekunda po sekundzie i przychodzą tym samym zapytaniem, które automat już
-  robił po waty i tętno — doszedł tylko `velocity_smooth` do listy kluczy.
-  Pełne 1 Hz dla stu jazd to 1,23 mln liczb i kilka megabajtów; próbkujemy
-  więc do najwyżej 700 punktów na jazdę, bo wykres ma 720 pikseli. Wyszło
-  **71 kB na 83 jazdy**.
+  **Dane: PEŁNE 1 Hz, plik na jazdę** (`przebiegi/<id>.js`, indeks
+  w `przebiegi.js`). Strava oddaje strumienie sekunda po sekundzie i tyle
+  zapisujemy — bez uśredniania. Wcześniej dane szły do kubełków po 5–10 s
+  i odczyt pod palcem podawał liczbę, której w tej sekundzie nie było;
+  Fryderyk poprosił o ciągłą sekundową i miał rację.
 
-  Wartość punktu to **średnia sekund**, które do niego wpadły, a nie co n-ta
-  sekunda: pojedyncza sekunda bywa artefaktem. Kubełek bez ani jednej sekundy
-  zostaje **pusty** — postój nie jest zerem watów, tak samo jak przy krzywej
-  mocy. Uwaga: zapisane zero to co innego niż brak pomiaru. Sekunda, w której
-  trenażer naprawdę pokazał 0 W, jest pomiarem i wchodzi do średniej.
+  **Dlaczego plik na jazdę, a nie jeden wielki.** Pełne 1 Hz to dziś ~670 kB
+  i rośnie z każdym treningiem. Strona nie ma po co ładować tego przy każdym
+  wejściu, na każdą zakładkę, skoro potrzebuje tego wyłącznie okno jednej
+  jazdy. Indeks (4 kB) mówi, co istnieje; dane doczytują się przy otwarciu.
 
-  **OBOK ŚREDNIEJ ZAPISUJEMY NAJWYŻSZĄ SEKUNDĘ W KUBEŁKU** (30.08.2026, po
-  uwadze Fryderyka). Sama średnia gubi zryw: rekord 1 s z 01.11.2025 to 804 W,
-  a na wykresie uśrednionym po 10 s widać było 496 W. Fryderyk podejrzewał błąd
-  przepisywania — błędu nie było, ale zarzut był trafny. Dowód, że potok liczy
-  dobrze: średnia z całego przebiegu wyszła 95 W, czyli **co do wata** tyle,
-  ile Strava podaje jako średnią jazdy, a szczyt 496 W jest **co do wata**
-  rekordem dziesięciosekundowym z tej samej jazdy. Policzone dobrze, pokazane
-  źle. Teraz szczyt idzie jako blada poświata nad linią średniej, a odczyt
-  podaje obie liczby — ale tylko wtedy, gdy naprawdę się różnią.
+  **Doczytywanie przez znacznik `<script>`, NIE przez `fetch`.** `fetch` na
+  `file://` blokuje CORS — ten sam powód, dla którego `dane.js` jest skryptem,
+  a nie `.json`. Znacznik działa i lokalnie, i na Pages.
 
-  Sprawdzone po zmianie: na **17 z 17** jazd z mocą najwyższa sekunda na
-  wykresie równa się rekordowi 1 s co do wata. Sto procent na osi to najwyższa
-  sekunda, nie najwyższa średnia — inaczej poświata wyjeżdżałaby poza wykres.
+  **BŁĄD, KTÓRY WYKASOWAŁ DANE 55 JAZD — nie powtórzyć.** `zapiszPrzebiegi()`
+  brało tablicę `przebiegi` za komplet pełnych danych, a `wczytajPrzebiegi()`
+  czyta INDEKS. Jazdy, których dany przebieg nie przeliczał, siedziały więc
+  w pamięci jako wydmuszki `{f, n, ma}` i zapis nadpisywał nimi pliki jazd.
+  Pierwszy przebieg działał, drugi zostawił 55 z 84 plików bez danych.
+  Złapane dopiero na wykresie: jazda trwająca 61 minut miała oś czasu do
+  6 minut, bo 369 kubełków zostało odczytane jako 369 sekund.
+  **Reguła: pliki zapisujemy WYŁĄCZNIE dla jazd policzonych w tym przebiegu**
+  (osobny rejestr), reszta zostaje nietknięta na dysku, a indeks składa się
+  z obu części. Do tego zapora: przebieg bez ani jednej serii nigdy nie
+  trafia do pliku. Test odtwarzający ten scenariusz siedzi w zestawie kontroli.
 
-  **Tętno poświaty NIE dostaje i to jest decyzja.** Serce nie skacze w dziesięć
-  sekund na tyle, żeby szczyt różnił się od średniej o coś więcej niż szum;
-  byłaby to druga linia bez treści.
+  **Strona sprawdza wersję formatu i odmawia rysowania starszej.** Migracja
+  idzie po kilkadziesiąt jazd na przebieg, więc przez chwilę część wpisów jest
+  w starym zapisie — wykres kłamiący o czasie trwania jest gorszy niż napis
+  „czeka na przeliczenie".
 
-  **Format przebiegu ma numer wersji** (`f`). Automat sam dobiera jazdy zapisane
-  w starym formacie, po kilkadziesiąt na przebieg, więc zmiana tego, CO liczymy,
-  rozchodzi się sama zamiast czekać na ręczne odpalenie z przełącznikiem.
+  Wartość to każda sekunda; postój zostaje **dziurą w osi czasu**, a nie
+  znika z niej. Zapisane zero to co innego niż brak pomiaru: sekunda, w której
+  trenażer naprawdę pokazał 0 W, jest pomiarem.
 
-  **Średnia z przebiegu bywa niższa niż `moc_sr` ze Stravy i to nie jest błąd.**
-  Strava liczy średnią po CZASIE RUCHU, a przebieg pokazuje pełną oś czasu
-  razem z postojem przy 0 W. Na wyścigu z 18.10.2025 (178 s postoju) wychodzi
-  129 W wobec 140 W Stravy; po odrzuceniu zer — 142 W. Nie „poprawiać" tego
-  przez wycinanie zer z przebiegu: postój jest częścią jazdy. W kodowaniu (zygzak + varint, jak trasy) wartość jest powiększona o 1,
-  bo **zero jest zarezerwowane na brak pomiaru**; bez tego postoju nie dałoby
-  się odróżnić od zera.
+  **Rysowanie: pasmo min–max plus linia średniej.** Wykres ma niecałe 700 px,
+  a jazda bywa dłuższa niż 4000 s, więc na piksel wypada kilka sekund. Nie
+  wybieramy z nich jednej: jasne pasmo pokazuje rozpiętość od najniższej do
+  najwyższej sekundy w kolumnie, mocna linia biegnie po średniej. Sprint
+  trwający sekundę widać przez to w pełnej wysokości, a odczyt podaje dokładną
+  sekundę. Sprawdzone: odczyt w sekundzie 1624 jazdy z 01.11.2025 daje **804 W**,
+  czyli rekord 1 s co do wata.
 
-  **BUDŻET ZAPYTAŃ — nie usuwać.** Uzupełnienie 83 jazd to 83 zapytania,
-  a Strava daje 100 na kwadrans. Skrypt dobiera najwyżej 55 jazd na przebieg
-  i pisze w logu, ile zostało. Backfill zajął trzy przebiegi.
+  **Uzupełnianie ma BUDŻET 55 jazd na przebieg** — Strava daje 100 zapytań na
+  kwadrans. Zmiana formatu rozchodzi się sama w dwóch–trzech przebiegach.
+
+  **Pięć jazd z sierpnia 2024 ma strumień DŁUŻSZY niż `elapsed_time`** (do
+  22%). Nic nie ginie — to rozjazd po stronie Stravy przy starych, przyciętych
+  aktywnościach. Nie „naprawiać" przez ucinanie do `elapsed_time`.
 
   **Jedna oś o jednym znaczeniu: procent szczytu z TEJ jazdy.** Trzy osobne
   skale pozwoliłyby dowieść dowolnej tezy samym przesunięciem zakresu. Dokładne
