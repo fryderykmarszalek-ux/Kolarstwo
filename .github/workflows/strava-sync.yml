@@ -96,14 +96,19 @@ jobs:
 
       - name: Commituj, jeśli są zmiany
         run: |
-          if git diff --quiet dane.js analiza.js && [ -z "$(git status --porcelain analiza.js)" ]; then
+          # Strażnik musi patrzeć na WSZYSTKO, co ten przebieg mógł wygenerować,
+          # a nie na wybrane dwa pliki. Wcześniej sprawdzał tylko dane.js
+          # i analiza.js — gdyby zmieniły się same przebiegi albo trasy, praca
+          # przepadłaby po cichu. Nowe pliki w katalogu też się liczą, więc
+          # najpierw git add, a dopiero potem pytanie „czy coś jest".
+          git config user.name "Automat Stravy"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A dane.js analiza.js trasy.js przebiegi.js przebiegi/
+
+          if git diff --cached --quiet; then
             echo "Bez zmian — nic do zrobienia."
             exit 0
           fi
-
-          git config user.name "Automat Stravy"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add dane.js analiza.js trasy.js przebiegi.js
           git commit -m "Dane ze Stravy — $(date -u +%Y-%m-%d)"
 
           # Zadanie potrafi stać w kolejce GitHuba kilka minut. Jeśli w tym
