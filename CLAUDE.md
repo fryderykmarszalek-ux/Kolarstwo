@@ -636,7 +636,36 @@ nie kolor: sylwetka roweru vs ekranu, słupek kreskowany vs pełny.
   Wartość punktu to **średnia sekund**, które do niego wpadły, a nie co n-ta
   sekunda: pojedyncza sekunda bywa artefaktem. Kubełek bez ani jednej sekundy
   zostaje **pusty** — postój nie jest zerem watów, tak samo jak przy krzywej
-  mocy. W kodowaniu (zygzak + varint, jak trasy) wartość jest powiększona o 1,
+  mocy. Uwaga: zapisane zero to co innego niż brak pomiaru. Sekunda, w której
+  trenażer naprawdę pokazał 0 W, jest pomiarem i wchodzi do średniej.
+
+  **OBOK ŚREDNIEJ ZAPISUJEMY NAJWYŻSZĄ SEKUNDĘ W KUBEŁKU** (30.08.2026, po
+  uwadze Fryderyka). Sama średnia gubi zryw: rekord 1 s z 01.11.2025 to 804 W,
+  a na wykresie uśrednionym po 10 s widać było 496 W. Fryderyk podejrzewał błąd
+  przepisywania — błędu nie było, ale zarzut był trafny. Dowód, że potok liczy
+  dobrze: średnia z całego przebiegu wyszła 95 W, czyli **co do wata** tyle,
+  ile Strava podaje jako średnią jazdy, a szczyt 496 W jest **co do wata**
+  rekordem dziesięciosekundowym z tej samej jazdy. Policzone dobrze, pokazane
+  źle. Teraz szczyt idzie jako blada poświata nad linią średniej, a odczyt
+  podaje obie liczby — ale tylko wtedy, gdy naprawdę się różnią.
+
+  Sprawdzone po zmianie: na **17 z 17** jazd z mocą najwyższa sekunda na
+  wykresie równa się rekordowi 1 s co do wata. Sto procent na osi to najwyższa
+  sekunda, nie najwyższa średnia — inaczej poświata wyjeżdżałaby poza wykres.
+
+  **Tętno poświaty NIE dostaje i to jest decyzja.** Serce nie skacze w dziesięć
+  sekund na tyle, żeby szczyt różnił się od średniej o coś więcej niż szum;
+  byłaby to druga linia bez treści.
+
+  **Format przebiegu ma numer wersji** (`f`). Automat sam dobiera jazdy zapisane
+  w starym formacie, po kilkadziesiąt na przebieg, więc zmiana tego, CO liczymy,
+  rozchodzi się sama zamiast czekać na ręczne odpalenie z przełącznikiem.
+
+  **Średnia z przebiegu bywa niższa niż `moc_sr` ze Stravy i to nie jest błąd.**
+  Strava liczy średnią po CZASIE RUCHU, a przebieg pokazuje pełną oś czasu
+  razem z postojem przy 0 W. Na wyścigu z 18.10.2025 (178 s postoju) wychodzi
+  129 W wobec 140 W Stravy; po odrzuceniu zer — 142 W. Nie „poprawiać" tego
+  przez wycinanie zer z przebiegu: postój jest częścią jazdy. W kodowaniu (zygzak + varint, jak trasy) wartość jest powiększona o 1,
   bo **zero jest zarezerwowane na brak pomiaru**; bez tego postoju nie dałoby
   się odróżnić od zera.
 
