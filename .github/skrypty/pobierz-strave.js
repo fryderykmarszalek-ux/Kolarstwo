@@ -347,7 +347,20 @@ function naNasz(a){
     nazwa: a.name,
     // Fakt ze Stravy, nie domysł: mówi, czy w ogóle warto pytać o strumień
     // tętna. Bez niego pytalibyśmy o każdą jazdę albo o żadną.
-    ...(a.has_heartrate === true ? { ma_tetno: 1 } : {})
+    ...(a.has_heartrate === true ? { ma_tetno: 1 } : {}),
+
+    // Średnie z jazdy — przychodzą w liście aktywności, więc nie kosztują ani
+    // jednego zapytania więcej. Tętno jest pomiarem zawsze: bez pasa Strava
+    // po prostu go nie przysyła.
+    ...(a.average_heartrate != null
+      ? { tetno_sr: Math.round(a.average_heartrate) } : {}),
+
+    // MOC WYŁĄCZNIE ZMIERZONA. average_watts przy braku miernika to estymata
+    // Stravy [S] — w tabeli wygląda dokładnie tak samo jak pomiar, a nie ma
+    // dziś czym jej sprawdzić. Ta sama zasada, co w kolumnie mocy przy
+    // segmentach; kolumna wypełni się sama w dniu kupna miernika.
+    ...(a.device_watts === true && a.average_watts != null
+      ? { moc_sr: Math.round(a.average_watts), z_miernika: 1 } : {})
   };
 }
 
