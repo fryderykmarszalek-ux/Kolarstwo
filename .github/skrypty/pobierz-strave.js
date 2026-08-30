@@ -84,8 +84,9 @@ const PELNE_PRZEBIEGI = process.env.PELNE_PRZEBIEGI === "true";
 /* WERSJA FORMATU PRZEBIEGU. Podniesiona, gdy zmienia się to, CO liczymy —
    wtedy automat sam dobiera stare jazdy po kilkadziesiąt na przebieg, zamiast
    czekać na ręczne odpalenie z przełącznikiem.
-   2 dołożyła szczyty w kubełkach, 3 wyrzuciła kubełki i zapisuje PEŁNE 1 Hz. */
-const FORMAT_PRZEBIEGU = 3;
+   2 dołożyła szczyty w kubełkach, 3 wyrzuciła kubełki i zapisuje PEŁNE 1 Hz,
+   4 naprawia zapis, który potrafił wyzerować pliki jazd (patrz zapiszPrzebiegi). */
+const FORMAT_PRZEBIEGU = 4;
 
 /* PLIK NA JAZDĘ, nie jeden wielki. Pełne 1 Hz dla wszystkich jazd to około
    pół megabajta i rośnie z każdym treningiem — a strona ładowałaby to przy
@@ -169,14 +170,23 @@ function wczytajPrzebiegi(){
 
 /* Indeks: co istnieje i jak długie. Strona ładuje go zawsze (jest malutki),
    a sam przebieg dopiero przy otwarciu konkretnej jazdy. */
-function zapiszPrzebiegi(przebiegi, pobrano){
+/* PISZEMY WYŁĄCZNIE TO, CO POLICZYLIŚMY W TYM PRZEBIEGU.
+
+   Pierwsza wersja tej funkcji brała `przebiegi` za komplet pełnych danych —
+   i przy drugim przebiegu automatu NADPISAŁA pliki 55 jazd samym wpisem
+   z indeksu, czyli {f, n, ma} bez ani jednej serii. Powód: wczytajPrzebiegi()
+   czyta INDEKS (bo tylko on jest w przebiegi.js), więc wpisy jazd, których ten
+   przebieg nie przeliczał, były w pamięci wydmuszkami. Zapis ich nie odróżniał.
+
+   Teraz pliki powstają tylko dla jazd świeżo policzonych; reszta zostaje
+   nietknięta na dysku, a indeks składa się z obu części. */
+function zapiszPrzebiegi(przebiegi, sweze, pobrano){
   fs.mkdirSync(KATALOG_PRZEBIEGOW, { recursive: true });
   const idy = Object.keys(przebiegi).sort();
 
-  // pliki jazd — piszemy tylko te, które faktycznie się zmieniły
   let zapisanych = 0;
-  for (const id of idy){
-    const p = przebiegi[id];
+  for (const [id, p] of sweze){
+    if (!p || (!p.v && !p.w && !p.h)) continue;    // zapora: nigdy pustego pliku
     const plik = path.join(KATALOG_PRZEBIEGOW, id + ".js");
     const tresc = "// Przebieg jazdy " + id + " — sekunda po sekundzie.\n"
       + "// PLIK GENEROWANY. Doczytywany przez stronę dopiero przy otwarciu tej jazdy.\n"
@@ -213,7 +223,11 @@ function zapiszPrzebiegi(przebiegi, pobrano){
   L.push(' "jazdy": {');
   L.push(idy.map(id => {
     const p = przebiegi[id];
-    const ma = [p.v ? "v" : "", p.w ? "w" : "", p.h ? "h" : ""].join("");
+    // Świeżo policzone mają serie; wpisy przeniesione z poprzedniego indeksu
+    // mają już gotowe pole ma i nie ma z czego go liczyć drugi raz.
+    const ma = (p.v || p.w || p.h)
+      ? [p.v ? "v" : "", p.w ? "w" : "", p.h ? "h" : ""].join("")
+      : (p.ma || "");
     return `  ${JSON.stringify(id)}: {"f":${p.f},"n":${p.n},"ma":${JSON.stringify(ma)}}`;
   }).join(",\n"));
   L.push(" }");
@@ -568,7 +582,7 @@ function zapisz(D){
    Ta sama sztuczka co w analiza.js — pozwala sprawdzić przycinanie strefą
    prywatności bez sieci i bez drugiej kopii logiki. */
 module.exports = { dekodujTrase, kodujTrase, metry, znajdzDom, utnijPrywatne,
-  przebiegJazdy, kodujSerie,
+  przebiegJazdy, kodujSerie, zapiszPrzebiegi,
   krzywaMocy, czasWStrefach, ktoraStrefa, tabelaNaDzien };
 if (require.main !== module) return;
 
@@ -612,6 +626,7 @@ if (require.main !== module) return;
   }
   const trasyStare = wczytajTrasy();
   const przebiegi = wczytajPrzebiegi();
+  const swezePrzebiegi = new Map();     // wyłącznie to, co policzone w TYM przebiegu
   for (const id of Object.keys(przebiegi))
     if (!zeStravy.some(a => String(a.id) === id)) delete przebiegi[id];
   // Backfill kosztuje po jednym zapytaniu na jazdę, więc rozkładamy go na
@@ -755,6 +770,7 @@ if (require.main !== module) return;
         const p = przebiegJazdy(str);
         if (p){
           przebiegi[a.id] = p;
+          swezePrzebiegi.set(a.id, p);
           nowychPrzebiegow++;
           console.log(`  przebieg: ${a.data.slice(0,10)} ${a.nazwa} — `
             + `${p.n} s`
@@ -832,7 +848,7 @@ if (require.main !== module) return;
   const skrotIndeksu = (o) => JSON.stringify(Object.keys(o).sort()
     .map(id => [id, o[id].f, o[id].n]));
   if (skrotIndeksu(przebiegi) !== skrotIndeksu(wczytajPrzebiegi()) || nowychPrzebiegow){
-    zapiszPrzebiegi(przebiegi, new Date().toISOString().slice(0,16));
+    zapiszPrzebiegi(przebiegi, swezePrzebiegi, new Date().toISOString().slice(0,16));
     console.log(`Przebiegi: ${Object.keys(przebiegi).length} jazd `
       + `(+${nowychPrzebiegow} w tym przebiegu).`);
   } else {

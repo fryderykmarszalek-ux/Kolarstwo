@@ -6314,7 +6314,7 @@ const PRZEBIEG_GOTOWY = new Map();
    więc narysowany jako 1 Hz pokazywałby godzinną jazdę jako sześciominutową.
    Zdarzyło się to naprawdę: automat przelicza po kilkadziesiąt jazd na
    przebieg, a strona brała po drodze stare wpisy za dobrą monetę. */
-const FORMAT_PRZEBIEGU = 3;
+const FORMAT_PRZEBIEGU = 4;
 
 function rozpakujPrzebieg(id, surowy){
   if (PRZEBIEG_GOTOWY.has(id)) return PRZEBIEG_GOTOWY.get(id);
