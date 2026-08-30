@@ -1093,69 +1093,19 @@ circle.punkt-proby{transition:r .12s ease}
 }
 .pusto .znak{font-size:26px;font-weight:600;color:var(--linia);display:block;margin-bottom:6px}
 
-/* ── TEREN → MAPA ───────────────────────────────────────────────────────────
-   Płótno zamiast SVG: przy przesuwaniu palcem przerysowuje się 37 tysięcy
-   punktów kilkadziesiąt razy na sekundę. touch-action:none jest konieczne,
-   bo bez niego Safari przewija stronę zamiast oddać gest mapie. */
-.mapa-obudowa{margin:14px 0 18px}
-.mapa-plotno-obudowa{position:relative;width:100%;
-  height:min(62vh,540px);min-height:300px;
-  border:1px solid var(--linia);border-radius:12px;overflow:hidden;
-  background:var(--tlo)}
-#mapa-plotno{display:block;touch-action:none;cursor:grab}
-#mapa-plotno:active{cursor:grabbing}
-
-.mapa-pinezki{position:absolute;inset:0;pointer-events:none;
-  transition:opacity .12s linear}
-.pinezka{position:absolute;transform:translate(-50%,-100%);
-  pointer-events:auto;background:none;border:0;padding:0;cursor:pointer;
-  /* cel dotykowy większy niż rysunek — palec nie trafia w 26 pikseli */
-  width:46px;height:52px;display:flex;align-items:flex-start;
-  justify-content:center}
-.pin-ciało{width:30px;height:30px;border-radius:50% 50% 50% 8px;
-  transform:rotate(-45deg);background:var(--akcent);
-  box-shadow:0 2px 7px rgba(0,0,0,.32);
-  display:flex;align-items:center;justify-content:center;
-  transition:transform .13s ease}
-.pin-ciało svg{width:17px;height:17px;transform:rotate(45deg);color:#fff}
-.pinezka:hover .pin-ciało,.pinezka:active .pin-ciało{transform:rotate(-45deg) scale(1.12)}
-.pin-licznik{position:absolute;top:-3px;right:1px;min-width:18px;height:18px;
-  padding:0 4px;border-radius:9px;background:var(--powierzchnia);
-  border:1.5px solid var(--akcent);color:var(--tekst);
-  font-size:11px;font-weight:700;line-height:15px;text-align:center}
-
-.mapa-skala{position:absolute;left:10px;bottom:9px;display:flex;
-  align-items:center;gap:6px;font-size:11px;color:var(--slaby);
-  background:color-mix(in srgb,var(--powierzchnia) 82%,transparent);
-  padding:3px 8px;border-radius:6px;pointer-events:none}
-.mapa-kreska{display:block;width:80px;height:6px;
-  border:1px solid var(--slaby);border-top:0}
-
-.mapa-sterowanie{position:absolute;right:10px;top:10px;display:flex;
-  flex-direction:column;gap:6px}
-.mapa-sterowanie button{width:38px;height:38px;border-radius:9px;
-  border:1px solid var(--linia);background:var(--powierzchnia);
-  color:var(--tekst);font-size:19px;line-height:1;cursor:pointer;
-  display:flex;align-items:center;justify-content:center}
-.mapa-sterowanie button svg{width:19px;height:19px}
-.mapa-sterowanie button:active{background:var(--plyta)}
-
-.rejony{display:flex;flex-direction:column;gap:7px;margin:10px 0 16px}
-.rejon{display:flex;align-items:center;gap:11px;width:100%;
-  padding:11px 13px;border:1px solid var(--linia);border-radius:10px;
-  background:var(--powierzchnia);color:var(--tekst);cursor:pointer;
-  text-align:left;font:inherit;min-height:52px}
-.rejon:active{background:var(--plyta)}
-.rejon-znak{flex:0 0 auto;width:26px;height:26px;color:var(--akcent)}
-.rejon-znak svg{width:26px;height:26px}
-.rejon-tresc{flex:1 1 auto;min-width:0}
-.rejon-nazwa{display:block;font-weight:600;font-size:14px}
-.rejon-opis{display:block;font-size:12px;color:var(--slaby);margin-top:2px}
-.rejon-udzial{flex:0 0 auto;font-size:13px;font-weight:600;color:var(--slaby)}
-
-@media (max-width:560px){
-  .mapa-plotno-obudowa{height:min(56vh,420px)}
-  .mapa-sterowanie button{width:42px;height:42px}
+/* ── AKTYWNOŚCI ────────────────────────────────────────────────────────────
+   Ta sama tabela co segmenty, ale sześć kolumn zamiast siedmiu, więc własne
+   szerokości. Dwie grupy filtrów obok siebie, bo warunki mają się łączyć. */
+table.aktywnosci th:first-child,table.aktywnosci td:first-child{width:34%}
+table.aktywnosci th:not(:first-child),table.aktywnosci td:not(:first-child){width:13.2%}
+.akt-nazwa{color:var(--tekst);font-weight:600}
+.przelaczniki-akt{flex-wrap:wrap;align-items:center;gap:8px 14px}
+.przelaczniki-akt .grupa-filtry{display:flex;align-items:center;gap:6px}
+.etykieta-filtru{font-size:11px;font-weight:700;letter-spacing:.04em;
+  text-transform:uppercase;color:var(--slaby);margin-right:2px}
+@media (max-width:620px){
+  .przelaczniki-akt{flex-direction:column;align-items:stretch}
+  .przelaczniki-akt .grupa-filtry{flex-wrap:wrap}
 }
 
 footer{color:var(--slaby);font-size:12px;padding:14px 20px 34px;max-width:1000px;
@@ -1194,8 +1144,6 @@ footer{color:var(--slaby);font-size:12px;padding:14px 20px 34px;max-width:1000px
 <footer id="stopka"></footer>
 
 <script src="dane.js"></script>
-<script src="swiat.js"></script>
-<script src="trasy.js"></script>
 <!-- Treści pisane przez Claude'a w czacie. Osobny plik, żeby nie ruszał
      272-kilobajtowego dane.js, którego automat i tak przepisuje co noc.
      Gdyby pliku nie było, strona działa dalej — patrz TRESCI niżej. -->
@@ -5825,743 +5773,341 @@ function analizaAI(){
    ========================================================================== */
 
 /* ==========================================================================
-   TEREN → MAPA
+   AKTYWNOŚCI — każda jazda w jednym wierszu
 
-   Mapa cieplna przejechanych dróg, rysowana od zera: zarys świata ze swiat.js
-   i ślady jazd z trasy.js. ŻADNYCH KAFELKÓW z cudzego serwera — byłaby to
-   dokładnie ta zależność zewnętrzna, której projekt unika od pierwszego dnia,
-   a mapa przestałaby działać wtedy, gdy ktoś ten serwer wyłączy albo zacznie
-   za niego liczyć pieniądze.
+   Ta sama tabela co przy segmentach, tylko jednostką jest CAŁA JAZDA, a nie
+   przejazd jednego odcinka. Wszystko poza tym zostaje: sortowanie po każdej
+   kolumnie, drugie dotknięcie odwraca, szukanie w nazwie, krzyżyk czyści.
 
-   DLACZEGO CANVAS, A NIE SVG. Reszta strony rysuje wykresy w SVG i tak ma
-   zostać. Tutaj jest 27 tysięcy punktów śladów plus 10 tysięcy punktów granic,
-   a przy przesuwaniu palcem trzeba je przerysować kilkadziesiąt razy na
-   sekundę. Trzydzieści siedem tysięcy elementów DOM przebudowywanych w takim
-   tempie zatrzymałoby iPada. Canvas rysuje to samo bez DOM-u — nadal od zera,
-   nadal bez ani jednej biblioteki.
+   PODZIAŁ IDZIE PO TYPIE ZE STRAVY, nie po nazwie jazdy. VirtualRide to
+   trenażer, czyli Zwift — i to jest INDOORS, bo dzieje się w pokoju. Ride to
+   szosa, czyli outdoors. Fryderyk w zleceniu napisał odwrotnie („outdoors to
+   ofc zwift"), ale chodziło mu o ten sam podział; nazwy stoją tam, gdzie
+   mówi rzeczywistość.
 
-   ZWIFT NIE STOI NA MAPIE. Jazdy z trenażera mają PRAWDZIWE współrzędne
-   i ZMYŚLONE miejsce: Watopia leży na Morzu Salomona, Ven-Top koło Nowej
-   Kaledonii. Postawienie ich na mapie byłoby tym samym błędem co moc [E]
-   udająca pomiar — obrazek twierdziłby, że Fryderyk tam był. Liczba jazd
-   pominiętych stoi pod mapą, żeby to nie wyglądało na zgubę.
+   MOC WYŁĄCZNIE ZMIERZONA — automat zapisuje `moc_sr` tylko przy
+   `device_watts`, więc szosa ma tu kreskę, dopóki nie będzie miernika.
+   Estymata Stravy wyglądałaby w tabeli identycznie jak pomiar; to ta sama
+   decyzja, przez którą z kolumny mocy przy segmentach wyleciała estymata
+   z modelu fizycznego.
 
-   CIEPŁO ZAMIAST DRUGIEJ BARWY. Droga przejechana dwadzieścia razy jest
-   ciemniejsza od przejechanej raz, bo dwadzieścia półprzezroczystych kresek
-   nakłada się na siebie. Nie dokładamy do palety ani jednego koloru: cała
-   mapa jest w barwie danych (--akcent), a częstość niesie nasycenie.
+   Wariant B: prędkość liczy się tutaj, z długości i czasu ruchu. Żadnego
+   nowego pola w danych.
    ========================================================================== */
 
-const SLADY = (typeof window !== "undefined" && window.TRASY) ? window.TRASY : null;
-const ZARYS = (typeof window !== "undefined" && window.SWIAT) ? window.SWIAT : null;
+const AKTYWNOSCI = D.aktywnosci
+  .filter(a => D.meta.typy_kolarskie.includes(a.typ))
+  .map(a => ({
+    id: a.id,
+    jazda: a,
+    nazwa: a.nazwa,
+    data: a.data,
+    wnetrze: a.typ === "VirtualRide",
+    dystans: a.dystans_m,
+    czas: a.czas_ruchu_s,
+    predkosc: a.czas_ruchu_s
+      ? (a.dystans_m / 1000) / (a.czas_ruchu_s / 3600) : null,
+    tetno: a.tetno_sr != null ? a.tetno_sr : null,
+    moc: a.moc_sr != null ? a.moc_sr : null,
+    przewyzszenie: a.przewyzszenie_m != null ? a.przewyzszenie_m : null
+  }));
 
-/* Ten sam dekoder na oba źródła — różni je wyłącznie mnożnik: ślady Stravy
-   mają 100000, zarys świata 100. Dwie kopie tego algorytmu rozjechałyby się
-   przy pierwszej poprawce. */
-function dekodujLinie(s, faktor){
-  const p = []; let i = 0, lat = 0, lng = 0;
-  while (i < s.length){
-    let b, sh = 0, r = 0;
-    do { b = s.charCodeAt(i++) - 63; r |= (b & 0x1f) << sh; sh += 5; } while (b >= 0x20);
-    lat += (r & 1) ? ~(r >> 1) : (r >> 1);
-    sh = 0; r = 0;
-    do { b = s.charCodeAt(i++) - 63; r |= (b & 0x1f) << sh; sh += 5; } while (b >= 0x20);
-    lng += (r & 1) ? ~(r >> 1) : (r >> 1);
-    p.push([lat / faktor, lng / faktor]);
-  }
-  return p;
+const IKONA_GORY = `<svg width="12" height="12" viewBox="0 0 16 16" fill="none"
+  stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"
+  aria-hidden="true"><path d="M1.5 13 6 5.2l2.6 4.3L10.2 7l4.3 6z"/></svg>`;
+const IKONA_SERCE_MALE = `<svg width="12" height="12" viewBox="0 0 20 20"
+  aria-hidden="true"><path d="M10 17S2.8 12.4 2.8 7.6A4 4 0 0 1 10 5.2a4 4 0
+  0 1 7.2 2.4C17.2 12.4 10 17 10 17Z" fill="currentColor"/></svg>`;
+
+/* Pierwsza kolumna sortuje po DACIE, nie po nazwie. Nazwy jazd to „Morning
+   Gassy ride" i „gravel brusy" — układanie ich alfabetycznie nie odpowiada
+   na żadne pytanie, a „co robiłem ostatnio" jest pierwszym pytaniem do listy
+   aktywności. Nazwy szuka się polem obok. */
+const KOLUMNY_AKT = [
+  { k:"data",          etykieta:"Aktywność",     ikona:IKONY_KOLUMN.czas,     malejaco:true, tekst:true,
+    opisSort:"data" },
+  { k:"dystans",       etykieta:"Długość",       ikona:IKONY_KOLUMN.dlugosc,  malejaco:true },
+  { k:"predkosc",      etykieta:"Prędkość",      ikona:IKONY_KOLUMN.predkosc, malejaco:true },
+  { k:"tetno",         etykieta:"Tętno",         ikona:IKONA_SERCE_MALE,      malejaco:true },
+  { k:"moc",           etykieta:"Moc",           ikona:IKONY_KOLUMN.moc,      malejaco:true },
+  { k:"przewyzszenie", etykieta:"Przewyższenie", ikona:IKONA_GORY,            malejaco:true }
+];
+
+/* DWIE NIEZALEŻNE GRUPY FILTRÓW, nie jedna lista jak przy segmentach.
+   Tam filtry wykluczały się wzajemnie, więc wystarczała jedna wartość. Tutaj
+   Fryderyk poprosił wprost o łączenie warunków — „bez mocy ale z tętnem" —
+   a tego nie da się zapisać jednym wyborem z listy. Dwie grupy po trzy stany
+   dają wszystkie dziewięć kombinacji i każda z nich jest wypowiadalna. */
+const FILTRY_MOC = [
+  { id:"wszystkie", etykieta:"Wszystkie",   pasuje: () => true },
+  { id:"z",         etykieta:"Z mocą",      pasuje: x => x.moc != null },
+  { id:"bez",       etykieta:"Bez mocy",    pasuje: x => x.moc == null }
+];
+const FILTRY_TETNO = [
+  { id:"wszystkie", etykieta:"Wszystkie",   pasuje: () => true },
+  { id:"z",         etykieta:"Z tętnem",    pasuje: x => x.tetno != null },
+  { id:"bez",       etykieta:"Bez tętna",   pasuje: x => x.tetno == null }
+];
+
+const DOMYSLNIE_AKT = { klucz:"data", malejaco:true,
+                        moc:"wszystkie", tetno:"wszystkie", szukaj:"" };
+let aktKlucz = DOMYSLNIE_AKT.klucz, aktMalejaco = DOMYSLNIE_AKT.malejaco,
+    aktMoc = DOMYSLNIE_AKT.moc, aktTetno = DOMYSLNIE_AKT.tetno,
+    aktSzukaj = DOMYSLNIE_AKT.szukaj, aktGrupa = "outdoors";
+
+const wGrupie = () => AKTYWNOSCI.filter(x =>
+  x.wnetrze === (aktGrupa === "indoors"));
+
+function przesianeAkt(pomijaj){
+  const fraza = bezOgonkow(aktSzukaj.trim());
+  const moc   = (FILTRY_MOC.find(f => f.id === aktMoc) || FILTRY_MOC[0]).pasuje;
+  const tetno = (FILTRY_TETNO.find(f => f.id === aktTetno) || FILTRY_TETNO[0]).pasuje;
+  return wGrupie().filter(x =>
+    (pomijaj === "moc"   || moc(x)) &&
+    (pomijaj === "tetno" || tetno(x)) &&
+    (!fraza || bezOgonkow(x.nazwa).includes(fraza)));
 }
 
-/* Odwzorowanie Merkatora, świat w kwadracie 1×1. To samo, którego używa każda
-   mapa, jaką Fryderyk widział w telefonie, więc kształty będą znajome.
-   Bieguny idą w nieskończoność, stąd ucięcie na 85,05 stopnia. */
-const MAPA_MAX_SZER = 85.0511287798066;
-function naSwiat(lat, lng){
-  const la = Math.max(-MAPA_MAX_SZER, Math.min(MAPA_MAX_SZER, lat));
-  const s = Math.sin(la * Math.PI / 180);
-  return { x: (lng + 180) / 360,
-           y: 0.5 - Math.log((1 + s) / (1 - s)) / (4 * Math.PI) };
+function posortowaneAkt(){
+  const kol = KOLUMNY_AKT.find(x => x.k === aktKlucz) || KOLUMNY_AKT[0];
+  return przesianeAkt().sort((a,b) => {
+    const x = a[aktKlucz], y = b[aktKlucz];
+    if (x == null && y == null) return 0;
+    if (x == null) return 1;                  // puste zawsze na końcu, w obie strony
+    if (y == null) return -1;
+    const r = kol.tekst ? String(x).localeCompare(String(y), "pl") : x - y;
+    return aktMalejaco ? -r : r;
+  });
 }
 
-function ramkaPunktow(pts){
-  let x1 = Infinity, y1 = Infinity, x2 = -Infinity, y2 = -Infinity;
-  for (const p of pts){
-    if (p.x < x1) x1 = p.x; if (p.x > x2) x2 = p.x;
-    if (p.y < y1) y1 = p.y; if (p.y > y2) y2 = p.y;
-  }
-  return { x1, y1, x2, y2 };
+function wierszeAktywnosci(){
+  const lista = posortowaneAkt();
+  if (!lista.length) return `
+    <tr><td colspan="6" class="pusty-wynik">Żadna jazda nie pasuje do
+      tych warunków.</td></tr>`;
+  return lista.map(x => `
+    <tr>
+      <td class="${aktKlucz==="data"?"akt":""}">
+        <span class="seg-nazwa akt-nazwa">${x.wnetrze
+          ? `<span class="seg-zwift" title="Zwift — trenażer, nie szosa">${
+              ikonaDyscypliny("VirtualRide",14)}</span>` : ""}${bezpieczny(x.nazwa)}${
+          znacznikErg(x.jazda, "Trening ze sterowaną mocą — liczba mówi, co kazał program")}</span>
+        <span class="seg-data">${pl(x.data.slice(0,10))} · ${czasNaTekst(x.czas)}${
+          x.jazda.rpe != null ? " · RPE " + x.jazda.rpe : ""}</span>
+      </td>
+      <td class="${aktKlucz==="dystans"?"akt":""}">${dlugoscNaTekst(x.dystans)}</td>
+      <td class="${aktKlucz==="predkosc"?"akt":""}">${
+        x.predkosc == null ? "—" : liczba(x.predkosc,1) + " km/h"}</td>
+      <td class="${aktKlucz==="tetno"?"akt":""}"${
+        x.tetno == null ? ' title="Brak zapisu tętna — nie zgadujemy"' : ""
+      }>${x.tetno == null ? "—" : x.tetno + " bpm"}</td>
+      <td class="${aktKlucz==="moc"?"akt":""}"${
+        x.moc == null ? ' title="Brak pomiaru mocy — nie zgadujemy"' : ""
+      }>${x.moc == null ? "—" : x.moc + " W"}</td>
+      <td class="${aktKlucz==="przewyzszenie"?"akt":""}">${
+        x.przewyzszenie == null ? "—" : Math.round(x.przewyzszenie) + " m"}</td>
+    </tr>`).join("");
 }
 
-let ZARYS_GOTOWY = null;
-function zarysNaMape(){
-  if (ZARYS_GOTOWY) return ZARYS_GOTOWY;
-  ZARYS_GOTOWY = [];
-  if (!ZARYS) return ZARYS_GOTOWY;
-  for (const k of ZARYS.kraje){
-    const obrysy = [];
-    for (const kod of k.o){
-      const pts = dekodujLinie(kod, ZARYS.faktor).map(([la, lo]) => naSwiat(la, lo));
-      if (pts.length >= 3) obrysy.push({ pts, r: ramkaPunktow(pts) });
-    }
-    if (!obrysy.length) continue;
-    const pole = (o) => (o.r.x2 - o.r.x1) * (o.r.y2 - o.r.y1);
-    obrysy.sort((a, b) => pole(b) - pole(a));
-    ZARYS_GOTOWY.push({ nazwa: k.n, obrysy, glowny: obrysy[0] });
-  }
-  return ZARYS_GOTOWY;
+function naglowkiAktywnosci(){
+  return KOLUMNY_AKT.map(kol => `
+    <th class="${aktKlucz===kol.k?"akt":""}">
+      <button type="button" data-ka="${kol.k}"
+        title="Sortuj po: ${kol.etykieta}">${kol.ikona}<span>${kol.etykieta}</span>${
+        aktKlucz===kol.k ? `<span class="strzalka-sort">${aktMalejaco?"▼":"▲"}</span>` : ""
+      }</button>
+    </th>`).join("");
 }
 
-/* Czy punkt leży w wielokącie — promień w prawo, liczymy przecięcia.
-   Służy wyłącznie do podpisania skupiska nazwą kraju. */
-function wWielokacie(p, pts){
-  let w = false;
-  for (let i = 0, j = pts.length - 1; i < pts.length; j = i++){
-    const a = pts[i], b = pts[j];
-    if ((a.y > p.y) !== (b.y > p.y)
-        && p.x < (b.x - a.x) * (p.y - a.y) / (b.y - a.y) + a.x) w = !w;
-  }
-  return w;
+/* Liczby przy filtrach są LICZONE Z DRUGIM FILTREM WŁĄCZONYM. Gdyby pokazywały
+   sumę bezwzględną, „Z tętnem (12)" przy włączonym „Z mocą" prowadziłoby do
+   pustej tabeli — liczba obiecywałaby dwanaście wierszy, których nie ma. */
+function grupaFiltrow(nazwa, lista, wybrany, pomijaj){
+  const ile = (f) => przesianeAkt(pomijaj).filter(f.pasuje).length;
+  return `<div class="grupa-filtry" data-grupa="${nazwa}">
+    <span class="etykieta-filtru">${nazwa === "moc" ? "Moc" : "Tętno"}</span>
+    ${lista.map(f => `<button type="button" data-fa="${nazwa}" data-v="${f.id}"
+      class="${wybrany === f.id ? "akt" : ""}">${f.etykieta} (${ile(f)})</button>`).join("")}
+  </div>`;
 }
 
-function krajPunktu(p){
-  for (const k of zarysNaMape())
-    for (const o of k.obrysy){
-      if (p.x < o.r.x1 || p.x > o.r.x2 || p.y < o.r.y1 || p.y > o.r.y2) continue;
-      if (wWielokacie(p, o.pts)) return k.nazwa;
-    }
-  return null;
+function podsumowanieAktywnosci(){
+  const widac = posortowaneAkt().length;
+  const wszystkich = wGrupie().length;
+  const czynne = aktSzukaj.trim() || aktMoc !== "wszystkie" || aktTetno !== "wszystkie";
+  const kol = KOLUMNY_AKT.find(k => k.k === aktKlucz) || KOLUMNY_AKT[0];
+  const czym = kol.opisSort || kol.etykieta.toLowerCase();
+  return czynne
+    ? `Widać <b>${widac}</b> z ${wszystkich} jazd.`
+      + (aktSzukaj.trim() ? ` Szukane: „${bezpieczny(aktSzukaj.trim())}".` : "")
+      + " Krzyżyk czyści szukanie, filtry i sortowanie."
+    : `Wszystkie ${wszystkich} ${wszystkich === 1 ? "jazda" : "jazd"}. Sortowanie: `
+      + `${czym}, ${aktKlucz === "data"
+          ? (aktMalejaco ? "najnowsze pierwsze" : "najstarsze pierwsze")
+          : (aktMalejaco ? "malejąco" : "rosnąco")}.`;
 }
 
-let TRASY_GOTOWE = null;
-function trasyNaMape(){
-  if (TRASY_GOTOWE) return TRASY_GOTOWE;
-  const lista = [];
-  let zwift = 0, bezSladu = 0;
-  const slady = (SLADY || {}).slady || {};
-  for (const a of D.aktywnosci){
-    if (!D.meta.typy_kolarskie.includes(a.typ)) continue;
-    if (a.typ === "VirtualRide"){ zwift++; continue; }
-    const kod = slady[a.id];
-    if (!kod){ bezSladu++; continue; }
-    const geo = dekodujLinie(kod, 1e5);
-    if (geo.length < 2){ bezSladu++; continue; }
-    const pts = geo.map(([la, lo]) => naSwiat(la, lo));
-    const r = ramkaPunktow(pts);
-    lista.push({ id: a.id, a, geo, pts, r,
-      srodek: { x: (r.x1 + r.x2) / 2, y: (r.y1 + r.y2) / 2 } });
-  }
-  TRASY_GOTOWE = { lista, zwift, bezSladu };
-  return TRASY_GOTOWE;
-}
-
-/* Odległość w kilometrach — wzór haversine. Na dystansie Warszawa–Kaszuby
-   przybliżenie płaskie myliłoby się już o kilometry. */
-function km(a, b){
-  const R = 6371, rad = Math.PI / 180;
-  const dLa = (b[0] - a[0]) * rad, dLo = (b[1] - a[1]) * rad;
-  const h = Math.sin(dLa/2)**2
-    + Math.cos(a[0]*rad) * Math.cos(b[0]*rad) * Math.sin(dLo/2)**2;
-  return 2 * R * Math.asin(Math.min(1, Math.sqrt(h)));
-}
-
-/* ── Rejony ────────────────────────────────────────────────────────────────
-   Skupiska liczone RAZ, niezależnie od tego, jak mapa jest akurat przybliżona:
-   jazdy, których środki dzieli mniej niż PROG_REJONU_KM, to jeden rejon.
-   Pinezki na mapie mają własne, zależne od przybliżenia skupianie — to dwie
-   różne rzeczy i mylenie ich dawałoby listę zmieniającą się przy każdym
-   przesunięciu palca. */
-const PROG_REJONU_KM = 35;
-
-/* Nazwa rejonu z nazw jazd. Nie bierzemy słowa najczęstszego, tylko takie,
-   które w TYM rejonie pada częściej niż w całej historii — inaczej każdy
-   rejon nazywałby się "ride" albo "gravel". To ta sama zasada, co przy
-   szukaniu słowa charakterystycznego dla dokumentu. */
-const SLOWA_PUSTE = new Set(["ride","rides","morning","lunch","evening","night",
-  "afternoon","late","early","jazda","jazde","na","do","w","z","ze","po","i",
-  "przez","the","a","of","and","km","and","rec","way","back","short","long",
-  "extended","return","zwift","wieczorna","poranna","popoludniowa","dzien"]);
-
-function slowaNazwy(n){
-  return String(n || "").toLowerCase()
-    .split(/[^a-z0-9ąćęłńóśźż]+/i)
-    .filter(w => w.length >= 3 && !SLOWA_PUSTE.has(w) && !/^\d+$/.test(w));
-}
-
-let REJONY_GOTOWE = null;
-function rejony(){
-  if (REJONY_GOTOWE) return REJONY_GOTOWE;
-  const { lista } = trasyNaMape();
-  const grupy = [];
-  for (const t of lista){
-    const start = t.geo[0];
-    let g = grupy.find(x => km(x.kotwica, start) < PROG_REJONU_KM);
-    if (!g){ g = { kotwica: start, trasy: [] }; grupy.push(g); }
-    g.trasy.push(t);
-  }
-  // częstość słów w całości — mianownik dla wyróżnienia
-  const wszedzie = new Map();
-  for (const t of lista)
-    for (const w of new Set(slowaNazwy(t.a.nazwa)))
-      wszedzie.set(w, (wszedzie.get(w) || 0) + 1);
-
-  for (const g of grupy){
-    const tu = new Map();
-    for (const t of g.trasy)
-      for (const w of new Set(slowaNazwy(t.a.nazwa)))
-        tu.set(w, (tu.get(w) || 0) + 1);
-    let naj = null, najWynik = 0;
-    for (const [w, ile] of tu){
-      if (ile < 2) continue;
-      const wynik = ile / wszedzie.get(w);            // udział tego rejonu w słowie
-      if (wynik > najWynik || (wynik === najWynik && naj && ile > tu.get(naj))){
-        najWynik = wynik; naj = w;
-      }
-    }
-    g.slowo = najWynik >= 0.6 ? naj : null;
-    g.kraj = krajPunktu(naSwiat(g.kotwica[0], g.kotwica[1]));
-    g.km = g.trasy.reduce((s, t) => s + t.a.dystans_m / 1000, 0);
-    g.od = g.trasy.reduce((s, t) => t.a.data < s ? t.a.data : s, "9999");
-    g.do_ = g.trasy.reduce((s, t) => t.a.data > s ? t.a.data : s, "0000");
-    const pts = g.trasy.flatMap(t => [{x:t.r.x1,y:t.r.y1},{x:t.r.x2,y:t.r.y2}]);
-    g.r = ramkaPunktow(pts);
-  }
-  grupy.sort((a, b) => b.trasy.length - a.trasy.length);
-  REJONY_GOTOWE = grupy;
-  return grupy;
-}
-
-function nazwaRejonu(g){
-  const s = g.slowo ? g.slowo.charAt(0).toUpperCase() + g.slowo.slice(1) : null;
-  if (s && g.kraj) return `${s} · ${g.kraj}`;
-  return s || g.kraj || "Rejon bez nazwy";
-}
-
-/* ── Stan mapy ─────────────────────────────────────────────────────────────
-   cx/cy to środek kadru we współrzędnych świata (0–1), skala to liczba
-   pikseli, jaką zajmuje cały świat. Wszystko inne liczy się z tych trzech
-   liczb, więc nie ma dwóch źródeł prawdy o tym, co widać. */
-const MAPA = { cx: 0.5, cy: 0.5, skala: 0, W: 0, H: 0, dpr: 1,
-               plotno: null, ctx: null, barwy: null, sygnatura: "",
-               wskazniki: new Map(), animacja: null, ruch: false };
-
-const naEkranX = (x) => (x - MAPA.cx) * MAPA.skala + MAPA.W / 2;
-const naEkranY = (y) => (y - MAPA.cy) * MAPA.skala + MAPA.H / 2;
-
-function barwyMapy(){
-  const sygn = (document.documentElement.getAttribute("data-motyw") || "auto")
-    + (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches ? "|c" : "|j");
-  if (MAPA.barwy && MAPA.sygnatura === sygn) return MAPA.barwy;
-  const s = getComputedStyle(document.documentElement);
-  const we = (n) => s.getPropertyValue(n).trim();
-  MAPA.sygnatura = sygn;
-  MAPA.barwy = {
-    woda: we("--mapa-woda"), lad: we("--mapa-lad"),
-    granica: we("--mapa-granica"), napis: we("--mapa-napis"),
-    akcent: we("--akcent"), tekst: we("--tekst"),
-    ciemny: sygn.endsWith("|c") || sygn.startsWith("ciemny")
-  };
-  return MAPA.barwy;
-}
-
-/* Świat ma wypełniać kadr szerokością. Przy min(W,H) na szerokim ekranie
-   zostawał pas pustki z obu stron i mapa wyglądała na zgubioną w oknie. */
-function skalaMinimalna(){ return MAPA.W; }
-
-function ograniczWidok(){
-  MAPA.skala = Math.max(skalaMinimalna(), Math.min(1 << 23, MAPA.skala));
-  // pion: nie pozwalamy wyjechać poza świat
-  const polH = MAPA.H / 2 / MAPA.skala;
-  MAPA.cy = polH >= 0.5 ? 0.5 : Math.max(polH, Math.min(1 - polH, MAPA.cy));
-  const polW = MAPA.W / 2 / MAPA.skala;
-  if (polW >= 0.5) MAPA.cx = 0.5;
-  else MAPA.cx = Math.max(polW, Math.min(1 - polW, MAPA.cx));
-}
-
-function ustawNaRamke(r, margines){
-  const m = margines == null ? 0.18 : margines;
-  const szer = Math.max(r.x2 - r.x1, 1e-6), wys = Math.max(r.y2 - r.y1, 1e-6);
-  MAPA.cx = (r.x1 + r.x2) / 2;
-  MAPA.cy = (r.y1 + r.y2) / 2;
-  MAPA.skala = Math.min(MAPA.W / (szer * (1 + m)), MAPA.H / (wys * (1 + m)));
-  ograniczWidok();
-}
-
-function lecDoRamki(r){
-  const doCx = MAPA.cx, doCy = MAPA.cy, doSk = MAPA.skala;
-  ustawNaRamke(r);
-  const cel = { cx: MAPA.cx, cy: MAPA.cy, skala: MAPA.skala };
-  MAPA.cx = doCx; MAPA.cy = doCy; MAPA.skala = doSk;
-  if (MAPA.animacja) cancelAnimationFrame(MAPA.animacja);
-  if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches){
-    MAPA.cx = cel.cx; MAPA.cy = cel.cy; MAPA.skala = cel.skala;
-    ograniczWidok(); rysujMape(); return;
-  }
-  const start = performance.now(), czas = 480;
-  // Skalę interpolujemy logarytmicznie: przybliżenie jest mnożeniem, nie
-  // dodawaniem, więc liniowa interpolacja skakałaby na końcu.
-  const logOd = Math.log(doSk), logDo = Math.log(cel.skala);
-  const krok = (t) => {
-    const u = Math.min(1, (t - start) / czas);
-    const e = u < 0.5 ? 4*u*u*u : 1 - Math.pow(-2*u + 2, 3) / 2;
-    MAPA.cx = doCx + (cel.cx - doCx) * e;
-    MAPA.cy = doCy + (cel.cy - doCy) * e;
-    MAPA.skala = Math.exp(logOd + (logDo - logOd) * e);
-    ograniczWidok(); rysujMape();
-    if (u < 1) MAPA.animacja = requestAnimationFrame(krok);
-    else MAPA.animacja = null;
-  };
-  MAPA.animacja = requestAnimationFrame(krok);
-}
-
-/* Skupianie pinezek zależy od PRZYBLIŻENIA, nie od geografii: siatka o boku
-   KRATKA_PX w pikselach ekranu. Gdy się oddalasz, ten sam bok obejmuje coraz
-   większy kawałek świata, więc sąsiednie skupiska same wpadają do jednej
-   kratki i pinezki się scalają. Tego właśnie chciał Fryderyk. */
-const KRATKA_PX = 96;
-const PIN_PONIZEJ_PX = 74;      // ślad mniejszy niż to jest nieczytelny
-
-function skupiskaWidoku(){
-  const { lista } = trasyNaMape();
-  const kratki = new Map();
-  for (const t of lista){
-    const ex = naEkranX(t.srodek.x), ey = naEkranY(t.srodek.y);
-    const k = Math.floor(ex / KRATKA_PX) + "|" + Math.floor(ey / KRATKA_PX);
-    if (!kratki.has(k)) kratki.set(k, []);
-    kratki.get(k).push(t);
-  }
-  let pinezki = [];
-  for (const grupa of kratki.values()){
-    const r = ramkaPunktow(grupa.flatMap(t =>
-      [{x:t.r.x1,y:t.r.y1},{x:t.r.x2,y:t.r.y2}]));
-    const w = (r.x2 - r.x1) * MAPA.skala, h = (r.y2 - r.y1) * MAPA.skala;
-    if (Math.max(w, h) < PIN_PONIZEJ_PX)
-      pinezki.push({ trasy: grupa, r,
-        x: naEkranX((r.x1 + r.x2) / 2), y: naEkranY((r.y1 + r.y2) / 2) });
-  }
-
-  /* Drugi przebieg: scalanie. Kratka potrafi przeciąć jedno skupisko na pół,
-     gdy wypadnie akurat na jego środku — i wtedy nad jednym miastem stoją dwie
-     pinezki obok siebie. Samym rozmiarem kratki tego nie da się naprawić, bo
-     granica zawsze gdzieś przebiega. Więc: pinezki bliższe niż SCAL_PX łączą
-     się w jedną, aż nie zostanie nic do połączenia. */
-  const SCAL_PX = 58;
-  let scalano = true;
-  while (scalano && pinezki.length > 1){
-    scalano = false;
-    szukaj:
-    for (let i = 0; i < pinezki.length; i++)
-      for (let j = i + 1; j < pinezki.length; j++){
-        if (Math.hypot(pinezki[i].x - pinezki[j].x,
-                       pinezki[i].y - pinezki[j].y) >= SCAL_PX) continue;
-        const trasy = pinezki[i].trasy.concat(pinezki[j].trasy);
-        const r = ramkaPunktow(trasy.flatMap(t =>
-          [{x:t.r.x1,y:t.r.y1},{x:t.r.x2,y:t.r.y2}]));
-        pinezki.splice(j, 1);
-        pinezki[i] = { trasy, r,
-          x: naEkranX((r.x1 + r.x2) / 2), y: naEkranY((r.y1 + r.y2) / 2) };
-        scalano = true;
-        break szukaj;
-      }
-  }
-  return { pinezki };
-}
-
-function rysujMape(){
-  const p = MAPA.plotno, ctx = MAPA.ctx;
-  if (!p || !ctx) return;
-  const B = barwyMapy();
-  ctx.save();
-  ctx.setTransform(MAPA.dpr, 0, 0, MAPA.dpr, 0, 0);
-  ctx.fillStyle = B.woda;
-  ctx.fillRect(0, 0, MAPA.W, MAPA.H);
-
-  // ── lądy
-  ctx.fillStyle = B.lad;
-  ctx.strokeStyle = B.granica;
-  ctx.lineWidth = 1;
-  ctx.lineJoin = "round";
-  for (const kraj of zarysNaMape()){
-    for (const o of kraj.obrysy){
-      const x1 = naEkranX(o.r.x1), x2 = naEkranX(o.r.x2);
-      const y1 = naEkranY(o.r.y1), y2 = naEkranY(o.r.y2);
-      if (x2 < -20 || x1 > MAPA.W + 20 || y2 < -20 || y1 > MAPA.H + 20) continue;
-      if (x2 - x1 < 1.2 && y2 - y1 < 1.2) continue;      // wysepka poniżej piksela
-      ctx.beginPath();
-      const pts = o.pts;
-      ctx.moveTo(naEkranX(pts[0].x), naEkranY(pts[0].y));
-      for (let i = 1; i < pts.length; i++)
-        ctx.lineTo(naEkranX(pts[i].x), naEkranY(pts[i].y));
-      ctx.closePath();
-      ctx.fill();
-      ctx.stroke();
-    }
-  }
-
-  // Ślady rysujemy ZAWSZE, także pod pinezką. Wcześniej skupisko zamienione
-  // w pinezkę znikało z podkładu i mapa przy średnim oddaleniu wyglądała pusto.
-  const { pinezki } = skupiskaWidoku();
-  const rysowane = trasyNaMape().lista;
-
-  // ── ślady: poświata pod spodem, rdzeń na wierzchu.
-  // Nakładanie się kresek JEST mapą cieplną — droga przejechana dwadzieścia
-  // razy dostaje dwadzieścia warstw i wychodzi z tła sama.
-  ctx.lineCap = "round"; ctx.lineJoin = "round";
-  ctx.strokeStyle = B.akcent;
-
-  /* KAŻDY ŚLAD OSOBNYM stroke() — i to jest tu cała sztuczka. Wrzucenie
-     wszystkich sześćdziesięciu sześciu tras do jednej ścieżki i jednego
-     stroke() rysuje szybciej, ale canvas składa taką ścieżkę Z TŁEM RAZ:
-     miejsce przejechane dwadzieścia razy wychodzi dokładnie tak samo blade
-     jak przejechane raz. Mapa cieplna przestaje wtedy istnieć, choć wygląda
-     na narysowaną. Osobne stroke'y nakładają przezroczystość na siebie —
-     jedna jazda daje 0,32 krycia, trzy 0,69, dziesięć praktycznie pełne. */
-  const widoczna = (t) => naEkranX(t.r.x2) > -40 && naEkranX(t.r.x1) < MAPA.W + 40
-                       && naEkranY(t.r.y2) > -40 && naEkranY(t.r.y1) < MAPA.H + 40;
-  for (const przebieg of [{ w: 8, a: 0.05 }, { w: 1.7, a: 0.32 }]){
-    ctx.lineWidth = przebieg.w;
-    ctx.globalAlpha = przebieg.a;
-    for (const t of rysowane){
-      if (!widoczna(t)) continue;
-      const pts = t.pts;
-      ctx.beginPath();
-      ctx.moveTo(naEkranX(pts[0].x), naEkranY(pts[0].y));
-      for (let i = 1; i < pts.length; i++)
-        ctx.lineTo(naEkranX(pts[i].x), naEkranY(pts[i].y));
-      ctx.stroke();
-    }
-  }
-  ctx.globalAlpha = 1;
-
-  // ── nazwy krajów: tylko tam, gdzie kraj jest na tyle duży, że podpis
-  // czegoś nie zasłoni. Bez tego pinezka wisi w próżni i nic nie mówi.
-  ctx.font = "600 11px ui-sans-serif, system-ui, sans-serif";
-  ctx.textAlign = "center"; ctx.textBaseline = "middle";
-  ctx.fillStyle = B.napis;
-  let podpisow = 0;
-  for (const kraj of zarysNaMape()){
-    if (podpisow >= 14) break;
-    const o = kraj.glowny;
-    const x1 = naEkranX(o.r.x1), x2 = naEkranX(o.r.x2);
-    const y1 = naEkranY(o.r.y1), y2 = naEkranY(o.r.y2);
-    if (x2 - x1 < 96 || y2 - y1 < 34) continue;
-    const cx = (x1 + x2) / 2, cy = (y1 + y2) / 2;
-    if (cx < 30 || cx > MAPA.W - 30 || cy < 16 || cy > MAPA.H - 16) continue;
-    ctx.globalAlpha = 0.75;
-    ctx.fillText(kraj.nazwa.toUpperCase(), cx, cy);
-    ctx.globalAlpha = 1;
-    podpisow++;
-  }
-  ctx.restore();
-
-  ustawPinezki(pinezki);
-  const info = document.getElementById("mapa-przyblizenie");
-  if (info) info.textContent = opisSkali();
-}
-
-/* Skala w kilometrach: ile kilometrów w terenie mieści się w 80 pikselach.
-   Bez tego liczba pikseli na świat nic Fryderykowi nie mówi. */
-function opisSkali(){
-  const szerSwiataKm = 40075 * Math.cos(
-    (Math.atan(Math.sinh(Math.PI * (1 - 2 * MAPA.cy)))) );
-  const kmNaPiksel = szerSwiataKm / MAPA.skala;
-  const d = kmNaPiksel * 80;
-  if (d >= 1000) return Math.round(d / 100) * 100 + " km";
-  if (d >= 10) return Math.round(d / 10) * 10 + " km";
-  if (d >= 1) return liczba(d, 1) + " km";
-  return Math.round(d * 1000) + " m";
-}
-
-function ikonaRoweru(){
-  return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
-    stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"
-    aria-hidden="true"><circle cx="5.5" cy="15.5" r="3.6"/>
-    <circle cx="18.5" cy="15.5" r="3.6"/>
-    <path d="M5.5 15.5 9.6 8.2h5.1M12 15.5 9.6 8.2M12 15.5h6.5l-2.6-5.1
-      M14 6.6h2.4"/></svg>`;
-}
-
-function ustawPinezki(pinezki){
-  const warstwa = document.getElementById("mapa-pinezki");
-  if (!warstwa) return;
-  MAPA.wskazniki.clear();
-  if (MAPA.ruch){ warstwa.style.opacity = "0.35"; } else { warstwa.style.opacity = "1"; }
-  warstwa.innerHTML = pinezki
-    .filter(p => p.x > -60 && p.x < MAPA.W + 60 && p.y > -60 && p.y < MAPA.H + 60)
-    .map((p, i) => {
-      MAPA.wskazniki.set(String(i), p);
-      const ile = p.trasy.length;
-      return `<button class="pinezka" data-pin="${i}" style="left:${p.x}px;top:${p.y}px"
-        title="${bezpieczny(ile + (ile === 1 ? " jazda" : " jazd"))}">
-        <span class="pin-ciało">${ikonaRoweru()}</span>
-        ${ile > 1 ? `<span class="pin-licznik">${ile}</span>` : ""}
-      </button>`;
-    }).join("");
-}
-
-function dopasujPlotno(){
-  const p = MAPA.plotno;
-  if (!p) return;
-  const r = p.parentElement.getBoundingClientRect();
-  MAPA.dpr = Math.min(2, window.devicePixelRatio || 1);
-  MAPA.W = Math.round(r.width);
-  MAPA.H = Math.round(r.height);
-  p.width = Math.round(MAPA.W * MAPA.dpr);
-  p.height = Math.round(MAPA.H * MAPA.dpr);
-  p.style.width = MAPA.W + "px";
-  p.style.height = MAPA.H + "px";
-}
-
-function terenMapa(){
-  const { lista, zwift, bezSladu } = trasyNaMape();
-  if (!SLADY || !lista.length) return `
+function aktywnosci(grupa){
+  aktGrupa = grupa;
+  const lista = wGrupie();
+  if (!lista.length) return `
     <section>
-      <div class="proba-tytul"><h2>Mapa</h2></div>
-      <div class="pusto">
-        <span class="znak">Mapa</span>
-        ${!SLADY
-          ? "Pliku <code>trasy.js</code> nie ma jeszcze w repozytorium. Powstanie przy najbliższym nocnym pobraniu ze Stravy."
-          : "W danych nie ma ani jednego śladu jazdy po prawdziwej drodze."}
-      </div>
+      <h2>${grupa === "indoors" ? "Indoors" : "Outdoors"}</h2>
+      <div class="pusto"><span class="znak">Brak jazd</span>
+        ${grupa === "indoors"
+          ? "W danych nie ma ani jednej jazdy z trenażera."
+          : "W danych nie ma ani jednej jazdy po drodze."}</div>
     </section>`;
 
-  const rej = rejony();
-  const kraje = [...new Set(rej.map(g => g.kraj).filter(Boolean))];
-  // najdalszy punkt od bazy — baza to środek najliczniejszego rejonu
-  const baza = rej[0].kotwica;
-  let najdalej = 0, najdalszaTrasa = null;
-  for (const t of lista)
-    for (const g of t.geo){
-      const d = km(baza, g);
-      if (d > najdalej){ najdalej = d; najdalszaTrasa = t; }
-    }
-
-  const kmRazem = lista.reduce((s, t) => s + t.a.dystans_m / 1000, 0);
+  const zMoca  = lista.filter(x => x.moc != null).length;
+  const zTetnem = lista.filter(x => x.tetno != null).length;
+  const kmRazem = lista.reduce((s,x) => s + x.dystans/1000, 0);
+  const hRazem  = lista.reduce((s,x) => s + x.czas/3600, 0);
+  const mRazem  = lista.reduce((s,x) => s + (x.przewyzszenie || 0), 0);
+  const najdluzsza = lista.reduce((a,b) => b.dystans > a.dystans ? b : a);
 
   return `
   <section>
-    <div class="proba-tytul"><h2>Mapa</h2>
-      <span class="analiza-stempel">${lista.length} ${lista.length === 1 ? "ślad" : "śladów"}</span>
-    </div>
+    <h2>${grupa === "indoors" ? "Indoors" : "Outdoors"}</h2>
     <p class="opis">
-      Każda droga, którą przejechałeś. Im częściej tędy jeździsz, tym mocniejsza
-      kreska — dwadzieścia przejazdów tą samą szosą to dwadzieścia nałożonych
-      warstw. Przesuwaj palcem, szczypnij dwoma, żeby przybliżyć. Z daleka
-      skupiska zamieniają się w pinezki; dotknięcie pinezki przenosi na miejsce.
+      ${grupa === "indoors"
+        ? `Wszystkie jazdy z trenażera — ${lista.length} sesji na Zwifcie.
+           Podział idzie po typie ze Stravy (<code>VirtualRide</code>), a nie
+           po nazwie jazdy.`
+        : `Wszystkie jazdy po prawdziwej drodze — ${lista.length} sztuk.
+           Podział idzie po typie ze Stravy (<code>Ride</code>), a nie po
+           nazwie jazdy.`}
+      Dotknij nagłówka, żeby posortować; dotknij drugi raz, żeby odwrócić
+      kolejność. Prędkość liczy się z długości i czasu ruchu, przy
+      wyświetlaniu — nie ma jej w danych.
+    </p>
+    <p class="opis">
+      <b>Moc pokazujemy tylko tam, gdzie została zmierzona.</b>
+      ${zMoca
+        ? `Tutaj ma ją ${zMoca} z ${lista.length} jazd — trenażer zapisuje waty
+           do pliku.`
+        : `Na szosie nie ma jej ani razu: rower nie ma miernika, a
+           liczba, którą Strava w tym miejscu podaje, to jej własny szacunek
+           z prędkości i profilu. W tabeli wyglądałby dokładnie tak samo jak
+           pomiar, więc stoi tam kreska. Kolumna wypełni się sama w dniu, w
+           którym pojawi się miernik.`}
+      <br><b>Tętno</b> ${zTetnem
+        ? `ma ${zTetnem} z ${lista.length} jazd.`
+        : `stoi puste przy każdej jeździe i <b>to nie jest błąd</b> — pas
+           piersiowy wchodzi do jazd od 1.09.2026. Od pierwszej jazdy z pasem
+           kolumna zacznie się wypełniać sama, bez żadnej zmiany w kodzie.`}
     </p>
 
-    <div class="mapa-obudowa">
-      <div class="mapa-plotno-obudowa">
-        <canvas id="mapa-plotno"></canvas>
-        <div id="mapa-pinezki" class="mapa-pinezki"></div>
-        <div class="mapa-skala"><span class="mapa-kreska"></span>
-          <span id="mapa-przyblizenie">—</span></div>
-        <div class="mapa-sterowanie">
-          <button data-mapa="plus"  aria-label="Przybliż">+</button>
-          <button data-mapa="minus" aria-label="Oddal">−</button>
-          <button data-mapa="dom"   aria-label="Wszystkie jazdy">${ikonaRoweru()}</button>
-          <button data-mapa="swiat" aria-label="Cały świat">🌍</button>
-        </div>
+    <div class="przelaczniki przelaczniki-akt">
+      ${grupaFiltrow("moc", FILTRY_MOC, aktMoc, "moc")}
+      ${grupaFiltrow("tetno", FILTRY_TETNO, aktTetno, "tetno")}
+      <div class="grupa-szukaj">
+        <label class="szukajka">
+          <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor"
+            stroke-width="1.6" stroke-linecap="round" aria-hidden="true">
+            <circle cx="7" cy="7" r="4.6"/><path d="M10.4 10.4 14 14"/></svg>
+          <input id="szukaj-aktywnosci" type="search" enterkeyhint="search"
+            autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
+            placeholder="Szukaj w nazwie" aria-label="Szukaj w nazwie jazdy"
+            value="${bezpieczny(aktSzukaj)}">
+        </label>
+        <button type="button" id="reset-aktywnosci"
+          title="Wyczyść szukanie, filtry i sortowanie"
+          aria-label="Wyczyść szukanie, filtry i sortowanie">&times;</button>
       </div>
     </div>
 
+    <div class="tabelka">
+      <table class="segmenty aktywnosci">
+        <thead><tr id="naglowki-aktywnosci">${naglowkiAktywnosci()}</tr></thead>
+        <tbody id="wiersze-aktywnosci">${wierszeAktywnosci()}</tbody>
+      </table>
+    </div>
+    <div class="info" id="info-aktywnosci">${podsumowanieAktywnosci()}</div>
+  </section>
+
+  <section>
     <div class="kafelki">
-      <div class="kafel"><div class="etykieta">Tras na mapie</div>
+      <div class="kafel"><div class="etykieta">Jazd</div>
         <div class="liczba">${lista.length}</div>
-        <div class="stopka">${liczba(kmRazem, 0)} km razem</div></div>
-      <div class="kafel"><div class="etykieta">Rejonów</div>
-        <div class="liczba">${rej.length}</div>
-        <div class="stopka">osobne miejsca, nie jazdy</div></div>
-      <div class="kafel"><div class="etykieta">Krajów</div>
-        <div class="liczba">${kraje.length || "—"}</div>
-        <div class="stopka">${bezpieczny(kraje.join(", ") || "nie rozpoznano")}</div></div>
-      <div class="kafel"><div class="etykieta">Najdalej od bazy</div>
-        <div class="liczba">${liczba(najdalej, 0)} km</div>
-        <div class="stopka">${najdalszaTrasa
-          ? bezpieczny(pl(najdalszaTrasa.a.data.slice(0,10))) : "—"}</div></div>
-    </div>
-
-    <h3 class="analiza-naglowek">Rejony</h3>
-    <p class="opis">
-      Jazdy, których początki dzieli mniej niż ${PROG_REJONU_KM} km, liczą się
-      jako jeden rejon. Nazwa bierze się ze słowa, które w tym rejonie pada
-      częściej niż w reszcie historii — dlatego nie każdy rejon nazywa się
-      „ride”. Dotknięcie wiersza przenosi mapę na miejsce.
-    </p>
-    <div class="rejony">
-      ${rej.map((g, i) => `
-        <button class="rejon" data-rejon="${i}">
-          <span class="rejon-znak">${ikonaRoweru()}</span>
-          <span class="rejon-tresc">
-            <span class="rejon-nazwa">${bezpieczny(nazwaRejonu(g))}</span>
-            <span class="rejon-opis">${g.trasy.length}
-              ${g.trasy.length === 1 ? "jazda" : "jazd"} ·
-              ${liczba(g.km, 0)} km ·
-              ${bezpieczny(pl(g.od.slice(0,10)))} – ${bezpieczny(pl(g.do_.slice(0,10)))}</span>
-          </span>
-          <span class="rejon-udzial">${Math.round(g.trasy.length / lista.length * 100)}%</span>
-        </button>`).join("")}
-    </div>
-
-    <div class="info">
-      <b>Czego na tej mapie NIE ma i dlaczego.</b>
-      ${zwift ? `Jazd ze Zwiftu: <b>${zwift}</b>. Mają prawdziwe współrzędne
-        i zmyślone miejsce — Watopia leży na Morzu Salomona, a Ven-Top koło
-        Nowej Kaledonii. Postawienie ich tutaj twierdziłoby, że tam byłeś.` : ""}
-      ${bezSladu ? ` Jazd bez zapisanego śladu: <b>${bezSladu}</b>.` : ""}
-      <br>Każdy ślad jest <b>przycięty w promieniu
-      ${(SLADY.przycinanie_m || 500)} m od domu</b>, z początku i z końca.
-      To repozytorium jest publiczne, a niecięty ślad prowadziłby pod twoje
-      drzwi. Sam punkt domowy nie jest zapisany nigdzie w repozytorium —
-      automat wylicza go przy każdym przebiegu i od razu zapomina.
-      <br>Mapa pokazuje <b>całą historię</b>, a nie okres liczony na wykresach —
-      jazda z 2024 roku odbyła się naprawdę, tak samo jak przy koszulkach
-      w Gablocie. Dlatego liczba śladów bywa większa niż liczba jazd w nagłówku.
-      <br>Podkład to zarys granic z Natural Earth (domena publiczna), leżący
-      w repozytorium. Mapa nie pobiera niczego z sieci, więc będzie działać
-      także wtedy, gdy nie będzie zasięgu.
+        <div class="stopka">${liczba(hRazem,1)} h w ruchu</div></div>
+      <div class="kafel"><div class="etykieta">Kilometrów</div>
+        <div class="liczba">${liczba(kmRazem,0)}</div>
+        <div class="stopka">średnio ${liczba(kmRazem/lista.length,1)} km na jazdę</div></div>
+      <div class="kafel"><div class="etykieta">Przewyższenie</div>
+        <div class="liczba">${Math.round(mRazem)}</div>
+        <div class="stopka">metrów razem</div></div>
+      <div class="kafel"><div class="etykieta">Najdłuższa</div>
+        <div class="liczba">${liczba(najdluzsza.dystans/1000,1)}</div>
+        <div class="stopka">km · ${pl(najdluzsza.data.slice(0,10))}</div></div>
     </div>
   </section>`;
 }
 
-function podepnijMape(){
-  const tresc = document.getElementById("tresc");
-  if (!tresc) return;
-  const plotno = document.getElementById("mapa-plotno");
-  if (!plotno) return;
+/* Uchwyty wieszamy na elementach, które powstają przy KAŻDYM przerysowaniu
+   zakładki — tak samo jak przy tabeli segmentów. Dzięki temu nie trzeba
+   wartownika i nie ma jak podpiąć niczego dwa razy. */
+function podepnijAktywnosci(){
+  const naglowki = document.getElementById("naglowki-aktywnosci");
+  if (!naglowki) return;
 
-  MAPA.plotno = plotno;
-  MAPA.ctx = plotno.getContext("2d");
-  MAPA.wskazniki = new Map();
-  dopasujPlotno();
-
-  // Start: wszystkie jazdy w kadrze. Świat na dzień dobry byłby pustym
-  // oceanem z jedną kropką — nauka niczego.
-  const { lista } = trasyNaMape();
-  if (lista.length){
-    const r = ramkaPunktow(lista.flatMap(t =>
-      [{x:t.r.x1,y:t.r.y1},{x:t.r.x2,y:t.r.y2}]));
-    ustawNaRamke(r);
-  } else { MAPA.skala = skalaMinimalna(); }
-  rysujMape();
-
-  const wskazniki = new Map();
-  let ostatniSrodek = null, ostatniRozstaw = 0;
-
-  const punktZdarzenia = (e) => {
-    const r = MAPA.plotno.getBoundingClientRect();
-    return { x: e.clientX - r.left, y: e.clientY - r.top };
+  // Przerysowujemy wyłącznie nagłówki, wiersze, liczniki filtrów i
+  // podsumowanie. Odświeżanie całego bloku budowałoby pole szukania od nowa
+  // przy każdej literze i gubiło kursor razem z klawiaturą iPada.
+  const odswiez = () => {
+    naglowki.innerHTML = naglowkiAktywnosci();
+    document.getElementById("wiersze-aktywnosci").innerHTML = wierszeAktywnosci();
+    const info = document.getElementById("info-aktywnosci");
+    if (info) info.innerHTML = podsumowanieAktywnosci();
+    for (const [nazwa, lista, wybrany, pomijaj] of [
+      ["moc", FILTRY_MOC, aktMoc, "moc"],
+      ["tetno", FILTRY_TETNO, aktTetno, "tetno"]]){
+      const g = document.querySelector(`.grupa-filtry[data-grupa="${nazwa}"]`);
+      if (g) g.outerHTML = grupaFiltrow(nazwa, lista, wybrany, pomijaj);
+    }
   };
 
-  const przyblizWokol = (mnoznik, px, py) => {
-    // Punkt pod palcem ma zostać pod palcem — inaczej przybliżanie ucieka.
-    const przedX = MAPA.cx + (px - MAPA.W/2) / MAPA.skala;
-    const przedY = MAPA.cy + (py - MAPA.H/2) / MAPA.skala;
-    MAPA.skala *= mnoznik;
-    ograniczWidok();
-    MAPA.cx = przedX - (px - MAPA.W/2) / MAPA.skala;
-    MAPA.cy = przedY - (py - MAPA.H/2) / MAPA.skala;
-    ograniczWidok();
-    rysujMape();
-  };
-
-  plotno.addEventListener("pointerdown", e => {
-    plotno.setPointerCapture(e.pointerId);
-    wskazniki.set(e.pointerId, punktZdarzenia(e));
-    if (wskazniki.size === 2){
-      const [a, b] = [...wskazniki.values()];
-      ostatniRozstaw = Math.hypot(a.x - b.x, a.y - b.y);
-      ostatniSrodek = { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 };
-    }
-    MAPA.ruch = true;
-    if (MAPA.animacja){ cancelAnimationFrame(MAPA.animacja); MAPA.animacja = null; }
-  });
-
-  plotno.addEventListener("pointermove", e => {
-    if (!wskazniki.has(e.pointerId)) return;
-    const teraz = punktZdarzenia(e);
-    const przed = wskazniki.get(e.pointerId);
-    wskazniki.set(e.pointerId, teraz);
-
-    if (wskazniki.size === 1){
-      MAPA.cx -= (teraz.x - przed.x) / MAPA.skala;
-      MAPA.cy -= (teraz.y - przed.y) / MAPA.skala;
-      ograniczWidok();
-      rysujMape();
-    } else if (wskazniki.size === 2){
-      const [a, b] = [...wskazniki.values()];
-      const rozstaw = Math.hypot(a.x - b.x, a.y - b.y);
-      const srodek = { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 };
-      if (ostatniRozstaw > 0){
-        // szczypanie: skala rośnie tak, jak rośnie odległość palców,
-        // a jednocześnie kadr jedzie za środkiem między nimi
-        MAPA.cx -= (srodek.x - ostatniSrodek.x) / MAPA.skala;
-        MAPA.cy -= (srodek.y - ostatniSrodek.y) / MAPA.skala;
-        przyblizWokol(rozstaw / ostatniRozstaw, srodek.x, srodek.y);
-      }
-      ostatniRozstaw = rozstaw;
-      ostatniSrodek = srodek;
-    }
-  });
-
-  const koniec = (e) => {
-    wskazniki.delete(e.pointerId);
-    if (wskazniki.size < 2){ ostatniRozstaw = 0; ostatniSrodek = null; }
-    if (wskazniki.size === 0){ MAPA.ruch = false; rysujMape(); }
-  };
-  plotno.addEventListener("pointerup", koniec);
-  plotno.addEventListener("pointercancel", koniec);
-
-  plotno.addEventListener("wheel", e => {
-    e.preventDefault();
-    const p = punktZdarzenia(e);
-    przyblizWokol(Math.pow(0.9987, e.deltaY), p.x, p.y);
-  }, { passive: false });
-
-  plotno.addEventListener("dblclick", e => {
-    const p = punktZdarzenia(e);
-    przyblizWokol(2, p.x, p.y);
-  });
-
-  if (tresc.dataset.mapaPodpieta) return;
-  tresc.dataset.mapaPodpieta = "1";
-
-  /* Uchwyt wisi na #tresc, który przeżywa przerysowanie zakładki — dlatego
-     stan czytamy z DOM w chwili dotknięcia, a nie z chwili rysowania.
-     Ta sama zasada, przez którą ptaszek w Prognozach wykonywał się dwa razy. */
-  tresc.addEventListener("click", e => {
-    const pin = e.target.closest && e.target.closest("[data-pin]");
-    if (pin){
-      const p = MAPA.wskazniki.get(pin.dataset.pin);
-      if (p) lecDoRamki(p.r);
-      return;
-    }
-    const wiersz = e.target.closest && e.target.closest("[data-rejon]");
-    if (wiersz){
-      const g = rejony()[+wiersz.dataset.rejon];
-      if (g){
-        lecDoRamki(g.r);
-        const pl2 = document.getElementById("mapa-plotno");
-        if (pl2) pl2.scrollIntoView({ behavior: "smooth", block: "center" });
-      }
-      return;
-    }
-    const b = e.target.closest && e.target.closest("[data-mapa]");
+  naglowki.addEventListener("click", e => {
+    const b = e.target.closest("button");
     if (!b) return;
-    const co = b.dataset.mapa;
-    if (co === "plus")  przyblizWokol(1.8, MAPA.W/2, MAPA.H/2);
-    if (co === "minus") przyblizWokol(1/1.8, MAPA.W/2, MAPA.H/2);
-    if (co === "swiat"){ MAPA.cx = 0.5; MAPA.cy = 0.5;
-      MAPA.skala = skalaMinimalna(); ograniczWidok(); rysujMape(); }
-    if (co === "dom"){
-      const { lista } = trasyNaMape();
-      if (lista.length) lecDoRamki(ramkaPunktow(lista.flatMap(t =>
-        [{x:t.r.x1,y:t.r.y1},{x:t.r.x2,y:t.r.y2}])));
-    }
+    const k = b.dataset.ka;
+    if (k === aktKlucz) aktMalejaco = !aktMalejaco;
+    else { aktKlucz = k;
+           aktMalejaco = KOLUMNY_AKT.find(x => x.k === k).malejaco; }
+    odswiez();
   });
 
-  window.addEventListener("resize", () => {
-    if (!document.getElementById("mapa-plotno")) return;
-    dopasujPlotno(); ograniczWidok(); rysujMape();
+  /* Uchwyt na .przelaczniki, a nie na każdym przycisku osobno: grupy filtrów
+     przerysowują się po każdym wyborze (zmieniają się liczniki), więc uchwyt
+     powieszony na przycisku zginąłby razem z nim po pierwszym kliknięciu. */
+  const panel = document.querySelector(".przelaczniki-akt");
+  if (panel) panel.addEventListener("click", e => {
+    const b = e.target.closest("[data-fa]");
+    if (!b) return;
+    if (b.dataset.fa === "moc") aktMoc = b.dataset.v;
+    else aktTetno = b.dataset.v;
+    odswiez();
+  });
+
+  const pole = document.getElementById("szukaj-aktywnosci");
+  if (pole){
+    pole.addEventListener("input", () => { aktSzukaj = pole.value; odswiez(); });
+    pole.addEventListener("keydown", e => {
+      if (e.key === "Enter"){ e.preventDefault(); pole.blur(); }
+    });
+  }
+
+  const krzyzyk = document.getElementById("reset-aktywnosci");
+  if (krzyzyk) krzyzyk.addEventListener("click", () => {
+    aktKlucz = DOMYSLNIE_AKT.klucz;
+    aktMalejaco = DOMYSLNIE_AKT.malejaco;
+    aktMoc = DOMYSLNIE_AKT.moc;
+    aktTetno = DOMYSLNIE_AKT.tetno;
+    aktSzukaj = DOMYSLNIE_AKT.szukaj;
+    if (pole) pole.value = "";
+    odswiez();
+    const ramka = document.querySelector(".tabelka");
+    if (ramka) ramka.scrollLeft = 0;
   });
 }
 
@@ -6593,13 +6139,13 @@ const SEKCJE = [
       { id:"stan",  tytul:"Stan wytrenowania", rysuj: stanWytrenowania },
       { id:"regeneracja", tytul:"Regeneracja", rysuj: regeneracja }
   ]},
-  // Teren zajmuje szóste miejsce, więc bierze jego barwę — cyjan. Barwa idzie
-  // za POZYCJĄ, nie za nazwą zakładki; ta sama zasada, przez którą Gablota
-  // przy przeprowadzce z piątego miejsca na siódme zmieniła fuksję na pomarańcz.
-  { id:"teren", tytul:"Teren", barwa:"cyjan", pod:[
-      { id:"mapa", tytul:"Mapa", rysuj: terenMapa },
-      { id:"podjazdy", tytul:"Podjazdy", rysuj: () => pusto("Podjazdy") },
-      { id:"zasieg", tytul:"Zasięg", rysuj: () => pusto("Zasięg") }
+  // Aktywności zajmują szóste miejsce, więc biorą jego barwę — cyjan. Barwa
+  // idzie za POZYCJĄ, nie za nazwą zakładki; ta sama zasada, przez którą
+  // Gablota przy przeprowadzce z piątego miejsca na siódme zmieniła fuksję
+  // na pomarańcz.
+  { id:"aktywnosci", tytul:"Aktywności", barwa:"cyjan", pod:[
+      { id:"outdoors", tytul:"Outdoors", rysuj: () => aktywnosci("outdoors") },
+      { id:"indoors",  tytul:"Indoors",  rysuj: () => aktywnosci("indoors") }
   ]},
   // Gablota na końcu — decyzja Fryderyka z 27.08.2026. Barwa idzie za pozycją,
   // nie za zakładką: siódme miejsce ma pomarańcz.
@@ -6676,7 +6222,7 @@ function pokaz(){
   podepnijTabeleStref();
   podepnijForme();
   podepnijRegeneracje();
-  podepnijMape();
+  podepnijAktywnosci();
 
   // Wykres otwiera się na najświeższym końcu — najnowsza przerwa jest
   // najważniejsza, a przy dwóch latach historii ląduje poza kadrem.
