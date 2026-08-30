@@ -86,6 +86,11 @@ const PELNE_PRZEBIEGI = process.env.PELNE_PRZEBIEGI === "true";
    co n-tą sekundę: pojedyncza sekunda potrafi być artefaktem, średnia nie.
    Kubełek bez ani jednej sekundy zostaje PUSTY — postój nie jest zerem. */
 const CEL_PUNKTOW = 700;
+
+/* WERSJA FORMATU PRZEBIEGU. Podniesiona, gdy zmienia się to, CO liczymy —
+   wtedy automat sam dobiera stare jazdy po kilkadziesiąt na przebieg, zamiast
+   czekać na ręczne odpalenie z przełącznikiem. Wersja 2 dołożyła szczyty. */
+const FORMAT_PRZEBIEGU = 2;
 const KROKI = [1, 2, 5, 10, 15, 20, 30, 60, 120];
 const BUDZET_UZUPELNIEN = 55;   // ile jazd wolno douczyć w jednym przebiegu:
                                 // Strava daje 100 zapytań na 15 minut
@@ -124,11 +129,26 @@ function przebiegJazdy(str){
 
   const sumy = { v: new Array(n).fill(0), w: new Array(n).fill(0), h: new Array(n).fill(0) };
   const ile  = { v: new Array(n).fill(0), w: new Array(n).fill(0), h: new Array(n).fill(0) };
+  /* SZCZYT W KUBEŁKU, obok średniej. Sama średnia gubi zryw: sekunda 804 W
+     wśród dziewięciu spokojnych daje w dziesięciosekundowym kubełku 496 W —
+     policzone poprawnie, ale na wykresie sprint znika. Zapisujemy więc też
+     najwyższą sekundę z kubełka i rysujemy ją jako poświatę nad linią.
+     Tętno takiego pola NIE dostaje: serce nie potrafi skoczyć w dziesięć
+     sekund na tyle, żeby szczyt różnił się od średniej o coś więcej niż
+     szum, więc byłaby to druga linia bez treści. */
+  const szczyt = { v: new Array(n).fill(null), w: new Array(n).fill(null) };
   for (let i = 0; i < dlugosc; i++){
     const k = Math.floor(t(i) / krok);
     if (k < 0 || k >= n) continue;
-    if (str.v && str.v[i] != null){ sumy.v[k] += str.v[i] * 3.6; ile.v[k]++; }
-    if (str.watts && str.watts[i] != null){ sumy.w[k] += str.watts[i]; ile.w[k]++; }
+    if (str.v && str.v[i] != null){
+      const kmh = str.v[i] * 3.6;
+      sumy.v[k] += kmh; ile.v[k]++;
+      if (szczyt.v[k] == null || kmh > szczyt.v[k]) szczyt.v[k] = kmh;
+    }
+    if (str.watts && str.watts[i] != null){
+      sumy.w[k] += str.watts[i]; ile.w[k]++;
+      if (szczyt.w[k] == null || str.watts[i] > szczyt.w[k]) szczyt.w[k] = str.watts[i];
+    }
     if (str.hr && str.hr[i] != null){ sumy.h[k] += str.hr[i]; ile.h[k]++; }
   }
   const serio = (klucz, mnoznik) => {
@@ -139,10 +159,17 @@ function przebiegJazdy(str){
   // w liczbie całkowitej — te same waty i uderzenia zostają całkowite.
   const v = serio("v", 10), w = serio("w", 1), h = serio("h", 1);
   if (!v && !w && !h) return null;
+  const szczyty = (klucz, mnoznik) =>
+    szczyt[klucz].some(x => x != null)
+      ? szczyt[klucz].map(x => x == null ? null : x * mnoznik) : null;
+  const vs = szczyty("v", 10), ws = szczyty("w", 1);
   return {
+    f: FORMAT_PRZEBIEGU,
     krok, n,
     ...(v ? { v: kodujSerie(v) } : {}),
+    ...(vs ? { vs: kodujSerie(vs) } : {}),
     ...(w ? { w: kodujSerie(w) } : {}),
+    ...(ws ? { ws: kodujSerie(ws) } : {}),
     ...(h ? { h: kodujSerie(h) } : {})
   };
 }
@@ -170,6 +197,11 @@ function zapiszPrzebiegi(przebiegi, pobrano){
   L.push("// Kodowanie: zygzak + varint na różnicach (jak trasy). Wartość jest powiększona");
   L.push("// o 1, bo ZERO znaczy \"brak pomiaru\" — postój nie jest zerem watów.");
   L.push("// Prędkość w dziesiątych częściach km/h, moc w watach, tętno w uderzeniach.");
+  L.push("//");
+  L.push("// v/w/h to ŚREDNIE w kubełku, vs/ws to NAJWYŻSZA SEKUNDA w tym samym kubełku.");
+  L.push("// Bez tej drugiej pary sprint ginie: sekunda 804 W wśród dziewięciu spokojnych");
+  L.push("// daje w kubełku dziesięciosekundowym 496 W. Tętno szczytu nie ma — serce nie");
+  L.push("// skacze w dziesięć sekund na tyle, żeby to była druga linia z treścią.");
   L.push("");
   L.push("window.PRZEBIEGI = {");
   L.push(' "wersja": 1,');
@@ -646,8 +678,9 @@ if (require.main !== module) return;
     // Przebieg jazdy: potrzebny KAŻDEJ jeździe, nie tylko tej z mocą — sama
     // prędkość w czasie jest już wykresem. Strumień to jedno zapytanie, więc
     // dociągamy z budżetem i resztę dobierze następny przebieg automatu.
-    const chcePrzebieg = kolarska && (!przebiegi[a.id] || PELNE_PRZEBIEGI)
-      && budzet > 0;
+    const chcePrzebieg = kolarska && budzet > 0
+      && (!przebiegi[a.id] || (przebiegi[a.id].f || 1) < FORMAT_PRZEBIEGU
+          || PELNE_PRZEBIEGI);
 
     // Kalorie są WYŁĄCZNIE w szczegółach jazdy — nie ma ich w liście. Strava
     // liczy je z mocy albo z własnego modelu; to jej liczba, nie nasza.
@@ -795,7 +828,8 @@ if (require.main !== module) return;
   } else {
     console.log(`Przebiegi: ${Object.keys(przebiegi).length} jazd, bez zmian.`);
   }
-  const brakuje = nowe.filter(a => ROWEROWE.has(a.typ) && !przebiegi[a.id]).length;
+  const brakuje = nowe.filter(a => ROWEROWE.has(a.typ)
+    && (!przebiegi[a.id] || (przebiegi[a.id].f || 1) < FORMAT_PRZEBIEGU)).length;
   if (brakuje) console.log(`  (${brakuje} jazd bez przebiegu — dobiorę je `
     + `w kolejnych przebiegach, żeby nie przekroczyć limitu zapytań Stravy)`);
   stare.meta.jazd_z_przebiegiem = Object.keys(przebiegi).length;

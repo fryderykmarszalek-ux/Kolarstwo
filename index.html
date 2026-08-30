@@ -6261,9 +6261,16 @@ function przebiegJazdy(id){
   if (p.v) serie.predkosc = dekodujSerie(p.v).map(x => x == null ? null : x / 10);
   if (p.w) serie.moc      = dekodujSerie(p.w);
   if (p.h) serie.tetno    = dekodujSerie(p.h);
+  /* Szczyty: najwyższa SEKUNDA w tym samym kubełku. Rysowane jako poświata
+     nad linią średniej, bo bez nich sprint znika w uśrednianiu — sekunda
+     804 W wśród dziewięciu spokojnych daje w kubełku 496 W. Tętno szczytu
+     nie ma i nie potrzebuje: serce nie skacze w dziesięć sekund. */
+  const szczyty = {};
+  if (p.vs) szczyty.predkosc = dekodujSerie(p.vs).map(x => x == null ? null : x / 10);
+  if (p.ws) szczyty.moc      = dekodujSerie(p.ws);
   const dlugosc = Math.max(...Object.values(serie).map(a => a.length), 0);
   if (!dlugosc) return null;
-  return { krok: p.krok, n: dlugosc, serie };
+  return { krok: p.krok, n: dlugosc, serie, szczyty };
 }
 
 // Podpis czasu: przy jeździe krótszej niż godzina minuty i sekundy,
@@ -6279,9 +6286,14 @@ function odczytPrzebiegu(pb, i){
   const czesci = Object.keys(OPIS_SERII).filter(k => pb.serie[k]).map(k => {
     const v = pb.serie[k][i];
     const o = OPIS_SERII[k];
+    const sz = (pb.szczyty[k] || [])[i];
+    // Szczyt podajemy tylko wtedy, gdy naprawdę różni się od średniej —
+    // "150 W, szczyt 150 W" to szum, nie informacja.
+    const rozny = v != null && sz != null && sz - v >= (k === "moc" ? 5 : 0.5);
     return `<span class="odczyt-poz"><i style="background:${o.barwa}"></i>
       <b>${v == null ? "—" : liczba(v, o.miejsc)}</b>
-      <em>${v == null ? "brak pomiaru" : o.jedn}</em></span>`;
+      <em>${v == null ? "brak pomiaru" : o.jedn}${rozny
+        ? ` · szczyt ${liczba(sz, o.miejsc)}` : ""}</em></span>`;
   }).join("");
   return `<span class="odczyt-czas">${czasOsi(sek, true)}</span>${czesci}`;
 }
@@ -6296,9 +6308,11 @@ function wykresPrzebiegu(pb){
   const licz = (v) => liczba(v, 1).replace(",", ".");
 
   const uzyte = Object.keys(OPIS_SERII).filter(k => pb.serie[k]);
+  // Sto procent to najwyższa SEKUNDA, nie najwyższa średnia — inaczej
+  // poświata sprintu wyjeżdżałaby ponad górną krawędź wykresu.
   const maks = {};
   for (const k of uzyte)
-    maks[k] = Math.max(...pb.serie[k].filter(v => v != null), 0) || 1;
+    maks[k] = Math.max(...(pb.szczyty[k] || pb.serie[k]).filter(v => v != null), 0) || 1;
 
   let g = `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img"
     aria-label="Prędkość, moc i tętno w czasie tej jazdy">`;
@@ -6318,6 +6332,21 @@ function wykresPrzebiegu(pb){
       stroke="var(--slaby)" stroke-width="1"/>
       <text x="${licz(xi)}" y="${gora+py+18}" text-anchor="middle" font-size="11"
         fill="var(--slaby)">${czasOsi(t)}</text>`;
+  }
+
+  // Poświata szczytów NAJPIERW, żeby linia średniej leżała na niej, a nie pod nią.
+  for (const k of uzyte){
+    const sz = pb.szczyty[k];
+    if (!sz) continue;
+    const o = OPIS_SERII[k];
+    let d = "", trzeba = true;
+    sz.forEach((v, i) => {
+      if (v == null){ trzeba = true; return; }
+      d += `${trzeba ? "M" : "L"}${licz(x(i))} ${licz(y(v / maks[k] * 100))} `;
+      trzeba = false;
+    });
+    g += `<path d="${d}" fill="none" stroke="${o.barwa}" stroke-width="1.2"
+      stroke-linejoin="round" stroke-linecap="round" opacity=".32"/>`;
   }
 
   for (const k of uzyte){
@@ -6344,14 +6373,22 @@ function wykresPrzebiegu(pb){
     <div class="odczyt-jazdy" id="odczyt-jazdy">${odczytPrzebiegu(pb, n - 1)}</div>
     <div class="wykres-przebiegu" id="wykres-przebiegu">${g}</div>
     <div class="legenda">${uzyte.map(k => `<span><i style="background:${
-      OPIS_SERII[k].barwa}"></i>${OPIS_SERII[k].nazwa} — szczyt ${liczba(maks[k],
+      OPIS_SERII[k].barwa}"></i>${OPIS_SERII[k].nazwa} — ${pb.szczyty[k]
+        ? "najwyższa sekunda" : "szczyt"} ${liczba(maks[k],
       OPIS_SERII[k].miejsc)} ${OPIS_SERII[k].jedn}</span>`).join("")}</div>
     <div class="podpis-wykresu">
       Przesuń palcem albo myszą po wykresie — odczyt nad nim pokazuje, ile
       dokładnie było w tym momencie jazdy. Oś pozioma to czas od startu,
       pionowa to <b>procent szczytu z tej jazdy</b>, ten sam przelicznik dla
       wszystkich trzech linii; trzy osobne skale pozwoliłyby dowieść dowolnej
-      tezy samym przesunięciem zakresu. Punkt to średnia z ${pb.krok} s.
+      tezy samym przesunięciem zakresu.
+      <br><b>Mocna linia to średnia z ${pb.krok} s, blada nad nią to najwyższa
+      sekunda w tym samym odcinku.</b> Bez tej drugiej sprint ginie w
+      uśrednianiu: sekunda 804 W wśród dziewięciu spokojnych daje w
+      dziesięciosekundowym kubełku 496 W — policzone dobrze, ale zrywu nie
+      widać. Dokładne rekordy na każde okno stoją w
+      <a class="odn-zakladka" href="#postepy/dane">Postępy → Dane</a> i liczą
+      się z pełnego zapisu sekunda po sekundzie, nie z tego wykresu.
       Przerwa w linii znaczy postój albo brak pomiaru — nie zero.
     </div>`;
 }
@@ -6380,7 +6417,7 @@ function podepnijPrzebieg(){
   const px = W - lewy - prawy, py = H - gora - dol;
   const maks = {};
   for (const k of Object.keys(pb.serie))
-    maks[k] = Math.max(...pb.serie[k].filter(v => v != null), 0) || 1;
+    maks[k] = Math.max(...(pb.szczyty[k] || pb.serie[k]).filter(v => v != null), 0) || 1;
 
   const pokaz = (klientX) => {
     const svg = ramka.querySelector("svg");
