@@ -73,32 +73,33 @@ const PLIK_PRZEBIEGOW = path.join(__dirname, "..", "..", "przebiegi.js");
 const PELNE_PRZEBIEGI = process.env.PELNE_PRZEBIEGI === "true";
 
 /* ── Przebiegi jazd (wykres w oknie Jazda) ─────────────────────────────────
-   Strava oddaje prędkość, moc i tętno SEKUNDA PO SEKUNDZIE. Zapisanie tego
-   1:1 dla stu jazd to ponad milion liczb i kilka megabajtów, których iPad
-   nie ma po co ściągać przy każdym wejściu na stronę.
+   Strava oddaje prędkość, moc i tętno SEKUNDA PO SEKUNDZIE i tyle właśnie
+   zapisujemy — pełne 1 Hz, bez uśredniania. Wcześniej dane były zbijane do
+   kubełków po 5-10 s; Fryderyk poprosił o ciągłą sekundową średnią i ma rację,
+   że przy uśrednianiu odczyt pod palcem podawał liczbę, której nie było.
 
-   Dlatego próbkujemy: celujemy w najwyżej CEL_PUNKTOW punktów na jazdę, bo
-   wykres ma niecałe 720 pikseli szerokości i gęstszej siatki i tak nie da
-   się zobaczyć. Krok wychodzi z długości jazdy i jest zaokrąglany w górę do
-   sensownej wartości — godzina i pół dostaje 10 s, krótka jazda 5 s.
-
-   Wartość punktu to ŚREDNIA z sekund, które do niego wpadły, a nie próbka
-   co n-tą sekundę: pojedyncza sekunda potrafi być artefaktem, średnia nie.
-   Kubełek bez ani jednej sekundy zostaje PUSTY — postój nie jest zerem. */
-const CEL_PUNKTOW = 700;
+   Indeks tablicy TO SEKUNDA od startu, więc postój zostaje dziurą, a nie
+   zniknięciem z osi czasu. */
 
 /* WERSJA FORMATU PRZEBIEGU. Podniesiona, gdy zmienia się to, CO liczymy —
    wtedy automat sam dobiera stare jazdy po kilkadziesiąt na przebieg, zamiast
-   czekać na ręczne odpalenie z przełącznikiem. Wersja 2 dołożyła szczyty. */
-const FORMAT_PRZEBIEGU = 2;
-const KROKI = [1, 2, 5, 10, 15, 20, 30, 60, 120];
+   czekać na ręczne odpalenie z przełącznikiem.
+   2 dołożyła szczyty w kubełkach, 3 wyrzuciła kubełki i zapisuje PEŁNE 1 Hz. */
+const FORMAT_PRZEBIEGU = 3;
+
+/* PLIK NA JAZDĘ, nie jeden wielki. Pełne 1 Hz dla wszystkich jazd to około
+   pół megabajta i rośnie z każdym treningiem — a strona ładowałaby to przy
+   każdym wejściu, na każdą zakładkę, choć potrzebuje tego wyłącznie okno
+   jednej jazdy. Dlatego indeks (przebiegi.js) jest malutki i mówi tylko, co
+   istnieje, a same przebiegi leżą w przebiegi/<id>.js i doczytują się dopiero
+   przy otwarciu jazdy.
+
+   Doczytujemy PRZEZ WSTAWIENIE ZNACZNIKA <script>, nie przez fetch. fetch na
+   file:// jest blokowany przez CORS — to ten sam powód, dla którego dane.js
+   jest skryptem, a nie .json. Znacznik script działa i lokalnie, i na Pages. */
+const KATALOG_PRZEBIEGOW = path.join(__dirname, "..", "..", "przebiegi");
 const BUDZET_UZUPELNIEN = 55;   // ile jazd wolno douczyć w jednym przebiegu:
                                 // Strava daje 100 zapytań na 15 minut
-
-function krokProbkowania(sekund){
-  for (const k of KROKI) if (sekund / k <= CEL_PUNKTOW) return k;
-  return KROKI[KROKI.length - 1];
-}
 
 /* Kodowanie serii: zygzak + varint na różnicach, ten sam pomysł co przy
    trasach. Wartość zapisujemy powiększoną o 1, bo ZERO jest zarezerwowane
@@ -113,6 +114,13 @@ function kodujSerie(wartosci){
   return out;
 }
 
+/* Pełny zapis sekunda po sekundzie. Indeks tablicy TO SEKUNDA od startu, więc
+   postój zostaje dziurą (null), a nie zniknięciem z osi czasu — jazda z 178 s
+   przerwy ma te 178 pozycji pustych i wykres je pokazuje jako przerwę.
+
+   Uśredniania już tu nie ma i nie ma po co: skoro trzymamy każdą sekundę,
+   szczyt jest po prostu jedną z nich. Osobne pole na maksimum w kubełku
+   (format 2) przestało być potrzebne. */
 function przebiegJazdy(str){
   if (!str) return null;
   const czas = str.czas;
@@ -120,57 +128,29 @@ function przebiegJazdy(str){
                            str.hr ? str.hr.length : 0,
                            str.v ? str.v.length : 0);
   if (!dlugosc) return null;
-  // Bez osi czasu zakładamy 1 Hz — tak samo jak przy krzywej mocy.
-  const t = (i) => (czas && czas[i] != null) ? czas[i] : i;
+  const t = (i) => (czas && czas[i] != null) ? czas[i] : i;   // bez osi czasu: 1 Hz
   const koniec = t(dlugosc - 1);
-  if (!(koniec > 0)) return null;
-  const krok = krokProbkowania(koniec);
-  const n = Math.floor(koniec / krok) + 1;
+  if (!(koniec > 0) || koniec > 200000) return null;          // zapora na absurd
+  const n = koniec + 1;
 
-  const sumy = { v: new Array(n).fill(0), w: new Array(n).fill(0), h: new Array(n).fill(0) };
-  const ile  = { v: new Array(n).fill(0), w: new Array(n).fill(0), h: new Array(n).fill(0) };
-  /* SZCZYT W KUBEŁKU, obok średniej. Sama średnia gubi zryw: sekunda 804 W
-     wśród dziewięciu spokojnych daje w dziesięciosekundowym kubełku 496 W —
-     policzone poprawnie, ale na wykresie sprint znika. Zapisujemy więc też
-     najwyższą sekundę z kubełka i rysujemy ją jako poświatę nad linią.
-     Tętno takiego pola NIE dostaje: serce nie potrafi skoczyć w dziesięć
-     sekund na tyle, żeby szczyt różnił się od średniej o coś więcej niż
-     szum, więc byłaby to druga linia bez treści. */
-  const szczyt = { v: new Array(n).fill(null), w: new Array(n).fill(null) };
+  const pusta = () => new Array(n).fill(null);
+  const v = str.v ? pusta() : null;
+  const w = str.watts ? pusta() : null;
+  const h = str.hr ? pusta() : null;
   for (let i = 0; i < dlugosc; i++){
-    const k = Math.floor(t(i) / krok);
+    const k = t(i);
     if (k < 0 || k >= n) continue;
-    if (str.v && str.v[i] != null){
-      const kmh = str.v[i] * 3.6;
-      sumy.v[k] += kmh; ile.v[k]++;
-      if (szczyt.v[k] == null || kmh > szczyt.v[k]) szczyt.v[k] = kmh;
-    }
-    if (str.watts && str.watts[i] != null){
-      sumy.w[k] += str.watts[i]; ile.w[k]++;
-      if (szczyt.w[k] == null || str.watts[i] > szczyt.w[k]) szczyt.w[k] = str.watts[i];
-    }
-    if (str.hr && str.hr[i] != null){ sumy.h[k] += str.hr[i]; ile.h[k]++; }
+    if (v && str.v[i] != null) v[k] = str.v[i] * 3.6 * 10;   // 0,1 km/h
+    if (w && str.watts[i] != null) w[k] = str.watts[i];
+    if (h && str.hr[i] != null) h[k] = str.hr[i];
   }
-  const serio = (klucz, mnoznik) => {
-    if (!ile[klucz].some(x => x > 0)) return null;
-    return sumy[klucz].map((s, i) => ile[klucz][i] ? s / ile[klucz][i] * mnoznik : null);
-  };
-  // Prędkość mnożona przez 10, żeby zmieścić jedno miejsce po przecinku
-  // w liczbie całkowitej — te same waty i uderzenia zostają całkowite.
-  const v = serio("v", 10), w = serio("w", 1), h = serio("h", 1);
-  if (!v && !w && !h) return null;
-  const szczyty = (klucz, mnoznik) =>
-    szczyt[klucz].some(x => x != null)
-      ? szczyt[klucz].map(x => x == null ? null : x * mnoznik) : null;
-  const vs = szczyty("v", 10), ws = szczyty("w", 1);
+  const jest = (a) => a && a.some(x => x != null);
+  if (!jest(v) && !jest(w) && !jest(h)) return null;
   return {
-    f: FORMAT_PRZEBIEGU,
-    krok, n,
-    ...(v ? { v: kodujSerie(v) } : {}),
-    ...(vs ? { vs: kodujSerie(vs) } : {}),
-    ...(w ? { w: kodujSerie(w) } : {}),
-    ...(ws ? { ws: kodujSerie(ws) } : {}),
-    ...(h ? { h: kodujSerie(h) } : {})
+    f: FORMAT_PRZEBIEGU, n,
+    ...(jest(v) ? { v: kodujSerie(v) } : {}),
+    ...(jest(w) ? { w: kodujSerie(w) } : {}),
+    ...(jest(h) ? { h: kodujSerie(h) } : {})
   };
 }
 
@@ -180,37 +160,66 @@ function wczytajPrzebiegi(){
     global.window = {};
     delete require.cache[require.resolve(PLIK_PRZEBIEGOW)];
     require(PLIK_PRZEBIEGOW);
-    return (global.window.PRZEBIEGI || {}).jazdy || {};
+    const idx = (global.window.PRZEBIEGI || {}).jazdy || {};
+    // Indeks nie niesie serii — do decyzji „czy przeliczyć" wystarczy nam
+    // wersja formatu, a to w indeksie jest.
+    return idx;
   } catch (e){ return {}; }
 }
 
+/* Indeks: co istnieje i jak długie. Strona ładuje go zawsze (jest malutki),
+   a sam przebieg dopiero przy otwarciu konkretnej jazdy. */
 function zapiszPrzebiegi(przebiegi, pobrano){
+  fs.mkdirSync(KATALOG_PRZEBIEGOW, { recursive: true });
   const idy = Object.keys(przebiegi).sort();
+
+  // pliki jazd — piszemy tylko te, które faktycznie się zmieniły
+  let zapisanych = 0;
+  for (const id of idy){
+    const p = przebiegi[id];
+    const plik = path.join(KATALOG_PRZEBIEGOW, id + ".js");
+    const tresc = "// Przebieg jazdy " + id + " — sekunda po sekundzie.\n"
+      + "// PLIK GENEROWANY. Doczytywany przez stronę dopiero przy otwarciu tej jazdy.\n"
+      + "window.PRZEBIEGI_DANE = window.PRZEBIEGI_DANE || {};\n"
+      + "window.PRZEBIEGI_DANE[" + JSON.stringify(id) + "] = "
+      + JSON.stringify(p) + ";\n";
+    let bylo = null;
+    try { bylo = fs.readFileSync(plik, "utf8"); } catch(e){}
+    if (bylo !== tresc){ fs.writeFileSync(plik, tresc, "utf8"); zapisanych++; }
+  }
+  // pliki jazd skasowanych na Stravie
+  try {
+    for (const nazwa of fs.readdirSync(KATALOG_PRZEBIEGOW)){
+      if (!nazwa.endsWith(".js")) continue;
+      if (!przebiegi[nazwa.slice(0, -3)])
+        fs.unlinkSync(path.join(KATALOG_PRZEBIEGOW, nazwa));
+    }
+  } catch(e){}
+
   const L = [];
-  L.push("// przebiegi.js — prędkość, moc i tętno w czasie każdej jazdy.");
+  L.push("// przebiegi.js — INDEKS przebiegów, nie same dane.");
   L.push("// PLIK GENEROWANY przez .github/skrypty/pobierz-strave.js — nie edytować ręcznie.");
   L.push("//");
-  L.push("// Strava oddaje te trzy strumienie sekunda po sekundzie. Zapisanie ich 1:1");
-  L.push("// dla stu jazd to ponad milion liczb; tutaj są uśrednione do kroku, który");
-  L.push("// daje najwyżej " + CEL_PUNKTOW + " punktów na jazdę — tyle, ile wykres i tak umie pokazać.");
+  L.push("// Same przebiegi leżą w przebiegi/<id>.js i doczytują się dopiero przy");
+  L.push("// otwarciu danej jazdy. Pełne 1 Hz dla wszystkich jazd to pół megabajta");
+  L.push("// i rośnie z każdym treningiem — strona nie ma po co ładować tego przy");
+  L.push("// każdym wejściu, skoro potrzebuje tego wyłącznie okno jednej jazdy.");
   L.push("//");
-  L.push("// Kodowanie: zygzak + varint na różnicach (jak trasy). Wartość jest powiększona");
-  L.push("// o 1, bo ZERO znaczy \"brak pomiaru\" — postój nie jest zerem watów.");
-  L.push("// Prędkość w dziesiątych częściach km/h, moc w watach, tętno w uderzeniach.");
-  L.push("//");
-  L.push("// v/w/h to ŚREDNIE w kubełku, vs/ws to NAJWYŻSZA SEKUNDA w tym samym kubełku.");
-  L.push("// Bez tej drugiej pary sprint ginie: sekunda 804 W wśród dziewięciu spokojnych");
-  L.push("// daje w kubełku dziesięciosekundowym 496 W. Tętno szczytu nie ma — serce nie");
-  L.push("// skacze w dziesięć sekund na tyle, żeby to była druga linia z treścią.");
+  L.push("// n = liczba sekund, ma = które serie są w pliku (v prędkość, w moc, h tętno).");
   L.push("");
   L.push("window.PRZEBIEGI = {");
-  L.push(' "wersja": 1,');
+  L.push(' "wersja": ' + FORMAT_PRZEBIEGU + ",");
   L.push(' "policzono": ' + JSON.stringify(pobrano) + ",");
   L.push(' "jazdy": {');
-  L.push(idy.map(id => `  ${JSON.stringify(id)}: ${JSON.stringify(przebiegi[id])}`).join(",\n"));
+  L.push(idy.map(id => {
+    const p = przebiegi[id];
+    const ma = [p.v ? "v" : "", p.w ? "w" : "", p.h ? "h" : ""].join("");
+    return `  ${JSON.stringify(id)}: {"f":${p.f},"n":${p.n},"ma":${JSON.stringify(ma)}}`;
+  }).join(",\n"));
   L.push(" }");
   L.push("};");
   fs.writeFileSync(PLIK_PRZEBIEGOW, L.join("\n") + "\n", "utf8");
+  if (zapisanych) console.log(`  (zapisano ${zapisanych} plików przebiegów)`);
 }
 
 const PLIK_TRAS = path.join(__dirname, "..", "..", "trasy.js");
@@ -559,7 +568,7 @@ function zapisz(D){
    Ta sama sztuczka co w analiza.js — pozwala sprawdzić przycinanie strefą
    prywatności bez sieci i bez drugiej kopii logiki. */
 module.exports = { dekodujTrase, kodujTrase, metry, znajdzDom, utnijPrywatne,
-  przebiegJazdy, kodujSerie, krokProbkowania,
+  przebiegJazdy, kodujSerie,
   krzywaMocy, czasWStrefach, ktoraStrefa, tabelaNaDzien };
 if (require.main !== module) return;
 
@@ -748,7 +757,7 @@ if (require.main !== module) return;
           przebiegi[a.id] = p;
           nowychPrzebiegow++;
           console.log(`  przebieg: ${a.data.slice(0,10)} ${a.nazwa} — `
-            + `${p.n} punktów co ${p.krok} s`
+            + `${p.n} s`
             + `${p.v ? ", prędkość" : ""}${p.w ? ", moc" : ""}${p.h ? ", tętno" : ""}`);
         }
       }
@@ -820,8 +829,9 @@ if (require.main !== module) return;
       trasy[a.id] = trasyStare[a.id];
     }
   }
-  const stanPrzebiegow = JSON.stringify(przebiegi);
-  if (stanPrzebiegow !== JSON.stringify(wczytajPrzebiegi())){
+  const skrotIndeksu = (o) => JSON.stringify(Object.keys(o).sort()
+    .map(id => [id, o[id].f, o[id].n]));
+  if (skrotIndeksu(przebiegi) !== skrotIndeksu(wczytajPrzebiegi()) || nowychPrzebiegow){
     zapiszPrzebiegi(przebiegi, new Date().toISOString().slice(0,16));
     console.log(`Przebiegi: ${Object.keys(przebiegi).length} jazd `
       + `(+${nowychPrzebiegow} w tym przebiegu).`);

@@ -6214,29 +6214,33 @@ const ZNAK_STRAVY = `<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="t
   m-7.008-5.599l2.836 5.598h4.172L10.463 0l-7 13.828h4.169"/></svg>`;
 
 /* ── Przebieg jednej jazdy ──────────────────────────────────────────────────
-   Prędkość, moc i tętno W CZASIE tej jazdy — ciągła linia, nie punkty na
-   kolejnych jazdach. Dane leżą w przebiegi.js: automat pobiera ze Stravy
-   strumienie sekunda po sekundzie i uśrednia je do kroku dającego najwyżej
-   700 punktów, bo tyle mieści wykres.
+   Prędkość, moc i tętno W CZASIE tej jazdy, PEŁNE 1 Hz — każda sekunda ma
+   swoją wartość. Wcześniej dane były zbijane do kubełków po 5-10 s i odczyt
+   pod palcem podawał średnią z kubełka, czyli liczbę, której w tej sekundzie
+   nie było. Fryderyk poprosił o ciągłą sekundową i miał rację.
 
-   OŚ POZIOMA TO CZAS OD STARTU, z podpisami — bez tego nie da się powiedzieć,
-   w którym momencie jazdy coś się działo.
+   DOCZYTYWANE NA ŻĄDANIE. Pełne 1 Hz dla wszystkich jazd to pół megabajta
+   i rośnie z każdym treningiem; strona nie ma po co ładować tego przy każdym
+   wejściu, skoro potrzebuje tego wyłącznie okno jednej jazdy. W przebiegi.js
+   leży sam indeks, a dane w przebiegi/<id>.js.
 
-   JEDNA OŚ PIONOWA O JEDNYM ZNACZENIU: procent najlepszej wartości w TEJ
-   jeździe. Trzy osobne skale na jednym obrazku pozwoliłyby dowieść dowolnej
-   tezy samym przesunięciem zakresu. Dokładne liczby — waty, uderzenia,
-   kilometry na godzinę — podaje odczyt nad wykresem, więc procent nie musi
-   niczego zastępować.
+   Doczytujemy PRZEZ ZNACZNIK <script>, nie przez fetch: fetch na file:// jest
+   blokowany przez CORS — ten sam powód, dla którego dane.js jest skryptem,
+   a nie .json. Znacznik działa i lokalnie, i na Pages.
 
-   Odczyt przesuwa się palcem i myszą. Nie przerysowujemy przy tym SVG:
-   krzyżyk i kropki mają zmieniane atrybuty, tekst odczytu innerHTML. Ta sama
-   zasada, przez którą wykres prób w Porównaniach przestał migać. */
+   RYSOWANIE. Wykres ma niecałe 700 pikseli, a jazda bywa dłuższa niż 4000
+   sekund, więc na piksel wypada kilka sekund. Nie wybieramy z nich jednej
+   i nie uśredniamy ich w dane — rysujemy PASMO od najniższej do najwyższej
+   sekundy w tej kolumnie, a na nim linię średniej. Dzięki temu sprint widać
+   w pełnej wysokości, a odczyt i tak podaje dokładną sekundę.
+
+   JEDNA OŚ PIONOWA O JEDNYM ZNACZENIU: procent najwyższej sekundy w TEJ
+   jeździe. Trzy osobne skale pozwoliłyby dowieść dowolnej tezy samym
+   przesunięciem zakresu. Dokładne waty, uderzenia i km/h podaje odczyt. */
 
 const PRZEBIEGI = (typeof window !== "undefined" && window.PRZEBIEGI)
   ? window.PRZEBIEGI : null;
 
-/* Dekoder lustrzany wobec kodujSerie() w automacie: zygzak + varint na
-   różnicach, wartość powiększona o 1, zero znaczy BRAK POMIARU. */
 function dekodujSerie(s){
   const out = []; let i = 0, poprz = 0;
   while (i < s.length){
@@ -6254,111 +6258,149 @@ const OPIS_SERII = {
   tetno:    { nazwa:"Tętno",    jedn:"bpm",  barwa:"var(--seria-tetno)",    miejsc:0 }
 };
 
-function przebiegJazdy(id){
-  const p = (PRZEBIEGI || {}).jazdy ? PRZEBIEGI.jazdy[id] : null;
-  if (!p) return null;
+// Przebiegi już rozpakowane — drugi raz tej samej jazdy nie dekodujemy.
+const PRZEBIEG_GOTOWY = new Map();
+
+function rozpakujPrzebieg(id, surowy){
+  if (PRZEBIEG_GOTOWY.has(id)) return PRZEBIEG_GOTOWY.get(id);
   const serie = {};
-  if (p.v) serie.predkosc = dekodujSerie(p.v).map(x => x == null ? null : x / 10);
-  if (p.w) serie.moc      = dekodujSerie(p.w);
-  if (p.h) serie.tetno    = dekodujSerie(p.h);
-  /* Szczyty: najwyższa SEKUNDA w tym samym kubełku. Rysowane jako poświata
-     nad linią średniej, bo bez nich sprint znika w uśrednianiu — sekunda
-     804 W wśród dziewięciu spokojnych daje w kubełku 496 W. Tętno szczytu
-     nie ma i nie potrzebuje: serce nie skacze w dziesięć sekund. */
-  const szczyty = {};
-  if (p.vs) szczyty.predkosc = dekodujSerie(p.vs).map(x => x == null ? null : x / 10);
-  if (p.ws) szczyty.moc      = dekodujSerie(p.ws);
-  const dlugosc = Math.max(...Object.values(serie).map(a => a.length), 0);
-  if (!dlugosc) return null;
-  return { krok: p.krok, n: dlugosc, serie, szczyty };
+  if (surowy.v) serie.predkosc = dekodujSerie(surowy.v).map(x => x == null ? null : x / 10);
+  if (surowy.w) serie.moc      = dekodujSerie(surowy.w);
+  if (surowy.h) serie.tetno    = dekodujSerie(surowy.h);
+  const n = Math.max(...Object.values(serie).map(a => a.length), 0);
+  if (!n) return null;
+  const pb = { n, serie };
+  PRZEBIEG_GOTOWY.set(id, pb);
+  return pb;
 }
 
-// Podpis czasu: przy jeździe krótszej niż godzina minuty i sekundy,
-// przy dłuższej godziny i minuty. „71:20" nikomu nic nie mówi.
+function wczytajPrzebieg(id, gotowe){
+  if (PRZEBIEG_GOTOWY.has(id)) return gotowe(PRZEBIEG_GOTOWY.get(id));
+  const juz = (window.PRZEBIEGI_DANE || {})[id];
+  if (juz) return gotowe(rozpakujPrzebieg(id, juz));
+  if (!((PRZEBIEGI || {}).jazdy || {})[id]) return gotowe(null);
+
+  const zn = document.createElement("script");
+  zn.src = "przebiegi/" + encodeURIComponent(id) + ".js";
+  zn.onload = () => {
+    const d = (window.PRZEBIEGI_DANE || {})[id];
+    gotowe(d ? rozpakujPrzebieg(id, d) : null);
+  };
+  zn.onerror = () => gotowe(null);
+  document.head.appendChild(zn);
+}
+
+// Przy jeździe krótszej niż godzina minuty i sekundy, przy dłuższej godziny
+// i minuty. „71:20" nikomu nic nie mówi.
 function czasOsi(sek, zSekundami){
   const h = Math.floor(sek/3600), m = Math.floor(sek%3600/60), s = Math.round(sek%60);
-  if (zSekundami && h === 0) return `${m}:${String(s).padStart(2,"0")}`;
+  if (zSekundami) return h ? `${h}:${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`
+                           : `${m}:${String(s).padStart(2,"0")}`;
   return h ? `${h}:${String(m).padStart(2,"0")}` : `${m} min`;
 }
 
 function odczytPrzebiegu(pb, i){
-  const sek = i * pb.krok;
   const czesci = Object.keys(OPIS_SERII).filter(k => pb.serie[k]).map(k => {
     const v = pb.serie[k][i];
     const o = OPIS_SERII[k];
-    const sz = (pb.szczyty[k] || [])[i];
-    // Szczyt podajemy tylko wtedy, gdy naprawdę różni się od średniej —
-    // "150 W, szczyt 150 W" to szum, nie informacja.
-    const rozny = v != null && sz != null && sz - v >= (k === "moc" ? 5 : 0.5);
     return `<span class="odczyt-poz"><i style="background:${o.barwa}"></i>
       <b>${v == null ? "—" : liczba(v, o.miejsc)}</b>
-      <em>${v == null ? "brak pomiaru" : o.jedn}${rozny
-        ? ` · szczyt ${liczba(sz, o.miejsc)}` : ""}</em></span>`;
+      <em>${v == null ? "brak pomiaru" : o.jedn}</em></span>`;
   }).join("");
-  return `<span class="odczyt-czas">${czasOsi(sek, true)}</span>${czesci}`;
+  return `<span class="odczyt-czas">${czasOsi(i, true)}</span>${czesci}`;
+}
+
+/* Kolumny piksela: dla każdej z nich najniższa, najwyższa i średnia sekunda.
+   Liczone raz przy rysowaniu i trzymane przy przebiegu, bo przydają się też
+   do wysokości kropki pod palcem. */
+function kolumnyPrzebiegu(pb, ilePx){
+  if (pb.kolumny && pb.kolumny.ile === ilePx) return pb.kolumny;
+  const wynik = {};
+  for (const k of Object.keys(pb.serie)){
+    const s = pb.serie[k];
+    const kol = new Array(ilePx);
+    for (let j = 0; j < ilePx; j++){
+      const od = Math.floor(j * pb.n / ilePx);
+      const doo = Math.max(od + 1, Math.floor((j + 1) * pb.n / ilePx));
+      let mn = Infinity, mx = -Infinity, suma = 0, ile = 0;
+      for (let i = od; i < doo && i < pb.n; i++){
+        const v = s[i];
+        if (v == null) continue;
+        if (v < mn) mn = v;
+        if (v > mx) mx = v;
+        suma += v; ile++;
+      }
+      kol[j] = ile ? { mn, mx, sr: suma/ile } : null;
+    }
+    wynik[k] = kol;
+  }
+  pb.kolumny = { ile: ilePx, dane: wynik };
+  return pb.kolumny;
 }
 
 function wykresPrzebiegu(pb){
   const W = 720, H = 300, lewy = 44, prawy = 14, gora = 16, dol = 40;
   const px = W - lewy - prawy, py = H - gora - dol;
-  const n = pb.n;
-  const koniec = (n - 1) * pb.krok;
-  const x = (i) => lewy + (n <= 1 ? px/2 : (i/(n-1)) * px);
+  const KOL = Math.min(px, pb.n);
+  const kol = kolumnyPrzebiegu(pb, KOL).dane;
+  const koniec = pb.n - 1;
+  const x = (j) => lewy + (KOL <= 1 ? px/2 : (j/(KOL-1)) * px);
+  const xSek = (i) => lewy + (koniec <= 0 ? px/2 : (i/koniec) * px);
   const y = (proc) => gora + py - (proc/100) * py;
   const licz = (v) => liczba(v, 1).replace(",", ".");
 
   const uzyte = Object.keys(OPIS_SERII).filter(k => pb.serie[k]);
-  // Sto procent to najwyższa SEKUNDA, nie najwyższa średnia — inaczej
-  // poświata sprintu wyjeżdżałaby ponad górną krawędź wykresu.
   const maks = {};
   for (const k of uzyte)
-    maks[k] = Math.max(...(pb.szczyty[k] || pb.serie[k]).filter(v => v != null), 0) || 1;
+    maks[k] = Math.max(...pb.serie[k].filter(v => v != null), 0) || 1;
 
   let g = `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img"
-    aria-label="Prędkość, moc i tętno w czasie tej jazdy">`;
+    aria-label="Prędkość, moc i tętno sekunda po sekundzie w tej jeździe">`;
   for (let p = 0; p <= 100; p += 25)
     g += `<line x1="${lewy}" y1="${y(p)}" x2="${W-prawy}" y2="${y(p)}"
       stroke="var(--linia)" stroke-width="1"/>
       <text x="${lewy-7}" y="${y(p)+4}" text-anchor="end" font-size="11"
         fill="var(--slaby)">${p}%</text>`;
 
-  // Podziałka czasu: krok dobrany tak, żeby wyszło 4–8 podpisów, i zawsze
-  // okrągły — 5, 10, 15, 30 minut albo godzina.
   const KROKI_OSI = [60,120,300,600,900,1800,3600,7200];
   const krokOsi = KROKI_OSI.find(k => koniec/k <= 8) || KROKI_OSI[KROKI_OSI.length-1];
   for (let t = 0; t <= koniec; t += krokOsi){
-    const xi = x(t / pb.krok);
+    const xi = xSek(t);
     g += `<line x1="${licz(xi)}" y1="${gora+py}" x2="${licz(xi)}" y2="${gora+py+4}"
       stroke="var(--slaby)" stroke-width="1"/>
       <text x="${licz(xi)}" y="${gora+py+18}" text-anchor="middle" font-size="11"
         fill="var(--slaby)">${czasOsi(t)}</text>`;
   }
 
-  // Poświata szczytów NAJPIERW, żeby linia średniej leżała na niej, a nie pod nią.
+  /* Pasmo od najniższej do najwyższej sekundy w kolumnie — dzięki niemu
+     sprint trwający sekundę jest widoczny w pełnej wysokości, choć na jego
+     piksel przypada kilka sekund. Przerwa w pomiarach rozcina pasmo. */
   for (const k of uzyte){
-    const sz = pb.szczyty[k];
-    if (!sz) continue;
-    const o = OPIS_SERII[k];
-    let d = "", trzeba = true;
-    sz.forEach((v, i) => {
-      if (v == null){ trzeba = true; return; }
-      d += `${trzeba ? "M" : "L"}${licz(x(i))} ${licz(y(v / maks[k] * 100))} `;
-      trzeba = false;
-    });
-    g += `<path d="${d}" fill="none" stroke="${o.barwa}" stroke-width="1.2"
-      stroke-linejoin="round" stroke-linecap="round" opacity=".32"/>`;
+    const c = kol[k];
+    let odcinki = [], biezacy = [];
+    for (let j = 0; j < KOL; j++){
+      if (c[j]) biezacy.push(j);
+      else if (biezacy.length){ odcinki.push(biezacy); biezacy = []; }
+    }
+    if (biezacy.length) odcinki.push(biezacy);
+    let d = "";
+    for (const o of odcinki){
+      d += o.map((j,i) => `${i?"L":"M"}${licz(x(j))} ${licz(y(c[j].mx/maks[k]*100))}`).join(" ");
+      d += " " + [...o].reverse().map(j => `L${licz(x(j))} ${licz(y(c[j].mn/maks[k]*100))}`).join(" ") + " Z ";
+    }
+    g += `<path d="${d}" fill="${OPIS_SERII[k].barwa}" stroke="none" opacity=".28"/>`;
   }
 
   for (const k of uzyte){
-    const o = OPIS_SERII[k];
+    const c = kol[k];
     let d = "", trzeba = true;
-    pb.serie[k].forEach((v, i) => {
-      if (v == null){ trzeba = true; return; }   // przerwa rozcina linię
-      d += `${trzeba ? "M" : "L"}${licz(x(i))} ${licz(y(v / maks[k] * 100))} `;
+    for (let j = 0; j < KOL; j++){
+      if (!c[j]){ trzeba = true; continue; }
+      d += `${trzeba ? "M" : "L"}${licz(x(j))} ${licz(y(c[j].sr/maks[k]*100))} `;
       trzeba = false;
-    });
-    g += `<path d="${d}" fill="none" stroke="${o.barwa}" stroke-width="1.7"
-      stroke-linejoin="round" stroke-linecap="round" opacity=".9"/>`;
+    }
+    g += `<path d="${d}" fill="none" stroke="${OPIS_SERII[k].barwa}" stroke-width="1.6"
+      stroke-linejoin="round" stroke-linecap="round"/>`;
   }
 
   g += `<line id="krzyzyk-przebiegu" x1="${lewy}" y1="${gora}" x2="${lewy}" y2="${gora+py}"
@@ -6369,33 +6411,32 @@ function wykresPrzebiegu(pb){
       pointer-events="none"/>`;
   g += `</svg>`;
 
+  const godzin = Math.floor(pb.n/3600), minut = Math.round(pb.n%3600/60);
   return `
-    <div class="odczyt-jazdy" id="odczyt-jazdy">${odczytPrzebiegu(pb, n - 1)}</div>
+    <div class="odczyt-jazdy" id="odczyt-jazdy">${odczytPrzebiegu(pb, pb.n - 1)}</div>
     <div class="wykres-przebiegu" id="wykres-przebiegu">${g}</div>
     <div class="legenda">${uzyte.map(k => `<span><i style="background:${
-      OPIS_SERII[k].barwa}"></i>${OPIS_SERII[k].nazwa} — ${pb.szczyty[k]
-        ? "najwyższa sekunda" : "szczyt"} ${liczba(maks[k],
-      OPIS_SERII[k].miejsc)} ${OPIS_SERII[k].jedn}</span>`).join("")}</div>
+      OPIS_SERII[k].barwa}"></i>${OPIS_SERII[k].nazwa} — najwyższa sekunda ${
+      liczba(maks[k], OPIS_SERII[k].miejsc)} ${OPIS_SERII[k].jedn}</span>`).join("")}</div>
     <div class="podpis-wykresu">
-      Przesuń palcem albo myszą po wykresie — odczyt nad nim pokazuje, ile
-      dokładnie było w tym momencie jazdy. Oś pozioma to czas od startu,
-      pionowa to <b>procent szczytu z tej jazdy</b>, ten sam przelicznik dla
-      wszystkich trzech linii; trzy osobne skale pozwoliłyby dowieść dowolnej
-      tezy samym przesunięciem zakresu.
-      <br><b>Mocna linia to średnia z ${pb.krok} s, blada nad nią to najwyższa
-      sekunda w tym samym odcinku.</b> Bez tej drugiej sprint ginie w
-      uśrednianiu: sekunda 804 W wśród dziewięciu spokojnych daje w
-      dziesięciosekundowym kubełku 496 W — policzone dobrze, ale zrywu nie
-      widać. Dokładne rekordy na każde okno stoją w
-      <a class="odn-zakladka" href="#postepy/dane">Postępy → Dane</a> i liczą
-      się z pełnego zapisu sekunda po sekundzie, nie z tego wykresu.
+      Przesuń palcem albo myszą — odczyt nad wykresem podaje <b>dokładną
+      sekundę</b>, nie średnią z odcinka. Zapisanych sekund: ${pb.n}${
+      godzin ? ` (${godzin} h ${minut} min)` : ` (${minut} min)`}.
+      <br>Na piksel wykresu wypada kilka sekund, więc jasne pasmo pokazuje
+      rozpiętość <b>od najniższej do najwyższej sekundy</b> w tym miejscu,
+      a mocna linia biegnie po średniej. Sprint trwający sekundę widać przez to
+      w pełnej wysokości. Oś pionowa to procent najwyższej sekundy z tej jazdy —
+      ten sam przelicznik dla wszystkich linii; trzy osobne skale pozwoliłyby
+      dowieść dowolnej tezy samym przesunięciem zakresu.
+      <br>Rekordy na każde okno czasowe stoją w
+      <a class="odn-zakladka" href="#postepy/dane">Postępy → Dane</a>.
       Przerwa w linii znaczy postój albo brak pomiaru — nie zero.
     </div>`;
 }
 
 function blokPrzebiegu(x){
-  const pb = przebiegJazdy(x.id);
-  if (!pb) return `
+  const jest = ((PRZEBIEGI || {}).jazdy || {})[x.id];
+  if (!jest) return `
     <div class="pusto"><span class="znak">Przebieg</span>
       ${!PRZEBIEGI
         ? "Pliku <code>przebiegi.js</code> nie ma jeszcze w repozytorium."
@@ -6403,49 +6444,64 @@ function blokPrzebiegu(x){
           + "po kilkadziesiąt na przebieg, żeby nie przekroczyć limitu zapytań "
           + "Stravy — wróć tu po najbliższej nocnej aktualizacji."}
     </div>`;
-  return wykresPrzebiegu(pb);
+  return `<div id="przebieg-miejsce" data-jazda="${x.id}">
+    <div class="pusto"><span class="znak">…</span>Wczytuję przebieg tej jazdy.</div>
+  </div>`;
 }
 
 function podepnijPrzebieg(){
-  const ramka = document.getElementById("wykres-przebiegu");
-  if (!ramka) return;
-  const blok = document.querySelector(".notatka-dopisek");
-  const pb = blok ? przebiegJazdy(blok.dataset.jazda) : null;
-  if (!pb) return;
+  const miejsce = document.getElementById("przebieg-miejsce");
+  if (!miejsce || miejsce.dataset.gotowe) return;
+  const id = miejsce.dataset.jazda;
+  miejsce.dataset.gotowe = "1";
 
-  const W = 720, lewy = 44, prawy = 14, gora = 16, dol = 40, H = 300;
-  const px = W - lewy - prawy, py = H - gora - dol;
-  const maks = {};
-  for (const k of Object.keys(pb.serie))
-    maks[k] = Math.max(...(pb.szczyty[k] || pb.serie[k]).filter(v => v != null), 0) || 1;
-
-  const pokaz = (klientX) => {
-    const svg = ramka.querySelector("svg");
-    if (!svg) return;
-    const r = svg.getBoundingClientRect();
-    const uX = (klientX - r.left) / r.width * W;
-    const i = Math.max(0, Math.min(pb.n - 1,
-      Math.round((uX - lewy) / px * (pb.n - 1))));
-    const xi = lewy + (pb.n <= 1 ? px/2 : (i/(pb.n-1)) * px);
-
-    const kr = document.getElementById("krzyzyk-przebiegu");
-    if (kr){ kr.setAttribute("x1", xi); kr.setAttribute("x2", xi);
-             kr.setAttribute("opacity", ".4"); }
-    for (const k of Object.keys(pb.serie)){
-      const kropka = document.getElementById("punkt-" + k);
-      if (!kropka) continue;
-      const v = pb.serie[k][i];
-      if (v == null){ kropka.setAttribute("opacity", "0"); continue; }
-      kropka.setAttribute("cx", xi);
-      kropka.setAttribute("cy", gora + py - (v / maks[k]) * py);
-      kropka.setAttribute("opacity", "1");
+  wczytajPrzebieg(id, (pb) => {
+    // Zakładka mogła się w tym czasie zmienić — nie wstawiamy w nieswoje miejsce.
+    const teraz = document.getElementById("przebieg-miejsce");
+    if (!teraz || teraz.dataset.jazda !== id) return;
+    if (!pb){
+      teraz.innerHTML = `<div class="pusto"><span class="znak">Przebieg</span>
+        Nie udało się wczytać przebiegu tej jazdy.</div>`;
+      return;
     }
-    const odczyt = document.getElementById("odczyt-jazdy");
-    if (odczyt) odczyt.innerHTML = odczytPrzebiegu(pb, i);
-  };
+    teraz.innerHTML = wykresPrzebiegu(pb);
 
-  ramka.addEventListener("pointermove", e => { e.preventDefault(); pokaz(e.clientX); });
-  ramka.addEventListener("pointerdown", e => { e.preventDefault(); pokaz(e.clientX); });
+    const ramka = document.getElementById("wykres-przebiegu");
+    if (!ramka) return;
+    const W = 720, lewy = 44, prawy = 14, gora = 16, dol = 40, H = 300;
+    const px = W - lewy - prawy, py = H - gora - dol;
+    const maks = {};
+    for (const k of Object.keys(pb.serie))
+      maks[k] = Math.max(...pb.serie[k].filter(v => v != null), 0) || 1;
+
+    const pokaz = (klientX) => {
+      const svg = ramka.querySelector("svg");
+      if (!svg) return;
+      const r = svg.getBoundingClientRect();
+      const uX = (klientX - r.left) / r.width * W;
+      const i = Math.max(0, Math.min(pb.n - 1,
+        Math.round((uX - lewy) / px * (pb.n - 1))));
+      const xi = lewy + (pb.n <= 1 ? px/2 : (i/(pb.n-1)) * px);
+
+      const kr = document.getElementById("krzyzyk-przebiegu");
+      if (kr){ kr.setAttribute("x1", xi); kr.setAttribute("x2", xi);
+               kr.setAttribute("opacity", ".4"); }
+      for (const k of Object.keys(pb.serie)){
+        const kropka = document.getElementById("punkt-" + k);
+        if (!kropka) continue;
+        const v = pb.serie[k][i];
+        if (v == null){ kropka.setAttribute("opacity", "0"); continue; }
+        kropka.setAttribute("cx", xi);
+        kropka.setAttribute("cy", gora + py - (v / maks[k]) * py);
+        kropka.setAttribute("opacity", "1");
+      }
+      const odczyt = document.getElementById("odczyt-jazdy");
+      if (odczyt) odczyt.innerHTML = odczytPrzebiegu(pb, i);
+    };
+
+    ramka.addEventListener("pointermove", e => { e.preventDefault(); pokaz(e.clientX); });
+    ramka.addEventListener("pointerdown", e => { e.preventDefault(); pokaz(e.clientX); });
+  });
 }
 
 function oknoJazdy(id){
