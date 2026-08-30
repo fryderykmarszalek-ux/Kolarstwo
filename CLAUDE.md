@@ -77,6 +77,7 @@ cel jeszcze długo po zmianie planu.
 ```
 index.html   cała strona: układ, style, wykresy, interakcja
 dane.js      100 aktywności ze Stravy + założenia + plan + kryterium
+przebiegi.js prędkość, moc i tętno w czasie każdej jazdy (próbkowane, 71 kB)
 trasy.js     kształty jazd (Strava), przycięte strefą prywatności 500 m — dziś nieużywane
 swiat.js     zarys granic świata, Natural Earth 110m — dziś nieużywane
 STRONA.md    jak budować stronę (źródło prawdy)
@@ -619,22 +620,42 @@ nie kolor: sylwetka roweru vs ekranu, słupek kreskowany vs pełny.
   nocnej Analizy AI. Claude w czacie pisze do `claude.js` przez konektor
   GitHuba i nic więcej mu nie potrzeba.
 
-  **Jeden wykres z trzema miarami — i NIE jest to złamanie zakazu dwóch osi.**
-  Fryderyk poprosił o moc, tętno i prędkość średnią na jednym rysunku. Zakaz
-  dotyczy dwóch RÓŻNYCH miar na dwóch skalach o osobnych zakresach, bo
-  przesunięciem jednego zakresu da się dowieść dowolnej tezy. Tutaj jest
-  **jedna oś o jednym znaczeniu: procent najlepszej wartości w zbiorze**.
-  Przeliczenie jest identyczne dla wszystkich trzech serii, nie ma w nim ani
-  jednej liczby dobranej ręcznie, a legenda podaje dzielnik, więc każdy punkt
-  wraca do watów i uderzeń. Barwy z gotowej palety serii (`--seria-moc`,
-  `--seria-tetno`, `--seria-predkosc`) — nic nowego nie dołożono.
+  **Wykres: PRZEBIEG TEJ JAZDY, sekunda po sekundzie** (poprawiony 30.08.2026,
+  pierwsza wersja była zła). Ciągła linia prędkości, mocy i tętna w czasie,
+  z osią czasu pod spodem i odczytem, który jedzie za palcem. Pierwsza wersja
+  pokazywała punkty na KOLEJNYCH JAZDACH, bez osi czasu i bez odczytu —
+  Fryderyk słusznie odrzucił to w całości.
 
-  **Punkt to CAŁA JAZDA, nie sekunda.** Strona trzyma średnie, nie przebieg
-  sekunda po sekundzie; rysunek wewnątrz jednej jazdy wymagałby strumieni,
-  czyli kilku megabajtów na sto jazd. Wykres pokazuje więc, jak te trzy miary
-  zmieniają się MIĘDZY jazdami, i tylko w obrębie tego samego rodzaju
-  (trenażer osobno od szosy — inaczej skok prędkości mówiłby o pogodzie).
-  Brakująca seria jest **nazwana pod wykresem**, a nie chowana w ciszy.
+  **Dane: `przebiegi.js`, nowy rodzaj danych.** Strava oddaje strumienie
+  sekunda po sekundzie i przychodzą tym samym zapytaniem, które automat już
+  robił po waty i tętno — doszedł tylko `velocity_smooth` do listy kluczy.
+  Pełne 1 Hz dla stu jazd to 1,23 mln liczb i kilka megabajtów; próbkujemy
+  więc do najwyżej 700 punktów na jazdę, bo wykres ma 720 pikseli. Wyszło
+  **71 kB na 83 jazdy**.
+
+  Wartość punktu to **średnia sekund**, które do niego wpadły, a nie co n-ta
+  sekunda: pojedyncza sekunda bywa artefaktem. Kubełek bez ani jednej sekundy
+  zostaje **pusty** — postój nie jest zerem watów, tak samo jak przy krzywej
+  mocy. W kodowaniu (zygzak + varint, jak trasy) wartość jest powiększona o 1,
+  bo **zero jest zarezerwowane na brak pomiaru**; bez tego postoju nie dałoby
+  się odróżnić od zera.
+
+  **BUDŻET ZAPYTAŃ — nie usuwać.** Uzupełnienie 83 jazd to 83 zapytania,
+  a Strava daje 100 na kwadrans. Skrypt dobiera najwyżej 55 jazd na przebieg
+  i pisze w logu, ile zostało. Backfill zajął trzy przebiegi.
+
+  **Jedna oś o jednym znaczeniu: procent szczytu z TEJ jazdy.** Trzy osobne
+  skale pozwoliłyby dowieść dowolnej tezy samym przesunięciem zakresu. Dokładne
+  waty, uderzenia i km/h podaje odczyt nad wykresem, więc procent niczego nie
+  zastępuje. Barwy z gotowej palety serii — nic nowego nie dołożono.
+
+  **Odczyt stoi NAD wykresem, nie w dymku pod palcem** — na iPadzie palec
+  zasłaniałby dokładnie to miejsce, które się czyta. Krzyżyk i kropki zmieniają
+  atrybuty, nie `innerHTML`: ta sama zasada, przez którą wykres prób
+  w Porównaniach przestał migać.
+
+  **Kalorie liczy Strava i tak są opisane na kafelku.** Są wyłącznie
+  w szczegółach jazdy, nie w liście — dociągane tym samym budżetem.
 
 - **Zakładka Teren → Mapa została USUNIĘTA 30.08.2026**, dzień po zbudowaniu —
   decyzja Fryderyka („zamiast tej zakładki z mapami"). Kod mapy wyleciał

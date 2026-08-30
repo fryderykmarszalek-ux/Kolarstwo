@@ -1121,6 +1121,24 @@ table.aktywnosci th:nth-child(6),table.aktywnosci td:nth-child(6){width:22.5%}
   border-top:1px solid var(--linia);padding-top:8px}
 .notatka-dopisek{border-left:3px dashed var(--slaby)}
 .notatka-dopisek textarea{font-style:italic}
+
+/* Odczyt stoi NAD wykresem, a nie w dymku pod palcem: na iPadzie palec
+   zasłoniłby dokładnie to miejsce, które się właśnie czyta. */
+.odczyt-jazdy{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 16px;
+  padding:9px 12px;border:1px solid var(--linia);border-radius:9px;
+  background:var(--plyta);margin-bottom:8px;min-height:38px}
+.odczyt-czas{font-variant-numeric:tabular-nums;font-weight:700;font-size:15px;
+  color:var(--tekst);min-width:58px}
+.odczyt-poz{display:inline-flex;align-items:baseline;gap:5px;font-size:13px;
+  color:var(--slaby)}
+.odczyt-poz i{width:9px;height:9px;border-radius:2px;flex:0 0 auto;
+  align-self:center}
+.odczyt-poz b{font-variant-numeric:tabular-nums;font-size:14.5px;color:var(--tekst)}
+.odczyt-poz em{font-style:normal;font-size:11.5px}
+.wykres-przebiegu{border:1px solid var(--linia);border-radius:9px;
+  background:var(--powierzchnia);padding:6px 4px;touch-action:pan-y;
+  cursor:crosshair}
+.wykres-przebiegu svg{display:block;height:auto}
 .odn-strava{color:#FC4C02;text-decoration:none;display:inline-flex;
   align-items:center;gap:4px;vertical-align:-2px}
 .odn-strava:hover{text-decoration:underline}
@@ -1170,6 +1188,7 @@ footer{color:var(--slaby);font-size:12px;padding:14px 20px 34px;max-width:1000px
 <footer id="stopka"></footer>
 
 <script src="dane.js"></script>
+<script src="przebiegi.js"></script>
 <!-- Treści pisane przez Claude'a w czacie. Osobny plik, żeby nie ruszał
      272-kilobajtowego dane.js, którego automat i tak przepisuje co noc.
      Gdyby pliku nie było, strona działa dalej — patrz TRESCI niżej. -->
@@ -6194,112 +6213,202 @@ const ZNAK_STRAVY = `<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="t
   width="13" height="13"><path d="M15.387 17.944l-2.089-4.116h-3.065L15.387 24l5.15-10.172h-3.066
   m-7.008-5.599l2.836 5.598h4.172L10.463 0l-7 13.828h4.169"/></svg>`;
 
-/* ── Wykres trzech miar naraz ───────────────────────────────────────────────
-   Fryderyk poprosił o jeden rysunek z mocą, tętnem i średnią prędkością.
-   Na tej stronie obowiązuje twarda zasada: NIGDY dwie różne miary na dwóch
-   osiach o osobnych zakresach, bo przesunięciem jednego zakresu da się
-   dowieść dowolnej tezy o tym, że jedno „idzie za" drugim.
+/* ── Przebieg jednej jazdy ──────────────────────────────────────────────────
+   Prędkość, moc i tętno W CZASIE tej jazdy — ciągła linia, nie punkty na
+   kolejnych jazdach. Dane leżą w przebiegi.js: automat pobiera ze Stravy
+   strumienie sekunda po sekundzie i uśrednia je do kroku dającego najwyżej
+   700 punktów, bo tyle mieści wykres.
 
-   Rozwiązanie, które daje jeden wykres i nie łamie tej zasady: JEDNA oś
-   o JEDNYM znaczeniu — procent najlepszej wartości w pokazanym zbiorze.
-   Przeliczenie jest identyczne dla wszystkich trzech serii i nie ma w nim
-   ani jednej liczby dobranej ręcznie, a legenda podaje dzielnik, więc każdy
-   punkt da się z powrotem zamienić na waty, uderzenia i kilometry.
+   OŚ POZIOMA TO CZAS OD STARTU, z podpisami — bez tego nie da się powiedzieć,
+   w którym momencie jazdy coś się działo.
 
-   Punkt = JAZDA, nie sekunda. Strona nie trzyma przebiegu jazdy sekunda po
-   sekundzie — tylko średnie — więc wykres pokazuje, jak te trzy miary
-   zmieniały się MIĘDZY jazdami. Rysunek wewnątrz jednej jazdy wymagałby
-   strumieni, czyli kilku megabajtów na sto jazd.
-*/
-const SERIE_JAZDY = [
-  { k:"moc",      nazwa:"Moc średnia",      jedn:"W",    barwa:"var(--seria-moc)" },
-  { k:"tetno",    nazwa:"Tętno średnie",    jedn:"bpm",  barwa:"var(--seria-tetno)" },
-  { k:"predkosc", nazwa:"Prędkość średnia", jedn:"km/h", barwa:"var(--seria-predkosc)" }
-];
+   JEDNA OŚ PIONOWA O JEDNYM ZNACZENIU: procent najlepszej wartości w TEJ
+   jeździe. Trzy osobne skale na jednym obrazku pozwoliłyby dowieść dowolnej
+   tezy samym przesunięciem zakresu. Dokładne liczby — waty, uderzenia,
+   kilometry na godzinę — podaje odczyt nad wykresem, więc procent nie musi
+   niczego zastępować.
 
-function wykresTrzechMiar(lista, wybranyId){
-  const W = 720, H = 300, lewy = 46, prawy = 16, gora = 18, dol = 52;
+   Odczyt przesuwa się palcem i myszą. Nie przerysowujemy przy tym SVG:
+   krzyżyk i kropki mają zmieniane atrybuty, tekst odczytu innerHTML. Ta sama
+   zasada, przez którą wykres prób w Porównaniach przestał migać. */
+
+const PRZEBIEGI = (typeof window !== "undefined" && window.PRZEBIEGI)
+  ? window.PRZEBIEGI : null;
+
+/* Dekoder lustrzany wobec kodujSerie() w automacie: zygzak + varint na
+   różnicach, wartość powiększona o 1, zero znaczy BRAK POMIARU. */
+function dekodujSerie(s){
+  const out = []; let i = 0, poprz = 0;
+  while (i < s.length){
+    let b, sh = 0, r = 0;
+    do { b = s.charCodeAt(i++) - 63; r |= (b & 0x1f) << sh; sh += 5; } while (b >= 0x20);
+    poprz += (r & 1) ? ~(r >> 1) : (r >> 1);
+    out.push(poprz === 0 ? null : poprz - 1);
+  }
+  return out;
+}
+
+const OPIS_SERII = {
+  predkosc: { nazwa:"Prędkość", jedn:"km/h", barwa:"var(--seria-predkosc)", miejsc:1 },
+  moc:      { nazwa:"Moc",      jedn:"W",    barwa:"var(--seria-moc)",      miejsc:0 },
+  tetno:    { nazwa:"Tętno",    jedn:"bpm",  barwa:"var(--seria-tetno)",    miejsc:0 }
+};
+
+function przebiegJazdy(id){
+  const p = (PRZEBIEGI || {}).jazdy ? PRZEBIEGI.jazdy[id] : null;
+  if (!p) return null;
+  const serie = {};
+  if (p.v) serie.predkosc = dekodujSerie(p.v).map(x => x == null ? null : x / 10);
+  if (p.w) serie.moc      = dekodujSerie(p.w);
+  if (p.h) serie.tetno    = dekodujSerie(p.h);
+  const dlugosc = Math.max(...Object.values(serie).map(a => a.length), 0);
+  if (!dlugosc) return null;
+  return { krok: p.krok, n: dlugosc, serie };
+}
+
+// Podpis czasu: przy jeździe krótszej niż godzina minuty i sekundy,
+// przy dłuższej godziny i minuty. „71:20" nikomu nic nie mówi.
+function czasOsi(sek, zSekundami){
+  const h = Math.floor(sek/3600), m = Math.floor(sek%3600/60), s = Math.round(sek%60);
+  if (zSekundami && h === 0) return `${m}:${String(s).padStart(2,"0")}`;
+  return h ? `${h}:${String(m).padStart(2,"0")}` : `${m} min`;
+}
+
+function odczytPrzebiegu(pb, i){
+  const sek = i * pb.krok;
+  const czesci = Object.keys(OPIS_SERII).filter(k => pb.serie[k]).map(k => {
+    const v = pb.serie[k][i];
+    const o = OPIS_SERII[k];
+    return `<span class="odczyt-poz"><i style="background:${o.barwa}"></i>
+      <b>${v == null ? "—" : liczba(v, o.miejsc)}</b>
+      <em>${v == null ? "brak pomiaru" : o.jedn}</em></span>`;
+  }).join("");
+  return `<span class="odczyt-czas">${czasOsi(sek, true)}</span>${czesci}`;
+}
+
+function wykresPrzebiegu(pb){
+  const W = 720, H = 300, lewy = 44, prawy = 14, gora = 16, dol = 40;
   const px = W - lewy - prawy, py = H - gora - dol;
-  const n = lista.length;
+  const n = pb.n;
+  const koniec = (n - 1) * pb.krok;
   const x = (i) => lewy + (n <= 1 ? px/2 : (i/(n-1)) * px);
   const y = (proc) => gora + py - (proc/100) * py;
+  const licz = (v) => liczba(v, 1).replace(",", ".");
 
-  const serie = SERIE_JAZDY.map(s => {
-    const wartosci = lista.map(a => a[s.k]);
-    const maks = Math.max(...wartosci.filter(v => v != null), 0);
-    return { ...s, wartosci, maks, ile: wartosci.filter(v => v != null).length };
-  }).filter(s => s.ile > 0);
-
-  if (!serie.length) return `<div class="pusto"><span class="znak">Brak pomiarów</span>
-    Żadna z tych jazd nie ma ani mocy, ani tętna, ani czasu potrzebnego do
-    policzenia prędkości.</div>`;
-
-  /* Brakującej serii nie chowamy w ciszy. Jeden z trzech kolorów na rysunku
-     zatytułowanym „moc, tętno i prędkość" wygląda jak awaria, dopóki nie jest
-     napisane, czego brakuje i od kiedy się pojawi. */
-  const brak = [];
-  if (!serie.some(s => s.k === "moc"))
-    brak.push("żadna z tych jazd nie ma zmierzonej mocy — rower nie ma miernika,"
-      + " a estymaty Stravy nie pokazujemy.");
-  if (!serie.some(s => s.k === "tetno"))
-    brak.push("tętna nie ma jeszcze w ani jednej jeździe — pas piersiowy wchodzi"
-      + " 1.09.2026 i linia dorysuje się sama.");
+  const uzyte = Object.keys(OPIS_SERII).filter(k => pb.serie[k]);
+  const maks = {};
+  for (const k of uzyte)
+    maks[k] = Math.max(...pb.serie[k].filter(v => v != null), 0) || 1;
 
   let g = `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img"
-    aria-label="Moc, tętno i prędkość średnia w kolejnych jazdach">`;
-  for (let p = 0; p <= 100; p += 25){
+    aria-label="Prędkość, moc i tętno w czasie tej jazdy">`;
+  for (let p = 0; p <= 100; p += 25)
     g += `<line x1="${lewy}" y1="${y(p)}" x2="${W-prawy}" y2="${y(p)}"
       stroke="var(--linia)" stroke-width="1"/>
-      <text x="${lewy-8}" y="${y(p)+4}" text-anchor="end" font-size="11"
+      <text x="${lewy-7}" y="${y(p)+4}" text-anchor="end" font-size="11"
         fill="var(--slaby)">${p}%</text>`;
+
+  // Podziałka czasu: krok dobrany tak, żeby wyszło 4–8 podpisów, i zawsze
+  // okrągły — 5, 10, 15, 30 minut albo godzina.
+  const KROKI_OSI = [60,120,300,600,900,1800,3600,7200];
+  const krokOsi = KROKI_OSI.find(k => koniec/k <= 8) || KROKI_OSI[KROKI_OSI.length-1];
+  for (let t = 0; t <= koniec; t += krokOsi){
+    const xi = x(t / pb.krok);
+    g += `<line x1="${licz(xi)}" y1="${gora+py}" x2="${licz(xi)}" y2="${gora+py+4}"
+      stroke="var(--slaby)" stroke-width="1"/>
+      <text x="${licz(xi)}" y="${gora+py+18}" text-anchor="middle" font-size="11"
+        fill="var(--slaby)">${czasOsi(t)}</text>`;
   }
 
-  const iWybrany = lista.findIndex(a => a.id === wybranyId);
-  if (iWybrany >= 0)
-    g += `<line x1="${x(iWybrany)}" y1="${gora}" x2="${x(iWybrany)}" y2="${gora+py}"
-      stroke="var(--tekst)" stroke-width="1.5" opacity=".45"
-      stroke-dasharray="4 3"/>`;
-
-  for (const s of serie){
-    /* Przerwa w pomiarach ROZCINA linię, zamiast ją zmyślać: brak tętna na
-       trzech jazdach pod rząd nie może wyglądać jak płaski odcinek. */
+  for (const k of uzyte){
+    const o = OPIS_SERII[k];
     let d = "", trzeba = true;
-    s.wartosci.forEach((v, i) => {
-      if (v == null){ trzeba = true; return; }
-      const proc = s.maks ? v / s.maks * 100 : 0;
-      d += `${trzeba ? "M" : "L"}${liczba(x(i),1).replace(",",".")} ${
-        liczba(y(proc),1).replace(",",".")} `;
+    pb.serie[k].forEach((v, i) => {
+      if (v == null){ trzeba = true; return; }   // przerwa rozcina linię
+      d += `${trzeba ? "M" : "L"}${licz(x(i))} ${licz(y(v / maks[k] * 100))} `;
       trzeba = false;
     });
-    g += `<path d="${d}" fill="none" stroke="${s.barwa}" stroke-width="2"
-      stroke-linejoin="round" stroke-linecap="round"/>`;
-    s.wartosci.forEach((v, i) => {
-      if (v == null) return;
-      const proc = s.maks ? v / s.maks * 100 : 0;
-      const wybrany = i === iWybrany;
-      g += `<circle cx="${x(i)}" cy="${y(proc)}" r="${wybrany ? 5 : 2.6}"
-        fill="${s.barwa}"${wybrany
-          ? ` stroke="var(--powierzchnia)" stroke-width="2"` : ""}/>`;
-    });
+    g += `<path d="${d}" fill="none" stroke="${o.barwa}" stroke-width="1.7"
+      stroke-linejoin="round" stroke-linecap="round" opacity=".9"/>`;
   }
-  g += `<text x="${lewy}" y="${H-26}" font-size="11" fill="var(--slaby)"
-    >kolejne jazdy, od najstarszej →</text></svg>`;
 
-  return `<div class="krzywa-mocy">${g}</div>
-    <div class="legenda">${serie.map(s =>
-      `<span><i style="background:${s.barwa}"></i>${s.nazwa} — 100% to
-        ${liczba(s.maks, s.k === "predkosc" ? 1 : 0)} ${s.jedn}</span>`).join("")}</div>
+  g += `<line id="krzyzyk-przebiegu" x1="${lewy}" y1="${gora}" x2="${lewy}" y2="${gora+py}"
+    stroke="var(--tekst)" stroke-width="1" opacity="0" pointer-events="none"/>`;
+  for (const k of uzyte)
+    g += `<circle id="punkt-${k}" r="4" fill="${OPIS_SERII[k].barwa}"
+      stroke="var(--powierzchnia)" stroke-width="1.6" opacity="0"
+      pointer-events="none"/>`;
+  g += `</svg>`;
+
+  return `
+    <div class="odczyt-jazdy" id="odczyt-jazdy">${odczytPrzebiegu(pb, n - 1)}</div>
+    <div class="wykres-przebiegu" id="wykres-przebiegu">${g}</div>
+    <div class="legenda">${uzyte.map(k => `<span><i style="background:${
+      OPIS_SERII[k].barwa}"></i>${OPIS_SERII[k].nazwa} — szczyt ${liczba(maks[k],
+      OPIS_SERII[k].miejsc)} ${OPIS_SERII[k].jedn}</span>`).join("")}</div>
     <div class="podpis-wykresu">
-      Jedna oś i jedno znaczenie: <b>procent najlepszej wartości w tym
-      zbiorze</b>. Trzy osobne skale na jednym obrazku pozwoliłyby dowieść
-      dowolnej tezy samym przesunięciem zakresu, więc każda seria jest dzielona
-      przez swoje maksimum — to samo przeliczenie dla wszystkich, a dzielniki
-      stoją w legendzie, żeby dało się wrócić do watów i uderzeń.
-      <br>Punkt to <b>cała jazda</b>, nie sekunda: strona trzyma średnie, a nie
-      przebieg sekunda po sekundzie. Przerwa w linii znaczy brak pomiaru.
-      ${brak.length ? `<br>Z trzech miar rysuje ${serie.length === 1
-        ? "się jedna" : "się " + serie.length}, bo ${brak.join(" ")}` : ""}
+      Przesuń palcem albo myszą po wykresie — odczyt nad nim pokazuje, ile
+      dokładnie było w tym momencie jazdy. Oś pozioma to czas od startu,
+      pionowa to <b>procent szczytu z tej jazdy</b>, ten sam przelicznik dla
+      wszystkich trzech linii; trzy osobne skale pozwoliłyby dowieść dowolnej
+      tezy samym przesunięciem zakresu. Punkt to średnia z ${pb.krok} s.
+      Przerwa w linii znaczy postój albo brak pomiaru — nie zero.
     </div>`;
+}
+
+function blokPrzebiegu(x){
+  const pb = przebiegJazdy(x.id);
+  if (!pb) return `
+    <div class="pusto"><span class="znak">Przebieg</span>
+      ${!PRZEBIEGI
+        ? "Pliku <code>przebiegi.js</code> nie ma jeszcze w repozytorium."
+        : "Ta jazda nie ma jeszcze pobranego przebiegu. Automat dobiera je "
+          + "po kilkadziesiąt na przebieg, żeby nie przekroczyć limitu zapytań "
+          + "Stravy — wróć tu po najbliższej nocnej aktualizacji."}
+    </div>`;
+  return wykresPrzebiegu(pb);
+}
+
+function podepnijPrzebieg(){
+  const ramka = document.getElementById("wykres-przebiegu");
+  if (!ramka) return;
+  const blok = document.querySelector(".notatka-dopisek");
+  const pb = blok ? przebiegJazdy(blok.dataset.jazda) : null;
+  if (!pb) return;
+
+  const W = 720, lewy = 44, prawy = 14, gora = 16, dol = 40, H = 300;
+  const px = W - lewy - prawy, py = H - gora - dol;
+  const maks = {};
+  for (const k of Object.keys(pb.serie))
+    maks[k] = Math.max(...pb.serie[k].filter(v => v != null), 0) || 1;
+
+  const pokaz = (klientX) => {
+    const svg = ramka.querySelector("svg");
+    if (!svg) return;
+    const r = svg.getBoundingClientRect();
+    const uX = (klientX - r.left) / r.width * W;
+    const i = Math.max(0, Math.min(pb.n - 1,
+      Math.round((uX - lewy) / px * (pb.n - 1))));
+    const xi = lewy + (pb.n <= 1 ? px/2 : (i/(pb.n-1)) * px);
+
+    const kr = document.getElementById("krzyzyk-przebiegu");
+    if (kr){ kr.setAttribute("x1", xi); kr.setAttribute("x2", xi);
+             kr.setAttribute("opacity", ".4"); }
+    for (const k of Object.keys(pb.serie)){
+      const kropka = document.getElementById("punkt-" + k);
+      if (!kropka) continue;
+      const v = pb.serie[k][i];
+      if (v == null){ kropka.setAttribute("opacity", "0"); continue; }
+      kropka.setAttribute("cx", xi);
+      kropka.setAttribute("cy", gora + py - (v / maks[k]) * py);
+      kropka.setAttribute("opacity", "1");
+    }
+    const odczyt = document.getElementById("odczyt-jazdy");
+    if (odczyt) odczyt.innerHTML = odczytPrzebiegu(pb, i);
+  };
+
+  ramka.addEventListener("pointermove", e => { e.preventDefault(); pokaz(e.clientX); });
+  ramka.addEventListener("pointerdown", e => { e.preventDefault(); pokaz(e.clientX); });
 }
 
 function oknoJazdy(id){
@@ -6326,12 +6435,6 @@ function oknoJazdy(id){
   const opis = (a.opis || "").trim();
   const dopisek = dopisekBiezacy(id);
   const brudnopis = Object.prototype.hasOwnProperty.call(dopiskiLokalne(), id);
-
-  // Wykres pokazuje jazdy TEGO SAMEGO rodzaju — mieszanie trenażera z szosą
-  // dałoby skok prędkości mówiący o pogodzie, a nie o zawodniku.
-  const rodzina = AKTYWNOSCI
-    .filter(y => y.wnetrze === x.wnetrze)
-    .sort((p,q) => p.data < q.data ? -1 : 1);
 
   const kafel = (etykieta, wartosc, stopka) => `
     <div class="kafel"><div class="etykieta">${etykieta}</div>
@@ -6371,6 +6474,8 @@ function oknoJazdy(id){
         ? "nie wpisane" : "odczuwany wysiłek 1–10")}
       ${kafel("Praca", x.moc == null ? "—" : Math.round(x.moc * x.czas / 1000),
         x.moc == null ? "potrzebna moc" : "kJ")}
+      ${kafel("Kalorie", a.kalorie == null ? "—" : a.kalorie,
+        a.kalorie == null ? "Strava jeszcze nie podała" : "kcal · liczy Strava")}
     </div>
   </section>
 
@@ -6429,8 +6534,8 @@ function oknoJazdy(id){
   </section>
 
   <section>
-    <h3 class="analiza-naglowek">Moc, tętno i prędkość w kolejnych jazdach</h3>
-    ${wykresTrzechMiar(rodzina, id)}
+    <h3 class="analiza-naglowek">Przebieg jazdy</h3>
+    ${blokPrzebiegu(x)}
   </section>`;
 }
 
@@ -6604,6 +6709,7 @@ function pokaz(){
   podepnijRegeneracje();
   podepnijAktywnosci();
   podepnijJazde();
+  podepnijPrzebieg();
 
   // Wykres otwiera się na najświeższym końcu — najnowsza przerwa jest
   // najważniejsza, a przy dwóch latach historii ląduje poza kadrem.
