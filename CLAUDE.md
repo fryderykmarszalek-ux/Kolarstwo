@@ -586,9 +586,55 @@ nie kolor: sylwetka roweru vs ekranu, słupek kreskowany vs pełny.
   przerysowują się po każdym wyborze (zmieniają się liczniki), więc uchwyt
   na przycisku zginąłby razem z nim po pierwszym kliknięciu.
 
-  **Wiersz NIE jest jeszcze klikalny** — decyzja Fryderyka z 30.08.2026.
-  Dotknięcie ma w przyszłości otwierać okno z jazdą, a nie prowadzić na Stravę.
-  Nie robić z nazwy odnośnika.
+  **Kolejność: Indoors, potem Outdoors** (decyzja z 30.08.2026, po pierwszej
+  wersji odwrotnej).
+
+  **Szerokości kolumn liczą się z NAJDŁUŻSZEGO NAPISU, a tym jest nagłówek,
+  nie liczba.** Sześć równych kolumn po 13,2% dawało 100 px przy `min-width`
+  760 px, a „Przewyższenie" potrzebuje 137 px — napis wychodził poza komórkę
+  i sklejał się z „Mocą" w jeden wyraz. Teraz `min-width` 840 px i osobna
+  szerokość na kolumnę; zmierzone prześwity 44–82 px przy 500 px ekranu.
+  Po dołożeniu kolumny SPRAWDZIĆ TO MIARĄ, nie okiem.
+
+- **Aktywności → Jazda** (30.08.2026) — okno pojedynczej jazdy, otwierane
+  dotknięciem wiersza w tabeli. Działa jak Porównania S: **wybrana jazda żyje
+  w adresie** (`#aktywnosci/jazda/<id>`), więc wstecz i odświeżenie działają
+  bez dodatkowego stanu, a odnośnik z tabeli jest zwykłym odnośnikiem.
+  Osiem kafelków (długość, czas ruchu i postój, prędkość, przewyższenie z m/km,
+  tętno, moc, RPE, praca w kJ) plus odnośnik na Stravę.
+
+  **DWIE WARSTWY NOTATEK, KTÓRE SIĘ NIE MIESZAJĄ** — decyzja Fryderyka:
+  1. `opis` ze Stravy — **NIETYKALNY, tylko do odczytu**. Strava jest jego
+     jedynym właścicielem, automat nadpisuje go przy każdym przebiegu, więc
+     poprawka wpisana na stronie zniknęłaby tej samej nocy. Blok ma barwę
+     firmową Stravy `#FC4C02` i pismo proste. Nie robić z niego pola do
+     edycji „dla wygody" — to nie jest niedoróbka.
+  2. **Dopisek** — osobne pole, osobny klucz, **kursywa i kreskowana krawędź**,
+     żeby nigdy nie dało się pomylić, kto co napisał. Pisze go Fryderyk na
+     stronie albo Claude w czacie przez `claude.js` → `jazdy[id_jazdy]`.
+     Pierwszeństwo: brudnopis urządzenia > `claude.js` > `dane.js` →
+     `notatki_jazd`. Klucz `localStorage`: `kolarstwo-notatki-jazd`.
+
+  Dopisek **nie wymaga sekretu** — `ANTHROPIC_API_KEY` jest wyłącznie dla
+  nocnej Analizy AI. Claude w czacie pisze do `claude.js` przez konektor
+  GitHuba i nic więcej mu nie potrzeba.
+
+  **Jeden wykres z trzema miarami — i NIE jest to złamanie zakazu dwóch osi.**
+  Fryderyk poprosił o moc, tętno i prędkość średnią na jednym rysunku. Zakaz
+  dotyczy dwóch RÓŻNYCH miar na dwóch skalach o osobnych zakresach, bo
+  przesunięciem jednego zakresu da się dowieść dowolnej tezy. Tutaj jest
+  **jedna oś o jednym znaczeniu: procent najlepszej wartości w zbiorze**.
+  Przeliczenie jest identyczne dla wszystkich trzech serii, nie ma w nim ani
+  jednej liczby dobranej ręcznie, a legenda podaje dzielnik, więc każdy punkt
+  wraca do watów i uderzeń. Barwy z gotowej palety serii (`--seria-moc`,
+  `--seria-tetno`, `--seria-predkosc`) — nic nowego nie dołożono.
+
+  **Punkt to CAŁA JAZDA, nie sekunda.** Strona trzyma średnie, nie przebieg
+  sekunda po sekundzie; rysunek wewnątrz jednej jazdy wymagałby strumieni,
+  czyli kilku megabajtów na sto jazd. Wykres pokazuje więc, jak te trzy miary
+  zmieniają się MIĘDZY jazdami, i tylko w obrębie tego samego rodzaju
+  (trenażer osobno od szosy — inaczej skok prędkości mówiłby o pogodzie).
+  Brakująca seria jest **nazwana pod wykresem**, a nie chowana w ciszy.
 
 - **Zakładka Teren → Mapa została USUNIĘTA 30.08.2026**, dzień po zbudowaniu —
   decyzja Fryderyka („zamiast tej zakładki z mapami"). Kod mapy wyleciał

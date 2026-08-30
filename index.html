@@ -1096,9 +1096,35 @@ circle.punkt-proby{transition:r .12s ease}
 /* ── AKTYWNOŚCI ────────────────────────────────────────────────────────────
    Ta sama tabela co segmenty, ale sześć kolumn zamiast siedmiu, więc własne
    szerokości. Dwie grupy filtrów obok siebie, bo warunki mają się łączyć. */
-table.aktywnosci th:first-child,table.aktywnosci td:first-child{width:34%}
-table.aktywnosci th:not(:first-child),table.aktywnosci td:not(:first-child){width:13.2%}
+table.aktywnosci{min-width:840px}
+table.aktywnosci th:nth-child(1),table.aktywnosci td:nth-child(1){width:30%}
+table.aktywnosci th:nth-child(2),table.aktywnosci td:nth-child(2){width:13%}
+table.aktywnosci th:nth-child(3),table.aktywnosci td:nth-child(3){width:13.5%}
+table.aktywnosci th:nth-child(4),table.aktywnosci td:nth-child(4){width:11%}
+table.aktywnosci th:nth-child(5),table.aktywnosci td:nth-child(5){width:10%}
+table.aktywnosci th:nth-child(6),table.aktywnosci td:nth-child(6){width:22.5%}
 .akt-nazwa{color:var(--tekst);font-weight:600}
+
+/* ── OKNO JAZDY ────────────────────────────────────────────────────────────
+   Dwie warstwy notatek muszą być rozróżnialne bez czytania podpisu: opis ze
+   Stravy dostaje jej barwę firmową i pismo proste, dopisek — kreskę i kursywę.
+   Barwa Stravy wyłamuje się z systemu ról świadomie i na tej samej zasadzie
+   co znaczek w nagłówku: to znak cudzej marki, nie dana. */
+.notatka-strava{border:1px solid var(--linia);border-left:3px solid #FC4C02;
+  border-radius:10px;background:var(--plyta);padding:12px 14px;margin:10px 0}
+.notatka-strava .notatka-tytul{color:#FC4C02;display:inline-flex;
+  align-items:center;gap:6px}
+.tresc-strava{font-size:14px;line-height:1.55;white-space:normal;
+  overflow-wrap:anywhere;margin:2px 0 8px}
+.tresc-strava.pusta{color:var(--slaby);font-style:italic}
+.notatka-stopka{font-size:11.5px;color:var(--slaby);line-height:1.5;
+  border-top:1px solid var(--linia);padding-top:8px}
+.notatka-dopisek{border-left:3px dashed var(--slaby)}
+.notatka-dopisek textarea{font-style:italic}
+.odn-strava{color:#FC4C02;text-decoration:none;display:inline-flex;
+  align-items:center;gap:4px;vertical-align:-2px}
+.odn-strava:hover{text-decoration:underline}
+.proba-tytul h2 .seg-zwift{margin-right:6px;vertical-align:-2px}
 .przelaczniki-akt{flex-wrap:wrap;align-items:center;gap:8px 14px}
 .przelaczniki-akt .grupa-filtry{display:flex;align-items:center;gap:6px}
 .etykieta-filtru{font-size:11px;font-weight:700;letter-spacing:.04em;
@@ -5888,10 +5914,12 @@ function wierszeAktywnosci(){
   return lista.map(x => `
     <tr>
       <td class="${aktKlucz==="data"?"akt":""}">
-        <span class="seg-nazwa akt-nazwa">${x.wnetrze
+        <a class="seg-nazwa akt-nazwa" href="#aktywnosci/jazda/${x.id}"
+           title="Pokaż szczegóły tej jazdy">${x.wnetrze
           ? `<span class="seg-zwift" title="Zwift — trenażer, nie szosa">${
               ikonaDyscypliny("VirtualRide",14)}</span>` : ""}${bezpieczny(x.nazwa)}${
-          znacznikErg(x.jazda, "Trening ze sterowaną mocą — liczba mówi, co kazał program")}</span>
+          znacznikErg(x.jazda, "Trening ze sterowaną mocą — liczba mówi, co kazał program")}<span
+          class="strzalka-wew" aria-hidden="true">›</span></a>
         <span class="seg-data">${pl(x.data.slice(0,10))} · ${czasNaTekst(x.czas)}${
           x.jazda.rpe != null ? " · RPE " + x.jazda.rpe : ""}</span>
       </td>
@@ -6111,6 +6139,357 @@ function podepnijAktywnosci(){
   });
 }
 
+
+/* ==========================================================================
+   JAZDA — okno pojedynczej aktywności
+
+   Działa jak Porównania S: wybrana jazda żyje w ADRESIE
+   (#aktywnosci/jazda/<id>), a nie w zmiennej. Dzięki temu wstecz i
+   odświeżenie działają bez dodatkowego stanu, a odnośnik z tabeli jest
+   zwykłym odnośnikiem, nie skryptem.
+
+   NOTATKI SĄ DWUWARSTWOWE I TE WARSTWY SIĘ NIE MIESZAJĄ.
+
+   1. Opis ze Stravy (`opis`) — NIETYKALNY. Strava jest jego jedynym
+      właścicielem: automat nadpisuje go przy każdym przebiegu, więc każda
+      próba edycji tutaj zniknęłaby tej samej nocy. Pole jest wyłącznie do
+      czytania i tak ma zostać.
+   2. Dopisek — pisany przez Fryderyka na stronie albo przez Claude'a
+      w czacie (przez `claude.js`). Osobne pole, osobny klucz, inna barwa
+      i kursywa, żeby nigdy nie dało się pomylić, kto co napisał.
+
+   Pierwszeństwo dopisku: brudnopis urządzenia > claude.js > dane.js —
+   ta sama zasada, co przy notatkach do prób.
+   ========================================================================== */
+
+const KLUCZ_NOTATEK_JAZD = "kolarstwo-notatki-jazd";
+
+function dopiskiLokalne(){
+  try { return JSON.parse(localStorage.getItem(KLUCZ_NOTATEK_JAZD) || "{}"); }
+  catch(e){ return {}; }
+}
+function zapiszDopiskiLokalne(obj){
+  try { localStorage.setItem(KLUCZ_NOTATEK_JAZD, JSON.stringify(obj)); return true; }
+  catch(e){ return false; }
+}
+function dopisekZRepo(id){
+  const n = (TRESCI.jazdy || {})[id] ?? (D.notatki_jazd || {})[id];
+  if (!n) return "";
+  return typeof n === "string" ? n : (n.tekst || "");
+}
+function dopisekBiezacy(id){
+  const l = dopiskiLokalne();
+  return Object.prototype.hasOwnProperty.call(l, id) ? l[id] : dopisekZRepo(id);
+}
+// Brudnopis zrównany z repozytorium nie ma po co żyć — jak przy próbach.
+(function sprzatnijDopiski(){
+  const l = dopiskiLokalne();
+  let zmiana = false;
+  for (const id of Object.keys(l))
+    if (l[id] === dopisekZRepo(id)){ delete l[id]; zmiana = true; }
+  if (zmiana) zapiszDopiskiLokalne(l);
+})();
+
+const ZNAK_STRAVY = `<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"
+  width="13" height="13"><path d="M15.387 17.944l-2.089-4.116h-3.065L15.387 24l5.15-10.172h-3.066
+  m-7.008-5.599l2.836 5.598h4.172L10.463 0l-7 13.828h4.169"/></svg>`;
+
+/* ── Wykres trzech miar naraz ───────────────────────────────────────────────
+   Fryderyk poprosił o jeden rysunek z mocą, tętnem i średnią prędkością.
+   Na tej stronie obowiązuje twarda zasada: NIGDY dwie różne miary na dwóch
+   osiach o osobnych zakresach, bo przesunięciem jednego zakresu da się
+   dowieść dowolnej tezy o tym, że jedno „idzie za" drugim.
+
+   Rozwiązanie, które daje jeden wykres i nie łamie tej zasady: JEDNA oś
+   o JEDNYM znaczeniu — procent najlepszej wartości w pokazanym zbiorze.
+   Przeliczenie jest identyczne dla wszystkich trzech serii i nie ma w nim
+   ani jednej liczby dobranej ręcznie, a legenda podaje dzielnik, więc każdy
+   punkt da się z powrotem zamienić na waty, uderzenia i kilometry.
+
+   Punkt = JAZDA, nie sekunda. Strona nie trzyma przebiegu jazdy sekunda po
+   sekundzie — tylko średnie — więc wykres pokazuje, jak te trzy miary
+   zmieniały się MIĘDZY jazdami. Rysunek wewnątrz jednej jazdy wymagałby
+   strumieni, czyli kilku megabajtów na sto jazd.
+*/
+const SERIE_JAZDY = [
+  { k:"moc",      nazwa:"Moc średnia",      jedn:"W",    barwa:"var(--seria-moc)" },
+  { k:"tetno",    nazwa:"Tętno średnie",    jedn:"bpm",  barwa:"var(--seria-tetno)" },
+  { k:"predkosc", nazwa:"Prędkość średnia", jedn:"km/h", barwa:"var(--seria-predkosc)" }
+];
+
+function wykresTrzechMiar(lista, wybranyId){
+  const W = 720, H = 300, lewy = 46, prawy = 16, gora = 18, dol = 52;
+  const px = W - lewy - prawy, py = H - gora - dol;
+  const n = lista.length;
+  const x = (i) => lewy + (n <= 1 ? px/2 : (i/(n-1)) * px);
+  const y = (proc) => gora + py - (proc/100) * py;
+
+  const serie = SERIE_JAZDY.map(s => {
+    const wartosci = lista.map(a => a[s.k]);
+    const maks = Math.max(...wartosci.filter(v => v != null), 0);
+    return { ...s, wartosci, maks, ile: wartosci.filter(v => v != null).length };
+  }).filter(s => s.ile > 0);
+
+  if (!serie.length) return `<div class="pusto"><span class="znak">Brak pomiarów</span>
+    Żadna z tych jazd nie ma ani mocy, ani tętna, ani czasu potrzebnego do
+    policzenia prędkości.</div>`;
+
+  /* Brakującej serii nie chowamy w ciszy. Jeden z trzech kolorów na rysunku
+     zatytułowanym „moc, tętno i prędkość" wygląda jak awaria, dopóki nie jest
+     napisane, czego brakuje i od kiedy się pojawi. */
+  const brak = [];
+  if (!serie.some(s => s.k === "moc"))
+    brak.push("żadna z tych jazd nie ma zmierzonej mocy — rower nie ma miernika,"
+      + " a estymaty Stravy nie pokazujemy.");
+  if (!serie.some(s => s.k === "tetno"))
+    brak.push("tętna nie ma jeszcze w ani jednej jeździe — pas piersiowy wchodzi"
+      + " 1.09.2026 i linia dorysuje się sama.");
+
+  let g = `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img"
+    aria-label="Moc, tętno i prędkość średnia w kolejnych jazdach">`;
+  for (let p = 0; p <= 100; p += 25){
+    g += `<line x1="${lewy}" y1="${y(p)}" x2="${W-prawy}" y2="${y(p)}"
+      stroke="var(--linia)" stroke-width="1"/>
+      <text x="${lewy-8}" y="${y(p)+4}" text-anchor="end" font-size="11"
+        fill="var(--slaby)">${p}%</text>`;
+  }
+
+  const iWybrany = lista.findIndex(a => a.id === wybranyId);
+  if (iWybrany >= 0)
+    g += `<line x1="${x(iWybrany)}" y1="${gora}" x2="${x(iWybrany)}" y2="${gora+py}"
+      stroke="var(--tekst)" stroke-width="1.5" opacity=".45"
+      stroke-dasharray="4 3"/>`;
+
+  for (const s of serie){
+    /* Przerwa w pomiarach ROZCINA linię, zamiast ją zmyślać: brak tętna na
+       trzech jazdach pod rząd nie może wyglądać jak płaski odcinek. */
+    let d = "", trzeba = true;
+    s.wartosci.forEach((v, i) => {
+      if (v == null){ trzeba = true; return; }
+      const proc = s.maks ? v / s.maks * 100 : 0;
+      d += `${trzeba ? "M" : "L"}${liczba(x(i),1).replace(",",".")} ${
+        liczba(y(proc),1).replace(",",".")} `;
+      trzeba = false;
+    });
+    g += `<path d="${d}" fill="none" stroke="${s.barwa}" stroke-width="2"
+      stroke-linejoin="round" stroke-linecap="round"/>`;
+    s.wartosci.forEach((v, i) => {
+      if (v == null) return;
+      const proc = s.maks ? v / s.maks * 100 : 0;
+      const wybrany = i === iWybrany;
+      g += `<circle cx="${x(i)}" cy="${y(proc)}" r="${wybrany ? 5 : 2.6}"
+        fill="${s.barwa}"${wybrany
+          ? ` stroke="var(--powierzchnia)" stroke-width="2"` : ""}/>`;
+    });
+  }
+  g += `<text x="${lewy}" y="${H-26}" font-size="11" fill="var(--slaby)"
+    >kolejne jazdy, od najstarszej →</text></svg>`;
+
+  return `<div class="krzywa-mocy">${g}</div>
+    <div class="legenda">${serie.map(s =>
+      `<span><i style="background:${s.barwa}"></i>${s.nazwa} — 100% to
+        ${liczba(s.maks, s.k === "predkosc" ? 1 : 0)} ${s.jedn}</span>`).join("")}</div>
+    <div class="podpis-wykresu">
+      Jedna oś i jedno znaczenie: <b>procent najlepszej wartości w tym
+      zbiorze</b>. Trzy osobne skale na jednym obrazku pozwoliłyby dowieść
+      dowolnej tezy samym przesunięciem zakresu, więc każda seria jest dzielona
+      przez swoje maksimum — to samo przeliczenie dla wszystkich, a dzielniki
+      stoją w legendzie, żeby dało się wrócić do watów i uderzeń.
+      <br>Punkt to <b>cała jazda</b>, nie sekunda: strona trzyma średnie, a nie
+      przebieg sekunda po sekundzie. Przerwa w linii znaczy brak pomiaru.
+      ${brak.length ? `<br>Z trzech miar rysuje ${serie.length === 1
+        ? "się jedna" : "się " + serie.length}, bo ${brak.join(" ")}` : ""}
+    </div>`;
+}
+
+function oknoJazdy(id){
+  if (!id) return `
+    <div class="pusto">
+      <span class="znak">Jazda</span>
+      To pole otworzy się po dotknięciu jazdy w zakładce
+      <a class="odn-zakladka" href="#aktywnosci/indoors">Indoors</a> albo
+      <a class="odn-zakladka" href="#aktywnosci/outdoors">Outdoors</a>.
+    </div>`;
+
+  const x = AKTYWNOSCI.find(a => a.id === id);
+  if (!x) return `
+    <div class="pusto">
+      <span class="znak">Nie znam takiej jazdy</span>
+      Wróć do zakładki
+      <a class="odn-zakladka" href="#aktywnosci/indoors">Indoors</a> albo
+      <a class="odn-zakladka" href="#aktywnosci/outdoors">Outdoors</a>
+      i wybierz z listy.
+    </div>`;
+
+  const a = x.jazda;
+  const postoj = (a.czas_calkowity_s || a.czas_ruchu_s) - a.czas_ruchu_s;
+  const opis = (a.opis || "").trim();
+  const dopisek = dopisekBiezacy(id);
+  const brudnopis = Object.prototype.hasOwnProperty.call(dopiskiLokalne(), id);
+
+  // Wykres pokazuje jazdy TEGO SAMEGO rodzaju — mieszanie trenażera z szosą
+  // dałoby skok prędkości mówiący o pogodzie, a nie o zawodniku.
+  const rodzina = AKTYWNOSCI
+    .filter(y => y.wnetrze === x.wnetrze)
+    .sort((p,q) => p.data < q.data ? -1 : 1);
+
+  const kafel = (etykieta, wartosc, stopka) => `
+    <div class="kafel"><div class="etykieta">${etykieta}</div>
+      <div class="liczba">${wartosc}</div>
+      <div class="stopka">${stopka || ""}</div></div>`;
+
+  return `
+  <section>
+    <div class="proba-tytul">
+      <h2>${x.wnetrze ? `<span class="seg-zwift">${
+        ikonaDyscypliny("VirtualRide",16)}</span>` : ""}${bezpieczny(x.nazwa)}${
+        znacznikErg(a, "Trening ze sterowaną mocą — liczba mówi, co kazał program")}</h2>
+      <span class="analiza-stempel">${pl(x.data.slice(0,10))} ·
+        ${x.data.slice(11,16)}</span>
+    </div>
+    <p class="opis">
+      ${x.wnetrze ? "Trenażer (Zwift)" : "Szosa"} ·
+      <a class="odn-strava" href="${adresStravy(a)}" target="_blank" rel="noopener"
+        >${ZNAK_STRAVY} Otwórz na Stravie</a>
+      · <a class="odn-zakladka" href="#aktywnosci/${x.wnetrze?"indoors":"outdoors"}"
+        >wróć do listy</a>
+    </p>
+
+    <div class="kafelki">
+      ${kafel("Długość", liczba(x.dystans/1000,2), "km")}
+      ${kafel("Czas ruchu", czasNaTekst(x.czas), postoj > 60
+        ? `postój ${czasNaTekst(postoj)}` : "bez postojów")}
+      ${kafel("Prędkość średnia", x.predkosc == null ? "—" : liczba(x.predkosc,1), "km/h")}
+      ${kafel("Przewyższenie", x.przewyzszenie == null ? "—"
+        : Math.round(x.przewyzszenie), `m · ${x.dystans
+          ? liczba(x.przewyzszenie/(x.dystans/1000),1) : "—"} m/km`)}
+      ${kafel("Tętno średnie", x.tetno == null ? "—" : x.tetno,
+        x.tetno == null ? "pas od 1.09.2026" : "bpm")}
+      ${kafel("Moc średnia", x.moc == null ? "—" : x.moc,
+        x.moc == null ? "brak miernika" : "W · pomiar [Z]")}
+      ${kafel("RPE", a.rpe == null ? "—" : a.rpe, a.rpe == null
+        ? "nie wpisane" : "odczuwany wysiłek 1–10")}
+      ${kafel("Praca", x.moc == null ? "—" : Math.round(x.moc * x.czas / 1000),
+        x.moc == null ? "potrzebna moc" : "kJ")}
+    </div>
+  </section>
+
+  <section>
+    <h3 class="analiza-naglowek">Notatki</h3>
+
+    <div class="notatka-strava">
+      <div class="notatka-gora">
+        <span class="notatka-tytul">${ZNAK_STRAVY} Opis ze Stravy</span>
+        <span class="notatka-stan">tylko do odczytu</span>
+      </div>
+      ${opis
+        ? `<div class="tresc-strava">${bezpieczny(opis).replace(/\n/g,"<br>")}</div>`
+        : `<div class="tresc-strava pusta">Ta jazda nie ma opisu na Stravie.</div>`}
+      <div class="notatka-stopka">
+        Tego pola nie da się tu zmienić i tak ma zostać: automat pobiera opis
+        ze Stravy przy każdym przebiegu, więc poprawka wpisana tutaj zniknęłaby
+        tej samej nocy. Zmieniaj go w aplikacji Stravy — u nas pojawi się sam.
+      </div>
+    </div>
+
+    <div class="notatka notatka-dopisek" data-jazda="${id}">
+      <div class="notatka-gora">
+        <span class="notatka-tytul">Dopisek — Twój albo Claude'a</span>
+        <span class="notatka-stan" id="dopisek-stan">${brudnopis
+          ? `<span class="stan-brudnopis">zapisany na tym urządzeniu — nie ma go jeszcze w danych</span>`
+          : dopisek ? "<span>z danych</span>" : ""}</span>
+      </div>
+      <textarea id="dopisek-pole" rows="4" spellcheck="false"
+        placeholder="Co warto zapamiętać poza tym, co poszło na Stravę? Samopoczucie, sprzęt, wnioski."
+        >${bezpieczny(dopisek)}</textarea>
+      <div class="notatka-dol">
+        <div class="notatka-przyciski">
+          <button type="button" id="dopisek-zapisz" class="kolko-akcja"
+            title="Zapisz dopisek" aria-label="Zapisz dopisek">&#10003;</button>
+          <button type="button" id="dopisek-anuluj" class="kolko-akcja"
+            title="Odrzuć zmiany" aria-label="Odrzuć zmiany">&#10007;</button>
+        </div>
+        <button type="button" id="dopisek-eksport" class="link-tekstowy"
+          >Dopiski dla Claude…</button>
+      </div>
+      <textarea id="dopisek-eksport-pole" readonly rows="4" hidden></textarea>
+    </div>
+
+    <div class="info">
+      Dwie warstwy, celowo rozdzielone. <b>Pomarańczowa</b> jest Stravy
+      i jest nietykalna. <b>Kursywa poniżej</b> to dopisek — możesz go pisać
+      Ty na tym urządzeniu, albo Claude w czacie, wpisując go do
+      <code>claude.js</code>. Nie potrzeba do tego żadnego sekretu: sekret
+      <code>ANTHROPIC_API_KEY</code> jest wyłącznie dla nocnej Analizy AI.
+      <br>Strona nadal nie umie pisać do repozytorium, więc dopisek zrobiony
+      tutaj żyje w tej przeglądarce. Przycisk „Dopiski dla Claude…" wypisuje
+      je do wklejenia w czacie, żeby trafiły do pliku i były widoczne na
+      każdym urządzeniu.
+    </div>
+  </section>
+
+  <section>
+    <h3 class="analiza-naglowek">Moc, tętno i prędkość w kolejnych jazdach</h3>
+    ${wykresTrzechMiar(rodzina, id)}
+  </section>`;
+}
+
+function podepnijJazde(){
+  const blok = document.querySelector(".notatka-dopisek");
+  if (!blok) return;
+  const id = blok.dataset.jazda;
+  const pole = document.getElementById("dopisek-pole");
+  const stan = (t) => {
+    const el = document.getElementById("dopisek-stan");
+    if (el) el.innerHTML = t;
+  };
+
+  if (pole) pole.addEventListener("input", () =>
+    stan(`<span class="stan-niezapisane">niezapisane — dotknij ✓</span>`));
+
+  blok.addEventListener("click", e => {
+    const b = e.target.closest("button");
+    if (!b) return;
+
+    if (b.id === "dopisek-zapisz"){
+      const l = dopiskiLokalne();
+      const tekst = pole.value.trim();
+      if (tekst === dopisekZRepo(id)) delete l[id];   // zgodny z repo — po co brudnopis
+      else l[id] = tekst;
+      const udane = zapiszDopiskiLokalne(l);
+      stan(udane
+        ? (Object.prototype.hasOwnProperty.call(l, id)
+            ? `<span class="stan-brudnopis">zapisany na tym urządzeniu — nie ma go jeszcze w danych</span>`
+            : "<span>z danych</span>")
+        : `<span class="stan-niezapisane">nie udało się zapisać w przeglądarce</span>`);
+    }
+
+    if (b.id === "dopisek-anuluj"){
+      pole.value = dopisekBiezacy(id);
+      stan(Object.prototype.hasOwnProperty.call(dopiskiLokalne(), id)
+        ? `<span class="stan-brudnopis">zapisany na tym urządzeniu — nie ma go jeszcze w danych</span>`
+        : dopisekBiezacy(id) ? "<span>z danych</span>" : "");
+    }
+
+    if (b.id === "dopisek-eksport"){
+      const l = dopiskiLokalne();
+      const wyj = document.getElementById("dopisek-eksport-pole");
+      const wpisy = {};
+      for (const [k, v] of Object.entries(l)){
+        const j = JAZDA_PO_ID.get(k);
+        wpisy[k] = { jazda: j ? j.nazwa : "?", data: j ? j.data.slice(0,10) : "?",
+                     tekst: v };
+      }
+      wyj.value = Object.keys(wpisy).length
+        ? "Dopisz to do claude.js -> jazdy:\n"
+          + JSON.stringify(wpisy, null, 1)
+        : "Na tym urządzeniu nie ma ani jednego dopisku poza tym, co już jest w danych.";
+      wyj.hidden = false;
+      wyj.select();
+    }
+  });
+}
+
 const SEKCJE = [
   { id:"start", tytul:"Start", barwa:"bursztyn", pod:[
       { id:"przeglad", tytul:"Przegląd", rysuj: przegladStart }
@@ -6144,8 +6523,9 @@ const SEKCJE = [
   // Gablota przy przeprowadzce z piątego miejsca na siódme zmieniła fuksję
   // na pomarańcz.
   { id:"aktywnosci", tytul:"Aktywności", barwa:"cyjan", pod:[
+      { id:"indoors",  tytul:"Indoors",  rysuj: () => aktywnosci("indoors") },
       { id:"outdoors", tytul:"Outdoors", rysuj: () => aktywnosci("outdoors") },
-      { id:"indoors",  tytul:"Indoors",  rysuj: () => aktywnosci("indoors") }
+      { id:"jazda",    tytul:"Jazda",    rysuj: oknoJazdy }
   ]},
   // Gablota na końcu — decyzja Fryderyka z 27.08.2026. Barwa idzie za pozycją,
   // nie za zakładką: siódme miejsce ma pomarańcz.
@@ -6223,6 +6603,7 @@ function pokaz(){
   podepnijForme();
   podepnijRegeneracje();
   podepnijAktywnosci();
+  podepnijJazde();
 
   // Wykres otwiera się na najświeższym końcu — najnowsza przerwa jest
   // najważniejsza, a przy dwóch latach historii ląduje poza kadrem.

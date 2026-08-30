@@ -31,6 +31,14 @@
 //        id segmentu z dane.js -> segmenty[].id. Komentarz staje pod
 //        wnioskami segmentu, podpisany datą.
 //
+//    jazdy[id_jazdy]     = "tekst"
+//        id jazdy z dane.js -> aktywnosci[].id. To DOPISEK do jazdy: staje
+//        pod opisem ze Stravy w zakładce Aktywności -> Jazda, kursywą, żeby
+//        było widać, że nie napisał tego Fryderyk na Stravie.
+//        UWAGA: opisu ze Stravy (pole `opis`) NIE RUSZAJ i nie kopiuj tutaj —
+//        automat nadpisuje go co noc, a dublowanie go zrobiłoby z jednej myśli
+//        dwie. Dopisek ma dokładać coś nowego, nie powtarzać.
+//
 //    teksty[klucz]        = "tekst"
 //        Wolne miejsce na treści do przyszłych zakładek. Klucz uzgadniacie
 //        z Fryderykiem.
@@ -46,6 +54,9 @@
 window.CLAUDE = {
 
   notatki: {
+  },
+
+  jazdy: {
   },
 
   analizy: {
