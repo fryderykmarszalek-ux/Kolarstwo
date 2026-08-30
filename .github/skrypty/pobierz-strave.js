@@ -237,13 +237,21 @@ function zapiszPrzebiegi(przebiegi, sweze, pobrano){
   L.push(' "wersja": ' + FORMAT_PRZEBIEGU + ",");
   L.push(' "policzono": ' + JSON.stringify(pobrano) + ",");
   L.push(' "jazdy": {');
+  const SERIE = ["v","w","h","y","d"];
   L.push(idy.map(id => {
     const p = przebiegi[id];
-    // Świeżo policzone mają serie; wpisy przeniesione z poprzedniego indeksu
-    // mają już gotowe pole ma i nie ma z czego go liczyć drugi raz.
-    const ma = (p.v || p.w || p.h)
-      ? [p.v ? "v" : "", p.w ? "w" : "", p.h ? "h" : ""].join("")
-      : (p.ma || "");
+    // Świeżo policzone mają serie w pamięci. Wpisy przeniesione z poprzedniego
+    // indeksu mają tylko etykietę — a ta potrafi być nieaktualna, gdy doszedł
+    // nowy rodzaj serii. Dlatego wtedy czytamy ją z PLIKU, który jest jedynym
+    // miejscem, gdzie stoi prawda o zawartości.
+    let ma;
+    if (SERIE.some(k => p[k])) ma = SERIE.filter(k => p[k]).join("");
+    else {
+      try {
+        const t = fs.readFileSync(path.join(KATALOG_PRZEBIEGOW, id + ".js"), "utf8");
+        ma = SERIE.filter(k => t.includes('"' + k + '":"')).join("");
+      } catch(e){ ma = p.ma || ""; }
+    }
     return `  ${JSON.stringify(id)}: {"f":${p.f},"n":${p.n},"ma":${JSON.stringify(ma)}}`;
   }).join(",\n"));
   L.push(" }");

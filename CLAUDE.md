@@ -705,6 +705,52 @@ nie kolor: sylwetka roweru vs ekranu, słupek kreskowany vs pełny.
   **Kalorie liczy Strava i tak są opisane na kafelku.** Są wyłącznie
   w szczegółach jazdy, nie w liście — dociągane tym samym budżetem.
 
+- **Aktywności → Segment** (30.08.2026) — jeden przejazd przez jeden segment.
+  Otwierany z listy segmentów w oknie Jazda; wybrany przejazd żyje w adresie
+  (`#aktywnosci/segment/<id_próby>`), jak wszystko inne na tej stronie.
+  Kafelki, odnośnik do `Postępy → Porównania S` na ten segment, odnośnik
+  z powrotem do jazdy, i wykres przejazdu.
+
+  **Lista segmentów w oknie Jazda** stoi w kolejności, w jakiej je pokonał —
+  sortowana po `start_index`, nie po nazwie ani czasie.
+
+  **MEDAL MUSI ZNACZYĆ, ŻE KOGOŚ POKONAŁEŚ.** Miejsce `r` dostaje medal dopiero
+  przy co najmniej `r+1` próbach: złoto od dwóch, srebro od trzech, brąz od
+  czterech. Bez tej reguły pierwsza jazda z pasem dostała **sześć srebrnych
+  medali za „2. miejsce z 2 prób"**, czyli za bycie gorszym z dwóch — pochwała
+  za nic. Miejsce i tak stoi w wierszu (`24. z 26 prób`), więc nic nie ginie.
+  Kontrola: jazda z 13.08.2026 daje 48 medali z 84 przejazdów, w tym 29 złotych
+  — zgadza się z 29 rekordami, które tego dnia padły.
+
+  **Medale liczą się z WŁASNYCH prób, nie z tabeli Stravy.** KOM-ów ani miejsc
+  w rankingu API nie oddaje; zgadywanie ich byłoby tym samym błędem co moc `[E]`
+  udająca pomiar. Przy remisie wyżej stoi próba, w której czas padł pierwszy
+  raz — ta sama zasada, co przy rekordzie w Porównaniach.
+
+  **Wykres: cztery miary, każda JEDNĄ linią, bez pasm i bez tła** — na odcinku
+  kilkudziesięciosekundowym na piksel wypada mniej niż sekunda, więc nie ma
+  czego uśredniać. Każda seria rozciągnięta na SWÓJ zakres z tego przejazdu,
+  żeby było widać kształt i moment; zakresy stoją w legendzie, bo bez nich
+  procent mógłby udawać, że tętno 150–155 to wielki skok.
+
+  **NACHYLENIE JEST WYJĄTKIEM POD TRZEMA WZGLĘDAMI.** Po pierwsze jest szare
+  i cieńsze, bo to własność DROGI, a nie zawodnika — trzy barwne linie mówią,
+  co zrobił, szara mówi, co miał pod kołami (do palety nie doszła przez to ani
+  jedna barwa). Po drugie liczy się w oknie 20 m, nie z sąsiednich sekund:
+  szum barometru przy 8 m/s robi z 30 cm błędu prawie 4% nachylenia. Po trzecie
+  ma **minimalną rozpiętość skali (8 pp)** — jako jedyne z czterech ma znaczenie
+  bezwzględne, a bez tego płaski segment Zwiftu wyglądał jak góry, bo szum ±2%
+  był rozciągany na całą wysokość wykresu.
+
+  **Nachylenia NIE MA w danych** — liczy się z wysokości i dystansu przy
+  wyświetlaniu. Wariant B: trzymamy pomiary, nie wielkości wyliczalne.
+
+  **`start_index`/`end_index` przejazdu są w `proby` jako `od`/`do`.** Bez nich
+  nie da się wyciąć kawałka przebiegu odpowiadającego segmentowi. Strumień
+  Stravy jest indeksowany PRÓBKĄ, a przebieg SEKUNDĄ — przy jeździe z postojami
+  to nie to samo, więc przebieg niesie mapę `i` (indeks → sekunda). Gdy oś jest
+  ciągła, mapa jest tożsamością i nie jest zapisywana.
+
 - **Zakładka Teren → Mapa została USUNIĘTA 30.08.2026**, dzień po zbudowaniu —
   decyzja Fryderyka („zamiast tej zakładki z mapami"). Kod mapy wyleciał
   z `index.html`, ale `swiat.js`, `trasy.js` i zbieranie śladów w automacie

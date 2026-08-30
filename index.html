@@ -1121,6 +1121,27 @@ table.aktywnosci th:nth-child(6),table.aktywnosci td:nth-child(6){width:22.5%}
   border-top:1px solid var(--linia);padding-top:8px}
 .notatka-dopisek{border-left:3px dashed var(--slaby)}
 .notatka-dopisek textarea{font-style:italic}
+/* ── LISTA SEGMENTÓW NA JEŹDZIE ─────────────────────────────────────────── */
+.segmenty-jazdy{display:flex;flex-direction:column;gap:6px;margin:10px 0 4px}
+.segment-wiersz{display:flex;align-items:center;gap:11px;width:100%;
+  padding:10px 12px;border:1px solid var(--linia);border-radius:10px;
+  background:var(--powierzchnia);color:var(--tekst);text-decoration:none;
+  min-height:52px}
+.segment-wiersz:active{background:var(--plyta)}
+.segment-wiersz:hover{border-color:var(--slaby)}
+.segment-medal{flex:0 0 auto;width:30px;display:flex;justify-content:center}
+.segment-miejsce{font-size:12px;color:var(--slaby);font-variant-numeric:tabular-nums}
+.medal{display:inline-flex;align-items:center;gap:3px}
+.medal b{font-size:11px;font-weight:700;color:var(--slaby)}
+.proba-tytul h2 .medal{margin-right:7px;vertical-align:-2px}
+.segment-tresc{flex:1 1 auto;min-width:0}
+.segment-nazwa{display:block;font-weight:600;font-size:13.5px;overflow-wrap:anywhere}
+.segment-opis{display:block;font-size:12px;color:var(--slaby);margin-top:2px;
+  font-variant-numeric:tabular-nums}
+.segment-strata{flex:0 0 auto;font-size:12px;color:var(--slaby);
+  font-variant-numeric:tabular-nums;display:flex;align-items:center;gap:2px}
+.odczyt-dystans{font-size:12.5px;color:var(--slaby);
+  font-variant-numeric:tabular-nums}
 .regen-uwaga{font-size:11.5px;color:var(--slaby);line-height:1.5;margin:6px 0 2px}
 
 /* Odczyt stoi NAD wykresem, a nie w dymku pod palcem: na iPadzie palec
@@ -6323,9 +6344,15 @@ function rozpakujPrzebieg(id, surowy){
   if (surowy.v) serie.predkosc = dekodujSerie(surowy.v).map(x => x == null ? null : x / 10);
   if (surowy.w) serie.moc      = dekodujSerie(surowy.w);
   if (surowy.h) serie.tetno    = dekodujSerie(surowy.h);
+  // Wysokość: zapisana w decymetrach przesunięta o 1000 m, bo kodowanie nie
+  // zna liczb ujemnych. Dystans w metrach od startu. Z nich liczy się
+  // nachylenie — samego nachylenia nie zapisujemy, bo jest wyliczalne.
+  if (surowy.y) serie.wysokosc = dekodujSerie(surowy.y)
+    .map(x => x == null ? null : x/10 - 1000);
+  if (surowy.d) serie.dystans  = dekodujSerie(surowy.d);
   const n = Math.max(...Object.values(serie).map(a => a.length), 0);
   if (!n) return null;
-  const pb = { n, serie };
+  const pb = { n, serie, indeks: surowy.i ? dekodujSerie(surowy.i) : null };
   PRZEBIEG_GOTOWY.set(id, pb);
   return pb;
 }
@@ -6405,6 +6432,8 @@ function wykresPrzebiegu(pb){
   const y = (proc) => gora + py - (proc/100) * py;
   const licz = (v) => liczba(v, 1).replace(",", ".");
 
+  // OPIS_SERII zna trzy miary; wysokość i dystans są w danych po to, żeby
+  // policzyć z nich nachylenie na wykresie segmentu, a nie żeby je rysować.
   const uzyte = Object.keys(OPIS_SERII).filter(k => pb.serie[k]);
   const maks = {};
   for (const k of uzyte)
@@ -6549,7 +6578,8 @@ function podepnijPrzebieg(){
       const kr = document.getElementById("krzyzyk-przebiegu");
       if (kr){ kr.setAttribute("x1", xi); kr.setAttribute("x2", xi);
                kr.setAttribute("opacity", ".4"); }
-      for (const k of Object.keys(pb.serie)){
+      for (const k of Object.keys(OPIS_SERII)){
+        if (!pb.serie[k]) continue;
         const kropka = document.getElementById("punkt-" + k);
         if (!kropka) continue;
         const v = pb.serie[k][i];
@@ -6562,6 +6592,426 @@ function podepnijPrzebieg(){
       if (odczyt) odczyt.innerHTML = odczytPrzebiegu(pb, i);
     };
 
+    ramka.addEventListener("pointermove", e => { e.preventDefault(); pokaz(e.clientX); });
+    ramka.addEventListener("pointerdown", e => { e.preventDefault(); pokaz(e.clientX); });
+  });
+}
+
+
+/* ==========================================================================
+   AKTYWNOŚCI → SEGMENT — jeden przejazd przez jeden segment
+
+   Wybrany przejazd żyje w ADRESIE (#aktywnosci/segment/<id_próby>), jak wybór
+   segmentu w Porównaniach i jak wybór jazdy w oknie Jazda. Wstecz i
+   odświeżenie działają bez dodatkowego stanu.
+
+   MEDALE LICZĄ SIĘ Z TWOICH WŁASNYCH PRÓB, nie z tabeli Stravy. KOM-ów ani
+   miejsc w rankingu API nie oddaje — zgadywanie ich byłoby tym samym błędem,
+   co moc [E] udająca pomiar. Złoto znaczy więc „najlepszy czas, jaki na tym
+   odcinku pojechałeś", a nie „najlepszy na świecie". Przy remisie wyżej stoi
+   próba, w której czas padł PIERWSZY raz — ta sama zasada, co przy rekordzie
+   w Porównaniach.
+   ========================================================================== */
+
+const MEDALE = ["#d4a017", "#9aa5b1", "#a9703f"];   // złoto, srebro, brąz
+const NAZWY_MEDALI = ["Najlepszy czas", "Drugi czas", "Trzeci czas"];
+
+/* MEDAL MUSI ZNACZYĆ, ŻE KOGOŚ POKONAŁEŚ. Miejsce r dostaje medal dopiero
+   przy co najmniej r+1 próbach: złoto od dwóch prób, srebro od trzech, brąz
+   od czterech. Bez tej reguły pierwsza jazda z pasem dostawała SZEŚĆ sreber
+   za „drugie miejsce z dwóch prób", czyli za bycie gorszym z dwóch — pochwała
+   za nic, a tego ta strona ma nie robić. Miejsce i tak stoi w wierszu, więc
+   nic nie ginie; znika tylko medal, który niczego nie znaczył. */
+function medalZa(miejsce, prob){
+  return (miejsce != null && miejsce <= 3 && prob >= miejsce + 1) ? miejsce : null;
+}
+
+function ikonaMedalu(miejsce){
+  if (miejsce == null || miejsce > 3) return "";
+  const b = MEDALE[miejsce-1];
+  return `<span class="medal" title="${NAZWY_MEDALI[miejsce-1]} na tym segmencie
+    spośród wszystkich Twoich prób"><svg viewBox="0 0 20 20" width="15" height="15"
+    aria-hidden="true"><path d="M6.2 1.6h7.6l-2.1 5.2H8.3z" fill="${b}" opacity=".55"/>
+    <circle cx="10" cy="12.6" r="5.6" fill="${b}"/>
+    <circle cx="10" cy="12.6" r="3.4" fill="none" stroke="rgba(0,0,0,.22)"
+      stroke-width="1"/></svg><b>${miejsce}</b></span>`;
+}
+
+// Miejsce każdej próby na swoim segmencie — liczone raz dla całych danych.
+const MIEJSCA_PROB = (() => {
+  const wg = new Map();
+  for (const p of (D.proby || [])){
+    if (!wg.has(p.s)) wg.set(p.s, []);
+    wg.get(p.s).push(p);
+  }
+  const wynik = new Map();
+  for (const [, lista] of wg){
+    const posort = [...lista].sort((a,b) => {
+      if (a.czas_s !== b.czas_s) return a.czas_s - b.czas_s;
+      // remis: wyżej ta, która padła wcześniej
+      const ja = JAZDA_PO_ID.get(a.a), jb = JAZDA_PO_ID.get(b.a);
+      return (ja ? ja.data : "") < (jb ? jb.data : "") ? -1 : 1;
+    });
+    posort.forEach((p, i) => wynik.set(p.id, { miejsce: i+1, z: lista.length,
+      najlepszy: posort[0].czas_s }));
+  }
+  return wynik;
+})();
+
+function probyJazdy(idJazdy){
+  return (D.proby || [])
+    .filter(p => p.a === idJazdy)
+    .map(p => ({ p, seg: (D.segmenty || []).find(s => s.id === p.s) }))
+    .filter(x => x.seg)
+    .sort((a,b) => (a.p.od ?? 1e9) - (b.p.od ?? 1e9));   // kolejność w jeździe
+}
+
+function listaSegmentowJazdy(x){
+  const lista = probyJazdy(x.id);
+  if (!lista.length) return `
+    <div class="info">Na tej jeździe nie ma zapisanych przejazdów przez
+      segmenty. Strona liczy je od ${pl(D.meta.segmenty_od)}.</div>`;
+
+  const medali = lista.filter(y => {
+    const m = MIEJSCA_PROB.get(y.p.id) || {};
+    return medalZa(m.miejsce, m.z);
+  }).length;
+  return `
+    <p class="opis">
+      ${lista.length} ${lista.length === 1 ? "przejazd" : "przejazdów"} przez
+      segmenty, w kolejności, w jakiej je pokonałeś.${medali ? `
+      <b>${medali}</b> ${medali === 1 ? "trafił" : "trafiło"} do Twojej
+      pierwszej trójki na danym odcinku.` : ""}
+      Dotknij wiersza, żeby zobaczyć przebieg tego jednego przejazdu.
+      <br>Medal znaczy miejsce <b>wśród Twoich własnych prób</b> — miejsc
+      w rankingu Stravy ani KOM-ów API nie oddaje, więc ich tu nie ma.
+      Medal wymaga też, żebyś kogoś pokonał: złoto od dwóch prób, srebro od
+      trzech, brąz od czterech. Drugie miejsce z dwóch przejazdów to bycie
+      gorszym z dwóch, a nie podium.
+    </p>
+    <div class="segmenty-jazdy">
+      ${lista.map(({p, seg}) => {
+        const m = MIEJSCA_PROB.get(p.id) || {};
+        const predkosc = p.czas_s ? (seg.dystans_m/1000)/(p.czas_s/3600) : null;
+        const strata = m.najlepszy != null ? p.czas_s - m.najlepszy : null;
+        return `<a class="segment-wiersz" href="#aktywnosci/segment/${p.id}">
+          <span class="segment-medal">${medalZa(m.miejsce, m.z)
+            ? ikonaMedalu(m.miejsce)
+            : `<span class="segment-miejsce">${m.miejsce}.</span>`}</span>
+          <span class="segment-tresc">
+            <span class="segment-nazwa">${bezpieczny(seg.nazwa)}</span>
+            <span class="segment-opis">${czasNaTekst(p.czas_s)}${
+              predkosc ? " · " + liczba(predkosc,1) + " km/h" : ""} ·
+              ${dlugoscNaTekst(seg.dystans_m)}${seg.nachylenie_proc != null
+                ? " · " + procentNaTekst(seg.nachylenie_proc) : ""}
+              · ${m.miejsce}. z ${m.z} ${m.z === 1 ? "próby" : "prób"}</span>
+          </span>
+          <span class="segment-strata">${strata === 0 ? "rekord"
+            : strata != null ? "+" + czasNaTekst(strata) : ""}
+            <span class="strzalka-wew" aria-hidden="true">›</span></span>
+        </a>`;
+      }).join("")}
+    </div>`;
+}
+
+/* ── Wykres przejazdu ───────────────────────────────────────────────────────
+   Cztery miary naraz, każda JEDNĄ grubą linią — bez pasma min-max, bo na
+   odcinku trwającym kilkadziesiąt sekund na piksel wypada mniej niż sekunda
+   i nie ma czego uśredniać. Każdy punkt na linii to konkretny odczyt.
+
+   SKALOWANIE: każda seria rozciągnięta na SWÓJ zakres z tego przejazdu, więc
+   widać kształt i moment, a nie płaską kreskę. Dokładne liczby podaje odczyt
+   nad wykresem, a zakres każdej serii stoi w legendzie — bez tego procent
+   mógłby udawać, że tętno 150-155 to wielki skok.
+
+   NACHYLENIE JEST SZARE, bo to własność DROGI, a nie Twoja. Trzy barwne linie
+   mówią, co zrobiłeś; szara mówi, co miałeś pod kołami. Do palety nie doszła
+   przez to ani jedna barwa. */
+const SERIE_SEG = [
+  { k:"predkosc",   nazwa:"Prędkość",   jedn:"km/h", miejsc:1, barwa:"var(--seria-predkosc)" },
+  { k:"tetno",      nazwa:"Tętno",      jedn:"bpm",  miejsc:0, barwa:"var(--seria-tetno)" },
+  { k:"moc",        nazwa:"Moc",        jedn:"W",    miejsc:0, barwa:"var(--seria-moc)" },
+  /* Nachylenie ma znaczenie BEZWZGLĘDNE, w odróżnieniu od pozostałych trzech:
+     4% to 4% niezależnie od tego, co się działo na tym odcinku. Rozciąganie go
+     na własny zakres zamieniałoby szum barometru na płaskiej drodze w góry —
+     na płaskim segmencie Zwiftu wahania ±2% wypełniały cały wykres. Stąd
+     minimalna rozpiętość skali: przy płaskiej drodze linia zostaje płaska,
+     a prawdziwy podjazd i tak wykorzystuje całą wysokość. */
+  { k:"nachylenie", nazwa:"Nachylenie", jedn:"%",    miejsc:1, barwa:"var(--slaby)",
+    minZakres: 8, cienka: true }
+];
+
+/* Nachylenie liczymy w oknie, nie z sąsiednich sekund. Wysokość z barometru
+   skacze o kilkadziesiąt centymetrów przy nieruchomym rowerze, więc różnica
+   dwóch kolejnych sekund to w większości szum — przy 8 m na sekundę 0,3 m
+   błędu daje 3,75% nachylenia z niczego. Okno 20 m wygładza to do sensownej
+   liczby, nie gubiąc kształtu podjazdu. */
+const OKNO_NACHYLENIA_M = 20;
+
+function nachylenieSerii(wys, dys){
+  if (!wys || !dys) return null;
+  const n = wys.length, out = new Array(n).fill(null);
+  for (let i = 0; i < n; i++){
+    if (wys[i] == null || dys[i] == null) continue;
+    let a = i, b = i;
+    while (a > 0 && dys[a] != null && dys[i] - dys[a] < OKNO_NACHYLENIA_M/2) a--;
+    while (b < n-1 && dys[b] != null && dys[b] - dys[i] < OKNO_NACHYLENIA_M/2) b++;
+    if (wys[a] == null || wys[b] == null || dys[a] == null || dys[b] == null) continue;
+    const dd = dys[b] - dys[a];
+    if (dd < 1) continue;                       // stoi w miejscu — nachylenie bez sensu
+    out[i] = (wys[b] - wys[a]) / dd * 100;
+  }
+  return out.some(x => x != null) ? out : null;
+}
+
+function przejazdSerie(pb, od, doo){
+  const wytnij = (a) => a ? a.slice(od, doo+1) : null;
+  const wys = pb.serie.wysokosc ? wytnij(pb.serie.wysokosc) : null;
+  const dys = pb.serie.dystans ? wytnij(pb.serie.dystans) : null;
+  const serie = {
+    predkosc: wytnij(pb.serie.predkosc),
+    tetno:    wytnij(pb.serie.tetno),
+    moc:      wytnij(pb.serie.moc),
+    nachylenie: nachylenieSerii(wys, dys)
+  };
+  for (const k of Object.keys(serie))
+    if (!serie[k] || !serie[k].some(v => v != null)) delete serie[k];
+  return { serie, dystans: dys, n: doo - od + 1 };
+}
+
+function odczytPrzejazdu(pj, i){
+  const wDrodze = pj.dystans && pj.dystans[i] != null && pj.dystans[0] != null
+    ? Math.round(pj.dystans[i] - pj.dystans[0]) : null;
+  const czesci = SERIE_SEG.filter(s => pj.serie[s.k]).map(s => {
+    const v = pj.serie[s.k][i];
+    const t = v == null ? "—"
+      : (v < 0 ? "\u2212" : "") + liczba(Math.abs(v), s.miejsc);
+    return `<span class="odczyt-poz"><i style="background:${s.barwa}"></i>
+      <b>${t}</b>
+      <em>${v == null ? "brak" : s.jedn}</em></span>`;
+  }).join("");
+  return `<span class="odczyt-czas">${czasNaTekst(i)}</span>${
+    wDrodze != null ? `<span class="odczyt-dystans">${wDrodze} m</span>` : ""}${czesci}`;
+}
+
+/* Zakres pionowy jednej serii. Osobna funkcja, bo liczy go i rysunek,
+   i uchwyt odczytu — dwie kopie rozjechałyby się przy pierwszej poprawce
+   i kropka przestałaby siadać na linii. */
+function zakresSerii(dane, s){
+  const w = dane.filter(v => v != null);
+  let mn = Math.min(...w), mx = Math.max(...w);
+  if (s.minZakres && mx - mn < s.minZakres){
+    const sr = (mn + mx) / 2;
+    mn = sr - s.minZakres/2; mx = sr + s.minZakres/2;
+  }
+  if (mx - mn < 1e-9){ mn -= 0.5; mx += 0.5; }            // płaska seria pośrodku
+  return { mn, mx };
+}
+
+function wykresPrzejazdu(pj){
+  const W = 720, H = 320, lewy = 42, prawy = 14, gora = 16, dol = 40;
+  const px = W - lewy - prawy, py = H - gora - dol;
+  const n = pj.n;
+  const x = (i) => lewy + (n <= 1 ? px/2 : (i/(n-1)) * px);
+  const y = (u) => gora + py - u * py;                    // u w zakresie 0..1
+  const licz = (v) => liczba(v, 1).replace(",", ".");
+
+  const uzyte = SERIE_SEG.filter(s => pj.serie[s.k]);
+  const zakres = {};
+  for (const s of uzyte) zakres[s.k] = zakresSerii(pj.serie[s.k], s);
+
+  let g = `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img"
+    aria-label="Prędkość, tętno, moc i nachylenie na tym przejeździe">`;
+  for (let u = 0; u <= 1.0001; u += 0.25)
+    g += `<line x1="${lewy}" y1="${licz(y(u))}" x2="${W-prawy}" y2="${licz(y(u))}"
+      stroke="var(--linia)" stroke-width="1"/>`;
+
+  const KROKI = [5,10,15,30,60,120,300,600];
+  const krok = KROKI.find(k => (n-1)/k <= 8) || KROKI[KROKI.length-1];
+  for (let t = 0; t <= n-1; t += krok)
+    g += `<line x1="${licz(x(t))}" y1="${gora+py}" x2="${licz(x(t))}" y2="${gora+py+4}"
+      stroke="var(--slaby)" stroke-width="1"/>
+      <text x="${licz(x(t))}" y="${gora+py+18}" text-anchor="middle" font-size="11"
+        fill="var(--slaby)">${czasNaTekst(t)}</text>`;
+
+  for (const s of uzyte){
+    const { mn, mx } = zakres[s.k];
+    let d = "", trzeba = true;
+    pj.serie[s.k].forEach((v, i) => {
+      if (v == null){ trzeba = true; return; }
+      d += `${trzeba ? "M" : "L"}${licz(x(i))} ${licz(y((v - mn)/(mx - mn)))} `;
+      trzeba = false;
+    });
+    // Nachylenie cieńszą i bledszą kreską: to kontekst, nie wynik. Trzy barwne
+    // linie mówią, co zrobiłeś; szara mówi, co miałeś pod kołami.
+    g += `<path d="${d}" fill="none" stroke="${s.barwa}"
+      stroke-width="${s.cienka ? 1.5 : 2.4}"
+      stroke-linejoin="round" stroke-linecap="round"
+      ${s.cienka ? 'opacity=".5"' : ""}/>`;
+  }
+
+  g += `<line id="krzyzyk-przejazdu" x1="${lewy}" y1="${gora}" x2="${lewy}" y2="${gora+py}"
+    stroke="var(--tekst)" stroke-width="1" opacity="0" pointer-events="none"/>`;
+  for (const s of uzyte)
+    g += `<circle id="pkt-${s.k}" r="4.5" fill="${s.barwa}"
+      stroke="var(--powierzchnia)" stroke-width="1.8" opacity="0"
+      pointer-events="none"/>`;
+  g += `</svg>`;
+
+  return `
+    <div class="odczyt-jazdy" id="odczyt-przejazdu">${odczytPrzejazdu(pj, 0)}</div>
+    <div class="wykres-przebiegu" id="wykres-przejazdu">${g}</div>
+    <div class="legenda">${uzyte.map(s => {
+      const lb = (v) => (v < 0 ? "\u2212" : "") + liczba(Math.abs(v), s.miejsc);
+      return `<span><i style="background:${s.barwa}"></i>${s.nazwa}
+        od ${lb(zakres[s.k].mn)} do ${lb(zakres[s.k].mx)} ${s.jedn}</span>`;
+    }).join("")}</div>
+    <div class="podpis-wykresu">
+      Każda linia to <b>konkretny odczyt sekunda po sekundzie</b> — bez pasm,
+      bez wygładzania, bez tła. Przesuń palcem albo myszą, żeby odczytać
+      dowolny moment.
+      <br>Każda seria jest rozciągnięta na <b>swój własny zakres z tego
+      przejazdu</b>, żeby było widać kształt i moment, a nie płaską kreskę.
+      Zakresy stoją w legendzie — bez nich procent mógłby udawać, że tętno
+      ${uzyte.some(s => s.k === "tetno")
+        ? liczba(zakres.tetno.mn,0) + "–" + liczba(zakres.tetno.mx,0)
+        : "150–155"} to wielki skok.
+      <br><b>Nachylenie jest szare i cieńsze, bo to własność drogi, a nie
+      Twoja.</b> Liczone z wysokości w oknie ${OKNO_NACHYLENIA_M} m: różnica
+      dwóch kolejnych sekund to w większości szum barometru, który przy 8 m/s
+      robi z 30 centymetrów błędu prawie cztery procent nachylenia. Jako jedyne
+      z czterech ma skalę o <b>minimalnej rozpiętości</b> — bez tego płaska
+      droga wyglądałaby jak góry, bo szum zostałby rozciągnięty na cały wykres.
+    </div>`;
+}
+
+function oknoSegmentu(idProby){
+  if (!idProby) return `
+    <div class="pusto">
+      <span class="znak">Segment</span>
+      To pole otworzy się po dotknięciu segmentu w oknie
+      <a class="odn-zakladka" href="#aktywnosci/indoors">jazdy</a>.
+    </div>`;
+
+  const p = (D.proby || []).find(q => q.id === idProby);
+  const seg = p ? (D.segmenty || []).find(s => s.id === p.s) : null;
+  const jazda = p ? JAZDA_PO_ID.get(p.a) : null;
+  if (!p || !seg || !jazda) return `
+    <div class="pusto">
+      <span class="znak">Nie znam takiego przejazdu</span>
+      Wróć do <a class="odn-zakladka" href="#aktywnosci/indoors">listy jazd</a>
+      i wybierz segment z okna jazdy.
+    </div>`;
+
+  const m = MIEJSCA_PROB.get(p.id) || {};
+  const predkosc = p.czas_s ? (seg.dystans_m/1000)/(p.czas_s/3600) : null;
+  const strata = m.najlepszy != null ? p.czas_s - m.najlepszy : null;
+  const kafel = (e, w, s) => `<div class="kafel"><div class="etykieta">${e}</div>
+    <div class="liczba">${w}</div><div class="stopka">${s || ""}</div></div>`;
+
+  return `
+  <section>
+    <div class="proba-tytul">
+      <h2>${medalZa(m.miejsce, m.z) ? ikonaMedalu(m.miejsce) : ""}${bezpieczny(seg.nazwa)}</h2>
+      <span class="analiza-stempel">${pl(jazda.data.slice(0,10))}</span>
+    </div>
+    <p class="opis">
+      Przejazd z jazdy
+      <a class="odn-zakladka" href="#aktywnosci/jazda/${jazda.id}"
+        >${bezpieczny(jazda.nazwa)}</a>.
+      <br><a class="odn-zakladka" href="#postepy/porownania/${seg.id}"
+        >Zobacz wszystkie ${m.z || ""} ${m.z === 1 ? "próbę" : "prób"} na tym
+        segmencie →</a>
+    </p>
+
+    <div class="kafelki">
+      ${kafel("Czas", czasNaTekst(p.czas_s), strata === 0 ? "Twój rekord"
+        : strata != null ? "+" + czasNaTekst(strata) + " do rekordu" : "")}
+      ${kafel("Miejsce", m.miejsce ? m.miejsce + "." : "—",
+        m.z ? `z ${m.z} ${m.z === 1 ? "próby" : "prób"}` : "")}
+      ${kafel("Prędkość", predkosc == null ? "—" : liczba(predkosc,1), "km/h")}
+      ${kafel("Długość", liczba(seg.dystans_m/1000,2), "km")}
+      ${kafel("Nachylenie", seg.nachylenie_proc == null ? "—"
+        : procentNaTekst(seg.nachylenie_proc), "średnie, ze Stravy")}
+      ${kafel("Moc", p.moc_S == null ? "—" : Math.round(p.moc_S),
+        p.moc_S == null ? "brak pomiaru" : "W · pomiar [Z]")}
+    </div>
+  </section>
+
+  <section>
+    <h3 class="analiza-naglowek">Przebieg tego przejazdu</h3>
+    ${p.od == null || p.do == null
+      ? `<div class="pusto"><span class="znak">Przebieg</span>
+          Ten przejazd nie ma jeszcze zapisanego miejsca w strumieniu jazdy.
+          Automat dobiera to po kilkadziesiąt jazd na przebieg — wróć tu po
+          najbliższej aktualizacji.</div>`
+      : `<div id="przejazd-miejsce" data-jazda="${jazda.id}" data-od="${p.od}"
+           data-do="${p.do}">
+          <div class="pusto"><span class="znak">…</span>Wczytuję przebieg.</div>
+        </div>`}
+  </section>`;
+}
+
+function podepnijPrzejazd(){
+  const miejsce = document.getElementById("przejazd-miejsce");
+  if (!miejsce || miejsce.dataset.gotowe) return;
+  miejsce.dataset.gotowe = "1";
+  const idJazdy = miejsce.dataset.jazda;
+
+  wczytajPrzebieg(idJazdy, (pb) => {
+    const teraz = document.getElementById("przejazd-miejsce");
+    if (!teraz || teraz.dataset.jazda !== idJazdy) return;
+    if (pb === "stary" || !pb){
+      teraz.innerHTML = PRZELICZANY;
+      return;
+    }
+    /* Strumień Stravy jest indeksowany PRÓBKĄ, a przebieg SEKUNDĄ. Przy
+       jeździe z postojami to nie to samo, więc start_index trzeba przełożyć
+       mapą zapisaną razem z przebiegiem. Gdy mapy nie ma, oś jest ciągła
+       i indeks równa się sekundzie. */
+    const mapa = pb.indeks;
+    const naSek = (i) => mapa ? (mapa[i] != null ? mapa[i] : i) : i;
+    const od = Math.max(0, Math.min(pb.n-1, naSek(+teraz.dataset.od)));
+    const doo = Math.max(od, Math.min(pb.n-1, naSek(+teraz.dataset.do)));
+    const pj = przejazdSerie(pb, od, doo);
+    if (!Object.keys(pj.serie).length){
+      teraz.innerHTML = `<div class="pusto"><span class="znak">Przebieg</span>
+        Ten przejazd nie ma ani jednego pomiaru.</div>`;
+      return;
+    }
+    teraz.innerHTML = wykresPrzejazdu(pj);
+
+    const ramka = document.getElementById("wykres-przejazdu");
+    if (!ramka) return;
+    const W = 720, lewy = 42, prawy = 14, gora = 16, dol = 40, H = 320;
+    const px = W - lewy - prawy, py = H - gora - dol;
+    const zakres = {};
+    for (const s of SERIE_SEG)
+      if (pj.serie[s.k]) zakres[s.k] = zakresSerii(pj.serie[s.k], s);
+    const pokaz = (klientX) => {
+      const svg = ramka.querySelector("svg");
+      if (!svg) return;
+      const r = svg.getBoundingClientRect();
+      const uX = (klientX - r.left) / r.width * W;
+      const i = Math.max(0, Math.min(pj.n - 1,
+        Math.round((uX - lewy) / px * (pj.n - 1))));
+      const xi = lewy + (pj.n <= 1 ? px/2 : (i/(pj.n-1)) * px);
+      const kr = document.getElementById("krzyzyk-przejazdu");
+      if (kr){ kr.setAttribute("x1", xi); kr.setAttribute("x2", xi);
+               kr.setAttribute("opacity", ".4"); }
+      for (const s of SERIE_SEG){
+        const kropka = document.getElementById("pkt-" + s.k);
+        if (!kropka || !pj.serie[s.k]) continue;
+        const v = pj.serie[s.k][i];
+        if (v == null){ kropka.setAttribute("opacity", "0"); continue; }
+        const { mn, mx } = zakres[s.k];
+        kropka.setAttribute("cx", xi);
+        kropka.setAttribute("cy", gora + py - (v - mn)/(mx - mn) * py);
+        kropka.setAttribute("opacity", "1");
+      }
+      const o = document.getElementById("odczyt-przejazdu");
+      if (o) o.innerHTML = odczytPrzejazdu(pj, i);
+    };
     ramka.addEventListener("pointermove", e => { e.preventDefault(); pokaz(e.clientX); });
     ramka.addEventListener("pointerdown", e => { e.preventDefault(); pokaz(e.clientX); });
   });
@@ -6692,6 +7142,11 @@ function oknoJazdy(id){
   <section>
     <h3 class="analiza-naglowek">Przebieg jazdy</h3>
     ${blokPrzebiegu(x)}
+  </section>
+
+  <section>
+    <h3 class="analiza-naglowek">Segmenty na tej jeździe</h3>
+    ${listaSegmentowJazdy(x)}
   </section>`;
 }
 
@@ -6786,7 +7241,8 @@ const SEKCJE = [
   { id:"aktywnosci", tytul:"Aktywności", barwa:"cyjan", pod:[
       { id:"indoors",  tytul:"Indoors",  rysuj: () => aktywnosci("indoors") },
       { id:"outdoors", tytul:"Outdoors", rysuj: () => aktywnosci("outdoors") },
-      { id:"jazda",    tytul:"Jazda",    rysuj: oknoJazdy }
+      { id:"jazda",    tytul:"Jazda",    rysuj: oknoJazdy },
+      { id:"segment",  tytul:"Segment",  rysuj: oknoSegmentu }
   ]},
   // Gablota na końcu — decyzja Fryderyka z 27.08.2026. Barwa idzie za pozycją,
   // nie za zakładką: siódme miejsce ma pomarańcz.
@@ -6866,6 +7322,7 @@ function pokaz(){
   podepnijAktywnosci();
   podepnijJazde();
   podepnijPrzebieg();
+  podepnijPrzejazd();
 
   // Wykres otwiera się na najświeższym końcu — najnowsza przerwa jest
   // najważniejsza, a przy dwóch latach historii ląduje poza kadrem.
