@@ -37,6 +37,10 @@ on:
         description: "Dociągnij kształt trasy także dla jazd, których nie ma w liście"
         type: boolean
         default: false
+      pelne_przebiegi:
+        description: "Przelicz od nowa przebiegi jazd (prędkość, moc, tętno w czasie)"
+        type: boolean
+        default: false
       wymus_analize:
         description: "Napisz analizę AI nawet bez zmian w danych"
         type: boolean
@@ -72,6 +76,7 @@ jobs:
           PELNA_MOC: ${{ inputs.pelna_moc }}
           PELNE_STREFY: ${{ inputs.pelne_strefy }}
           PELNE_TRASY: ${{ inputs.pelne_trasy }}
+          PELNE_PRZEBIEGI: ${{ inputs.pelne_przebiegi }}
         run: node .github/skrypty/pobierz-strave.js
 
       - name: Sprawdź, czy plik się parsuje
@@ -98,7 +103,7 @@ jobs:
 
           git config user.name "Automat Stravy"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add dane.js analiza.js trasy.js
+          git add dane.js analiza.js trasy.js przebiegi.js
           git commit -m "Dane ze Stravy — $(date -u +%Y-%m-%d)"
 
           # Zadanie potrafi stać w kolejce GitHuba kilka minut. Jeśli w tym

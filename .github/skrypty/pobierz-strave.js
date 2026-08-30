@@ -69,6 +69,118 @@ const PELNE_STREFY = process.env.PELNE_STREFY === "true";
    nigdzie zapisywany — liczymy go przy każdym przebiegu z punktów startowych,
    więc do pliku trafiają wyłącznie ślady już przycięte. To ta sama ochrona,
    którą Strava nazywa strefą prywatności. */
+const PLIK_PRZEBIEGOW = path.join(__dirname, "..", "..", "przebiegi.js");
+const PELNE_PRZEBIEGI = process.env.PELNE_PRZEBIEGI === "true";
+
+/* ── Przebiegi jazd (wykres w oknie Jazda) ─────────────────────────────────
+   Strava oddaje prędkość, moc i tętno SEKUNDA PO SEKUNDZIE. Zapisanie tego
+   1:1 dla stu jazd to ponad milion liczb i kilka megabajtów, których iPad
+   nie ma po co ściągać przy każdym wejściu na stronę.
+
+   Dlatego próbkujemy: celujemy w najwyżej CEL_PUNKTOW punktów na jazdę, bo
+   wykres ma niecałe 720 pikseli szerokości i gęstszej siatki i tak nie da
+   się zobaczyć. Krok wychodzi z długości jazdy i jest zaokrąglany w górę do
+   sensownej wartości — godzina i pół dostaje 10 s, krótka jazda 5 s.
+
+   Wartość punktu to ŚREDNIA z sekund, które do niego wpadły, a nie próbka
+   co n-tą sekundę: pojedyncza sekunda potrafi być artefaktem, średnia nie.
+   Kubełek bez ani jednej sekundy zostaje PUSTY — postój nie jest zerem. */
+const CEL_PUNKTOW = 700;
+const KROKI = [1, 2, 5, 10, 15, 20, 30, 60, 120];
+const BUDZET_UZUPELNIEN = 55;   // ile jazd wolno douczyć w jednym przebiegu:
+                                // Strava daje 100 zapytań na 15 minut
+
+function krokProbkowania(sekund){
+  for (const k of KROKI) if (sekund / k <= CEL_PUNKTOW) return k;
+  return KROKI[KROKI.length - 1];
+}
+
+/* Kodowanie serii: zygzak + varint na różnicach, ten sam pomysł co przy
+   trasach. Wartość zapisujemy powiększoną o 1, bo ZERO jest zarezerwowane
+   na „brak pomiaru" — inaczej postoju nie dałoby się odróżnić od zera watów. */
+function kodujSerie(wartosci){
+  let out = "", poprz = 0;
+  for (const v of wartosci){
+    const n = (v == null || !isFinite(v)) ? 0 : Math.max(0, Math.round(v)) + 1;
+    out += kodujLiczbe(n - poprz);
+    poprz = n;
+  }
+  return out;
+}
+
+function przebiegJazdy(str){
+  if (!str) return null;
+  const czas = str.czas;
+  const dlugosc = Math.max(str.watts ? str.watts.length : 0,
+                           str.hr ? str.hr.length : 0,
+                           str.v ? str.v.length : 0);
+  if (!dlugosc) return null;
+  // Bez osi czasu zakładamy 1 Hz — tak samo jak przy krzywej mocy.
+  const t = (i) => (czas && czas[i] != null) ? czas[i] : i;
+  const koniec = t(dlugosc - 1);
+  if (!(koniec > 0)) return null;
+  const krok = krokProbkowania(koniec);
+  const n = Math.floor(koniec / krok) + 1;
+
+  const sumy = { v: new Array(n).fill(0), w: new Array(n).fill(0), h: new Array(n).fill(0) };
+  const ile  = { v: new Array(n).fill(0), w: new Array(n).fill(0), h: new Array(n).fill(0) };
+  for (let i = 0; i < dlugosc; i++){
+    const k = Math.floor(t(i) / krok);
+    if (k < 0 || k >= n) continue;
+    if (str.v && str.v[i] != null){ sumy.v[k] += str.v[i] * 3.6; ile.v[k]++; }
+    if (str.watts && str.watts[i] != null){ sumy.w[k] += str.watts[i]; ile.w[k]++; }
+    if (str.hr && str.hr[i] != null){ sumy.h[k] += str.hr[i]; ile.h[k]++; }
+  }
+  const serio = (klucz, mnoznik) => {
+    if (!ile[klucz].some(x => x > 0)) return null;
+    return sumy[klucz].map((s, i) => ile[klucz][i] ? s / ile[klucz][i] * mnoznik : null);
+  };
+  // Prędkość mnożona przez 10, żeby zmieścić jedno miejsce po przecinku
+  // w liczbie całkowitej — te same waty i uderzenia zostają całkowite.
+  const v = serio("v", 10), w = serio("w", 1), h = serio("h", 1);
+  if (!v && !w && !h) return null;
+  return {
+    krok, n,
+    ...(v ? { v: kodujSerie(v) } : {}),
+    ...(w ? { w: kodujSerie(w) } : {}),
+    ...(h ? { h: kodujSerie(h) } : {})
+  };
+}
+
+function wczytajPrzebiegi(){
+  if (!fs.existsSync(PLIK_PRZEBIEGOW)) return {};
+  try {
+    global.window = {};
+    delete require.cache[require.resolve(PLIK_PRZEBIEGOW)];
+    require(PLIK_PRZEBIEGOW);
+    return (global.window.PRZEBIEGI || {}).jazdy || {};
+  } catch (e){ return {}; }
+}
+
+function zapiszPrzebiegi(przebiegi, pobrano){
+  const idy = Object.keys(przebiegi).sort();
+  const L = [];
+  L.push("// przebiegi.js — prędkość, moc i tętno w czasie każdej jazdy.");
+  L.push("// PLIK GENEROWANY przez .github/skrypty/pobierz-strave.js — nie edytować ręcznie.");
+  L.push("//");
+  L.push("// Strava oddaje te trzy strumienie sekunda po sekundzie. Zapisanie ich 1:1");
+  L.push("// dla stu jazd to ponad milion liczb; tutaj są uśrednione do kroku, który");
+  L.push("// daje najwyżej " + CEL_PUNKTOW + " punktów na jazdę — tyle, ile wykres i tak umie pokazać.");
+  L.push("//");
+  L.push("// Kodowanie: zygzak + varint na różnicach (jak trasy). Wartość jest powiększona");
+  L.push("// o 1, bo ZERO znaczy \"brak pomiaru\" — postój nie jest zerem watów.");
+  L.push("// Prędkość w dziesiątych częściach km/h, moc w watach, tętno w uderzeniach.");
+  L.push("");
+  L.push("window.PRZEBIEGI = {");
+  L.push(' "wersja": 1,');
+  L.push(' "policzono": ' + JSON.stringify(pobrano) + ",");
+  L.push(' "jazdy": {');
+  L.push(idy.map(id => `  ${JSON.stringify(id)}: ${JSON.stringify(przebiegi[id])}`).join(",\n"));
+  L.push(" }");
+  L.push("};");
+  fs.writeFileSync(PLIK_PRZEBIEGOW, L.join("\n") + "\n", "utf8");
+}
+
 const PLIK_TRAS = path.join(__dirname, "..", "..", "trasy.js");
 const PELNE_TRASY = process.env.PELNE_TRASY === "true";
 const PROMIEN_PRYWATNOSCI_M = 500;
@@ -200,13 +312,16 @@ async function dociagnijJazde(id, access, zSegmentami){
 async function dociagnijStrumienie(id, access){
   try {
     const s = await zapytaj(
-      `${STRAVA}/api/v3/activities/${id}/streams?keys=time,watts,heartrate&key_by_type=true`,
+      `${STRAVA}/api/v3/activities/${id}/streams?keys=time,watts,heartrate,velocity_smooth&key_by_type=true`,
       { headers: { Authorization: `Bearer ${access}` } });
     if (!s) return null;
     const watts = s.watts && s.watts.data ? s.watts.data : null;
     const hr = s.heartrate && s.heartrate.data ? s.heartrate.data : null;
-    if (!watts && !hr) return null;
-    return { watts, hr, czas: s.time && s.time.data ? s.time.data : null };
+    // velocity_smooth przychodzi w metrach na sekundę i NIC nie kosztuje —
+    // leci tym samym zapytaniem co waty i tętno.
+    const v = s.velocity_smooth && s.velocity_smooth.data ? s.velocity_smooth.data : null;
+    if (!watts && !hr && !v) return null;
+    return { watts, hr, v, czas: s.time && s.time.data ? s.time.data : null };
   } catch (e){
     console.log(`  (nie udało się pobrać strumieni ${id}: ${e.message.split("\n")[0]})`);
     return undefined;
@@ -412,6 +527,7 @@ function zapisz(D){
    Ta sama sztuczka co w analiza.js — pozwala sprawdzić przycinanie strefą
    prywatności bez sieci i bez drugiej kopii logiki. */
 module.exports = { dekodujTrase, kodujTrase, metry, znajdzDom, utnijPrywatne,
+  przebiegJazdy, kodujSerie, krokProbkowania,
   krzywaMocy, czasWStrefach, ktoraStrefa, tabelaNaDzien };
 if (require.main !== module) return;
 
@@ -454,6 +570,12 @@ if (require.main !== module) return;
     if (linia) surowe.set(String(a.id), linia);
   }
   const trasyStare = wczytajTrasy();
+  const przebiegi = wczytajPrzebiegi();
+  for (const id of Object.keys(przebiegi))
+    if (!zeStravy.some(a => String(a.id) === id)) delete przebiegi[id];
+  // Backfill kosztuje po jednym zapytaniu na jazdę, więc rozkładamy go na
+  // kilka przebiegów zamiast wpaść w limit Stravy (100 na 15 minut).
+  let budzet = BUDZET_UZUPELNIEN;
 
   const opisy = new Map(stare.aktywnosci.map(a => [a.id, a.opis]));
   // RPE (perceived_exertion) — jak opis: nie ma go w liście aktywności,
@@ -461,6 +583,7 @@ if (require.main !== module) return;
   // jest najlepszą dostępną miarą wysiłku, więc nie wolno go zgubić przy
   // przebiegu, który akurat nie pyta o tę jazdę.
   const rpeStare = new Map(stare.aktywnosci.map(a => [a.id, a.rpe]));
+  const kaloriStare = new Map(stare.aktywnosci.map(a => [a.id, a.kalorie]));
   const znaneId = new Set(stare.aktywnosci.map(a => a.id));
 
   const nowe = zeStravy.map(naNasz)
@@ -489,7 +612,7 @@ if (require.main !== module) return;
   let nowychRozkladow = 0;
   const segmenty = new Map((stare.segmenty || []).map(x => [x.id, x]));
 
-  let zapytan = 0, zmienionych = 0, nowychProb = 0;
+  let zapytan = 0, zmienionych = 0, nowychProb = 0, nowychPrzebiegow = 0;
   for (const a of nowe){
     const znana    = znaneId.has(a.id);
     const stary    = opisy.get(a.id);
@@ -520,16 +643,31 @@ if (require.main !== module) return;
     let chceStrefy = strefyMozliwe && (!rozklady[a.id] || PELNE_STREFY);
     if (chceStrefy) chceMoc = chceMoc || mocMozliwa;   // i tak pytamy o strumień
 
-    if (!chceOpis && !chceSegmenty && !chceMoc && !chceStrefy && !chceTrase){
+    // Przebieg jazdy: potrzebny KAŻDEJ jeździe, nie tylko tej z mocą — sama
+    // prędkość w czasie jest już wykresem. Strumień to jedno zapytanie, więc
+    // dociągamy z budżetem i resztę dobierze następny przebieg automatu.
+    const chcePrzebieg = kolarska && (!przebiegi[a.id] || PELNE_PRZEBIEGI)
+      && budzet > 0;
+
+    // Kalorie są WYŁĄCZNIE w szczegółach jazdy — nie ma ich w liście. Strava
+    // liczy je z mocy albo z własnego modelu; to jej liczba, nie nasza.
+    const chceKalorie = kolarska && a.kalorie == null
+      && kaloriStare.get(a.id) == null && budzet > 0;
+
+    if (!chceOpis && !chceSegmenty && !chceMoc && !chceStrefy && !chceTrase
+        && !chcePrzebieg && !chceKalorie){
       if (stary) a.opis = stary;               // nic do pytania — zachowaj, co mamy
       if (staryRpe != null) a.rpe = staryRpe;
+      if (kaloriStare.get(a.id) != null) a.kalorie = kaloriStare.get(a.id);
       continue;
     }
+    if (kaloriStare.get(a.id) != null) a.kalorie = kaloriStare.get(a.id);
 
     // Szczegółów nie pobieramy dla samej mocy — strumień jest osobnym adresem.
-    const jazda = (chceOpis || chceSegmenty || chceTrase)
+    const pytamOSzczegoly = chceOpis || chceSegmenty || chceTrase || chceKalorie;
+    const jazda = pytamOSzczegoly
       ? await dociagnijJazde(a.id, access, chceSegmenty) : null;
-    if (chceOpis || chceSegmenty || chceTrase) zapytan++;
+    if (pytamOSzczegoly){ zapytan++; if (chceKalorie) budzet--; }
 
     if (jazda === undefined){                  // zapytanie padło — nie ruszamy niczego
       if (stary) a.opis = stary;
@@ -553,6 +691,7 @@ if (require.main !== module) return;
 
     // Strava jest masterem również tutaj: skasowany RPE znika też u nas.
     if (jazda && jazda.perceived_exertion != null) a.rpe = jazda.perceived_exertion;
+    if (jazda && jazda.calories != null) a.kalorie = Math.round(jazda.calories);
 
     if (chceOpis && jazda){
       const o = (jazda.description || "").trim() || null;
@@ -566,9 +705,20 @@ if (require.main !== module) return;
     }
     if (!chceOpis && staryRpe != null && a.rpe == null) a.rpe = staryRpe;
 
-    if (chceMoc || chceStrefy){
+    if (chceMoc || chceStrefy || chcePrzebieg){
       const str = await dociagnijStrumienie(a.id, access);
       zapytan++;
+      if (chcePrzebieg) budzet--;
+      if (chcePrzebieg && str !== undefined){
+        const p = przebiegJazdy(str);
+        if (p){
+          przebiegi[a.id] = p;
+          nowychPrzebiegow++;
+          console.log(`  przebieg: ${a.data.slice(0,10)} ${a.nazwa} — `
+            + `${p.n} punktów co ${p.krok} s`
+            + `${p.v ? ", prędkość" : ""}${p.w ? ", moc" : ""}${p.h ? ", tętno" : ""}`);
+        }
+      }
       if (str !== undefined){
         if (chceMoc){
           mocPobrana.add(a.id);
@@ -637,6 +787,19 @@ if (require.main !== module) return;
       trasy[a.id] = trasyStare[a.id];
     }
   }
+  const stanPrzebiegow = JSON.stringify(przebiegi);
+  if (stanPrzebiegow !== JSON.stringify(wczytajPrzebiegi())){
+    zapiszPrzebiegi(przebiegi, new Date().toISOString().slice(0,16));
+    console.log(`Przebiegi: ${Object.keys(przebiegi).length} jazd `
+      + `(+${nowychPrzebiegow} w tym przebiegu).`);
+  } else {
+    console.log(`Przebiegi: ${Object.keys(przebiegi).length} jazd, bez zmian.`);
+  }
+  const brakuje = nowe.filter(a => ROWEROWE.has(a.typ) && !przebiegi[a.id]).length;
+  if (brakuje) console.log(`  (${brakuje} jazd bez przebiegu — dobiorę je `
+    + `w kolejnych przebiegach, żeby nie przekroczyć limitu zapytań Stravy)`);
+  stare.meta.jazd_z_przebiegiem = Object.keys(przebiegi).length;
+
   const bylyTrasy = JSON.stringify(trasyStare);
   if (JSON.stringify(trasy) !== bylyTrasy){
     zapiszTrasy(trasy, dom, { pobrano: new Date().toISOString().slice(0,16) });
