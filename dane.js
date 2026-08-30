@@ -1099,6 +1099,12 @@ regeneracja: {
   "wzor": "godziny = wspolczynnik × minuty_ruchu × (RPE / 10) ^ wykladnik_rpe",
   "wspolczynnik": 0.8,
   "wykladnik_rpe": 1.9,
+ "rpe_ze_stref": {
+  "_opis": "Od 1.09.2026 jest pas piersiowy, więc wysiłek da się ZMIERZYĆ, a nie tylko zadeklarować. Zamiast drugiego wzoru przeliczamy czas w strefach tętna na odczuwany wysiłek i wkładamy go do tego samego wzoru — dzięki temu jazdy sprzed pasa i po nim leżą na jednej skali. Metoda to Edwards TRIMP (suma minut w strefie razy waga strefy), tylko wagi są w skali RPE 1-10, a nie 1-5, żeby pasowały do wzoru.",
+  "_wagi_opis": "Ile na skali 1-10 waży minuta w danej strefie. Z1 regeneracja, Z2 baza, Z3 tempo, Z4 próg, Z5 VO2.",
+  "wagi": [2, 3.5, 5.5, 7.5, 9.5],
+  "_pierwszenstwo": "Tętno wygrywa z RPE, bo pomiar wygrywa z deklaracją. Panel pokazuje obie liczby, żeby było widać, gdzie się rozjeżdżają."
+ },
   "maks_godzin": 96,
   "udzial_zaleglosci": 0.5,
   "_zaleglosc_opis": "Jazda zaczęta przed końcem poprzedniej regeneracji dolicza połowę zaległych godzin. Nie całość, bo część regeneracji biegnie równolegle; nie zero, bo wtedy dwa mocne dni pod rząd wyglądałyby jak jeden.",

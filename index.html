@@ -1121,6 +1121,7 @@ table.aktywnosci th:nth-child(6),table.aktywnosci td:nth-child(6){width:22.5%}
   border-top:1px solid var(--linia);padding-top:8px}
 .notatka-dopisek{border-left:3px dashed var(--slaby)}
 .notatka-dopisek textarea{font-style:italic}
+.regen-uwaga{font-size:11.5px;color:var(--slaby);line-height:1.5;margin:6px 0 2px}
 
 /* Odczyt stoi NAD wykresem, a nie w dymku pod palcem: na iPadzie palec
    zasłoniłby dokładnie to miejsce, które się właśnie czyta. */
@@ -5171,18 +5172,23 @@ const KONF_FORMY = D.stan_wytrenowania || null;
 function seriaFormy(){
   if (!KONF_FORMY) return null;
   const od = KONF_FORMY.od_daty;
+  /* Ta sama miara wysiłku co przy regeneracji: tętno, gdy pas był założony,
+     RPE dopiero wtedy, gdy tętna nie ma. Dwie różne definicje wysiłku na
+     jednej stronie prędzej czy później rozjechałyby wykres formy z licznikiem
+     regeneracji i nie dałoby się powiedzieć, która ma rację. */
   const jazdyF = JAZDY_GABLOTA.filter(a => a.data.slice(0,10) >= od
-    && a.data.slice(0,10) <= DZIS && a.rpe != null && a.czas_ruchu_s);
+    && a.data.slice(0,10) <= DZIS && a.czas_ruchu_s && wysilekJazdy(a));
   if (!jazdyF.length) return null;
 
   // Obciążenie na dzień. Dwie jazdy tego samego dnia sumują się.
   const obciazenie = new Map();
   for (const a of jazdyF){
     const d = a.data.slice(0,10);
-    obciazenie.set(d, (obciazenie.get(d) || 0) + (a.czas_ruchu_s / 60) * a.rpe);
+    obciazenie.set(d, (obciazenie.get(d) || 0)
+      + (a.czas_ruchu_s / 60) * wysilekJazdy(a).rpe);
   }
   const bezRPE = JAZDY_GABLOTA.filter(a => a.data.slice(0,10) >= od
-    && a.data.slice(0,10) <= DZIS && a.rpe == null).length;
+    && a.data.slice(0,10) <= DZIS && !wysilekJazdy(a)).length;
 
   // Średnia wykładnicza: dzisiejsza wartość to wczorajsza plus ułamek różnicy.
   // Ułamek 1 − e^(−1/τ) to klasyczna postać, ta sama, której używa model
@@ -5398,10 +5404,35 @@ function podepnijForme(){
 const KONF_REGEN = D.regeneracja || null;
 const czasJazdyMs = (a) => new Date(a.data).getTime();
 
+/* WYSIŁEK JAZDY — pomiar przed deklaracją.
+
+   Do 1.09.2026 jedyną miarą było RPE, które Fryderyk wpisuje sam. Od pasa
+   piersiowego wysiłek da się ZMIERZYĆ, więc liczymy go z czasu w strefach
+   tętna metodą Edwardsa (suma minut w strefie razy waga strefy) — tyle że
+   wagi są w skali RPE 1-10, nie 1-5, żeby wynik wchodził do TEGO SAMEGO
+   wzoru na regenerację. Dzięki temu jazdy sprzed pasa i po nim leżą na jednej
+   skali i wykres nie skacze w dniu, w którym doszedł nowy czujnik.
+
+   Wagi siedzą w dane.js, nie tutaj: to założenie, a nie kod. */
+function wysilekJazdy(a){
+  const konf = (KONF_REGEN || {}).rpe_ze_stref;
+  const rozklad = ((D.strefy || {}).rozklady || {}).jazdy || {};
+  const sekundy = (rozklad[a.id] || {}).tetno;
+  if (konf && Array.isArray(sekundy) && sekundy.length === konf.wagi.length){
+    const suma = sekundy.reduce((x,y) => x + (y||0), 0);
+    if (suma > 0){
+      const wazone = sekundy.reduce((x,y,i) => x + (y||0) * konf.wagi[i], 0) / suma;
+      return { rpe: wazone, skad: "tetno", zRpe: a.rpe != null ? a.rpe : null };
+    }
+  }
+  if (a.rpe != null) return { rpe: a.rpe, skad: "rpe", zRpe: a.rpe };
+  return null;
+}
+
 function planRegeneracji(){
   if (!KONF_REGEN) return null;
   const jazdyR = JAZDY_GABLOTA
-    .filter(a => a.rpe != null && a.czas_ruchu_s)
+    .filter(a => a.czas_ruchu_s && wysilekJazdy(a))
     .sort((x,y) => x.data < y.data ? -1 : 1);
   if (!jazdyR.length) return null;
 
@@ -5410,16 +5441,17 @@ function planRegeneracji(){
   for (const a of jazdyR){
     const start = czasJazdyMs(a);
     const koniecJazdy = start + (a.czas_calkowity_s || a.czas_ruchu_s) * 1000;
+    const wys = wysilekJazdy(a);
     const bazowe = Math.min(KONF_REGEN.maks_godzin,
       KONF_REGEN.wspolczynnik * (a.czas_ruchu_s / 60)
-        * Math.pow(a.rpe / 10, KONF_REGEN.wykladnik_rpe));
+        * Math.pow(wys.rpe / 10, KONF_REGEN.wykladnik_rpe));
     // Ile regeneracji zostało niedokończonej w chwili STARTU tej jazdy.
     const zalegleGodz = poprzedniKoniec > start
       ? (poprzedniKoniec - start) / 3600000 : 0;
     const razem = Math.min(KONF_REGEN.maks_godzin,
       bazowe + zalegleGodz * KONF_REGEN.udzial_zaleglosci);
     poprzedniKoniec = koniecJazdy + razem * 3600000;
-    wpisy.push({ jazda: a, koniecJazdy, bazowe, zalegleGodz, razem,
+    wpisy.push({ jazda: a, koniecJazdy, bazowe, zalegleGodz, razem, wysilek: wys,
       wygasa: poprzedniKoniec });
   }
   return wpisy;
@@ -5492,7 +5524,8 @@ function regeneracja(){
   if (!st) return `
     <div class="pusto">
       <span class="znak">Regeneracja</span>
-      Nie ma jeszcze jazdy z wpisanym RPE — bez niej nie ma z czego liczyć.
+      Nie ma jeszcze jazdy z tętnem ani z wpisanym RPE — bez jednego albo
+      drugiego nie ma z czego liczyć.
     </div>`;
 
   const o = st.ostatni, gotowe = st.zostaloMs <= 0;
@@ -5507,6 +5540,10 @@ function regeneracja(){
     <p class="opis">
       Ile godzin dzieli Cię od pełnej gotowości po ostatniej jeździe. Licznik
       idzie <b>na żywo</b> — wejdziesz za pięć godzin, zobaczysz o pięć mniej.
+      <br>Wysiłek jazdy bierzemy z <b>czasu w strefach tętna</b>, gdy pas był
+      założony, a z RPE dopiero wtedy, gdy tętna nie ma — pomiar wygrywa
+      z deklaracją. Obie drogi wpadają do tego samego wzoru, więc jazdy sprzed
+      pasa i po nim leżą na jednej skali.
       Nowa jazda przelicza go od nowa i <b>dolicza to, czego nie odrobiłeś</b>.
     </p>
     <div class="regen-uklad">
@@ -5530,8 +5567,19 @@ function regeneracja(){
           <div class="regen-rozbicie">
             <span><span class="etykieta">kiedy</span> ${pl(o.jazda.data)}</span>
             <span><span class="etykieta">czas</span> ${czasNaTekst(o.jazda.czas_ruchu_s)}</span>
-            <span><span class="etykieta">RPE</span> ${o.jazda.rpe}/10</span>
+            <span><span class="etykieta">${o.wysilek.skad === "tetno"
+              ? "wysiłek z tętna" : "RPE"}</span> ${liczba(o.wysilek.rpe,
+              o.wysilek.skad === "tetno" ? 1 : 0)}/10</span>
           </div>
+          ${o.wysilek.skad === "tetno" ? `
+            <div class="regen-uwaga">
+              Policzone z <b>czasu w strefach tętna</b>, nie z wpisanego RPE —
+              pomiar wygrywa z deklaracją.${o.wysilek.zRpe != null ? `
+                Twoje RPE ${o.wysilek.zRpe} dałoby
+                ${godzinyKrotko(Math.min(KONF_REGEN.maks_godzin,
+                  KONF_REGEN.wspolczynnik * (o.jazda.czas_ruchu_s/60)
+                    * Math.pow(o.wysilek.zRpe/10, KONF_REGEN.wykladnik_rpe)))}.` : ""}
+            </div>` : ""}
           <ul class="regen-skladniki">
             <li><span>za samą jazdę</span><b>${godzinyKrotko(o.bazowe)}</b></li>
             ${o.zalegleGodz > 0.05 ? `
@@ -6261,8 +6309,16 @@ const OPIS_SERII = {
 // Przebiegi już rozpakowane — drugi raz tej samej jazdy nie dekodujemy.
 const PRZEBIEG_GOTOWY = new Map();
 
+/* Wersja formatu, którą ta strona umie narysować. Plik z niższą wersją to
+   przebieg zapisany JESZCZE W KUBEŁKACH — jego `n` liczy kubełki, nie sekundy,
+   więc narysowany jako 1 Hz pokazywałby godzinną jazdę jako sześciominutową.
+   Zdarzyło się to naprawdę: automat przelicza po kilkadziesiąt jazd na
+   przebieg, a strona brała po drodze stare wpisy za dobrą monetę. */
+const FORMAT_PRZEBIEGU = 3;
+
 function rozpakujPrzebieg(id, surowy){
   if (PRZEBIEG_GOTOWY.has(id)) return PRZEBIEG_GOTOWY.get(id);
+  if ((surowy.f || 1) < FORMAT_PRZEBIEGU) return "stary";
   const serie = {};
   if (surowy.v) serie.predkosc = dekodujSerie(surowy.v).map(x => x == null ? null : x / 10);
   if (surowy.w) serie.moc      = dekodujSerie(surowy.w);
@@ -6434,8 +6490,14 @@ function wykresPrzebiegu(pb){
     </div>`;
 }
 
+const PRZELICZANY = `<div class="pusto"><span class="znak">Przebieg</span>
+  Ta jazda czeka na przeliczenie do zapisu sekunda po sekundzie. Automat robi
+  to po kilkadziesiąt jazd na przebieg, żeby nie przekroczyć limitu zapytań
+  Stravy — wykres pojawi się po najbliższej aktualizacji.</div>`;
+
 function blokPrzebiegu(x){
   const jest = ((PRZEBIEGI || {}).jazdy || {})[x.id];
+  if (jest && (jest.f || 1) < FORMAT_PRZEBIEGU) return PRZELICZANY;
   if (!jest) return `
     <div class="pusto"><span class="znak">Przebieg</span>
       ${!PRZEBIEGI
@@ -6459,6 +6521,7 @@ function podepnijPrzebieg(){
     // Zakładka mogła się w tym czasie zmienić — nie wstawiamy w nieswoje miejsce.
     const teraz = document.getElementById("przebieg-miejsce");
     if (!teraz || teraz.dataset.jazda !== id) return;
+    if (pb === "stary"){ teraz.innerHTML = PRZELICZANY; return; }
     if (!pb){
       teraz.innerHTML = `<div class="pusto"><span class="znak">Przebieg</span>
         Nie udało się wczytać przebiegu tej jazdy.</div>`;
