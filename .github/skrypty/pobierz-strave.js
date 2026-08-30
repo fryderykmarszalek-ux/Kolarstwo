@@ -85,8 +85,9 @@ const PELNE_PRZEBIEGI = process.env.PELNE_PRZEBIEGI === "true";
    wtedy automat sam dobiera stare jazdy po kilkadziesiąt na przebieg, zamiast
    czekać na ręczne odpalenie z przełącznikiem.
    2 dołożyła szczyty w kubełkach, 3 wyrzuciła kubełki i zapisuje PEŁNE 1 Hz,
-   4 naprawia zapis, który potrafił wyzerować pliki jazd (patrz zapiszPrzebiegi). */
-const FORMAT_PRZEBIEGU = 4;
+   4 naprawia zapis, który potrafił wyzerować pliki jazd (patrz zapiszPrzebiegi),
+   5 dokłada wysokość i dystans (do nachylenia) oraz mapę indeks -> sekunda. */
+const FORMAT_PRZEBIEGU = 5;
 
 /* PLIK NA JAZDĘ, nie jeden wielki. Pełne 1 Hz dla wszystkich jazd to około
    pół megabajta i rośnie z każdym treningiem — a strona ładowałaby to przy
@@ -138,20 +139,35 @@ function przebiegJazdy(str){
   const v = str.v ? pusta() : null;
   const w = str.watts ? pusta() : null;
   const h = str.hr ? pusta() : null;
+  const y = str.alt ? pusta() : null;      // wysokość w decymetrach
+  const dl = str.dys ? pusta() : null;     // dystans od startu w metrach
+  // Indeks w strumieniu -> sekunda. Potrzebny, żeby próba na segmencie
+  // (start_index/end_index) trafiła w tę samą oś, po której idzie wykres.
+  const naSekunde = new Array(dlugosc).fill(null);
   for (let i = 0; i < dlugosc; i++){
     const k = t(i);
     if (k < 0 || k >= n) continue;
+    naSekunde[i] = k;
     if (v && str.v[i] != null) v[k] = str.v[i] * 3.6 * 10;   // 0,1 km/h
     if (w && str.watts[i] != null) w[k] = str.watts[i];
     if (h && str.hr[i] != null) h[k] = str.hr[i];
+    // Wysokość bywa ujemna (depresje, błąd barometru), a kodowanie nie zna
+    // liczb ujemnych — przesuwamy o 1000 m i odejmujemy przy odczycie.
+    if (y && str.alt[i] != null) y[k] = (str.alt[i] + 1000) * 10;
+    if (dl && str.dys[i] != null) dl[k] = str.dys[i];
   }
   const jest = (a) => a && a.some(x => x != null);
-  if (!jest(v) && !jest(w) && !jest(h)) return null;
+  if (!jest(v) && !jest(w) && !jest(h) && !jest(y)) return null;
   return {
     f: FORMAT_PRZEBIEGU, n,
     ...(jest(v) ? { v: kodujSerie(v) } : {}),
     ...(jest(w) ? { w: kodujSerie(w) } : {}),
-    ...(jest(h) ? { h: kodujSerie(h) } : {})
+    ...(jest(h) ? { h: kodujSerie(h) } : {}),
+    ...(jest(y) ? { y: kodujSerie(y) } : {}),
+    ...(jest(dl) ? { d: kodujSerie(dl) } : {}),
+    // Mapa indeks strumienia -> sekunda. Gdy oś czasu jest ciągła, jest to
+    // po prostu tożsamość i wtedy jej nie zapisujemy.
+    ...(naSekunde.some((k, i) => k !== i) ? { i: kodujSerie(naSekunde) } : {})
   };
 }
 
@@ -367,7 +383,7 @@ async function dociagnijJazde(id, access, zSegmentami){
 async function dociagnijStrumienie(id, access){
   try {
     const s = await zapytaj(
-      `${STRAVA}/api/v3/activities/${id}/streams?keys=time,watts,heartrate,velocity_smooth&key_by_type=true`,
+      `${STRAVA}/api/v3/activities/${id}/streams?keys=time,watts,heartrate,velocity_smooth,altitude,distance&key_by_type=true`,
       { headers: { Authorization: `Bearer ${access}` } });
     if (!s) return null;
     const watts = s.watts && s.watts.data ? s.watts.data : null;
@@ -375,8 +391,13 @@ async function dociagnijStrumienie(id, access){
     // velocity_smooth przychodzi w metrach na sekundę i NIC nie kosztuje —
     // leci tym samym zapytaniem co waty i tętno.
     const v = s.velocity_smooth && s.velocity_smooth.data ? s.velocity_smooth.data : null;
-    if (!watts && !hr && !v) return null;
-    return { watts, hr, v, czas: s.time && s.time.data ? s.time.data : null };
+    // Wysokość i dystans: z nich liczy się NACHYLENIE na wykresie segmentu.
+    // Nachylenia nie zapisujemy — to wielkość wyliczalna, a wariant B każe
+    // trzymać pomiary. Ten sam adres, to samo zapytanie, zero kosztu.
+    const alt = s.altitude && s.altitude.data ? s.altitude.data : null;
+    const dys = s.distance && s.distance.data ? s.distance.data : null;
+    if (!watts && !hr && !v && !alt) return null;
+    return { watts, hr, v, alt, dys, czas: s.time && s.time.data ? s.time.data : null };
   } catch (e){
     console.log(`  (nie udało się pobrać strumieni ${id}: ${e.message.split("\n")[0]})`);
     return undefined;
@@ -474,6 +495,12 @@ function wyciagnijProby(jazda){
         ? Number((seg.elevation_high - seg.elevation_low).toFixed(1)) : null
     });
     proby.push({
+      // Gdzie ten przejazd LEŻY w strumieniu jazdy. Bez tych dwóch liczb nie
+      // da się wyciąć z przebiegu jazdy kawałka odpowiadającego segmentowi,
+      // a to jest cały sens zakładki Aktywności -> Segment. Przychodzą w tej
+      // samej odpowiedzi co reszta przejazdu, więc nie kosztują nic.
+      od: e.start_index != null ? e.start_index : null,
+      do: e.end_index != null ? e.end_index : null,
       // Identyfikator przejazdu ze Stravy. Nie służy do rysowania — jest
       // KOTWICĄ dla notatek.
       //
@@ -676,8 +703,13 @@ if (require.main !== module) return;
     const swieza   = a.data.slice(0,10) >= granica;
 
     const chceOpis = kolarska && (!znana || swieza || PELNE_OPISY);
+    // Próby zapisane przed 30.08.2026 nie mają start_index/end_index — bez nich
+    // nie da się wyciąć segmentu z przebiegu. Dociągamy je ponownie, ale
+    // z budżetem, żeby nie wpaść w limit Stravy przy 61 jazdach naraz.
+    const probyBezIndeksow = proby.some(x => x.a === a.id && x.od == null);
     const chceSegmenty = kolarska && a.data.slice(0,10) >= SEGMENTY_OD
-      && (!jazdyZeSegmentami.has(a.id) || PELNE_SEGMENTY);
+      && (!jazdyZeSegmentami.has(a.id) || PELNE_SEGMENTY
+          || (probyBezIndeksow && budzet > 0));
 
     const staryRpe = rpeStare.get(a.id);
 
