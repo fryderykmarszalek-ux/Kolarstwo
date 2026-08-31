@@ -1293,7 +1293,26 @@ const ostatniDzien = dniZJazda[dniZJazda.length-1];
 const przerwaTrwa = roznicaDni(naDzien(ostatniDzien), naDzien(DZIS));
 const PROG = D.kryterium_przerwy.prog_dni;
 const WARIANT = D.kryterium_przerwy.wybor;
-const WYJAZDY = D.kryterium_przerwy.wyjazdy_bez_roweru || [];
+/* WYJAZD KOŃCZY SIĘ W DNIU, W KTÓRYM ZNÓW WSIADŁEŚ NA ROWER — niezależnie od
+   tego, co mówi zadeklarowana data końca. Wpis „bez dostępu do roweru" nie może
+   obejmować dnia, w którym w danych stoi jazda: to sprzeczność, a nie wyjątek.
+
+   Bez tego przycięcia zdarzyło się dokładnie to: wyjazd zgłoszony do 31.08,
+   powrót i jazda 30.08, a kafelek „Od ostatniej jazdy" pokazywał jednodniową
+   przerwę z podpisem „Francja · nie liczy się". Data w danych zostaje taka,
+   jaką wpisał Fryderyk — poprawiamy tylko to, jak długo naprawdę obowiązuje. */
+const WYJAZDY = (D.kryterium_przerwy.wyjazdy_bez_roweru || []).map(w => {
+  // Czytamy prosto z danych, bo stała JAZDY powstaje dużo niżej w pliku
+  // i odwołanie do niej w tym miejscu wywaliłoby stronę przy wczytywaniu.
+  const pierwszaPoStarcie = D.aktywnosci
+    .filter(a => D.meta.typy_kolarskie.includes(a.typ))
+    .map(a => a.data.slice(0,10))
+    .filter(d => d >= w.od && d <= w.do)
+    .sort()[0];
+  if (!pierwszaPoStarcie) return w;
+  const koniec = dzienNaTekst(naDzien(pierwszaPoStarcie) - 86400000);
+  return koniec < w.od ? null : { ...w, do: koniec, przyciety: w.do };
+}).filter(Boolean);
 
 // Wariant B: przerwa nachodząca na zgłoszony wyjazd bez roweru nie liczy się
 // do kryterium. Warunek zgłoszenia z góry jest sprawdzany, nie zakładany.
@@ -5836,6 +5855,26 @@ const BLOKI_ANALIZY = {
   ...WYKRESY_ANALIZY
 };
 
+/* Analiza ma być codzienna. Jeśli nie jest, strona MUSI to powiedzieć —
+   nieświeży komentarz pokazany bez ostrzeżenia wygląda dokładnie tak samo jak
+   świeży i cicho kłamie o tym, kiedy powstał. To ta sama zasada, co pasek
+   świeżości danych nad treścią. */
+function swiezoscAnalizy(){
+  if (!ANALIZA || !ANALIZA.utworzono) return "";
+  const dni = Math.floor(
+    (naDzien(DZIS) - naDzien(ANALIZA.utworzono.slice(0,10))) / 86400000);
+  if (dni <= 1) return "";
+  const brakSekretu = /czatu/i.test(ANALIZA.model || "");
+  return `<div class="info ${dni >= 3 ? "alarmowy" : ""}">
+    <b>Ten komentarz ma ${dni} dni.</b> Miał się odświeżać codziennie, więc
+    coś stoi.${brakSekretu ? ` Najpewniejszy powód: w repozytorium wciąż nie ma
+    sekretu <code>ANTHROPIC_API_KEY</code> — bez niego automat nie ma czym
+    zapytać modelu i zostawia poprzedni tekst. Dodaje się go w
+    <b>Settings → Secrets and variables → Actions</b>.` : ` Zajrzyj do
+    przebiegów automatu — krok „Napisz analizę AI" mówi w logu, co się stało.`}
+  </div>`;
+}
+
 function analizaAI(){
   if (!ANALIZA || !Array.isArray(ANALIZA.bloki) || !ANALIZA.bloki.length) return `
     <div class="pusto">
@@ -5862,10 +5901,11 @@ function analizaAI(){
     </div>
     <p class="opis">
       To jedyne miejsce na stronie, gdzie tekst pisze <b>model</b>, a nie reguła.
-      Powstaje w nocy, po pobraniu danych ze Stravy, i zmienia się tylko wtedy,
-      gdy w danych coś się zmieniło — po dniu bez jazdy zostaje ten sam.
+      Powstaje przy nocnym pobraniu danych ze Stravy — <b>codziennie</b>, także
+      w dniu bez jazdy, i dodatkowo po każdej nowej jeździe.
       ${ANALIZA.jazd_w_danych ? `Ostatnio liczone z ${ANALIZA.jazd_w_danych} jazd.` : ""}
     </p>
+    ${swiezoscAnalizy()}
     <div class="analiza-tresc">${tresc}</div>
     <div class="info">
       Napisał to <b>${bezpieczny(ANALIZA.model || "model Claude")}</b> na podstawie

@@ -838,6 +838,15 @@ Nachylenie bierzemy z `average_grade` Stravy. **Nie liczyć go z przewyższenia:
 — decyzja Fryderyka; wcześniejsza historia zostaje w pliku, ale nie wchodzi do
 wykresów. Zmiana tej jednej daty przywraca wszystko.
 
+**WYJAZD BEZ ROWERU KOŃCZY SIĘ W DNIU, W KTÓRYM ZNÓW BYŁA JAZDA** (31.08.2026),
+niezależnie od zadeklarowanej daty końca. Wpis „bez dostępu do roweru" nie może
+obejmować dnia, w którym w danych stoi jazda — to sprzeczność, a nie wyjątek.
+Bez tego przycięcia kafelek „Od ostatniej jazdy" pokazywał jednodniową przerwę
+z podpisem „Francja · nie liczy się", bo wyjazd był zgłoszony do 31.08, a powrót
+i jazda wypadły 30.08. Daty w `dane.js` zostają takie, jakie wpisał Fryderyk;
+przycinamy tylko to, jak długo naprawdę obowiązują. Kontrola: przerwa
+15.08→30.08 nadal jest wyłączona z kryterium, więc werdykt się nie zmienił.
+
 **Kryterium sezonu: wariant B**, wybrany 19.08.2026. Wyjazd bez roweru nie liczy
 się jako przerwa, jeśli zgłoszony **zanim** przerwa przekroczy 14 dni. Maks. dwa
 w roku. Lista w `dane.js` → `kryterium_przerwy.wyjazdy_bez_roweru`.
@@ -896,9 +905,26 @@ automat: `.github/skrypty/analiza.js` po nocnym pobraniu ze Stravy woła
 Messages API (`claude-opus-5`, raw `fetch`, zero zależności — tak jak reszta
 automatu) i zapisuje wynik do `analiza.js`. Strona tylko go rysuje.
 
-**Odcisk danych zamiast codziennego wydatku.** Przed wywołaniem liczymy skrót
-z briefingu. Ten sam odcisk = nic się nie zmieniło = nie wołamy modelu i
-zostawiamy poprzedni komentarz. Dzień bez jazdy nie kosztuje ani grosza.
+**ANALIZA JEST CODZIENNA — zmiana z 31.08.2026, decyzja Fryderyka.** Wcześniej
+powstawała wyłącznie przy zmianie danych (ten sam odcisk briefingu = nie wołamy
+modelu). Skutek: po dniu bez jazdy komentarz stał w miejscu i wyglądał na
+zepsuty. Fryderyk poprosił wprost o świeży tekst codziennie, także w dniu
+przerwy, i o **pełne akapity**, a nie jedno zdanie o pustce.
+
+Reguła: piszemy, gdy nie ma poprzedniej analizy, gdy poprzednia jest
+z wcześniejszego dnia (gwarancja codzienności) albo gdy zmienił się odcisk
+(doszła jazda). W pozostałych przypadkach zostawiamy to, co jest. Wychodzi
+jedno wywołanie w dniu bez jazdy i dwa w dniu z jazdą. Odcisk został, ale nie
+blokuje już pisania — mówi modelowi, czy coś doszło, żeby wiedział, o czym pisać.
+
+W poleceniu dla modelu stoi wprost, że **dzień bez jazdy nie jest dniem bez
+tematu**: forma, przerwa w kryterium, cele z prognoz, plan objętości i braki
+w danych zmieniają się same z upływem dni.
+
+**Strona mówi, gdy analiza jest nieświeża.** Komentarz starszy niż dzień
+dostaje ostrzeżenie z liczbą dni, a przy trzech dniach — czerwone. Nieświeży
+tekst pokazany bez ostrzeżenia wygląda dokładnie tak samo jak świeży i cicho
+kłamie o tym, kiedy powstał. To ta sama zasada, co pasek świeżości danych.
 
 **Model NIE wstawia HTML-a.** Oddaje listę bloków z zamkniętego słownika
 (nagłówek, akapit, lista, kafelki, ostrzeżenie i siedem typów wykresów),

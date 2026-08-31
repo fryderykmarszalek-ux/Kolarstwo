@@ -4,10 +4,24 @@
  * GitHuba, raz na dobę, PO pobraniu danych ze Stravy, i zapisuje wynik do
  * analiza.js. Strona tylko go rysuje.
  *
- * ODCISK DANYCH. Przed wydaniem grosza liczymy skrót z tego, co model i tak
- * by zobaczył. Jeśli jest ten sam co poprzednio — nic się nie zmieniło, więc
- * nie ma o czym pisać: zostawiamy poprzednią analizę i nie wołamy API.
- * Dzień bez jazdy nie kosztuje ani zapytania.
+ * KIEDY WOŁAMY MODEL — zmiana z 31.08.2026, na prośbę Fryderyka.
+ *
+ * Wcześniej analiza powstawała TYLKO przy zmianie danych: ten sam odcisk
+ * briefingu znaczył „nic się nie zmieniło, nie ma o czym pisać". Skutek był
+ * taki, że po dniu bez jazdy komentarz stał w miejscu i wyglądał na zepsuty.
+ * Fryderyk poprosił wprost, żeby był świeży CODZIENNIE, nawet w dniu przerwy,
+ * i z pełnymi akapitami, a nie z jednym zdaniem o pustce.
+ *
+ * Reguła jest teraz taka:
+ *   · brak poprzedniej analizy            -> piszemy,
+ *   · poprzednia jest z wcześniejszego dnia -> piszemy (gwarancja codzienności),
+ *   · odcisk się zmienił, czyli doszła jazda -> piszemy (świeżość po treningu),
+ *   · w pozostałych przypadkach            -> zostawiamy to, co jest.
+ *
+ * Wychodzi z tego jedno wywołanie w dniu bez jazdy i dwa w dniu z jazdą:
+ * poranne, żeby komentarz był aktualny na start dnia, i wieczorne, gdy jazda
+ * już wpadnie. Odcisk został, ale nie blokuje już pisania — mówi tylko, czy
+ * coś się zmieniło, żeby model wiedział, o czym pisać.
  *
  * BEZ ZALEŻNOŚCI. Node ma wbudowany fetch, tak jak w pobierz-strave.js.
  * Oficjalny pakiet SDK byłby wygodniejszy, ale ten projekt trzyma zasadę
@@ -186,9 +200,23 @@ ZASADY, KTÓRE OBOWIĄZUJĄ NA TEJ STRONIE OD POCZĄTKU:
 - Sesje ERG na Zwifcie opisują plan treningu, nie zawodnika.
 - Ma 16 lat i umysł matematyczny: wzór, podstawienie, wynik, wniosek.
 
-ILE PISAĆ: tyle, ile się wydarzyło. Po tygodniu z czterema jazdami i nowym
-rekordem — dużo, z wykresami. Po tygodniu bez jazd — kilka zdań o tym, co
-to znaczy dla formy, i tyle. Nie rozciągaj pustki na trzy akapity.
+ILE PISAĆ: ZAWSZE PEŁNĄ ANALIZĘ, także w dniu bez jazdy. Fryderyk czyta to
+codziennie i poprosił wprost o pełne akapity nawet po dniu przerwy — nie
+o jedno zdanie, że nic się nie działo.
+
+Dzień bez jazdy NIE JEST dniem bez tematu. Jest wtedy o czym pisać:
+- co dokładnie robi forma, gdy nie ma obciążenia — z liczbami i tempem spadku,
+- ile zostało do progu przerwy w kryterium sezonu i co to znaczy,
+- gdzie stoją cele z prognoz i ile do nich brakuje,
+- które segmenty czekają na powtórzenie i dlaczego akurat te,
+- co mówi plan objętości na najbliższy tydzień,
+- czego w danych wciąż nie ma i co to psuje.
+
+Nie zmyślaj jazdy, której nie było, i nie udawaj, że coś się wydarzyło.
+Pisz o STANIE, nie o zdarzeniu — stan zmienia się każdego dnia, także w dół.
+
+Trzymaj się mniej więcej pięciu-ośmiu bloków: nagłówki, akapity, kafelki
+i wykresy tam, gdzie naprawdę pokazują to, o czym piszesz.
 
 ODDAJESZ WYŁĄCZNIE JSON — tablicę bloków, bez komentarza wokół, bez
 markdownu, bez bloku kodu. Format:
@@ -213,12 +241,16 @@ Wykres wstawiaj TYLKO wtedy, gdy pokazuje to, o czym właśnie piszesz.
 Wykres bez zdania obok jest ozdobą, a nie argumentem. Zaczynaj od nagłówka.
 W tekście nie używaj znaczników HTML — strona i tak je wyświetli jako tekst.`;
 
-function polecenie(br, stara){
+function polecenie(br, stara, cosSieZmienilo){
   return `Oto komplet danych treningowych Fryderyka na dziś. Napisz analizę.
 
-${stara ? `Poprzednia analiza powstała ${stara.utworzono}. Nie powtarzaj jej
-słowo w słowo — napisz to, co zmieniło się od tamtego czasu, i dopiero potem
-resztę obrazu.\n\n` : ""}DANE:
+${stara ? `Poprzednia analiza powstała ${stara.utworzono}. ${cosSieZmienilo
+  ? `Od tamtej pory DANE SIĘ ZMIENIŁY — zacznij od tego, co doszło.`
+  : `Od tamtej pory NIE DOSZŁO nic nowego: nie było jazdy. To nie znaczy,
+że nie ma o czym pisać — forma, przerwa, cele i plan zmieniają się same
+z upływem dni. Napisz PEŁNĄ analizę stanu na dziś, innymi słowami niż
+poprzednio, i nie zaczynaj od zdania, że nic się nie wydarzyło.`}
+Nie powtarzaj poprzedniej analizy słowo w słowo.\n\n` : ""}DANE:
 ${JSON.stringify(br, null, 1)}`;
 }
 
@@ -323,17 +355,29 @@ if (require.main !== module) return;
   const odcisk = odciskDanych(br);
   const stara = poprzednia();
 
-  if (stara && stara.odcisk === odcisk && !WYMUS){
-    console.log("Dane bez zmian (odcisk " + odcisk + ") — analiza zostaje, "
-      + "nie wołam modelu.");
+  const dzisiaj = new Date().toISOString().slice(0,10);
+  const zDzisiaj = stara && stara.utworzono
+    && stara.utworzono.slice(0,10) === dzisiaj;
+  const cosSieZmienilo = !stara || stara.odcisk !== odcisk;
+
+  if (stara && zDzisiaj && !cosSieZmienilo && !WYMUS){
+    console.log("Analiza z dzisiaj już jest, a dane się nie zmieniły — "
+      + "zostawiam ją w spokoju.");
     return;
   }
+  console.log(zDzisiaj
+    ? "Analiza z dzisiaj istnieje, ale doszły nowe dane — piszę od nowa."
+    : "Nie ma dzisiejszej analizy — piszę.");
   if (!process.env.ANTHROPIC_API_KEY){
-    console.log("Brak ANTHROPIC_API_KEY — pomijam analizę.");
+    console.log("========================================================");
+    console.log("BRAK SEKRETU ANTHROPIC_API_KEY — analiza NIE POWSTANIE.");
+    console.log("Dodaj go w Settings -> Secrets and variables -> Actions.");
+    console.log("Do tego czasu na stronie stoi poprzedni komentarz i strona");
+    console.log("mówi wprost, z którego jest dnia.");
+    console.log("========================================================");
     return;
   }
-  console.log(`Dane zmienione (odcisk ${stara ? stara.odcisk : "brak"} → ${odcisk}). Pytam model...`);
-  const odp = await zapytajModel(SYSTEM, polecenie(br, stara));
+  const odp = await zapytajModel(SYSTEM, polecenie(br, stara, cosSieZmienilo));
   if (odp.stop === "max_tokens")
     console.log("  (uwaga: odpowiedź ucięta limitem tokenów)");
   const { dobre, odrzucone } = sprawdz(odp.bloki, D);
