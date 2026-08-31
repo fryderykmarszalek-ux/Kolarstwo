@@ -2,157 +2,156 @@
 // NIE EDYTOWAĆ RĘCZNIE: plik jest nadpisywany po każdej zmianie danych.
 // Powstaje w .github/skrypty/analiza.js po nocnym pobraniu ze Stravy.
 //
-// Ta pierwsza wersja jest wyjątkiem: napisana w sesji czatu, żeby zakładka
-// nie stała pusta do czasu dodania sekretu ANTHROPIC_API_KEY. Pole odcisk
-// jest prawdziwym skrótem dzisiejszego briefingu, więc automat uzna dane za
-// niezmienione i zostawi ten tekst w spokoju aż do następnej jazdy.
+// Ta wersja jest wyjątkiem — napisana w sesji czatu 31.08.2026, bo sekretu
+// ANTHROPIC_API_KEY jeszcze nie ma. Pole odcisk to prawdziwy skrót
+// dzisiejszego briefingu, więc automat uzna dane za niezmienione, a że
+// analiza jest z dzisiaj, zostawi ją w spokoju do jutra.
 
 window.ANALIZA = {
  "wersja": 1,
- "utworzono": "2026-08-28T11:40",
+ "utworzono": "2026-08-31T12:10",
  "model": "asystent w sesji czatu",
- "jazd_w_danych": 83,
- "dane_pobrano": "2026-08-27T10:24",
- "odcisk": "c6e44f45636fc0ae",
+ "jazd_w_danych": 85,
+ "dane_pobrano": "2026-08-31T09:26",
+ "odcisk": "0f0ec34bd277a263",
  "bloki": [
   {
    "t": "naglowek",
-   "tekst": "Dwanaście dni bez roweru — ile to naprawdę kosztuje"
+   "tekst": "Wróciłeś — i pierwsze dwa dni z pasem tętna mówią więcej niż poprzednie dwa miesiące"
   },
   {
    "t": "akapit",
-   "tekst": "Ostatnia jazda to 15 sierpnia. Dane pobrano 27 sierpnia, czyli minęło 12 dni. Kryterium sezonu jest bezpieczne: wyjazd do Francji (17–31 sierpnia) zgłosiłeś 19 sierpnia, a więc zanim przerwa mogła przekroczyć próg 14 dni, i w wariancie B taki wyjazd nie liczy się jako przerwa. To jedno z dwóch zgłoszeń, które masz na cały rok kalendarzowy — drugie zostało."
+   "tekst": "Piętnaście dni bez roweru skończyło się 30 sierpnia. Od tamtej pory masz dwie jazdy: „Z2 1 HR” (22,5 km w 61 minut) i dzisiejszą „Morning 90min” (33,6 km w 90 minut). Razem 2 godziny 31 minut ruchu, 56,1 km, 112 metrów przewyższenia i 1273 kcal. Prędkość obu jazd jest niemal identyczna — 22,0 i 22,5 km/h — więc pod względem samego tempa wróciłeś dokładnie tam, gdzie skończyłeś. Ale to nie tempo jest dziś najciekawszą liczbą."
   },
   {
    "t": "kafelki",
    "pozycje": [
     {
-     "etykieta": "Bez jazdy",
-     "wartosc": "12 dni",
-     "stopka": "od 15.08"
+     "etykieta": "Powrót",
+     "wartosc": "2 jazdy",
+     "stopka": "56,1 km w dwa dni"
     },
     {
-     "etykieta": "Wytrenowanie",
-     "wartosc": "95",
-     "stopka": "szczyt 146 · 20.07"
-    },
-    {
-     "etykieta": "Zmęczenie",
-     "wartosc": "35",
-     "stopka": "było 192 · 15.08"
+     "etykieta": "Czas z tętnem",
+     "wartosc": "2,5 h",
+     "stopka": "pierwsze w całej historii"
     },
     {
      "etykieta": "Forma",
-     "wartosc": "+61",
-     "stopka": "i to jest pułapka"
+     "wartosc": "+17",
+     "stopka": "98 − 81, szczyt 146"
+    },
+    {
+     "etykieta": "Rekordy dziś",
+     "wartosc": "7 z 60",
+     "stopka": "ale przeczytaj niżej"
     }
    ]
   },
   {
    "t": "akapit",
-   "tekst": "Liczby po kolei. Wytrenowanie spada wykładniczo ze stałą 42 dni, czyli każdy dzień bez obciążenia zabiera współczynnik 1 − e^(−1/42) = 0,0235, w przybliżeniu 2,35% stanu. Ze szczytu 146 z 20 lipca zeszło do 127 na dzień ostatniej jazdy i do 95 na 27 sierpnia. Jeśli do powrotu nie usiądziesz na rowerze, 1 września zobaczysz około 85, po tygodniu września 73, po dwóch 62. To nie jest kara — to arytmetyka, którą znałeś, zanim wyjechałeś."
+   "tekst": "Zacznijmy od formy, bo to ona najszybciej się zmieniła. Wytrenowanie stoi na 98, zmęczenie na 81, różnica to +17. Dla porównania: 27 sierpnia, po dwunastu dniach przerwy, było 95 i 35, czyli forma +61. Ta zmiana wygląda jak pogorszenie i nie jest nim. Zmęczenie liczy się średnią wykładniczą o stałej 7 dni, więc dwie jazdy pod rząd podnoszą je gwałtownie — z 35 na 81 w dwa dni. Wytrenowanie ma stałą 42 dni, więc te same dwie jazdy podniosły je zaledwie z 95 na 98. Innymi słowy: zapłaciłeś pełną cenę zmęczenia i dostałeś trzy punkty kapitału. Tak wygląda każdy powrót po przerwie i dlatego pierwszy tydzień zawsze boli bardziej, niż wynikałoby z przejechanych kilometrów."
   },
   {
    "t": "wykres_forma",
-   "tytul": "Wytrenowanie i zmęczenie od 1 marca"
+   "tytul": "Wytrenowanie i zmęczenie — dwa dni powrotu widać na końcu"
+  },
+  {
+   "t": "akapit",
+   "tekst": "Szczyt wytrenowania to 146 z 20 lipca. Dziś jest 98, czyli 67% tamtego stanu. Żeby wrócić do 146, musisz przez dłuższy czas dowozić więcej obciążenia, niż wynosi bieżące wytrenowanie podzielone przez 42 — a to znaczy w praktyce regularność, nie pojedyncze mocne wyjścia. Plan na wrzesień (3 h, potem 4 h, potem 4,5 h) jest dokładnie tym narzędziem."
+  },
+  {
+   "t": "naglowek",
+   "tekst": "Tętno: dwa i pół godziny pomiaru zamiast dwóch miesięcy zgadywania"
+  },
+  {
+   "t": "akapit",
+   "tekst": "To jest największa zmiana w danych od czasu, gdy powstała ta strona. Do 30 sierpnia kolumna tętna była pusta w każdej jednej jeździe szosowej — pierścienie w zakładce Objętość pokazywały pustkę i mówiły wprost dlaczego. Teraz masz 9003 sekundy zapisu z pasa piersiowego i pierwszy prawdziwy rozkład stref: Z1 0,5%, Z2 68,3%, Z3 30,7%, Z4 0,5%, Z5 0%."
+  },
+  {
+   "t": "wykres_strefy",
+   "miara": "tetno",
+   "dni": 7,
+   "tytul": "Rozkład stref tętna — ostatnie 7 dni"
+  },
+  {
+   "t": "akapit",
+   "tekst": "Ten rozkład jest dobry i zły jednocześnie. Dobry, bo prawie 70% czasu poniżej progu tlenowego to jest baza i dokładnie o to chodzi we wrześniu. Zły, bo brakuje drugiego bieguna: modelowi spolaryzowanemu potrzeba około 15–20% czasu powyżej progu, a ty masz 0,5%. Efektywność liczona ze wzorca Seilera pokazuje 58% i to nie jest ocena tego, ile jeździsz, tylko jak rozłożony jest wysiłek. Sama baza bez ani jednego twardego akcentu daje w tej skali około 51% — jesteś więc siedem punktów nad czystą bazą. Nie poprawiaj tego w tym tygodniu: po piętnastu dniach przerwy baza jest właściwym miejscem. Poprawiaj od drugiego tygodnia września."
+  },
+  {
+   "t": "akapit",
+   "tekst": "Druga liczba z pasa jest ciekawsza niż strefy. Policzyłem dryf sercowo-oddechowy — stosunek prędkości do tętna w pierwszej i drugiej połowie jazdy. 30 sierpnia: 0,1727 wobec 0,1569, czyli −9,2%. 31 sierpnia: 0,1601 wobec 0,1635, czyli +2,1%. Wartość poniżej 5% uznaje się za świadectwo dobrej bazy tlenowej, więc dzisiejsza jazda wypadła bardzo dobrze — 90 minut i tętno nie odjechało od prędkości ani o punkt procentowy w złą stronę. Zastrzeżenie, żeby nie było nieporozumienia: na szosie ten wskaźnik zaburza wiatr, teren i to, czy jechałeś w kole. Dwie jazdy to nie trend. Ale kierunek jest właściwy i warto go pilnować co jazdę."
   },
   {
    "t": "ostrzezenie",
-   "tekst": "Forma +61 to dziś najbardziej mylące liczby na całej stronie. Forma to różnica wytrenowanie minus zmęczenie, a ona urosła nie dlatego, że wytrenowanie poszło w górę, tylko dlatego, że zmęczenie spadło ze 192 do 35 — stała 7 dni zjada je szybciej, niż 42 dni zjadają wytrenowanie. Ta sama liczba +61 opisuje zawodnika wypoczętego po bloku i zawodnika, który przestał trenować. Rozróżnia je wyłącznie kierunek grubej linii, a ta idzie w dół."
+   "tekst": "Jazda z 30 sierpnia ma RPE 2, a pomiar mówi, że 17 minut z 61 spędziłeś w Z3, czyli w tempie. RPE 2 to „bardzo lekko” — trzecia strefa nią nie jest. To pierwszy raz, kiedy da się sprawdzić twoją deklarację pomiarem, i wyszła rozbieżność. Ma to konsekwencję liczbową: krzywa formy i licznik regeneracji biorą teraz wysiłek z tętna, gdy pas był założony, właśnie dlatego, że pomiar wygrywa z deklaracją. Wpisuj RPE dalej — ale wiedz, że od teraz strona umie je zweryfikować."
   },
   {
    "t": "naglowek",
-   "tekst": "Segmenty: 29 rekordów padło w trzyosobowej grupie"
+   "tekst": "Siedem rekordów, które nie są rekordami"
   },
   {
    "t": "akapit",
-   "tekst": "Masz 221 segmentów przejechanych więcej niż raz. Rekordy nie rozkładają się po nich równo — grupują się w kilku dniach. Najwięcej, 29, padło 13 sierpnia. To jazda z opisem „Ok/trio/?1/hr160-195”: jechałeś w trójce. Drugi co do wielkości pęk, 19 rekordów, pochodzi z 22 lipca — jazda „morning short pace”, 19,4 km w 39 minut, średnia 29,7 km/h, bez ani jednego słowa opisu."
+   "tekst": "Dzisiejsza jazda przecięła 60 segmentów i na siedmiu z nich masz najlepszy czas w historii. Sprawdziłem każdy z tych siedmiu: „Ciszyca-Opacz”, „Gassy (CiszycaOpacz) Gassy”, „Ciszyca - Opacz - Gassy”, „Lotnisko - Cieciszew - Obory (short) Loop”, „GRG - Rozrzutna Paulina”, „TRIPOWER TT a” i „LCC KOM”. Wszystkie siedem to pierwsze przejazdy w życiu. Rekord z jednej próby jest rekordem z definicji, a nie z powodu formy. Na 53 segmentach, które już znałeś, dziś nie padł ani jeden."
   },
   {
    "t": "akapit",
-   "tekst": "To znaczy dokładnie tyle: nie wiadomo, ile z tych rekordów jest twoje, a ile koła przed tobą. Trzy kwadranse ze średnią 29,7 km/h po płaskim i 15 rekordów w jednej krótkiej jeździe to układ, który znacznie łatwiej wyjaśnić jazdą za kimś niż skokiem formy w jeden poranek. Strona sama tego nie rozstrzygnie — nie ma pola „jechałem sam”. Ma za to znacznik Ok w opisie i to jest jedyna rzecz, która to naprawia, przy czym naprawia wyłącznie jazdy przyszłe."
+   "tekst": "Na tych 22 segmentach, które masz przejechane co najmniej dziesięć razy, mediana straty do własnego rekordu wynosi dziś 69,1%. Najbliżej byłeś na „obczajce” (+28,2%), najdalej na „[Na Osi - ] OS-2” (+78,8%). Na większości z nich dzisiejszy przejazd to ostatnie albo przedostatnie miejsce w tabeli."
   },
   {
    "t": "lista",
    "punkty": [
-    "13.08 — 29 rekordów, opis mówi wprost „trio”. Warunki znane i niekorzystne dla porównań.",
-    "22.07 — 19 rekordów, brak opisu. Warunki nieznane, czyli tak samo bezużyteczne dla porównania jak jazda w grupie.",
-    "Od 1 września: znacznik Ok w opisie tylko wtedy, gdy naprawdę jechałeś sam i bez silnego wiatru. Jeden dopisany znak decyduje, czy czas w ogóle da się kiedyś do czegoś przyrównać."
+    "obczajka — +28,2% do rekordu, 11. miejsce z 11 prób",
+    "I Got Bad — +34,0%, 26. z 27",
+    "Gassy sprint — +34,1%, 10. z 11",
+    "Od lasu do pałacu — +40,7%, 26. z 27 (rekord 59 s z 22 lipca, dziś 83 s)",
+    "Potulickich do Od lasu — +42,7%, 25. z 25"
    ]
   },
   {
    "t": "akapit",
-   "tekst": "Jedna konsekwencja tego jest bardzo konkretna. Koszulka sprinterska wymaga Obory-Opacz w 12:35, czyli 755 sekund. Twój rekord to 765 sekund — dziesięć sekund, 1,3%. To najbliższa koszulka w całej gablocie. Kłopot w tym, że ten rekord padł właśnie 22 lipca, na jeździe bez opisu. Jeśli powstał na kole, to do celu jest dalej, niż pokazuje pasek postępu."
+   "tekst": "I teraz najważniejsze zdanie w całej tej analizie: to nie jest werdykt o formie. Dzisiejsza jazda miała RPE 4 i 68% czasu w drugiej strefie — to była baza, a nie ściganie. Twoje rekordy na tych segmentach padły 22 lipca i 8 czerwca, czyli w dniach, w których jechałeś na maksa. Porównywanie spokojnej jazdy do rekordu ze sprintu nie mierzy niczego poza tym, że jedna była spokojna, a druga nie. Tabela segmentów tego rozróżnienia nie robi — traktuje każdy przejazd tak samo — i dlatego RPE przy każdej jeździe nie jest ozdobą, tylko jedynym powodem, dla którego da się te liczby uczciwie czytać. Prawdziwy pomiar formy na segmencie dostaniesz dopiero wtedy, gdy pojedziesz go z zamiarem."
   },
   {
    "t": "wykres_segment",
-   "segment": "6804424",
-   "tytul": "Obory-Opacz — wszystkie przejazdy"
+   "segment": "12134121",
+   "tytul": "Od lasu do pałacu — 27 prób, rekord 59 s"
   },
   {
    "t": "naglowek",
-   "tekst": "Moc: cała krzywa jest sprzed dziesięciu miesięcy"
+   "tekst": "Od jutra liczy się plan"
   },
   {
    "t": "akapit",
-   "tekst": "Każdy rekord mocy w twoich danych pochodzi z okresu 18 października – 1 listopada 2025. Ani jeden nie jest młodszy. Powód jest prosty i nie jest twoją winą: szosa nie ma miernika, a na Zwifcie nie było cię od tamtego czasu. Krzywa mocy na stronie opisuje więc zawodnika sprzed dziesięciu miesięcy, przed całym blokiem szosowym, który zbudował wytrenowanie 146."
-  },
-  {
-   "t": "wykres_moc",
-   "tytul": "Rekordy mocy — wszystkie z jesieni 2025"
-  },
-  {
-   "t": "akapit",
-   "tekst": "Teraz najważniejsza rzecz w tej analizie. Zestaw rekordów: 5 s = 702 W, 15 s = 451 W, 30 s = 271 W, 1 min = 210 W, 5 min = 172 W, 20 min = 148 W. Zwróć uwagę na iloraz 210/702 = 0,30. Minutowa moc równa 30% mocy pięciosekundowej to nie jest profil zawodnika — to profil pomiaru, którego nigdy nie zrobiono. Rekord minutowy pochodzi z wyścigu dla początkujących, a nie z próby na minutę. Te same 210 W siedzą obok 271 W na trzydziestu sekundach z tej samej jazdy."
-  },
-  {
-   "t": "akapit",
-   "tekst": "Dlatego prognoza na grudzień 2026 wygląda tak, jak wygląda. Do celu 5 s = 720 W brakuje 2,6%, bo tę wartość naprawdę zmierzyłeś przy sprincie. Do celu 1 min = 480 W brakuje 129%, do 40 s = 545 W brakuje 130%, do 5 min = 300 W brakuje 74%, do 20 min = 225 W brakuje 52%. Trzy pierwsze liczby mierzą głównie brak testu, nie brak mocy. Czwarta jest prawdziwym dystansem: 148 W to 2,11 W/kg przy 70 kg, a 225 W to 3,21 W/kg."
-  },
-  {
-   "t": "lista",
-   "punkty": [
-    "Jedna sesja na Zwifcie, poza ERG-iem, załatwia trzy z tych czterech pytań: 5 s, 1 min, 5 min, 20 min, każde jako osobna maksymalna próba z pełnym odpoczynkiem.",
-    "Do tego czasu ptaszki i krzyżyki w Prognozach opisują stan pomiaru, a nie stan nóg.",
-    "FTP w danych to dwie różne liczby i tak ma zostać: 150 W deklarowane i 180 W z modelu z tagiem [E]. Zmierzone 20 minut daje 148 W, czyli reguła 0,95 × 20 min prowadzi do 141 W. Bliżej prawdy jest liczba niższa."
-   ]
-  },
-  {
-   "t": "naglowek",
-   "tekst": "Jedyny pomiar tętna, jaki masz, jest bardzo dobry"
-  },
-  {
-   "t": "akapit",
-   "tekst": "14 sierpnia zrobiłeś próbę opisaną jako „30min x2 (20+10)”, z odczytami 130/129/131/130 i wynikiem 0,67 przy adnotacji „dryf koło 0”. Cztery kolejne bloki na tym samym tętnie, dryf poniżej procenta — to znaczy, że na tej intensywności twoja baza tlenowa jest solidna i że godzinę takiej jazdy wytrzymujesz bez narastania kosztu. To jedyne dane o tętnie w całym pliku i siedzą w polu tekstowym, bo pas piersiowy wchodzi dopiero od 1 września. Od tego dnia zakładki Tętno i Efektywność zaczną się wypełniać same; dziś są puste i tak mają wyglądać, dopóki nie ma czego liczyć."
-  },
-  {
-   "t": "naglowek",
-   "tekst": "Co zrobić od 1 września"
-  },
-  {
-   "t": "akapit",
-   "tekst": "Plan startuje od 3 godzin w pierwszym tygodniu. Policz, co to znaczy dla wytrenowania: 180 minut po RPE 5 to 900 jednostek na tydzień, czyli 129 dziennie. Twoje wytrenowanie będzie wtedy w okolicy 85, a rośnie zawsze, gdy dzienne obciążenie przekracza bieżący stan. Znaczy to, że gruba linia zawraca w górę już w pierwszym tygodniu i nie musisz w tym celu robić niczego bohaterskiego. Ostatni pełny tydzień z jazdami, 10–16 sierpnia, dał 5,3 godziny — plan wraca do tego poziomu dopiero pod koniec września i to jest właściwa kolejność."
+   "tekst": "1 września zaczyna się pierwszy tydzień planu objętości: 3 godziny. Dzisiejsze 1,5 godziny wpada do tego samego słupka na wykresie (tydzień 31.08–06.09 pokrywa się z tygodniem planu w sześciu dniach na siedem), więc masz połowę tygodnia zrobioną pierwszego dnia. Zostaje 1,5 godziny na sześć dni — to jest wykonalne bez wysiłku i dokładnie dlatego pierwszy tydzień jest ustawiony tak nisko. Kolejne: 4 h, 4,5 h, potem 3,5 h odciążenia, potem 5 h. Dla porównania twój najlepszy tydzień tego lata to 5,3 godziny (tydzień od 10 sierpnia)."
   },
   {
    "t": "wykres_tygodnie",
-   "tytul": "Godziny w tygodniach — plan zaczyna się 1 września"
+   "tytul": "Godziny w tygodniach — plan wrześniowy zaczyna się jutro"
   },
   {
    "t": "akapit",
-   "tekst": "Cel 80 km na długą jazdę wymaga +15,7 km ponad najlepsze 64,3 km z 14 lipca. Przy planie idącym 3 → 4 → 4,5 godziny to jest zadanie na drugą połowę września, nie na pierwszy weekend po powrocie. W całej historii, którą gablota liczy inaczej niż wykresy, najdłuższa jazda to 66,6 km z 6 sierpnia 2024 — czyli do koszulki młodzieżowej brakuje 13,4 km."
+   "tekst": "1 września otwiera się też okno Żółtej koszulki: od jutra do 24 grudnia żadna przerwa dłuższa niż 14 dni. To 115 dni, w których wolno ci mieć najwyżej trzynaście dni z rzędu bez roweru. Twoja przerwa z sierpnia trwała piętnaście — zmieściła się w kryterium sezonu tylko dlatego, że wyjazd do Francji zgłosiłeś zawczasu i wariant B takich wyjazdów nie liczy. W Żółtej koszulce nie ma odpowiednika tego wyjątku. Zostało ci też tylko jedno zgłoszenie wyjazdu bez roweru na cały rok kalendarzowy."
   },
   {
-   "t": "lista",
-   "punkty": [
-    "Pierwszy tydzień: objętość, nie tempo. Wytrenowanie odbudowuje się z godzin, a nie z rekordów.",
-    "Znacznik Ok w opisie każdej jazdy, na której jechałeś sam — inaczej wrześniowe czasy będą tak samo nieporównywalne jak lipcowe.",
-    "Jedna sesja testowa na Zwifcie, gdy tylko będzie okazja. Bez niej trzy z pięciu celów na grudzień pozostaną nierozstrzygalne.",
-    "Pas piersiowy od pierwszej jazdy — to jedyna rzecz na tej liście, która odblokowuje całą zakładkę Objętość."
-   ]
+   "t": "naglowek",
+   "tekst": "Czego wciąż nie ma"
   },
   {
    "t": "akapit",
-   "tekst": "Jedna uwaga o tym tekście. To pierwsza analiza w tym miejscu i powstała w sesji czatu, nie w nocnym automacie — automat nie napisał jeszcze ani słowa, bo w repozytorium nie ma sekretu ANTHROPIC_API_KEY. Od chwili, w której go dodasz, ten komentarz będzie się przepisywał sam po każdej zmianie danych, a po dniu bez jazdy zostanie ten, który akurat stoi."
+   "tekst": "Wszystkie twoje rekordy mocy pochodzą z trzech jazd na Zwifcie z października i listopada 2025: wyścig z 18 października, „Strength” z 22 października i „Strength” z 1 listopada. Nic młodszego niż dziesięć miesięcy. To nie znaczy, że nie jesteś dziś mocniejszy — to znaczy, że nie ma czym tego zmierzyć, bo na szosie nie masz miernika, a na Zwifcie nie byłeś od listopada. Dopóki to się nie zmieni, krzywa mocy jest historią, a nie stanem."
+  },
+  {
+   "t": "wykres_moc",
+   "tytul": "Krzywa rekordów mocy — wszystko z jesieni 2025"
+  },
+  {
+   "t": "akapit",
+   "tekst": "Warto na nią spojrzeć razem z prognozą na grudzień 2026, bo jedna rzecz jest tam już rozstrzygnięta. Cel na 5 sekund to 720 W, a ty masz 804 W z 1 listopada — ten jest zrobiony i nie wróci. Reszta wygląda inaczej: 40 s cel 545 W wobec dzisiejszych 237 W, 5 minut cel 300 W wobec 172 W, 20 minut cel 225 W wobec 148 W. To są skoki rzędu 50–130%, w cztery miesiące, licząc od pomiarów sprzed dziesięciu miesięcy. Nie mówię, że są niemożliwe — mówię, że nie ma dziś ani jednej danej, która pozwalałaby ocenić, jak blisko nich jesteś. Pierwszy powrót na Zwift albo pierwszy miernik zmieni to jednym pomiarem."
+  },
+  {
+   "t": "akapit",
+   "tekst": "Podsumowując dzisiejszy stan: wróciłeś po piętnastu dniach dwiema spokojnymi jazdami, założyłeś pas i od razu wypadło z tego coś wartościowego — dryf 2,1% przy 90 minutach to solidna baza. Forma pokazuje +17 i będzie spadać przez najbliższe dni, bo tak działa powrót do treningu; to jest oczekiwane, nie alarmujące. Siedem dzisiejszych „rekordów” to pierwsze przejazdy, a nie przyspieszenie. Od jutra masz plan, który przez pierwszy tydzień wymaga od ciebie 1,5 godziny więcej niż już zrobiłeś, i okno Żółtej koszulki, w którym przerwa dłuższa niż trzynaście dni kończy sprawę. Najbardziej użyteczna rzecz, jaką możesz zrobić w tym tygodniu, to nie jedna mocna jazda, tylko trzecia i czwarta spokojna."
   }
  ]
 };

@@ -6374,8 +6374,16 @@ const PRZEBIEG_GOTOWY = new Map();
    przebieg zapisany JESZCZE W KUBEŁKACH — jego `n` liczy kubełki, nie sekundy,
    więc narysowany jako 1 Hz pokazywałby godzinną jazdę jako sześciominutową.
    Zdarzyło się to naprawdę: automat przelicza po kilkadziesiąt jazd na
-   przebieg, a strona brała po drodze stare wpisy za dobrą monetę. */
-const FORMAT_PRZEBIEGU = 4;
+   przebieg, a strona brała po drodze stare wpisy za dobrą monetę.
+
+   PODNIESIONE Z 4 NA 5 (31.08.2026). Format 5 dołożył wysokość, dystans
+   i mapę indeks -> sekunda. Okno Segment potrzebuje wszystkich trzech:
+   bez wysokości nie ma linii nachylenia, a bez mapy wycinek przejazdu liczy
+   się tak, jakby oś czasu była ciągła — przy jeździe z postojami wycina wtedy
+   nie ten kawałek. Plik w wersji 4 rysowałby się więc po cichu źle zamiast
+   powiedzieć „czeka na przeliczenie". Dziś wszystkie 85 plików ma wersję 5,
+   więc zmiana niczego nie zasłania — jest zaporą na przyszłość. */
+const FORMAT_PRZEBIEGU = 5;
 
 function rozpakujPrzebieg(id, surowy){
   if (PRZEBIEG_GOTOWY.has(id)) return PRZEBIEG_GOTOWY.get(id);

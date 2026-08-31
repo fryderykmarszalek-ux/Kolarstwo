@@ -671,7 +671,12 @@ nie kolor: sylwetka roweru vs ekranu, słupek kreskowany vs pełny.
   **Strona sprawdza wersję formatu i odmawia rysowania starszej.** Migracja
   idzie po kilkadziesiąt jazd na przebieg, więc przez chwilę część wpisów jest
   w starym zapisie — wykres kłamiący o czasie trwania jest gorszy niż napis
-  „czeka na przeliczenie".
+  „czeka na przeliczenie". Próg podniesiony z 4 na 5 (31.08.2026): automat
+  pisze wersję 5 od czasu okna Segment, a plik w wersji 4 nie ma wysokości
+  (brak linii nachylenia) ani mapy indeks → sekunda (wycinek przejazdu liczony
+  tak, jakby oś czasu była ciągła). Rysowałby się po cichu źle. Dziś wszystkie
+  85 plików ma wersję 5, więc zmiana niczego nie zasłania — jest zaporą.
+  **Podnosząc format w automacie, podnieść go też na stronie.**
 
   Wartość to każda sekunda; postój zostaje **dziurą w osi czasu**, a nie
   znika z niej. Zapisane zero to co innego niż brak pomiaru: sekunda, w której
@@ -911,11 +916,37 @@ modelu). Skutek: po dniu bez jazdy komentarz stał w miejscu i wyglądał na
 zepsuty. Fryderyk poprosił wprost o świeży tekst codziennie, także w dniu
 przerwy, i o **pełne akapity**, a nie jedno zdanie o pustce.
 
-Reguła: piszemy, gdy nie ma poprzedniej analizy, gdy poprzednia jest
-z wcześniejszego dnia (gwarancja codzienności) albo gdy zmienił się odcisk
-(doszła jazda). W pozostałych przypadkach zostawiamy to, co jest. Wychodzi
-jedno wywołanie w dniu bez jazdy i dwa w dniu z jazdą. Odcisk został, ale nie
-blokuje już pisania — mówi modelowi, czy coś doszło, żeby wiedział, o czym pisać.
+**JEDNO WYWOŁANIE NA DOBĘ — druga decyzja z 31.08.2026, tego samego dnia.**
+Pierwsza wersja codzienności dawała jedno wywołanie w dniu bez jazdy i **dwa**
+w dniu z jazdą (poranne plus wieczorne po wpadnięciu treningu). Fryderyk
+zapytał, czy analiza nie może odświeżać się sama za darmo jak wykresy, i po
+wyjaśnieniu, że nie może, wybrał wprost: **raz dziennie, wieczorem, na Opusie**.
+Powód reguły jest więc pieniężny, nie techniczny — około 0,19 USD za wywołanie,
+czyli ~6 USD miesięcznie przy jednym dziennie i dwa razy tyle przy dwóch.
+
+Reguła: piszemy, gdy nie ma jeszcze analizy z dzisiaj. **Nowa jazda w ciągu dnia
+NIE otwiera drugiego wywołania** — model zobaczy ją w najbliższym wieczornym
+przebiegu. Przycisk `wymus_analize` omija tę blokadę i to jedyna droga do
+drugiego tekstu tego samego dnia.
+
+Odcisk został, ale **nie blokuje już pisania ani go nie wymusza**. Robi jedno:
+mówi modelowi, czy od poprzedniej analizy doszła jazda, żeby wiedział, o czym
+pisać. Nie kasować go — bez niego polecenie traci rozróżnienie „dzień
+z treningiem" / „dzień przerwy".
+
+**Poranne odpalenie jest SIATKĄ, nie drugą analizą.** Workflow woła skrypt
+także o 5:37 UTC, przekazując `POWOD_ODPALENIA=poranek`. W tym trybie piszemy
+wyłącznie wtedy, gdy ostatnia analiza jest starsza niż wczorajsza — czyli gdy
+wieczorny przebieg naprawdę przepadł, a cron GitHuba potrafi zgubić zadanie
+(zdarzyło się 26.08.2026). Przy zdrowym wieczorze poranek nie kosztuje grosza.
+Sprawdzone na sześciu przypadkach bez sieci: wieczór z analizą z dziś (bez
+zmian i ze zmianą danych) milczy, wieczór z analizą z wczoraj pisze, poranek
+z analizą z wczoraj milczy, poranek z analizą sprzed trzech dni pisze, a wymus
+pisze zawsze.
+
+`POWOD_ODPALENIA` stoi w YAML-u **w jednej linii**. Zwinięty blok (`>-`)
+zostawia znak nowej linii w środku `${{ }}`, gdy druga linia jest wcięta
+głębiej — a wyrażenia GitHuba tego nie znoszą.
 
 W poleceniu dla modelu stoi wprost, że **dzień bez jazdy nie jest dniem bez
 tematu**: forma, przerwa w kryterium, cele z prognoz, plan objętości i braki
@@ -944,8 +975,8 @@ Wymaga sekretu `ANTHROPIC_API_KEY` w repozytorium. **Dopóki sekretu nie ma,
 skrypt wypisuje „Brak ANTHROPIC_API_KEY — pomijam analizę” i kończy się zerem** —
 nie kasuje tego, co stoi w `analiza.js`, i nie psuje pobierania danych.
 
-**Pierwsza analiza jest napisana ręcznie w czacie** (28.08.2026) i to jedyny
-taki wpis. Powstała, bo zakładka bez sekretu stałaby pusta, a Fryderyk poprosił,
+**Analizy pisane ręcznie w czacie** (28.08.2026 i 31.08.2026) — dwa wpisy,
+oba przed dodaniem sekretu. Powstała, bo zakładka bez sekretu stałaby pusta, a Fryderyk poprosił,
 żeby analiza „zawsze tam była”. Pole `odcisk` jest prawdziwym skrótem briefingu
 z tego dnia, więc automat uzna dane za niezmienione i zostawi ten tekst
 w spokoju aż do pierwszej nowej jazdy. Pole `model` mówi wprost „asystent

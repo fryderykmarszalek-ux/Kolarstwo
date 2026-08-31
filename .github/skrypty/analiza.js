@@ -4,24 +4,38 @@
  * GitHuba, raz na dobę, PO pobraniu danych ze Stravy, i zapisuje wynik do
  * analiza.js. Strona tylko go rysuje.
  *
- * KIEDY WOŁAMY MODEL — zmiana z 31.08.2026, na prośbę Fryderyka.
+ * KIEDY WOŁAMY MODEL — DOKŁADNIE RAZ NA DOBĘ. Decyzja Fryderyka z 31.08.2026.
  *
- * Wcześniej analiza powstawała TYLKO przy zmianie danych: ten sam odcisk
- * briefingu znaczył „nic się nie zmieniło, nie ma o czym pisać". Skutek był
- * taki, że po dniu bez jazdy komentarz stał w miejscu i wyglądał na zepsuty.
- * Fryderyk poprosił wprost, żeby był świeży CODZIENNIE, nawet w dniu przerwy,
- * i z pełnymi akapitami, a nie z jednym zdaniem o pustce.
+ * Historia tej reguły w trzech krokach, bo sama zasada bez powodu zaraz
+ * zostanie cofnięta przez kogoś, kto uzna ją za zbyt oszczędną:
  *
- * Reguła jest teraz taka:
- *   · brak poprzedniej analizy            -> piszemy,
- *   · poprzednia jest z wcześniejszego dnia -> piszemy (gwarancja codzienności),
- *   · odcisk się zmienił, czyli doszła jazda -> piszemy (świeżość po treningu),
- *   · w pozostałych przypadkach            -> zostawiamy to, co jest.
+ *  1. Na początku analiza powstawała TYLKO przy zmianie danych: ten sam odcisk
+ *     briefingu znaczył „nic nie doszło, nie ma o czym pisać". Skutek — po dniu
+ *     bez jazdy komentarz stał w miejscu i wyglądał na zepsuty.
+ *  2. Potem doszła gwarancja codzienności: piszemy też wtedy, gdy poprzednia
+ *     analiza jest z wcześniejszego dnia. To dawało jedno wywołanie w dniu bez
+ *     jazdy i DWA w dniu z jazdą (poranne i wieczorne po wpadnięciu treningu).
+ *  3. Teraz jest jedno. Powód nie jest techniczny, tylko pieniężny: każde
+ *     wywołanie to około 0,19 USD, a Fryderyk zgodził się płacić za jedno
+ *     dziennie i wyraźnie nie zgodził się na dwa. Model dostaje pełne dane
+ *     wieczorem, czyli PO całym dniu — to zresztą najlepszy moment na komentarz.
  *
- * Wychodzi z tego jedno wywołanie w dniu bez jazdy i dwa w dniu z jazdą:
- * poranne, żeby komentarz był aktualny na start dnia, i wieczorne, gdy jazda
- * już wpadnie. Odcisk został, ale nie blokuje już pisania — mówi tylko, czy
- * coś się zmieniło, żeby model wiedział, o czym pisać.
+ * Reguła:
+ *   · WYMUS_ANALIZE=true                      -> piszemy zawsze (przycisk ręczny),
+ *   · analiza z dzisiaj już jest              -> NIE piszemy, choćby doszła jazda,
+ *   · w pozostałych przypadkach               -> piszemy.
+ *
+ * ODCISK ZOSTAŁ, ale nie blokuje już pisania ani go nie wymusza. Służy do
+ * jednego: mówi modelowi, czy od poprzedniej analizy doszła jazda, żeby
+ * wiedział, o czym pisać. Nie kasować go — bez niego polecenie dla modelu
+ * traci rozróżnienie „dzień z treningiem" / „dzień przerwy".
+ *
+ * DRUGIE ODPALENIE (poranne) JEST SIATKĄ, NIE DRUGĄ ANALIZĄ. Workflow woła ten
+ * skrypt także o 5:37 UTC, z POWOD_ODPALENIA=poranek, bo cron GitHuba potrafi
+ * zgubić zadanie — zdarzyło się to naprawdę 26.08.2026. W trybie porannym
+ * piszemy WYŁĄCZNIE wtedy, gdy ostatnia analiza jest starsza niż wczorajsza,
+ * czyli gdy wieczorny przebieg faktycznie przepadł. Przy zdrowym wieczorze
+ * poranek nie kosztuje ani grosza.
  *
  * BEZ ZALEŻNOŚCI. Node ma wbudowany fetch, tak jak w pobierz-strave.js.
  * Oficjalny pakiet SDK byłby wygodniejszy, ale ten projekt trzyma zasadę
@@ -42,7 +56,11 @@ const PLIK_WYJSCIA = path.join(KORZEN, "analiza.js");
 
 const MODEL = "claude-opus-5";
 const MAKS_TOKENOW = 16000;
-const WYMUS = process.env.WYMUS_ANALIZE === "true";   // ignoruj odcisk
+const WYMUS = process.env.WYMUS_ANALIZE === "true";   // przycisk ręczny
+/* "wieczor" (główne odpalenie), "poranek" (siatka na wypadek zgubionego crona)
+   albo "recznie". Puste = traktujemy jak wieczór, żeby uruchomienie skryptu
+   z ręki nigdy nie milczało bez powodu. */
+const POWOD = process.env.POWOD_ODPALENIA || "wieczor";
 
 // ── wczytanie danych ────────────────────────────────────────────────────────
 function wczytaj(){
@@ -355,19 +373,33 @@ if (require.main !== module) return;
   const odcisk = odciskDanych(br);
   const stara = poprzednia();
 
-  const dzisiaj = new Date().toISOString().slice(0,10);
-  const zDzisiaj = stara && stara.utworzono
-    && stara.utworzono.slice(0,10) === dzisiaj;
+  const teraz = new Date();
+  const dzisiaj = teraz.toISOString().slice(0,10);
+  const wczoraj = new Date(teraz - 86400000).toISOString().slice(0,10);
+  const kiedy = stara && stara.utworzono ? stara.utworzono.slice(0,10) : null;
+  const zDzisiaj = kiedy === dzisiaj;
   const cosSieZmienilo = !stara || stara.odcisk !== odcisk;
 
-  if (stara && zDzisiaj && !cosSieZmienilo && !WYMUS){
-    console.log("Analiza z dzisiaj już jest, a dane się nie zmieniły — "
-      + "zostawiam ją w spokoju.");
-    return;
+  /* Jedno wywołanie na dobę — patrz nagłówek pliku. Nowa jazda w ciągu dnia
+     NIE otwiera drugiego: model i tak zobaczy ją wieczorem następnego dnia,
+     a Fryderyk płaci za każde wywołanie osobno. */
+  if (!WYMUS){
+    if (zDzisiaj){
+      console.log("Analiza z dzisiaj już jest — jedno wywołanie na dobę wystarczy.");
+      return;
+    }
+    /* Poranek pisze tylko wtedy, gdy wieczór faktycznie przepadł. Analiza
+       z wczoraj znaczy, że wieczorny przebieg zadziałał i nie ma czego ratować. */
+    if (POWOD === "poranek" && kiedy && kiedy >= wczoraj){
+      console.log("Poranna siatka: wieczorna analiza z " + kiedy
+        + " jest na miejscu — nic nie robię.");
+      return;
+    }
   }
-  console.log(zDzisiaj
-    ? "Analiza z dzisiaj istnieje, ale doszły nowe dane — piszę od nowa."
-    : "Nie ma dzisiejszej analizy — piszę.");
+  console.log(WYMUS
+    ? "Wymuszone ręcznie — piszę."
+    : "Nie ma dzisiejszej analizy (ostatnia: " + (kiedy || "brak")
+      + ", odpalenie: " + POWOD + ") — piszę.");
   if (!process.env.ANTHROPIC_API_KEY){
     console.log("========================================================");
     console.log("BRAK SEKRETU ANTHROPIC_API_KEY — analiza NIE POWSTANIE.");

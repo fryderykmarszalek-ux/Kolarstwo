@@ -42,7 +42,7 @@ on:
         type: boolean
         default: false
       wymus_analize:
-        description: "Napisz analizę AI nawet bez zmian w danych"
+        description: "Napisz analizę AI ponownie, nawet jeśli dzisiejsza już jest (kosztuje ok. 0,19 USD)"
         type: boolean
         default: false
 
@@ -85,13 +85,25 @@ jobs:
              if(!n) { console.error('Pusta lista — nie commituję.'); process.exit(1); }
              console.log('Plik poprawny, aktywności:', n);"
 
-      # Analiza AI. Sama pilnuje kosztu: liczy odcisk danych i woła model tylko
-      # wtedy, gdy coś się naprawdę zmieniło. Bez klucza albo przy błędzie
-      # kończy się zerem — komentarz zostaje ten, co był, a przebieg leci dalej.
+      # Analiza AI — DOKŁADNIE JEDNO PŁATNE WYWOŁANIE NA DOBĘ.
+      #
+      # W odróżnieniu od reszty przebiegu ten krok kosztuje pieniądze: około
+      # 0,19 USD za wywołanie, czyli mniej więcej 6 USD miesięcznie przy jednym
+      # dziennie. Fryderyk zgodził się na jedno i wyraźnie nie na dwa, więc
+      # skrypt dostaje POWOD_ODPALENIA i sam decyduje:
+      #   wieczor  (37 20 UTC) — normalne, główne odpalenie, pisze raz dziennie,
+      #   poranek  (37 5 UTC)  — SIATKA: pisze tylko wtedy, gdy wieczór przepadł
+      #                          (cron GitHuba potrafi zgubić zadanie — 26.08.2026),
+      #   recznie              — przycisk, zachowuje się jak wieczór.
+      # Bez klucza albo przy błędzie krok kończy się zerem: komentarz zostaje
+      # ten, co był, a pobieranie danych leci dalej.
       - name: Napisz analizę AI
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           WYMUS_ANALIZE: ${{ inputs.wymus_analize }}
+          # Jedna linia świadomie: zwinięty blok YAML (">-") zostawia znak
+          # nowej linii w środku ${{ }}, gdy druga linia jest wcięta głębiej.
+          POWOD_ODPALENIA: ${{ github.event_name != 'schedule' && 'recznie' || (github.event.schedule == '37 5 * * *' && 'poranek' || 'wieczor') }}
         run: node .github/skrypty/analiza.js
 
       - name: Commituj, jeśli są zmiany
