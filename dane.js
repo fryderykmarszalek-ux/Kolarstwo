@@ -5,7 +5,7 @@
 
 window.DANE = {
 
-meta: {"pobrano":"2026-08-31T09:26","zrodlo":"Strava API (GitHub Actions): /athlete/activities + /activities/{id}","athlete_id":143761800,"liczba_aktywnosci":102,"zakres":["2024-07-31","2026-08-31"],"liczone_od":"2025-08-31","liczone_od_powod":"Decyzja Fryderyka z 19.08.2026: wcześniejsze daty nieistotne. Historia zostaje w pliku w całości — po prostu nie jest liczona. Zmiana tej jednej daty przywraca wszystko.","linia_podzialu":"2026-08-19","linia_podzialu_opis":"Przed tą datą jazdy mają tylko to, co daje Strava — bez wiatru, składu grupy i tętna. Nie uzupełniać wstecz.","typy_kolarskie":["Ride","VirtualRide"],"typy_kolarskie_opis":"Tylko te przerywają przerwę. E-bike, spacery, treki i biegi — nie.","pola_pominiete":["pr_count","achievement_count","kudos_count"],"pola_pominiete_powod":"Zmienne w czasie — stan na moment pobrania, nie fakt historyczny (13.08: 60 -> 59 w kilkanaście minut). Zapisać dopiero z datą pobrania obok.","segmenty_od":"2025-08-01","liczba_segmentow":373,"liczba_prob":1800,"jazd_z_moca":17,"jazd_z_rozkladem":19,"jazd_z_trasa":85,"jazd_z_przebiegiem":85},
+meta: {"pobrano":"2026-08-31T20:42","zrodlo":"Strava API (GitHub Actions): /athlete/activities + /activities/{id}","athlete_id":143761800,"liczba_aktywnosci":102,"zakres":["2024-07-31","2026-08-31"],"liczone_od":"2025-08-31","liczone_od_powod":"Decyzja Fryderyka z 19.08.2026: wcześniejsze daty nieistotne. Historia zostaje w pliku w całości — po prostu nie jest liczona. Zmiana tej jednej daty przywraca wszystko.","linia_podzialu":"2026-08-19","linia_podzialu_opis":"Przed tą datą jazdy mają tylko to, co daje Strava — bez wiatru, składu grupy i tętna. Nie uzupełniać wstecz.","typy_kolarskie":["Ride","VirtualRide"],"typy_kolarskie_opis":"Tylko te przerywają przerwę. E-bike, spacery, treki i biegi — nie.","pola_pominiete":["pr_count","achievement_count","kudos_count"],"pola_pominiete_powod":"Zmienne w czasie — stan na moment pobrania, nie fakt historyczny (13.08: 60 -> 59 w kilkanaście minut). Zapisać dopiero z datą pobrania obok.","segmenty_od":"2025-08-01","liczba_segmentow":373,"liczba_prob":1800,"jazd_z_moca":17,"jazd_z_rozkladem":19,"jazd_z_trasa":85,"jazd_z_przebiegiem":85},
 
 zalozenia: {
   "_opis": "Wariant B: tu i tylko tu żyją stałe modelu. Nigdy nie wpisywać ich w kod wykresu. Zmiana jednej liczby przelicza całą historię.",
@@ -3522,7 +3522,7 @@ aktywnosci: [
   {"id":"19790657175","data":"2026-08-18T10:57:10","typ":"Hike","dystans_m":538.8,"czas_ruchu_s":479,"czas_calkowity_s":522,"przewyzszenie_m":0,"nazwa":"Hike dla Streaka"},
   {"id":"19813335331","data":"2026-08-19T20:18:57","typ":"Run","dystans_m":2701.3,"czas_ruchu_s":1125,"czas_calkowity_s":1499,"przewyzszenie_m":22.9,"nazwa":"Evening Run"},
   {"id":"19962190482","data":"2026-08-30T12:56:00","typ":"Ride","dystans_m":22523.3,"czas_ruchu_s":3681,"czas_calkowity_s":3681,"przewyzszenie_m":51,"nazwa":"Z2 1 HR","ma_tetno":1,"tetno_sr":138,"kalorie":522,"rpe":2},
-  {"id":"19972642177","data":"2026-08-31T09:09:45","typ":"Ride","dystans_m":33595.4,"czas_ruchu_s":5372,"czas_calkowity_s":5424,"przewyzszenie_m":61,"nazwa":"Morning 90min","ma_tetno":1,"tetno_sr":139,"rpe":4,"kalorie":751},
+  {"id":"19972642177","data":"2026-08-31T09:09:45","typ":"Ride","dystans_m":33595.4,"czas_ruchu_s":5372,"czas_calkowity_s":5424,"przewyzszenie_m":61,"nazwa":"Morning 90min","ma_tetno":1,"tetno_sr":139,"kalorie":751,"rpe":4},
 ]
 
 };
