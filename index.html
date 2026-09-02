@@ -5659,17 +5659,21 @@ function regeneracja(){
     </section>
 
     <div class="info">
-      <b>Skąd te godziny.</b> Garmin liczy regenerację z EPOC, czyli z tętna —
-      tego jeszcze nie masz, więc liczymy z RPE, które wpisujesz sam:
-      <code>0,8 × minuty × (RPE/10)^1,9</code>. Wykładnik sprawia, że
+      <b>Skąd te godziny.</b> Wzór jest jeden:
+      <code>0,8 × minuty × (wysiłek/10)^1,9</code>. Wykładnik sprawia, że
       intensywność waży mocniej niż czas: pół godziny na maksa kosztuje więcej
       niż dwie godziny spokojnej jazdy. Zakotwiczenie jest w regule „48–72 h
-      między twardymi treningami" — mocna jednostka 90 minut przy RPE 8 wychodzi
-      na ${godzinyKrotko(KONF_REGEN.wspolczynnik * 90 * Math.pow(0.8, KONF_REGEN.wykladnik_rpe))}.
+      między twardymi treningami" — mocna jednostka 90 minut przy wysiłku 8
+      wychodzi na ${godzinyKrotko(KONF_REGEN.wspolczynnik * 90 * Math.pow(0.8, KONF_REGEN.wykladnik_rpe))}.
+      <br>Do wzoru wchodzi <b>wysiłek policzony z czasu w strefach tętna</b>,
+      gdy pas był założony, a wpisane RPE dopiero wtedy, gdy tętna nie ma.
+      Garmin robi to samo z EPOC — też z tętna, tylko innym rachunkiem.
+      Obie drogi trafiają do tego samego wzoru, więc jazdy sprzed pasa i po nim
+      leżą na jednej skali i nic nie skacze w dniu, w którym doszedł czujnik.
       <br>Licznik odlicza od <b>zegara tego urządzenia</b> — to jedyne miejsce
       poza paskiem świeżości danych, gdzie strona pyta o realny czas. Sama jazda
       pojawia się tu dopiero po nocnej aktualizacji danych ze Stravy.
-      <br>Jazda bez wpisanego RPE nie da się policzyć i jest pomijana — zgadywanie
+      <br>Jazda bez tętna i bez wpisanego RPE jest pomijana — zgadywanie
       wysiłku byłoby zmyśleniem.
     </div>
   </section>`;

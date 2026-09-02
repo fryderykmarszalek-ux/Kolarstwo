@@ -487,6 +487,12 @@ nie kolor: sylwetka roweru vs ekranu, słupek kreskowany vs pełny.
   jeden. Sprawdzone: interwały RPE 8 (47 h), a po nich tempo RPE 6 z 23 h
   zaległości → 18 + 11 = **30 h**.
 
+  Opis pod licznikiem mówi o wysiłku, nie o RPE (poprawka z 02.09.2026):
+  do 1.09 stało tam „Garmin liczy to z EPOC — tego jeszcze nie masz, więc
+  liczymy z RPE", choć panel wyżej pisał już „policzone z czasu w strefach
+  tętna". Dwa sprzeczne zdania na jednym ekranie. Wzór jest jeden, a wchodzi
+  do niego wysiłek z tętna albo z RPE — i tyle ma mówić opis.
+
   **Licznik odlicza od ZEGARA URZĄDZENIA** — to drugie i ostatnie takie miejsce
   na stronie (pierwsze to pasek świeżości danych). Licznik, który stoi, nie jest
   licznikiem. Reszta strony nadal liczy względem `meta.pobrano`.
@@ -975,8 +981,8 @@ Wymaga sekretu `ANTHROPIC_API_KEY` w repozytorium. **Dopóki sekretu nie ma,
 skrypt wypisuje „Brak ANTHROPIC_API_KEY — pomijam analizę” i kończy się zerem** —
 nie kasuje tego, co stoi w `analiza.js`, i nie psuje pobierania danych.
 
-**Analizy pisane ręcznie w czacie** (28.08.2026 i 31.08.2026) — dwa wpisy,
-oba przed dodaniem sekretu. Powstała, bo zakładka bez sekretu stałaby pusta, a Fryderyk poprosił,
+**Analizy pisane ręcznie w czacie** (28.08, 31.08 i 02.09.2026) — trzy wpisy,
+wszystkie przed dodaniem sekretu. Powstała, bo zakładka bez sekretu stałaby pusta, a Fryderyk poprosił,
 żeby analiza „zawsze tam była”. Pole `odcisk` jest prawdziwym skrótem briefingu
 z tego dnia, więc automat uzna dane za niezmienione i zostawi ten tekst
 w spokoju aż do pierwszej nowej jazdy. Pole `model` mówi wprost „asystent
