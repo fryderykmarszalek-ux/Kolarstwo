@@ -2,135 +2,142 @@
 // NIE EDYTOWAĆ RĘCZNIE: plik jest nadpisywany po każdej zmianie danych.
 // Powstaje w .github/skrypty/analiza.js po nocnym pobraniu ze Stravy.
 //
-// Ta wersja jest wyjątkiem — napisana w sesji czatu 02.09.2026, bo sekretu
+// Ta wersja jest wyjątkiem — napisana w sesji czatu 04.09.2026, bo sekretu
 // ANTHROPIC_API_KEY jeszcze nie ma. Pole odcisk to prawdziwy skrót
 // dzisiejszego briefingu, a analiza jest z dzisiaj, więc automat zostawi ją
 // w spokoju do jutrzejszego wieczora.
 
 window.ANALIZA = {
  "wersja": 1,
- "utworzono": "2026-09-02T20:15",
+ "utworzono": "2026-09-04T10:30",
  "model": "asystent w sesji czatu",
- "jazd_w_danych": 86,
- "dane_pobrano": "2026-09-02T17:43",
- "odcisk": "cb70ee497a57c5a3",
+ "jazd_w_danych": 87,
+ "dane_pobrano": "2026-09-04T07:57",
+ "odcisk": "63c6976eb476ebde",
  "bloki": [
   {
    "t": "naglowek",
-   "tekst": "Pierwsze tętno powyżej 180 — i pierwszy prawdziwy rekord od powrotu"
+   "tekst": "Tętno 197 i szesnaście podiów na dwadzieścia pięć segmentów"
   },
   {
    "t": "akapit",
-   "tekst": "„Evening LTHR+ sprints”: 19,7 km w 55 minutach, 514 kcal, RPE 6. Krótka jazda, a najgęstsza w dane ze wszystkiego, co masz w pliku. Po raz pierwszy w historii tej strony pojawiły się sekundy w czwartej i piątej strefie tętna — do wczoraj obie stały na zerze. Najwyższe tętno tej jazdy to 187, poprzedni rekord zapisu wynosił 170. To nie jest nowe HRmax (masz udokumentowane 201 z pasa), ale to pierwsza jazda, na której pas w ogóle zobaczył górę skali."
+   "tekst": "„Morning 10min, 4 min + 30s+10s”: 19,1 km w 44 minutach, RPE 8, 577 kcal, tętno średnie 165. Najkrótsza jazda tygodnia i bez porównania najmocniejsza. Rozbiłem przebieg na minuty i widać w nim dokładnie to, co zapowiada nazwa — nie musiałem niczego zgadywać."
+  },
+  {
+   "t": "lista",
+   "punkty": [
+    "0–11 min — rozgrzewka, tętno 132–157",
+    "12–22 min — blok 10-minutowy: tętno średnie 183, ostatnie pięć minut 192, prędkość 33,3 km/h, 6,11 km",
+    "23–28 min — zejście, tętno 149–153",
+    "29–33 min — blok 4-minutowy: tętno średnie 184, prędkość 29,7 km/h, 1,98 km",
+    "39 min — akcent 30-sekundowy, szczyt 190",
+    "44 min — akcent 10-sekundowy, szczyt 182, prędkość 31 km/h"
+   ]
   },
   {
    "t": "kafelki",
    "pozycje": [
     {
      "etykieta": "Tętno maks.",
-     "wartosc": "187",
-     "stopka": "było 170 · 31.08"
+     "wartosc": "197",
+     "stopka": "98% z HRmax 201"
     },
     {
-     "etykieta": "Powyżej 180",
-     "wartosc": "52 s",
-     "stopka": "pierwszy raz w danych"
+     "etykieta": "Powyżej 190",
+     "wartosc": "4:25",
+     "stopka": "było 0 s"
     },
     {
-     "etykieta": "Rekord",
-     "wartosc": "1 z 25",
-     "stopka": "i tym razem prawdziwy"
+     "etykieta": "Podium",
+     "wartosc": "16 z 25",
+     "stopka": "segmentów"
     },
     {
      "etykieta": "Forma",
-     "wartosc": "−4",
-     "stopka": "101 − 105"
+     "wartosc": "−21",
+     "stopka": "105 − 126"
     }
    ]
   },
   {
    "t": "naglowek",
-   "tekst": "Co ta jazda naprawdę zawierała"
+   "tekst": "HRmax 201 właśnie się potwierdziło"
   },
   {
    "t": "akapit",
-   "tekst": "Rozbiłem przebieg na dwuminutowe kawałki i kształt jest bardzo czytelny. Przez pierwsze trzydzieści minut jedziesz spokojnie i równo: tętno idzie 130 → 145, a prędkość w tym samym czasie 19 → 25 km/h. To jest dobry znak sam w sobie — tętno rośnie wolniej niż tempo. Potem zaczynają się sprinty: 32. minuta (szczyt 183), 36. (182), 42. (187) i 54. (182), każdy z wyraźnym zejściem pomiędzy. Czyli trzydzieści minut budowania i cztery mocne akcenty na końcu."
+   "tekst": "Najwyższe tętno tej jazdy to 197. Dwa dni temu rekord zapisu wynosił 187, a jeszcze 31 sierpnia — 170. Wartość 201 z pasa piersiowego stała w TRENING.md jako liczba, której nie da się dziś sprawdzić; teraz podszedłeś do niej na cztery uderzenia, czyli na 98%. To praktycznie potwierdzenie. Poza tym: 265 sekund powyżej 190 i 62 sekundy powyżej 195, przy zerze w obu tych przedziałach przez całą wcześniejszą historię danych."
+  },
+  {
+   "t": "akapit",
+   "tekst": "Najwyższa jednominutowa średnia tętna wyszła 196,3, czterominutowa 193,4, a dziesięciominutowa 185,4. Blok dziesięciominutowy trzymał 183 średnio i kończył się przy 192 — czyli tętno rosło przez cały odcinek, co jest normalne przy wysiłku powyżej progu i mówi, że nie jechałeś tego na jednostajnym progu, tylko wyżej."
   },
   {
    "t": "ostrzezenie",
-   "tekst": "Nazwa jazdy zapowiada test LTHR i muszę powiedzieć wprost: tego testu w danych nie ma. Test progu to około 20–30 minut jednostajnego maksymalnego wysiłku ze średnią tętna z ostatnich 20 minut — a tu masz spokojne trzydzieści minut i cztery sprinty. Policzyłem najwyższą dwudziestominutową średnią tętna: 148,5 bpm. Nie podaję jej jako LTHR i nie wpisuj jej do progów stref, bo to okno łapie sprinty i przerwy między nimi, czyli mierzy coś innego niż próg. Jeśli chcesz mieć LTHR z liczby, a nie z oszacowania, potrzeba osobnej jazdy: rozgrzewka, potem 20 minut najmocniej, jak da się utrzymać do końca, bez ani jednego sprintu."
+   "tekst": "Piszesz, że poprawiłeś progi stref po teście — i muszę powiedzieć, co się z tym stało, bo to nie zadziałało tak, jak pewnie zakładasz. Nowa tabela siedzi w pamięci Twojego Safari (localStorage), a nie w dane.js. To znaczy dwie rzeczy. Po pierwsze: rozkład stref tej jazdy, który widzisz na stronie, policzył automat STARĄ tabelą z 27 sierpnia — Z4 od 161, Z5 od 181. Po drugie: strona nie przelicza rozkładów przy wyświetlaniu, tylko czyta gotowe sekundy z pliku, więc zmiana progów w przeglądarce nie ruszy ani tej jazdy, ani żadnej wcześniejszej. Żeby nowe progi zaczęły cokolwiek znaczyć, muszą trafić do dane.js. Naciśnij „Progi dla Claude'a…” w zakładce Objętość → Tętno i wklej mi to, co wypisze — wtedy wpiszę je do danych i przeliczę wszystkie jazdy od nowa."
   },
   {
    "t": "akapit",
-   "tekst": "Ta sama sprawa psuje dryf. Na jeździe z 31 sierpnia policzyłem 2,1% i to była wartościowa liczba, bo cała jazda szła równo. Dziś wychodzi −10,6%, ale to nic nie znaczy: druga połowa zawiera cztery sprinty, więc tętno w niej jest wysokie z powodu wysiłku, a nie zmęczenia. Dryf mierzy się na jednostajnej jeździe albo wcale."
+   "tekst": "Dla porządku, przy starej tabeli ta jazda wygląda tak: Z2 4:19, Z3 16:38, Z4 10:55, Z5 11:47. Prawie dwanaście minut w piątej strefie jest podejrzanie dużo i to jest właśnie sygnał, że próg 181 na Z5 był za nisko ustawiony. Twoja poprawka najpewniej idzie w dobrą stronę — tylko jeszcze nie działa."
   },
   {
    "t": "wykres_strefy",
    "miara": "tetno",
    "dni": 7,
-   "tytul": "Strefy tętna — 7 dni, po raz pierwszy z Z4 i Z5"
-  },
-  {
-   "t": "akapit",
-   "tekst": "Tydzień wygląda teraz tak: Z1 0,4%, Z2 65,6%, Z3 31,7%, Z4 1,8%, Z5 0,4% z 3 godzin 24 minut zapisu. Efektywność 59%, czyli o punkt lepiej niż przed tą jazdą. Rusza się w dobrą stronę, ale wolno, bo model spolaryzowany chce 15–20% powyżej progu, a masz 2,2%. Te 56 minut w Z3 to nadal największy problem tego rozkładu — trzecia strefa jest za mocna, żeby liczyła się jako baza, i za słaba, żeby coś rozwijała. Sprinty są dobre. Do poprawy jest to, co pomiędzy nimi."
+   "tytul": "Strefy tętna, 7 dni — liczone STARĄ tabelą"
   },
   {
    "t": "naglowek",
-   "tekst": "Rekord, który tym razem jest rekordem"
+   "tekst": "To, co napisałem 31 sierpnia, właśnie się sprawdziło"
   },
   {
    "t": "akapit",
-   "tekst": "Dwa dni temu siedem „rekordów” okazało się w komplecie pierwszymi przejazdami. Dziś jest odwrotnie: z 25 segmentów padł jeden najlepszy czas i jest prawdziwy. Konstancin-Obory Hopka, 204 metry, przejechane w 27 sekund przy poprzednim najlepszym 29 — dziesiąta próba na tym segmencie, poprawa o 2 sekundy, średnia 27,3 km/h. Krótki odcinek, więc to jest rekord mocy szczytowej, a nie wytrzymałości, i pasuje dokładnie do tego, co robiłeś: sprint numer jeden."
-  },
-  {
-   "t": "akapit",
-   "tekst": "Na pozostałych 24 segmentach rekordu nie ma i to jest w porządku — jechałeś je między sprintami, czyli na regeneracji. Powtarzam to, co pisałem 31 sierpnia, bo to jest najczęstsza pułapka tej strony: czas na segmencie mierzy formę tylko wtedy, gdy jechałeś go z zamiarem. Dzisiejsza jazda ma cztery takie momenty i jeden z nich dał rekord."
-  },
-  {
-   "t": "naglowek",
-   "tekst": "Forma zeszła pod zero i tak miało być"
-  },
-  {
-   "t": "akapit",
-   "tekst": "Wytrenowanie 101, zmęczenie 105, forma −4. Pierwszy ujemny odczyt od powrotu z Francji. Dwa dni temu było 98 i 81, czyli +17. Zmęczenie liczy się średnią o stałej 7 dni, więc mocna jazda podnosi je od razu, a wytrenowanie ze stałą 42 dni ledwie drgnęło: 98 → 101. Napięcie zmęczenie do wytrenowania wynosi 1,04, czyli nabierasz zmęczenia minimalnie szybciej, niż je odrabiasz. W bloku treningowym dokładnie tak ma być. Alarm byłby wtedy, gdyby to trwało tygodniami przy wytrenowaniu stojącym w miejscu."
-  },
-  {
-   "t": "wykres_forma",
-   "tytul": "Wytrenowanie i zmęczenie — forma schodzi pod kreskę"
-  },
-  {
-   "t": "akapit",
-   "tekst": "Licznik regeneracji pokazuje 9,6 godziny za tę jazdę i pełną gotowość jutro nad ranem. Zwróć uwagę na jedną liczbę: wysiłek policzony z czasu w strefach tętna wyszedł 4,5 na 10, a Twoje wpisane RPE 6 dałoby 17 godzin zamiast 9,6. To jest druga jazda z rzędu, na której deklaracja i pomiar się rozjeżdżają — 30 sierpnia w drugą stronę (RPE 2 przy 17 minutach w Z3), dziś w tę. Nie przestawaj wpisywać RPE, bo bez pasa jest jedyną miarą, jaką masz. Ale to pas ma teraz ostatnie słowo i strona liczy z niego."
-  },
-  {
-   "t": "naglowek",
-   "tekst": "Tydzień planu: brakuje 36 minut"
-  },
-  {
-   "t": "akapit",
-   "tekst": "Trwa pierwszy tydzień wrześniowego planu — 3 godziny. Masz w nim 2,4 godziny: półtorej z 31 sierpnia i 55 minut z dzisiaj. Do dowiezienia zostaje 36 minut, a do niedzieli jest jeszcze pięć dni. To praktycznie pewne, więc jedyne, czym warto się teraz zająć, to czym te 36 minut wypełnić. Po dzisiejszych sprintach i przy zmęczeniu 8 na 10 odpowiedź brzmi: spokojną jazdą w Z2, nie kolejnymi akcentami. Kolejny tydzień to 4 godziny, a potem 4,5 — miejsce na mocne rzeczy będzie."
-  },
-  {
-   "t": "wykres_tygodnie",
-   "tytul": "Godziny w tygodniach — pierwszy tydzień planu w toku"
-  },
-  {
-   "t": "akapit",
-   "tekst": "Jedna rzecz w tle, o której łatwo zapomnieć: 1 września otworzyło się okno Żółtej koszulki i biegnie do 24 grudnia. Żadna przerwa dłuższa niż 14 dni. Okno otworzyło się we wtorek, we wtorek nie jechałeś, a dzisiejsza jazda jest w nim pierwsza. Licznik dni od ostatniej jazdy stoi na zerze i tylko tyle trzeba pilnować przez najbliższe 113 dni."
+   "tekst": "Trzy dni temu na spokojnej jeździe mediana straty do rekordu na dobrze ogranych segmentach wynosiła 69,1%, a Ty byłeś ostatni albo przedostatni prawie wszędzie. Napisałem wtedy, że to nie jest werdykt o formie, bo czas na segmencie mierzy cokolwiek tylko wtedy, gdy jechałeś go z zamiarem. Dziś jechałeś z zamiarem. Mediana straty: 9,6%. Szesnaście przejazdów na dwadzieścia pięć wylądowało w pierwszej trójce, w tym pięć drugich miejsc na segmentach z 24–26 próbami. Ta sama trasa, ten sam zawodnik, siedem razy mniejsza strata — różnicę zrobił wyłącznie zamiar."
   },
   {
    "t": "lista",
    "punkty": [
-    "Tętno: pierwsze 52 sekundy powyżej 180 i pierwsze sekundy w Z4 i Z5 w całej historii danych",
-    "Segmenty: 1 prawdziwy rekord z 25 przejazdów — Konstancin-Obory Hopka, 27 s zamiast 29 s",
-    "Forma −4, napięcie 1,04 — obciążenie rośnie zgodnie z planem, nie ponad niego",
-    "Plan wrześniowy: 2,4 h z 3 h, brakuje 36 minut do niedzieli",
-    "LTHR wciąż niezmierzone — potrzeba osobnej jazdy z jednym 20-minutowym odcinkiem"
+    "Obory-Opacz — 3. miejsce z 22 prób, 13:17 przy rekordzie 12:45",
+    "Na Gassy sprint (JR) — 2. z 26, 121 s przy rekordzie 113 s",
+    "the long gassy sprint — 2. z 26, 132 s przy 122 s",
+    "500m GASSY — 2. z 26, 51 s przy 47 s",
+    "Very long Gassy sprint — 2. z 24, 323 s przy 297 s"
    ]
   },
   {
    "t": "akapit",
-   "tekst": "Podsumowując: pierwsza jazda od powrotu, na której coś naprawdę boli i coś naprawdę zostało zmierzone. Trzydzieści minut równej pracy plus cztery sprinty to sensowna jednostka, a rekord na Hopce jest jej twardym dowodem. Dwie rzeczy do poprawy, obie łatwe. Pierwsza: mniej trzeciej strefy w jazdach spokojnych — 32% tygodnia w tempie to jest jazda w szarej strefie, ani lekko, ani mocno. Druga: jeśli chcesz progu, zrób osobny test i nie mieszaj go ze sprintami, bo wtedy nie da się z tego wyciągnąć ani progu, ani sprintów. Reszta idzie tak, jak powinna."
+   "tekst": "Rekordu dziś nie ma i to też ma sens: rekordy na tych segmentach padły 22 lipca i 8 czerwca, na szczycie formy przed przerwą, a Ty jesteś dziesięć dni po wznowieniu jeżdżenia. Być 8% od siebie z lipca po piętnastu dniach bez roweru to dobry wynik, nie zły."
+  },
+  {
+   "t": "naglowek",
+   "tekst": "Koszulka sprinterska jest na dziesięć sekund"
+  },
+  {
+   "t": "akapit",
+   "tekst": "Warunek brzmi: Obory-Opacz, 6,94 km po płaskim, w 12:35 albo szybciej. Twój rekord to 12:45 z 22 lipca, czyli brakuje dziesięciu sekund na blisko siedmiu kilometrach — to 1,3% czasu. Gablota pokazuje 99% drogi i nie jest to zaokrąglenie na wyrost. Dziś przejechałeś ten segment w 13:17, ale w środku sesji interwałowej, a nie jako próbę na czas. Jak wrócisz do formy z lipca i pojedziesz go świadomie, jeden raz, w dobry dzień i bez wiatru w twarz — ta koszulka spada. To najbliższa rzecz w całej gablocie."
+  },
+  {
+   "t": "naglowek",
+   "tekst": "Pierwszy tydzień planu dowieziony"
+  },
+  {
+   "t": "akapit",
+   "tekst": "Plan na tydzień 1–7 września to 3 godziny. Masz 3,1 i jest dopiero piątek. Słupek na wykresie jest zielony po raz pierwszy od dawna. Warto zauważyć, jak to się złożyło: 90 minut spokojnie 31 sierpnia, 55 minut ze sprintami 2 września i 44 minuty interwałów dzisiaj. Trzy jazdy o trzech różnych zadaniach, żadna nie dłuższa niż półtorej godziny."
+  },
+  {
+   "t": "wykres_tygodnie",
+   "tytul": "Godziny w tygodniach — pierwszy zielony słupek planu"
+  },
+  {
+   "t": "ostrzezenie",
+   "tekst": "I teraz jedyna rzecz, którą naprawdę warto zrobić w weekend: nic. Forma zeszła na −21 (wytrenowanie 105, zmęczenie 126), napięcie zmęczenie do wytrenowania wynosi 1,15, zmęczenie stoi na 8 z 10, a licznik regeneracji daje 17 godzin i pełną gotowość dopiero jutro nad ranem. Trzy jazdy w pięć dni po piętnastodniowej przerwie, z czego dwie mocne, a dzisiejsza z tętnem 197. Tydzień jest dowieziony, więc dokładanie czwartej jazdy niczego nie poprawi w planie, a doda zmęczenia, które i tak jest najwyższe od lipca. Jeśli chcesz jechać, to spokojnie i krótko."
+  },
+  {
+   "t": "wykres_forma",
+   "tytul": "Wytrenowanie i zmęczenie — najniższa forma od lipca"
+  },
+  {
+   "t": "akapit",
+   "tekst": "Na koniec liczba, która dobrze podsumowuje ten tydzień. Wysiłek tej jazdy policzony z czasu w strefach tętna wyszedł 6,9 na 10, a Twoje wpisane RPE 8 dałoby 23 godziny regeneracji zamiast 17. Trzecia jazda z rzędu, na której deklaracja i pomiar się rozjeżdżają, i pierwsza, na której obie wersje mówią to samo w istocie: było ciężko. Wcześniej różnica dotyczyła tego, czy jazda była lekka; teraz tylko tego, jak bardzo mocna. To znaczy, że Twoje RPE zaczyna być kalibrowane — i że sensowniej będzie je oceniać dopiero po tym, jak nowe progi stref wejdą do danych."
   }
  ]
 };
