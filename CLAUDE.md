@@ -444,8 +444,15 @@ nie kolor: sylwetka roweru vs ekranu, słupek kreskowany vs pełny.
   datowania nie wystarczyła: pierwsza tabela była **estymatą** z HRmax, a nie
   pomiarem, więc poprawka po teście musi sięgnąć wstecz — inaczej wrzesień
   zostaje policzony progami, o których już wiadomo, że są złe.
-  - **⟳ Poprawka** podmienia tabelę, która OBOWIĄZUJE (zachowuje jej `od`),
-    więc przelicza także jazdy już zapisane. Do naprawiania pomyłek.
+  - **⟳ Poprawka** znaczy „te progi były prawdziwe od zawsze": wchodzi pod
+    `od` **najstarszej** tabeli i kasuje nowsze wersje z urządzenia. Do
+    naprawiania pomyłek. Data najstarsza, a nie data tabeli bieżącej — to
+    wyszło na próbie: kto zapisał progi wcześniej przyciskiem ✓, ma już wersję
+    z wczorajszą datą, a poprawka wpisana „do bieżącej" naprawiłaby wyłącznie
+    jazdy od wczoraj. Straż „nic nie zmieniłeś" jest wyłączona przy poprawce,
+    bo przeniesienie NIEZMIENIONEJ tabeli pod starszą datę jest właśnie tym
+    ruchem, którego ten ktoś potrzebuje — jedno dotknięcie, bez przepisywania
+    liczb od nowa.
   - **✓ Od dziś** zakłada nową wersję z dzisiejszą datą i zostawia starsze
     jazdy w spokoju. Do notowania postępu.
 

@@ -4758,10 +4758,12 @@ function tabelaStrefHTML(miara){
       </div>` : ""}
     <div class="info">
       <b>Dwa sposoby zapisu i to nie jest to samo.</b>
-      <br><b>⟳ Poprawka</b> podmienia tabelę, która OBOWIĄZUJE
-      (od ${pl(biezaca.od)}), więc przelicza także jazdy już zapisane. To jest
-      właściwy przycisk, gdy poprzednie progi były zgadnięte albo błędne —
-      a pierwsza tabela na tej stronie była właśnie estymatą z HRmax.
+      <br><b>⟳ Poprawka</b> mówi „te progi były prawdziwe od zawsze": wchodzą
+      pod najstarszą datą (${pl(wersje[0].od)}) i przeliczają <b>wszystkie</b>
+      jazdy, także te już zapisane. Nowsze wersje z tego urządzenia znikają, bo
+      były podejściami do tej samej poprawki. To jest właściwy przycisk, gdy
+      poprzednie progi były zgadnięte albo błędne — a pierwsza tabela na tej
+      stronie była właśnie estymatą z HRmax.
       <br><b>✓ Od dziś</b> zakłada NOWĄ wersję z dzisiejszą datą i zostawia
       starsze jazdy w spokoju. To jest właściwy przycisk, gdy stare progi były
       prawdziwe, tylko Ty się zmieniłeś — podniesiony próg we wrześniu nie
@@ -4824,18 +4826,38 @@ function podepnijTabeleStref(){
           return;
         }
       }
+      /* Straż „nic nie zmieniłeś" dotyczy WYŁĄCZNIE zapisu od dziś: zakładanie
+         nowej wersji identycznej z obowiązującą nie ma sensu. Przy poprawce ma
+         sens jak najbardziej — przenosi tę samą tabelę pod najstarszą datę,
+         czyli rozciąga ją na jazdy sprzed jej zapisania. To jest dokładnie ten
+         ruch, którego potrzebuje ktoś, kto najpierw zapisał progi przyciskiem ✓
+         i dopiero potem zorientował się, że chciał poprawki. */
       const bezZmian = strefy.every((z,i) =>
         z.min === biezaca.strefy[i].min && z.max === biezaca.strefy[i].max);
-      if (bezZmian){ stan(`<span>bez zmian wobec obecnej tabeli</span>`); return; }
+      if (bezZmian && !poprawka){
+        stan(`<span>bez zmian wobec obecnej tabeli</span>`); return; }
+      if (bezZmian && poprawka && tabeleStref(miara)[0].od === biezaca.od){
+        stan(`<span>ta tabela już obowiązuje od najstarszej daty</span>`); return; }
 
-      /* Data obowiązywania. Przy „od dziś" bierzemy zegar urządzenia, bo to
-         moment decyzji, a nie pomiar. Przy poprawce zostawiamy datę tabeli,
-         którą podmieniamy — dzięki temu jazdy policzone tamtą tabelą liczą się
-         od nowa tą poprawioną, zamiast zostać przy błędnych progach. */
+      /* Data obowiązywania — i tu siedzi cała różnica między przyciskami.
+
+         „Od dziś" bierze zegar urządzenia, bo to moment decyzji, a nie pomiar.
+
+         POPRAWKA IDZIE DO NAJSTARSZEJ DATY, nie do daty tabeli bieżącej.
+         Powód wyszedł na próbie: jeśli wcześniej zapisałeś progi przyciskiem ✓,
+         masz już wersję z wczorajszą datą — i poprawka wpisana „do bieżącej"
+         naprawiłaby wyłącznie jazdy od wczoraj, zostawiając starsze przy
+         progach, o których już wiadomo, że są złe. A poprawka znaczy właśnie
+         „te progi były prawdziwe od zawsze". Dlatego siadamy na dacie
+         najstarszej tabeli i kasujemy nowsze wersje Z TEGO URZĄDZENIA — były
+         podejściami do tej samej poprawki. Wersji z dane.js strona nie rusza,
+         bo nie umie pisać do repozytorium; przy jednej tabeli w danych, a tak
+         jest dziś, nie ma to żadnego znaczenia. */
       const dzis = new Date().toISOString().slice(0,10);
-      const od = poprawka ? biezaca.od : dzis;
+      const wszystkie = tabeleStref(miara);
+      const od = poprawka ? wszystkie[0].od : dzis;
       const l = strefyLokalne();
-      l[miara] = (l[miara] || []).filter(t => t.od !== od);
+      l[miara] = (l[miara] || []).filter(t => poprawka ? t.od < od : t.od !== od);
       l[miara].push({ od, zrodlo: poprawka
         ? "poprawka wpisana na urządzeniu " + dzis
         : "wpisane na urządzeniu", strefy });
@@ -4850,7 +4872,7 @@ function podepnijTabeleStref(){
       { const k = document.getElementById("objetosc");
         if (k) dopelnijPrzebiegiStref(k.dataset.miara, +k.dataset.dni); }
       stan(`<span class="stan-brudnopis">zapisane na tym urządzeniu — ${poprawka
-        ? `poprawiona tabela od ${pl(od)}, starsze jazdy przeliczone`
+        ? `poprawka od ${pl(od)} — wszystkie jazdy przeliczone`
         : `obowiązuje od ${pl(od)}, starsze jazdy bez zmian`}</span>`);
       return;
     }
