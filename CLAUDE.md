@@ -414,11 +414,46 @@ nie kolor: sylwetka roweru vs ekranu, słupek kreskowany vs pełny.
   Obok liczymy wskaźnik polaryzacji PI = log10(Z1/Z2 × Z3 × 100) z ułamków
   czasu, próg 2,00 (Treff i in. 2019) — kontrola krzyżowa dla samej oceny.
 
-  **Progi stref są DATOWANE i działają tylko w przód** (27.08.2026, decyzja
-  Fryderyka). `strefy.tetno.tabele` i `strefy.moc.tabele` to listy wersji, każda
-  z polem `od`. Rozkład jazdy liczy się tabelą obowiązującą **w dniu tej
-  jazdy** i zostaje zapisany na stałe, więc podniesienie progu w listopadzie
-  nie rusza jazd z września. Automat musi trzymać tę samą regułę i zapisywać
+  **ROZKŁAD LICZY SIĘ Z PRZEBIEGU, NIE Z GOTOWYCH SEKUND** (05.09.2026) —
+  to wariant B zastosowany do stref. Przebieg 1 Hz jest pomiarem, a sekundy
+  w strefach są z niego wyliczalne, więc nie mają czego szukać w danych jako
+  osobna prawda. Do 5.09 strona czytała gotowe sekundy z `strefy.rozklady`,
+  a z tabeli brała wyłącznie NAZWY i ZAKRESY — po zmianie progów pokazywała
+  więc **nowe podpisy nad starymi liczbami, bez słowa ostrzeżenia**. Fryderyk
+  poprawił progi po teście progowym, słusznie oczekiwał przeliczenia i słusznie
+  się zdziwił.
+
+  Gotowe sekundy z `dane.js` zostają jako **zapas** (jazda bez przebiegu albo
+  taka, której przebieg jeszcze się nie doczytał) i automat dalej je zapisuje.
+  Przebiegi doczytują się PO narysowaniu zakładki, wyłącznie dla jazd z okna;
+  przerysowanie następuje raz, po ostatnim pliku — inaczej pierścień skakałby
+  tyle razy, ile jest jazd. Blok „Skąd te sekundy" mówi, ile jazd policzono
+  z przebiegu, a ile z zapasu.
+
+  Znana różnica: automat dolicza do strefy odstęp między próbkami (do 10 s),
+  a przebieg ma w tym miejscu dziurę, więc **sumy z przebiegu wychodzą o 1–2,5%
+  niższe**. Sprawdzone na czterech jazdach z pasem. Na udziałach procentowych
+  nie widać tego wcale. Nie „naprawiać" tego przez wyrównywanie do automatu.
+
+  **Progi stref są DATOWANE** (27.08.2026, decyzja Fryderyka). `strefy.tetno.tabele`
+  i `strefy.moc.tabele` to listy wersji, każda z polem `od`. Rozkład jazdy liczy
+  się tabelą obowiązującą **w dniu tej jazdy**, więc podniesienie progu
+  w listopadzie nie rusza jazd z września.
+
+  **DWA PRZYCISKI ZAPISU, bo to dwie różne rzeczy** (05.09.2026). Sama zasada
+  datowania nie wystarczyła: pierwsza tabela była **estymatą** z HRmax, a nie
+  pomiarem, więc poprawka po teście musi sięgnąć wstecz — inaczej wrzesień
+  zostaje policzony progami, o których już wiadomo, że są złe.
+  - **⟳ Poprawka** podmienia tabelę, która OBOWIĄZUJE (zachowuje jej `od`),
+    więc przelicza także jazdy już zapisane. Do naprawiania pomyłek.
+  - **✓ Od dziś** zakłada nową wersję z dzisiejszą datą i zostawia starsze
+    jazdy w spokoju. Do notowania postępu.
+
+  Strona nie zgaduje, który przypadek zachodzi, bo nie ma z czego — wybiera
+  Fryderyk, a oba przyciski mówią pod tabelą, co robią. Sprawdzone w Chromium:
+  ⟳ z progami 130/152/168/186 przestawia rozkład 30-dniowy z 0,3/55,8/33,1/5,8/5,1
+  na 5,6/78,3/7,7/5,9/2,6 i efektywność z 62% na 94%, a ✓ nie zmienia ani
+  jednej liczby i dokłada wersję do historii progów. Automat musi trzymać tę samą regułę i zapisywać
   przy jeździe, której tabeli użył. Jazda starsza niż najstarsza tabela bierze
   tę najstarszą — innej nie ma, a odmowa policzenia byłaby gorsza niż jawne
   założenie.
@@ -434,11 +469,10 @@ nie kolor: sylwetka roweru vs ekranu, słupek kreskowany vs pełny.
   Wpisane dziś tabele to **propozycje Claude'a do nadpisania**: tętno z HRmax
   201 (`TRENING.md` §6), moc z modelu Coggana przy FTP 150 W.
 
-  `strefy.rozklady.jazdy` jest wciąż puste — automat dopisze sekundy w strefach,
-  gdy będzie co liczyć. Wykres pokazuje wtedy pusty pierścień i mówi wprost
+  `strefy.rozklady.jazdy` jest dziś już wypełnione (4 jazdy z tętnem od
+  30.08.2026, 17 ze Zwiftu z mocą), ale po zmianie z 5.09 służy tylko za zapas.
+  Gdyby kiedyś było puste, wykres pokazuje pusty pierścień i mówi wprost
   dlaczego. **Nie wypełniać go zerami** — koło pełne zer wygląda jak wynik.
-  Tętno wchodzi do jazd od 1.09.2026 (pas piersiowy), moc ma dziś wyłącznie
-  Zwift i tylko z sesji swobodnych.
 - **Objętość → Stan wytrenowania** (27.08.2026) — krzywa formy. Gruba linia to
   wytrenowanie (42 dni), cienka przerywana zmęczenie (7 dni), różnica to forma.
   Obie w tych samych jednostkach, więc jedna oś — zakaz dwóch osi dotyczy

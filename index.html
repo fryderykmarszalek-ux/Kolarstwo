@@ -4703,11 +4703,11 @@ function tabelaStrefHTML(miara){
     </div>
     <p class="opis">
       Tu wpisujesz swoje progi. Każda strefa osobno, w ${tetno ? "uderzeniach na minutę" : "watach"}.
-      <br><b>Zmiana działa tylko w przód.</b> Jazda jest liczona tabelą, która
-      obowiązywała w <b>dniu tej jazdy</b>, i jej rozkład zostaje zapisany na
-      stałe. Jeśli w listopadzie podniesiesz Z2, wrześniowe jazdy zostaną takie,
-      jakie były — inaczej historia zmieniałaby się pod ręką i żaden wykres nie
-      znaczyłby tego samego dwa razy.
+      <br><b>Każda jazda liczy się tabelą z dnia tej jazdy.</b> Dlatego
+      podniesienie Z2 w listopadzie nie rusza wrześniowych jazd — inaczej
+      historia zmieniałaby się pod ręką i żaden wykres nie znaczyłby tego samego
+      dwa razy. Ale gdy poprzednie progi były po prostu błędne, poprawka ma
+      sięgnąć wstecz: od tego jest przycisk <b>⟳</b>, opisany pod tabelą.
     </p>
     <ul class="strefy-wiersze">
       ${biezaca.strefy.map((z,i) => `
@@ -4737,7 +4737,10 @@ function tabelaStrefHTML(miara){
         ? `<span class="stan-brudnopis">ta tabela jest zapisana tylko na tym urządzeniu</span>`
         : ""}</span>
       <span class="tabela-przyciski">
-        <button class="kolko-akcja" id="tabela-zapisz" title="Zapisz jako nową tabelę od dziś">✓</button>
+        <button class="kolko-akcja" id="tabela-popraw"
+          title="Popraw tabelę, która obowiązuje — przeliczy też starsze jazdy">⟳</button>
+        <button class="kolko-akcja" id="tabela-zapisz"
+          title="Zapisz jako nową tabelę od dziś — starsze jazdy zostają bez zmian">✓</button>
         <button class="kolko-akcja" id="tabela-anuluj" title="Cofnij zmiany">✗</button>
       </span>
     </div>
@@ -4753,6 +4756,19 @@ function tabelaStrefHTML(miara){
                 ? `<span class="stan-brudnopis">tylko na tym urządzeniu</span>` : ""}</li>`).join("")}
         </ul>
       </div>` : ""}
+    <div class="info">
+      <b>Dwa sposoby zapisu i to nie jest to samo.</b>
+      <br><b>⟳ Poprawka</b> podmienia tabelę, która OBOWIĄZUJE
+      (od ${pl(biezaca.od)}), więc przelicza także jazdy już zapisane. To jest
+      właściwy przycisk, gdy poprzednie progi były zgadnięte albo błędne —
+      a pierwsza tabela na tej stronie była właśnie estymatą z HRmax.
+      <br><b>✓ Od dziś</b> zakłada NOWĄ wersję z dzisiejszą datą i zostawia
+      starsze jazdy w spokoju. To jest właściwy przycisk, gdy stare progi były
+      prawdziwe, tylko Ty się zmieniłeś — podniesiony próg we wrześniu nie
+      może przepisywać lipca, bo w lipcu naprawdę było inaczej.
+      <br>Wybór należy do Ciebie, bo strona nie ma jak zgadnąć, czy poprawiasz
+      pomyłkę, czy notujesz postęp.
+    </div>
     <div class="prognoza-dol">
       <span class="odblok-podpis">Nowe progi zapisują się na tym urządzeniu —
         wyślij je do Claude'a, żeby trafiły do <code>dane.js</code> i liczyły się
@@ -4781,7 +4797,10 @@ function podepnijTabeleStref(){
     if (!b || !korzen) return;
     const miara = korzen.dataset.miara;
 
-    if (b.id === "tabela-zapisz"){
+    if (b.id === "tabela-zapisz" || b.id === "tabela-popraw"){
+      // ⟳ podmienia tabelę obowiązującą (przelicza starsze jazdy),
+      // ✓ zakłada nową wersję od dziś (starsze jazdy zostają).
+      const poprawka = b.id === "tabela-popraw";
       const biezaca = tabelaBiezaca(miara);
       const ostatnia = biezaca.strefy.length - 1;
       const strefy = biezaca.strefy.map((z,i) => {
@@ -4809,19 +4828,30 @@ function podepnijTabeleStref(){
         z.min === biezaca.strefy[i].min && z.max === biezaca.strefy[i].max);
       if (bezZmian){ stan(`<span>bez zmian wobec obecnej tabeli</span>`); return; }
 
-      // Nowa tabela obowiązuje OD DZIŚ — data z zegara urządzenia, bo to
-      // moment decyzji, a nie pomiar.
+      /* Data obowiązywania. Przy „od dziś" bierzemy zegar urządzenia, bo to
+         moment decyzji, a nie pomiar. Przy poprawce zostawiamy datę tabeli,
+         którą podmieniamy — dzięki temu jazdy policzone tamtą tabelą liczą się
+         od nowa tą poprawioną, zamiast zostać przy błędnych progach. */
       const dzis = new Date().toISOString().slice(0,10);
+      const od = poprawka ? biezaca.od : dzis;
       const l = strefyLokalne();
-      l[miara] = (l[miara] || []).filter(t => t.od !== dzis);
-      l[miara].push({ od: dzis, zrodlo: "wpisane na urządzeniu", strefy });
+      l[miara] = (l[miara] || []).filter(t => t.od !== od);
+      l[miara].push({ od, zrodlo: poprawka
+        ? "poprawka wpisana na urządzeniu " + dzis
+        : "wpisane na urządzeniu", strefy });
       if (!zapiszStrefyLokalne(l)){
         stan(`<span class="stan-niezapisane">nie udało się zapisać w przeglądarce</span>`);
         return;
       }
       const [, , arg] = zHasha();
       tresc.innerHTML = objetosc(miara, arg);
-      stan(`<span class="stan-brudnopis">zapisane na tym urządzeniu — obowiązuje od ${pl(dzis)}</span>`);
+      // Nowe progi = nowy rozkład. Przebiegi są już w pamięci, więc przeliczenie
+      // jest natychmiastowe; to wołanie łapie tylko jazdy jeszcze niedoczytane.
+      { const k = document.getElementById("objetosc");
+        if (k) dopelnijPrzebiegiStref(k.dataset.miara, +k.dataset.dni); }
+      stan(`<span class="stan-brudnopis">zapisane na tym urządzeniu — ${poprawka
+        ? `poprawiona tabela od ${pl(od)}, starsze jazdy przeliczone`
+        : `obowiązuje od ${pl(od)}, starsze jazdy bez zmian`}</span>`);
       return;
     }
 
@@ -4854,6 +4884,68 @@ function jazdyOkna(dni){
     && a.data.slice(0,10) <= DZIS);
 }
 
+/* ROZKŁAD LICZY SIĘ Z PRZEBIEGU, NIE Z GOTOWYCH SEKUND — zmiana z 05.09.2026.
+   To jest wariant B zastosowany do stref: przebieg 1 Hz jest POMIAREM, a
+   sekundy w strefach są z niego WYLICZALNE, więc nie mają czego szukać
+   w danych jako osobna prawda.
+
+   Powód zmiany był konkretny. Fryderyk poprawił progi po teście progowym
+   i słusznie oczekiwał, że pierścień się przeliczy. Wcześniej nie mógł:
+   strona czytała gotowe sekundy policzone przez automat starą tabelą,
+   a z nowej tabeli brała tylko NAZWY i ZAKRESY stref. Wychodziło z tego
+   najgorsze możliwe połączenie — nowe podpisy nad starymi liczbami, bez
+   słowa ostrzeżenia. Teraz każda sekunda przebiegu jest klasyfikowana od nowa
+   tabelą obowiązującą W DNIU TEJ JAZDY, więc progi wpisane na stronie działają
+   natychmiast i bez pośrednictwa czatu.
+
+   Gotowe sekundy z dane.js zostają jako zapas: jazda bez przebiegu (albo taka,
+   której przebieg jeszcze się nie doczytał) liczy się po staremu. Automat też
+   je dalej zapisuje — nic nie tracimy, gdyby przebiegi kiedyś zniknęły.
+
+   Różnica między jedną a drugą drogą jest mała i znana: automat dolicza do
+   strefy odstęp między próbkami (do 10 s), a przebieg ma po prostu dziurę,
+   więc sumy z przebiegu wychodzą o 1–2,5% niższe. Na udziałach procentowych,
+   czyli na tym, co pokazuje pierścień, nie widać tego wcale. */
+const ROZKLAD_Z_PRZEBIEGU = new Map();
+
+function odciskTabeli(t){
+  return t ? t.od + "|" + t.strefy.map(z =>
+    z.min + "-" + (z.max == null ? "" : z.max)).join(",") : "brak";
+}
+
+/* Sekundy w strefach dla JEDNEJ jazdy, liczone z jej przebiegu. Zwraca null,
+   gdy przebiegu nie ma albo nie ma w nim tej serii — wtedy dzwoniący sięga po
+   zapas z dane.js. Nie wczytuje niczego sam: pyta wyłącznie o to, co już leży
+   w pamięci, żeby dało się to wołać synchronicznie przy rysowaniu. */
+function rozkladJazdyZPrzebiegu(a, miara){
+  const tab = tabelaNaDzien(miara, a.data.slice(0,10));
+  if (!tab || !tab.strefy || !tab.strefy.length) return null;
+  const klucz = a.id + "|" + miara + "|" + odciskTabeli(tab);
+  if (ROZKLAD_Z_PRZEBIEGU.has(klucz)) return ROZKLAD_Z_PRZEBIEGU.get(klucz);
+
+  const pb = PRZEBIEG_GOTOWY.get(String(a.id));
+  if (!pb) return null;
+  const seria = pb.serie[miara === "tetno" ? "tetno" : "moc"];
+  if (!seria) { ROZKLAD_Z_PRZEBIEGU.set(klucz, null); return null; }
+
+  /* Ta sama reguła co w automacie i w opisie na stronie: wartość trafia do
+     PIERWSZEJ strefy, której górny próg jest od niej nie mniejszy, a ostatnia
+     (max = null) łapie resztę. Dzięki temu skrajności — tętno 90 przy Z1 od
+     100 czy sprint 1000 W — nigdy nie wypadają poza wykres. */
+  const sumy = new Array(tab.strefy.length).fill(0);
+  for (const v of seria){
+    if (v == null) continue;          // brak pomiaru to nie jest zero
+    let i = tab.strefy.length - 1;
+    for (let k = 0; k < tab.strefy.length; k++){
+      const mx = tab.strefy[k].max;
+      if (mx == null || v <= mx){ i = k; break; }
+    }
+    sumy[i]++;
+  }
+  ROZKLAD_Z_PRZEBIEGU.set(klucz, sumy);
+  return sumy;
+}
+
 /* Rozkład sekund po strefach dla okna. Zwraca null, gdy nie ma ani jednej
    jazdy z tym pomiarem — puste koło z podpisem jest uczciwsze niż koło
    wypełnione zerami, które wygląda jak wynik. */
@@ -4863,7 +4955,7 @@ function rozkladStref(miara, dni){
   const ile = strefyMiary(miara).length;
   const sumy = new Array(ile).fill(0);
   const jazdy = (STREFY.rozklady && STREFY.rozklady.jazdy) || {};
-  let zPomiarem = 0, wszystkich = 0;
+  let zPomiarem = 0, wszystkich = 0, zPrzebiegu = 0, zZapasu = 0, czekaja = 0;
 
   let odsianeErg = 0;
   for (const a of jazdyOkna(dni)){
@@ -4871,14 +4963,61 @@ function rozkladStref(miara, dni){
     // Moc sterowana opisuje plan treningu, nie zawodnika — do rozkładu stref
     // mocy nie wchodzi. Ta sama reguła co wszędzie indziej na stronie.
     if (miara === "moc" && jestErg(a)){ odsianeErg++; continue; }
+
+    const zzywego = rozkladJazdyZPrzebiegu(a, miara);
+    if (zzywego && zzywego.length === ile){
+      zPomiarem++; zPrzebiegu++;
+      for (let i = 0; i < ile; i++) sumy[i] += zzywego[i] || 0;
+      continue;
+    }
     const r = jazdy[a.id];
     const sek = r && r[miara];
     if (!Array.isArray(sek) || sek.length !== ile) continue;
-    zPomiarem++;
+    zPomiarem++; zZapasu++;
+    // Jazda, która MA przebieg z tą serią, ale jeszcze go nie doczytała —
+    // po doczytaniu przeliczy się sama, więc mówimy o tym wprost.
+    if (maSeriePrzebiegu(a.id, miara)) czekaja++;
     for (let i = 0; i < ile; i++) sumy[i] += sek[i] || 0;
   }
   const suma = sumy.reduce((x,y) => x+y, 0);
-  return { sumy, suma, zPomiarem, wszystkich, ile, odsianeErg };
+  return { sumy, suma, zPomiarem, wszystkich, ile, odsianeErg,
+           zPrzebiegu, zZapasu, czekaja };
+}
+
+// Czy indeks przebiegów obiecuje przy tej jeździe serię tętna/mocy. Litery
+// w polu `ma` zapisuje automat: v prędkość, h tętno, w moc, y wysokość.
+function maSeriePrzebiegu(id, miara){
+  const p = ((PRZEBIEGI || {}).jazdy || {})[String(id)];
+  return !!(p && p.ma && p.ma.includes(miara === "tetno" ? "h" : "w"));
+}
+
+/* Doczytanie przebiegów potrzebnych oknu. Wołane PO narysowaniu, więc strona
+   pojawia się natychmiast (na zapasie z dane.js), a przeliczone liczby wchodzą
+   chwilę później. Przy dzisiejszych danych to 4 pliki po ~18 kB na tętno
+   i 17 po ~15 kB na moc — mniej, niż waży jedno zdjęcie.
+
+   Rysujemy dopiero, gdy WSZYSTKIE się doczytają. Przerysowanie po każdym
+   pliku z osobna dawałoby pierścień skaczący cztery razy pod rząd. */
+function dopelnijPrzebiegiStref(miara, dni){
+  const brakujace = jazdyOkna(dni).filter(a =>
+    !(miara === "moc" && jestErg(a))
+    && maSeriePrzebiegu(a.id, miara)
+    && !PRZEBIEG_GOTOWY.has(String(a.id)));
+  if (!brakujace.length) return;
+
+  let zostalo = brakujace.length;
+  for (const a of brakujace){
+    wczytajPrzebieg(String(a.id), () => {
+      if (--zostalo) return;
+      // Zakładka mogła się w międzyczasie zmienić — wtedy nie ma co rysować.
+      const korzen = document.getElementById("objetosc");
+      if (!korzen || korzen.dataset.miara !== miara || +korzen.dataset.dni !== dni) return;
+      const tresc = document.getElementById("tresc");
+      if (!tresc) return;
+      const [, , arg] = zHasha();
+      tresc.innerHTML = objetosc(miara, arg);
+    });
+  }
 }
 
 /* --- Efektywność rozkładu -------------------------------------------------
@@ -5133,6 +5272,31 @@ function objetosc(miara, arg){
       (0,7 + 0,6) / 2 = <b>65%</b>. Przy jazdach różnej długości waży je sam
       czas — i tak ma być: godzina w Z2 waży więcej niż dziesięć minut w Z2.
     </div>
+    ${rozklad && rozklad.zPomiarem ? `
+      <div class="info">
+        <b>Skąd te sekundy.</b>
+        ${rozklad.zPrzebiegu ? `
+          ${rozklad.zPrzebiegu === 1 ? "Jedna jazda jest liczona" :
+            `<b>${rozklad.zPrzebiegu}</b> ${rozklad.zPrzebiegu < 5 ? "jazdy są liczone" : "jazd jest liczonych"}`}
+          <b>na żywo z przebiegu</b> — każda sekunda zapisu klasyfikowana od
+          nowa, tabelą obowiązującą w dniu tej jazdy. Dlatego progi wpisane
+          niżej działają natychmiast: zmieniasz liczbę, pierścień się przelicza.`
+        : ""}
+        ${rozklad.zZapasu ? `
+          ${rozklad.zPrzebiegu ? "Pozostałe" : "Wszystkie"}
+          <b>${rozklad.zZapasu}</b> ${rozklad.zZapasu === 1 ? "jazda korzysta" : "biorą"}
+          z sekund policzonych wcześniej przez automat i zapisanych
+          w <code>dane.js</code>${rozklad.czekaja
+            ? ` — z tego ${rozklad.czekaja === 1 ? "jedna czeka" : `<b>${rozklad.czekaja}</b> czekają`}
+                na doczytanie przebiegu i przeliczy się za chwilę sama`
+            : `, bo nie ${rozklad.zZapasu === 1 ? "ma" : "mają"} zapisanego przebiegu.
+               Zmiana progów ich nie ruszy`}.`
+        : ""}
+        <br>Różnica między jedną drogą a drugą jest znana i mała: automat
+        dolicza do strefy odstęp między próbkami, a przebieg ma w tym miejscu
+        dziurę, więc sumy z przebiegu wychodzą o 1–2,5% niższe. Na udziałach
+        procentowych nie widać tego wcale.
+      </div>` : ""}
   </section>`;
 }
 
@@ -7369,6 +7533,12 @@ function pokaz(){
   podepnijGablote();
   podepnijStrefy();
   podepnijTabeleStref();
+  // Pierścień stref rysuje się od razu z zapasu w dane.js, a przebiegi
+  // doczytują się w tle i przeliczają go dokładnie. Patrz rozkladStref.
+  {
+    const k = document.getElementById("objetosc");
+    if (k) dopelnijPrzebiegiStref(k.dataset.miara, +k.dataset.dni);
+  }
   podepnijForme();
   podepnijRegeneracje();
   podepnijAktywnosci();
