@@ -2,140 +2,166 @@
 // NIE EDYTOWAĆ RĘCZNIE: plik jest nadpisywany po każdej zmianie danych.
 // Powstaje w .github/skrypty/analiza.js po nocnym pobraniu ze Stravy.
 //
-// Ta wersja jest wyjątkiem — napisana w sesji czatu 05.09.2026, bo sekretu
+// Ta wersja jest wyjątkiem — napisana w sesji czatu 06.09.2026, bo sekretu
 // ANTHROPIC_API_KEY jeszcze nie ma. Pole odcisk to prawdziwy skrót
 // dzisiejszego briefingu, a analiza jest z dzisiaj, więc automat zostawi ją
 // w spokoju do jutrzejszego wieczora.
 
 window.ANALIZA = {
  "wersja": 1,
- "utworzono": "2026-09-05T11:20",
+ "utworzono": "2026-09-06T20:40",
  "model": "asystent w sesji czatu",
- "jazd_w_danych": 87,
- "dane_pobrano": "2026-09-05T08:32",
- "odcisk": "0f54d247962449ea",
+ "jazd_w_danych": 88,
+ "dane_pobrano": "2026-09-06T18:01",
+ "odcisk": "2f20775d0e0291a7",
  "bloki": [
   {
    "t": "naglowek",
-   "tekst": "Dzień bez roweru, na którym najciekawsze jest to, jak szybko wróciłeś do siebie"
+   "tekst": "Osiem rekordów i ostrzeżenie, które strona wypisała sama"
   },
   {
    "t": "akapit",
-   "tekst": "Dziś nie jechałeś i nie ma w tym nic złego — wczoraj napisałem, że najlepszą rzeczą na ten weekend jest nic. Ale jedna liczba zmieniła się przez noc tak mocno, że warto się przy niej zatrzymać. Wczoraj zmęczenie stało na 8 z 10 z podpisem „ciało prosi o dzień wolny”. Dziś stoi na 2 z 10, z podpisem „praktycznie wypoczęty, można uderzyć”. Licznik regeneracji doszedł do zera, czyli te 17 godzin zostało odrobione co do godziny."
+   "tekst": "„Z3/4 intervals”: 34,1 km w 82 minutach, tętno średnie 153, RPE 5, 891 kcal. To najdłuższa jazda tego września i najszybsza tego tygodnia — 24,9 km/h średnio. Wjechało z niej 59 przejazdów przez segmenty, osiem rekordów i dwadzieścia miejsc na podium. To bardzo dużo jak na jedną jazdę. Zacznę jednak od czegoś innego, bo zakładka Regeneracja pokazuje dziś stopień 9 z 10 i zdanie „Wolne. Trening tutaj to już nie bodziec, tylko szkoda”."
   },
   {
    "t": "kafelki",
    "pozycje": [
     {
-     "etykieta": "Zmęczenie",
-     "wartosc": "2/10",
-     "stopka": "wczoraj 8/10"
-    },
-    {
-     "etykieta": "Forma",
-     "wartosc": "−7",
-     "stopka": "wczoraj −21"
+     "etykieta": "Rekordy",
+     "wartosc": "8",
+     "stopka": "z 59 przejazdów"
     },
     {
      "etykieta": "Tydzień",
-     "wartosc": "3,1 h",
-     "stopka": "plan 3 h · dowieziony"
+     "wartosc": "4,5 h",
+     "stopka": "plan 3 h · 151%"
     },
     {
-     "etykieta": "Bez jazdy",
-     "wartosc": "1 dzień",
-     "stopka": "limit 14"
+     "etykieta": "Zmęczenie",
+     "wartosc": "9/10",
+     "stopka": "przeciążony"
+    },
+    {
+     "etykieta": "Forma",
+     "wartosc": "−43",
+     "stopka": "111 − 154"
     }
    ]
   },
   {
+   "t": "naglowek",
+   "tekst": "Najpierw ostrzeżenie, bo jest ważniejsze niż rekordy"
+  },
+  {
+   "t": "ostrzezenie",
+   "tekst": "Cztery jazdy w siedem dni, z czego trzy mocne, i wszystkie w ciągu pięciu dni: 2 września sprinty, 4 września interwały z tętnem 197, dziś półtorej godziny w tempie i progu. Napięcie zmęczenie do wytrenowania wynosi 1,39 — najwyższe od lipca. Licznik regeneracji daje 23 godziny za samą tę jazdę i pełną gotowość dopiero jutro wieczorem. Wczoraj napisałem, że najlepszą rzeczą na weekend jest nic; wyszło odwrotnie i to jest w porządku, bo jazda była dobra. Ale poniedziałek i wtorek mają być wolne albo bardzo lekkie. Nie dlatego, że coś się stało — dlatego, że kolejny mocny akcent w tym stanie nie doda już nic, a odejmie."
+  },
+  {
    "t": "akapit",
-   "tekst": "Skąd taki skok. Zmęczenie jest średnią wykładniczą o stałej 7 dni, więc każdy dzień bez obciążenia zabiera mu współczynnik 1 − e^(−1/7) = 0,133, czyli 13,3% stanu. Wytrenowanie ma stałą 42 dni i traci 2,35% dziennie. Jeden dzień przerwy: zmęczenie 126 → 109, wytrenowanie 105 → 102. Forma, czyli różnica, skacze z −21 na −7 po jednym dniu bez roweru. To jest arytmetyka, nie regeneracja — ale akurat tutaj obie mówią to samo, bo licznik godzin też doszedł do zera."
+   "tekst": "Dla równowagi trzy rzeczy, które trzymają to w proporcji. Po pierwsze, forma −43 nie jest żadnym rekordem: najniższa w tym roku to −151 z 16 lipca, czyli trzy i pół raza głębiej. Po drugie, wytrenowanie po raz pierwszy od czerwca rośnie szybko — 98 na koniec sierpnia, dziś 111. Po trzecie, ujemna forma w bloku treningowym jest celem, nie usterką; problemem staje się dopiero wtedy, gdy trwa tygodniami, a wytrenowanie przestaje rosnąć. Trwa pięć dni i rośnie. Czyli: odpocznij dwa dni i wracaj, a nie „przestań”."
   },
   {
    "t": "wykres_forma",
-   "tytul": "Wytrenowanie i zmęczenie — jeden dzień przerwy i forma wraca"
-  },
-  {
-   "t": "akapit",
-   "tekst": "Wniosek na przyszłość, bo to się będzie powtarzać: odczyt „obciążony” po mocnej jeździe nie jest ostrzeżeniem o przetrenowaniu. To normalna reakcja na bodziec i schodzi w jeden, dwa dni. Alarmem byłoby coś innego — zmęczenie utrzymujące się wysoko przez tydzień albo dłużej przy wytrenowaniu stojącym w miejscu. Tego nie masz i nie miałeś ani razu w tym roku."
+   "tytul": "Wytrenowanie i zmęczenie — nożyce z ostatnich pięciu dni"
   },
   {
    "t": "naglowek",
-   "tekst": "Cztery jazdy, RPE 2, 4, 6, 8"
+   "tekst": "Co było w tej jeździe"
   },
   {
    "t": "akapit",
-   "tekst": "Zajrzałem w RPE czterech jazd od powrotu z Francji i wyszedł z tego wzór, który wygląda jak zaplanowany: 30 sierpnia RPE 2, 31 sierpnia RPE 4, 2 września RPE 6, 4 września RPE 8. Równa drabinka co dwa punkty, z dniem przerwy między każdym kolejnym stopniem. Jeśli to był plan — dobry plan, bo tak właśnie wraca się po piętnastu dniach bez roweru: nie od razu na maksa i nie tygodniami na luzie. Jeśli wyszło przypadkiem, warto to zauważyć i powtórzyć."
+   "tekst": "Profil co dwie minuty pokazuje długi, spójny blok pracy, a nie pojedyncze zrywy: od dwunastej do czterdziestej szóstej minuty tętno prawie nie schodzi poniżej 150, trzymając się w paśmie 150–172 przy prędkości 25–32 km/h. Potem kilkanaście minut lżej, jeden akcent w 64. minucie (szczyt 190) i finisz w 82. minucie — 187 uderzeń przy 37 km/h. Nazwa jazdy zgadza się z zapisem, co po „LTHR+ sprints” z 2 września warto odnotować."
   },
   {
    "t": "lista",
    "punkty": [
-    "30.08 · Z2 1 HR — 22,5 km, 61 min, RPE 2, pierwsza jazda z pasem",
-    "31.08 · Morning 90min — 33,6 km, 90 min, RPE 4, dryf 2,1%",
-    "02.09 · Evening LTHR+ sprints — 19,7 km, 55 min, RPE 6, tętno maks. 187",
-    "04.09 · Morning 10min, 4 min + 30s+10s — 19,1 km, 44 min, RPE 8, tętno maks. 197"
+    "45 minut z tętnem co najmniej 150",
+    "26 minut z tętnem co najmniej 160",
+    "6 minut 23 sekundy powyżej 170",
+    "61 sekund powyżej 180, szczyt 190",
+    "Prędkość maksymalna 45,3 km/h"
    ]
   },
   {
    "t": "akapit",
-   "tekst": "Zwróć uwagę na coś, co widać dopiero w tym zestawieniu: im mocniejsza jazda, tym krótsza. 90 minut na RPE 4, 44 minuty na RPE 8. To jest poprawnie zrobione i nie jest oczywiste — najczęstszy błąd przy powrocie do formy polega na tym, że mocny trening jest jednocześnie długi, bo „skoro już jadę”. Tydzień, w którym intensywność rośnie, a czas maleje, jest dokładnie tym, czym ma być."
+   "tekst": "Podaję to w uderzeniach, a nie w strefach, celowo — te liczby są prawdziwe niezależnie od tego, gdzie postawisz granice stref. Sam podział czasu na Z2, Z3 i Z4 zależy od progów, a te wciąż czekają (o czym niżej)."
   },
   {
    "t": "naglowek",
-   "tekst": "Czego w tym tygodniu nie było: długiej jazdy"
+   "tekst": "Osiem rekordów — i ile są warte"
   },
   {
    "t": "akapit",
-   "tekst": "I to jest jedyna rzecz, którą mam do zarzucenia. Plan na wrzesień i październik mówi wprost: niedzielna długa startuje od 50 km i rośnie o 8–10 km co dwa tygodnie, żeby pod koniec października dojść do 80. Najdłuższa jazda tego września to 19,7 km. Dla porównania: w lipcu 64,3 km, w maju 47,1, w czerwcu 46,2, nawet w sierpniu przed wyjazdem 43,3. Wrzesień ma dziś najniższe maksimum miesiąca w całej liczonej historii."
+   "tekst": "Jechałeś dziś inną trasą niż zwykle, przez Saneczkową i Cieciszew, i tam padły wszystkie rekordy. Muszę jednak powiedzieć, ile z nich waży, bo to nie jest jedno i to samo. Sześć z ośmiu padło na segmentach, które masz przejechane dwa albo trzy razy — tam rekord jest łatwy, bo konkurencja to Ty sprzed miesiąca, jadący tamtędy pierwszy raz. Dwa są mocne same z siebie i to na nie warto patrzeć."
   },
   {
-   "t": "wykres_dlugie",
-   "tytul": "Najdłuższa jazda w miesiącu — wrzesień na razie odstaje"
+   "t": "lista",
+   "punkty": [
+    "Lotnisko – Cieciszew – Obory (short) Loop — 7,4 km w 16:22, o 3 minuty 25 sekund lepiej niż poprzednio, średnio 27,2 km/h",
+    "Cieciszew – Obory – Lądowisko — 4,8 km w 10:41, o 1 minutę 46 sekund lepiej, średnio 27,0 km/h",
+    "Uphill Saneczkowa — 306 m w 35 s zamiast 48 s (31,5 km/h)",
+    "Saneczkowa (former) cobblestone climb — 402 m w 45 s zamiast 59 s (32,1 km/h)"
+   ]
   },
   {
    "t": "akapit",
-   "tekst": "Trzy godziny tygodnia dowiozłeś, ale zrobiłeś to trzema krótkimi jazdami. Objętość się zgadza, kształt nie. Jutro jest niedziela, jesteś wypoczęty na 2 z 10, a licznik regeneracji stoi na zerze — trudno o lepszy moment na pierwszą długą. Nie 80 km i nawet nie 64: plan mówi 50 i to jest właściwa liczba na pierwszy raz po przerwie. Przy Twoim tempie z ostatnich jazd to jakieś dwie i pół godziny spokojnie, czyli więcej niż cały ten tydzień razem wzięty. Jeśli to wypadnie, przesuwa też Koszulkę młodzieżową (pierwsza jazda 80 km) z 83% na coś, co da się realnie planować."
+   "tekst": "Najciekawsza liczba dnia nie jest jednak żadnym rekordem. Na „Sprint do Obory” zrobiłeś 63 sekundy — dokładnie tyle samo, co 27 czerwca i 13 sierpnia. Trzy przejazdy, ten sam czas co do sekundy. Formalnie jesteś trzeci, bo przy remisie rekord należy do tego, kto zrobił ten czas pierwszy, ale wyrównałeś swój najlepszy wynik dziesięć dni po powrocie z piętnastodniowej przerwy. To mówi o formie więcej niż sześć rekordów na segmentach z trzema próbami."
+  },
+  {
+   "t": "akapit",
+   "tekst": "Na dwudziestu dziewięciu segmentach, które masz przejechane co najmniej pięć razy, mediana straty do rekordu wynosi dziś 21,5%. Dla porównania: 4 września, w sesji interwałowej, było 9,6%, a 31 sierpnia, na spokojnej jeździe, 69,1%. Wszystkie trzy liczby są zgodne z tym, jak jechałeś — dziś była to praca w tempie, nie polowanie na czasy."
   },
   {
    "t": "naglowek",
-   "tekst": "Progi stref wciąż nie doszły"
+   "tekst": "Tydzień: 151% planu"
+  },
+  {
+   "t": "akapit",
+   "tekst": "Plan na 1–7 września to 3 godziny. Masz 4 godziny 31 minut i jeszcze jeden dzień do końca. To drugi najmocniejszy tydzień w całej liczonej historii — więcej było tylko raz, 5 godzin 17 minut w tygodniu od 10 sierpnia. Cztery jazdy: 90 minut spokojnie, 55 ze sprintami, 44 interwałowe i 82 dzisiaj. Objętość zrobiona z ogromnym zapasem."
+  },
+  {
+   "t": "wykres_tygodnie",
+   "tytul": "Godziny w tygodniach — 4,5 h przy planie 3 h"
+  },
+  {
+   "t": "akapit",
+   "tekst": "I tu jedno „ale”, bo wczoraj pisałem o czymś innym. Sugerowałem na niedzielę długą jazdę, 50 km spokojnie w drugiej strefie — plan wrześniowy przewiduje niedzielną długą i to ona buduje bazę pod cel 80 km na koniec października. Pojechałeś 34,1 km w tempie i progu. To jest lepsze niż nic i jest najdłuższą jazdą września, ale nie zastępuje długiej: 82 minuty w tempie i dwie i pół godziny spokojnie to dwa różne treningi, robiące dwie różne rzeczy. Długa wciąż czeka, a rekord życiowy na dystansie to 64,3 km z 14 lipca — do 80 km jest jeszcze kawałek i nie zrobi się sam."
+  },
+  {
+   "t": "naglowek",
+   "tekst": "Progi stref — teraz to już nie jest drobiazg"
   },
   {
    "t": "ostrzezenie",
-   "tekst": "Piszę to drugi raz, bo bez tego kawałek strony pokazuje liczby, o których już wiemy, że są policzone starą miarą. W dane.js nadal stoi jedna tabela tętna, ta z 27 sierpnia: Z4 od 161, Z5 od 181. Twoja poprawka po teście siedzi w pamięci Safari i nic z niej nie wynika — strona czyta gotowe sekundy z pliku, a nie przelicza ich przy wyświetlaniu. Wejdź w Objętość → Tętno, naciśnij „Progi dla Claude'a…” i wklej mi to, co wypisze. Wtedy wpiszę je do danych i przeliczę wszystkie jazdy od nowa. Do tego czasu pierścienie i efektywność opisują starą tabelę, nie Twój próg."
+   "tekst": "Trzeci raz i ostatni, bo dziś zaczęło to psuć rzeczy poważniejsze niż pierścień. W dane.js nadal jest tylko tabela z 27 sierpnia. Twoja poprawka działa u Ciebie w Safari, ale ja liczę ze starej — więc liczby stref, efektywność, wysiłek jazdy, licznik regeneracji i stopień zmęczenia widzę inne, niż Ty widzisz na iPadzie. Wysiłek jazdy liczy się z czasu w strefach, więc od progów zależy nawet to, ile godzin regeneracji strona Ci przyzna. Naciśnij „Progi dla Claude'a…” w Objętość → Tętno i wklej mi to, co wypisze. Do tego czasu każda moja liczba ze stref jest liczbą ze starej tabeli i tak ją traktuj."
   },
   {
    "t": "akapit",
-   "tekst": "Dlaczego to nie jest drobiazg. Przy starej tabeli jazda z 4 września ma 11 minut 47 sekund w piątej strefie, a 10 minut 55 w czwartej. Dwanaście minut w Z5 na czterdziestoczterominutowej jeździe to za dużo, żeby było prawdą — piąta strefa to wysiłek, którego nie utrzymuje się tak długo. Podejrzewam, że po Twojej poprawce spora część tego czasu przeniesie się do Z4, a ocena efektywności też się zmieni. Ale to jest podejrzenie, a nie liczba, i takim zostanie, dopóki progi nie trafią do pliku."
+   "tekst": "Pokażę, jak bardzo to zmienia obraz. Starą tabelą tydzień wygląda tak: 39,2% w Z2, 42,1% w Z3, 13,5% w Z4, 5,0% w Z5, a efektywność spada do 21% z komentarzem „to nie jest trening spolaryzowany”. Gdyby to była prawda, byłby to najpoważniejszy zarzut tego tygodnia — 42% czasu w tempie to klasyczna szara strefa, za mocna na bazę i za słaba na rozwój. Ale jeśli Twoje progi są wyższe, spora część tego czasu jest po prostu drugą strefą i cały zarzut znika. Nie wiem, która wersja jest prawdziwa, i dlatego nie stawiam tu tezy — stawiam prośbę o osiem liczb."
   },
   {
    "t": "wykres_strefy",
    "miara": "tetno",
-   "dni": 30,
-   "tytul": "Strefy tętna, 30 dni — nadal STARĄ tabelą"
-  },
-  {
-   "t": "akapit",
-   "tekst": "Jedna uwaga do tego pierścienia: okno 30-dniowe pokazuje dziś dokładnie to samo co 7-dniowe, bo cały zapis tętna, jaki masz, pochodzi z ostatnich siedmiu dni. To nie jest błąd wykresu — po prostu pas dostałeś 30 sierpnia. Za trzy tygodnie te dwa okna zaczną mówić różne rzeczy i wtedy trzydziestka stanie się użyteczna."
+   "dni": 7,
+   "tytul": "Strefy tętna, 7 dni — u mnie STARĄ tabelą, u Ciebie Twoją"
   },
   {
    "t": "naglowek",
-   "tekst": "Co dalej"
+   "tekst": "Na najbliższe dni"
   },
   {
    "t": "lista",
    "punkty": [
-    "Jutro (niedziela) — długa jazda, cel 50 km, spokojnie w Z2. Jesteś wypoczęty, a wrzesień nie ma jeszcze ani jednej długiej.",
-    "Poniedziałek — koniec pierwszego tygodnia planu. 3,1 h z 3 h już jest, więc długa jazda to czysty zysk.",
-    "Wtorek — start drugiego tygodnia: 4 godziny. To o godzinę więcej niż w tym tygodniu i najwięcej od 10 sierpnia.",
-    "Kiedykolwiek — wklej progi stref, żeby pierścienie zaczęły mówić prawdę.",
-    "Żółta koszulka: dzień 5 ze 115, przerwa 1 dzień. Nic do pilnowania poza tym, żeby z jednego dnia nie zrobił się tydzień."
+    "Poniedziałek i wtorek — wolne albo bardzo lekko. Pełna gotowość wypada jutro o 18:26, a stopień 9 z 10 to nie jest odczyt do zignorowania.",
+    "Wtorek zaczyna drugi tydzień planu: 4 godziny. Po tym tygodniu wiesz już, że dowieziesz — pytanie brzmi, jak.",
+    "W tym tygodniu jedna długa, spokojna jazda: 50 km, druga strefa, bez ani jednego akcentu. To jedyna rzecz, której we wrześniu jeszcze nie było.",
+    "Progi stref do wklejenia — bez nich połowa liczb na tej stronie znaczy dla mnie co innego niż dla Ciebie.",
+    "Żółta koszulka: dzień 6 ze 115, przerwa 0 dni. Tu wszystko w porządku."
    ]
   },
   {
    "t": "akapit",
-   "tekst": "Podsumowując tydzień, bo to był pierwszy pełny tydzień po przerwie: plan objętości dowieziony w piątek, cztery jazdy o czterech różnych zadaniach, tętno maksymalne podniesione z 170 na 197, HRmax 201 praktycznie potwierdzone, szesnaście podiów na dwadzieścia pięć segmentów w sesji interwałowej i Koszulka sprinterska na dziesięć sekund. Jak na dziesięć dni od powrotu z Francji, gdzie nie było roweru przez piętnaście dni, to jest dobry tydzień. Brakuje w nim jednej rzeczy i wiesz już której."
+   "tekst": "Podsumowując pierwszy pełny tydzień po przerwie: plan przekroczony o połowę, cztery jazdy o czterech różnych zadaniach, tętno maksymalne podniesione ze 170 na 197, osiem rekordów, wyrównany najlepszy czas na „Sprint do Obory” i wytrenowanie z 98 na 111. To jest bardzo dobry tydzień i nie ma sensu udawać, że jest inaczej. Dwie rzeczy do poprawienia są za to konkretne i obie łatwe: brakuje długiej jazdy, a strona nie zna Twoich progów. Żadna z nich nie wymaga większego wysiłku — jedna wymaga dwóch i pół godziny w drugiej strefie, druga jednego dotknięcia ekranu."
   }
  ]
 };
