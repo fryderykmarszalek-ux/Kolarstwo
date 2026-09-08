@@ -1029,6 +1029,15 @@ z tego dnia, więc automat uzna dane za niezmienione i zostawi ten tekst
 w spokoju aż do pierwszej nowej jazdy. Pole `model` mówi wprost „asystent
 w sesji czatu” — plik nie ma udawać, że napisał go automat.
 
+**Briefing liczy formę TĄ SAMĄ miarą co strona** (poprawka z 08.09.2026).
+Do tego dnia `briefing()` brał obciążenie jako `minuty × RPE`, choć strona od
+30.08 używa `wysilekJazdy()` — wysiłek z czasu w strefach tętna, gdy pas był
+założony. Wyszło to na dwugodzinnej jeździe w Z2 z 8.09: RPE 6, a z tętna 3,8,
+więc briefing pokazywał modelowi formę **−90**, podczas gdy Fryderyk widział
+na stronie **−61**. Analiza opisywałaby inne dane niż te, na które patrzy
+czytelnik. Po poprawce obie liczby to −61. **Zmieniając definicję wysiłku na
+stronie, zmienić ją też w briefingu.**
+
 `briefing()` i `odciskDanych()` są eksportowane z `.github/skrypty/analiza.js`
 (`module.exports` + `if (require.main !== module) return;`), żeby dało się
 policzyć **dokładnie ten sam** skrót bez drugiej kopii logiki. Dwie kopie

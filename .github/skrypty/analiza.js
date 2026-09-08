@@ -151,15 +151,34 @@ function briefing(D){
           uwaga: "brak pomiarów — nie ma czego liczyć" };
   }
 
-  // krzywa formy: obciążenie = minuty × RPE, dwie średnie wykładnicze
+  /* Krzywa formy: obciążenie = minuty × WYSIŁEK, dwie średnie wykładnicze.
+     Wysiłek bierzemy z czasu w strefach tętna, gdy pas był założony, a z RPE
+     dopiero wtedy, gdy tętna nie ma — DOKŁADNIE tak, jak liczy to strona
+     w wysilekJazdy(). To nie jest ozdoba: 8.09.2026 dwugodzinna jazda w Z2
+     dostała RPE 6, a z tętna wyszło 3,8, więc briefing pokazywał modelowi
+     formę −90, podczas gdy Fryderyk widział na stronie −61. Dwie definicje
+     wysiłku na jeden projekt to gwarancja, że analiza opisze inne dane niż te,
+     na które patrzy czytelnik. */
   const K = D.stan_wytrenowania || {};
+  const WAGI = ((D.regeneracja || {}).rpe_ze_stref || {}).wagi || null;
+  const ROZKLADY = ((D.strefy || {}).rozklady || {}).jazdy || {};
+  const wysilekJazdy = (a) => {
+    const sek = (ROZKLADY[a.id] || {}).tetno;
+    if (WAGI && Array.isArray(sek) && sek.length === WAGI.length){
+      const suma = sek.reduce((x,y) => x + (y||0), 0);
+      if (suma > 0) return sek.reduce((x,y,i) => x + (y||0) * WAGI[i], 0) / suma;
+    }
+    return a.rpe != null ? a.rpe : null;
+  };
   let forma = null;
   if (K.od_daty){
     const dzien = (t) => t.slice(0,10);
     const obc = new Map();
-    for (const a of jazdy)
-      if (a.rpe != null && dzien(a.data) >= K.od_daty)
-        obc.set(dzien(a.data), (obc.get(dzien(a.data)) || 0) + (a.czas_ruchu_s/60)*a.rpe);
+    for (const a of jazdy){
+      const w = wysilekJazdy(a);
+      if (w != null && dzien(a.data) >= K.od_daty)
+        obc.set(dzien(a.data), (obc.get(dzien(a.data)) || 0) + (a.czas_ruchu_s/60)*w);
+    }
     const kC = 1 - Math.exp(-1/K.ctl_dni), kA = 1 - Math.exp(-1/K.atl_dni);
     let ctl = 0, atl = 0, szczyt = 0, szczytData = null;
     const start = Date.parse(K.od_daty + "T12:00:00Z");
@@ -172,7 +191,8 @@ function briefing(D){
     }
     forma = { wytrenowanie: Math.round(ctl), zmeczenie: Math.round(atl),
       forma: Math.round(ctl - atl), szczyt: Math.round(szczyt), szczyt_data: szczytData,
-      metoda: "minuty ruchu × RPE, średnie wykładnicze " + K.ctl_dni + "/" + K.atl_dni + " dni" };
+      metoda: "minuty ruchu × wysiłek (z tętna, gdy jest; inaczej z RPE), "
+        + "średnie wykładnicze " + K.ctl_dni + "/" + K.atl_dni + " dni" };
   }
 
   // koszulki: co blisko, co zdobyte
