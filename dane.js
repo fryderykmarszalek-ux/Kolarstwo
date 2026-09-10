@@ -5,7 +5,7 @@
 
 window.DANE = {
 
-meta: {"pobrano":"2026-09-10T17:52","zrodlo":"Strava API (GitHub Actions): /athlete/activities + /activities/{id}","athlete_id":143761800,"liczba_aktywnosci":107,"zakres":["2024-07-31","2026-09-10"],"liczone_od":"2025-08-31","liczone_od_powod":"Decyzja Fryderyka z 19.08.2026: wcześniejsze daty nieistotne. Historia zostaje w pliku w całości — po prostu nie jest liczona. Zmiana tej jednej daty przywraca wszystko.","linia_podzialu":"2026-08-19","linia_podzialu_opis":"Przed tą datą jazdy mają tylko to, co daje Strava — bez wiatru, składu grupy i tętna. Nie uzupełniać wstecz.","typy_kolarskie":["Ride","VirtualRide"],"typy_kolarskie_opis":"Tylko te przerywają przerwę. E-bike, spacery, treki i biegi — nie.","pola_pominiete":["pr_count","achievement_count","kudos_count"],"pola_pominiete_powod":"Zmienne w czasie — stan na moment pobrania, nie fakt historyczny (13.08: 60 -> 59 w kilkanaście minut). Zapisać dopiero z datą pobrania obok.","segmenty_od":"2025-08-01","liczba_segmentow":384,"liczba_prob":2032,"jazd_z_moca":17,"jazd_z_rozkladem":24,"jazd_z_trasa":90,"jazd_z_przebiegiem":90},
+meta: {"pobrano":"2026-09-10T20:45","zrodlo":"Strava API (GitHub Actions): /athlete/activities + /activities/{id}","athlete_id":143761800,"liczba_aktywnosci":107,"zakres":["2024-07-31","2026-09-10"],"liczone_od":"2025-08-31","liczone_od_powod":"Decyzja Fryderyka z 19.08.2026: wcześniejsze daty nieistotne. Historia zostaje w pliku w całości — po prostu nie jest liczona. Zmiana tej jednej daty przywraca wszystko.","linia_podzialu":"2026-08-19","linia_podzialu_opis":"Przed tą datą jazdy mają tylko to, co daje Strava — bez wiatru, składu grupy i tętna. Nie uzupełniać wstecz.","typy_kolarskie":["Ride","VirtualRide"],"typy_kolarskie_opis":"Tylko te przerywają przerwę. E-bike, spacery, treki i biegi — nie.","pola_pominiete":["pr_count","achievement_count","kudos_count"],"pola_pominiete_powod":"Zmienne w czasie — stan na moment pobrania, nie fakt historyczny (13.08: 60 -> 59 w kilkanaście minut). Zapisać dopiero z datą pobrania obok.","segmenty_od":"2025-08-01","liczba_segmentow":384,"liczba_prob":2032,"jazd_z_moca":17,"jazd_z_rozkladem":24,"jazd_z_trasa":90,"jazd_z_przebiegiem":90},
 
 zalozenia: {
   "_opis": "Wariant B: tu i tylko tu żyją stałe modelu. Nigdy nie wpisywać ich w kod wykresu. Zmiana jednej liczby przelicza całą historię.",
@@ -3830,7 +3830,7 @@ aktywnosci: [
   {"id":"20029911411","data":"2026-09-04T08:44:19","typ":"Ride","dystans_m":19136.6,"czas_ruchu_s":2658,"czas_calkowity_s":2681,"przewyzszenie_m":35,"nazwa":"Morning 10min,4 min + 30s+10s","ma_tetno":1,"tetno_sr":165,"kalorie":577,"rpe":8},
   {"id":"20064645010","data":"2026-09-06T17:48:46","typ":"Ride","dystans_m":34145.2,"czas_ruchu_s":4943,"czas_calkowity_s":4943,"przewyzszenie_m":74,"nazwa":"Z3/4 intervals","ma_tetno":1,"tetno_sr":153,"kalorie":891,"rpe":5},
   {"id":"20088445195","data":"2026-09-08T13:45:09","typ":"Ride","dystans_m":47288.6,"czas_ruchu_s":7523,"czas_calkowity_s":7627,"przewyzszenie_m":119,"nazwa":"2hr Z2 afternoon ride","ma_tetno":1,"tetno_sr":134,"kalorie":904,"rpe":6},
-  {"id":"20119310922","data":"2026-09-10T17:33:52","typ":"Ride","dystans_m":29435.2,"czas_ruchu_s":3982,"czas_calkowity_s":5006,"przewyzszenie_m":134,"nazwa":"duo afternoon ride","ma_tetno":1,"tetno_sr":156,"rpe":7,"kalorie":776},
+  {"id":"20119310922","data":"2026-09-10T17:33:52","typ":"Ride","dystans_m":29435.2,"czas_ruchu_s":3982,"czas_calkowity_s":5006,"przewyzszenie_m":134,"nazwa":"duo afternoon ride","ma_tetno":1,"tetno_sr":156,"kalorie":776,"rpe":7},
 ]
 
 };
