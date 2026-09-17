@@ -5,7 +5,7 @@
 
 window.DANE = {
 
-meta: {"pobrano":"2026-09-17T05:46","zrodlo":"Strava API (GitHub Actions): /athlete/activities + /activities/{id}","athlete_id":143761800,"liczba_aktywnosci":108,"zakres":["2024-07-31","2026-09-12"],"liczone_od":"2025-08-31","liczone_od_powod":"Decyzja Fryderyka z 19.08.2026: wcześniejsze daty nieistotne. Historia zostaje w pliku w całości — po prostu nie jest liczona. Zmiana tej jednej daty przywraca wszystko.","linia_podzialu":"2026-08-19","linia_podzialu_opis":"Przed tą datą jazdy mają tylko to, co daje Strava — bez wiatru, składu grupy i tętna. Nie uzupełniać wstecz.","typy_kolarskie":["Ride","VirtualRide"],"typy_kolarskie_opis":"Tylko te przerywają przerwę. E-bike, spacery, treki i biegi — nie.","pola_pominiete":["pr_count","achievement_count","kudos_count"],"pola_pominiete_powod":"Zmienne w czasie — stan na moment pobrania, nie fakt historyczny (13.08: 60 -> 59 w kilkanaście minut). Zapisać dopiero z datą pobrania obok.","segmenty_od":"2025-08-01","liczba_segmentow":384,"liczba_prob":2070,"jazd_z_moca":17,"jazd_z_rozkladem":25,"jazd_z_trasa":91,"jazd_z_przebiegiem":91},
+meta: {"pobrano":"2026-09-17T17:49","zrodlo":"Strava API (GitHub Actions): /athlete/activities + /activities/{id}","athlete_id":143761800,"liczba_aktywnosci":109,"zakres":["2024-07-31","2026-09-17"],"liczone_od":"2025-08-31","liczone_od_powod":"Decyzja Fryderyka z 19.08.2026: wcześniejsze daty nieistotne. Historia zostaje w pliku w całości — po prostu nie jest liczona. Zmiana tej jednej daty przywraca wszystko.","linia_podzialu":"2026-08-19","linia_podzialu_opis":"Przed tą datą jazdy mają tylko to, co daje Strava — bez wiatru, składu grupy i tętna. Nie uzupełniać wstecz.","typy_kolarskie":["Ride","VirtualRide"],"typy_kolarskie_opis":"Tylko te przerywają przerwę. E-bike, spacery, treki i biegi — nie.","pola_pominiete":["pr_count","achievement_count","kudos_count"],"pola_pominiete_powod":"Zmienne w czasie — stan na moment pobrania, nie fakt historyczny (13.08: 60 -> 59 w kilkanaście minut). Zapisać dopiero z datą pobrania obok.","segmenty_od":"2025-08-01","liczba_segmentow":384,"liczba_prob":2075,"jazd_z_moca":18,"jazd_z_rozkladem":26,"jazd_z_trasa":92,"jazd_z_przebiegiem":92},
 
 zalozenia: {
   "_opis": "Wariant B: tu i tylko tu żyją stałe modelu. Nigdy nie wpisywać ich w kod wykresu. Zmiana jednej liczby przelicza całą historię.",
@@ -1078,6 +1078,26 @@ strefy: {
         "moc": null,
         "tabela_tetno": "2026-08-27",
         "tabela_moc": null
+      },
+      "20215674019": {
+        "tetno": [
+          39,
+          553,
+          497,
+          725,
+          897
+        ],
+        "moc": [
+          1039,
+          146,
+          145,
+          226,
+          570,
+          401,
+          184
+        ],
+        "tabela_tetno": "2026-08-27",
+        "tabela_moc": "2026-08-27"
       }
     }
   },
@@ -2550,9 +2570,13 @@ proby: [
   {"od":1480,"do":2456,"id":"3415815062438212000","s":"24674235","a":"16215300750","czas_s":976,"moc_S":100.1,"z_miernika":1,"tetno":null},
   {"od":158,"do":3453,"id":"3428504003350464500","s":"24685955","a":"16566037541","czas_s":3295,"moc_S":102.4,"z_miernika":1,"tetno":null},
   {"od":28,"do":158,"id":"3428504003352511500","s":"24700908","a":"16566037541","czas_s":130,"moc_S":69,"z_miernika":1,"tetno":null},
+  {"od":31,"do":171,"id":"3535699986352120000","s":"24700908","a":"20215674019","czas_s":140,"moc_S":62.5,"z_miernika":1,"tetno":127},
   {"od":2460,"do":2501,"id":"3428504003354876000","s":"24700963","a":"16566037541","czas_s":41,"moc_S":109.5,"z_miernika":1,"tetno":null},
+  {"od":2178,"do":2213,"id":"3535699986353887000","s":"24700963","a":"20215674019","czas_s":35,"moc_S":186.1,"z_miernika":1,"tetno":185},
   {"od":1865,"do":1963,"id":"3428504003352404000","s":"24701010","a":"16566037541","czas_s":98,"moc_S":109.6,"z_miernika":1,"tetno":null},
+  {"od":1705,"do":1773,"id":"3535699986354132000","s":"24701010","a":"20215674019","czas_s":68,"moc_S":180.2,"z_miernika":1,"tetno":183},
   {"od":1578,"do":1628,"id":"3428504003353676000","s":"24710570","a":"16566037541","czas_s":50,"moc_S":79.5,"z_miernika":1,"tetno":null},
+  {"od":1493,"do":1530,"id":"3535699986352858000","s":"24710570","a":"20215674019","czas_s":37,"moc_S":178.4,"z_miernika":1,"tetno":179},
   {"od":2496,"do":2681,"id":"3514961047372620000","s":"24953437","a":"19415496764","czas_s":185,"moc_S":null,"z_miernika":0,"tetno":null},
   {"od":428,"do":496,"id":"3397259430432157700","s":"25021870","a":"15650458577","czas_s":69,"moc_S":null,"z_miernika":0,"tetno":null},
   {"od":472,"do":530,"id":"3397616292720399000","s":"25021870","a":"15659929857","czas_s":58,"moc_S":null,"z_miernika":0,"tetno":null},
@@ -3106,6 +3130,7 @@ proby: [
   {"od":2687,"do":2728,"id":"3415815062438638000","s":"38169117","a":"16215300750","czas_s":41,"moc_S":107.4,"z_miernika":1,"tetno":null},
   {"od":129,"do":158,"id":"3428504003355016000","s":"38169137","a":"16566037541","czas_s":29,"moc_S":74.6,"z_miernika":1,"tetno":null},
   {"od":3426,"do":3453,"id":"3428504003349123000","s":"38169137","a":"16566037541","czas_s":27,"moc_S":79.6,"z_miernika":1,"tetno":null},
+  {"od":141,"do":171,"id":"3535699986353166300","s":"38169137","a":"20215674019","czas_s":30,"moc_S":73.7,"z_miernika":1,"tetno":129},
   {"od":494,"do":522,"id":"3425257636531858000","s":"38170232","a":"16479980049","czas_s":28,"moc_S":110,"z_miernika":1,"tetno":null},
   {"od":1195,"do":1222,"id":"3425257636532096500","s":"38170232","a":"16479980049","czas_s":27,"moc_S":110,"z_miernika":1,"tetno":null},
   {"od":1878,"do":1905,"id":"3425257636530113000","s":"38170232","a":"16479980049","czas_s":27,"moc_S":109.6,"z_miernika":1,"tetno":null},
@@ -3748,7 +3773,7 @@ proby: [
   {"od":2182,"do":2284,"id":"3533175688004559400","s":"9926797","a":"20119310922","czas_s":102,"moc_S":null,"z_miernika":0,"tetno":169},
 ],
 
-segmenty_pobrane: ["15650458577","15659929857","15718034220","15820597167","15875808667","15954703695","16130454908","16152610580","16182099651","16183714130","16194964157","16215300750","16225978401","16266432121","16286281071","16296395304","16306020934","16325922529","16336493568","16377663365","16479980049","16547212377","16566037541","17707959140","17708859621","18296163995","18328405840","18346607726","18360199343","18438077208","18454701002","18492969096","18530281768","18554597453","18619303262","18635140776","18692876636","18718998937","18729555478","18841404334","18945539070","18971344203","19000739541","19014149953","19033109585","19089641123","19179947367","19180109565","19201212771","19247803670","19415453209","19415474905","19415496764","19415517403","19415553503","19447815706","19728167402","19728195586","19728218329","19742428076","19756483940","19962190482","19972642177","20008658665","20029911411","20064645010","20088445195","20119310922","20146204393"],
+segmenty_pobrane: ["15650458577","15659929857","15718034220","15820597167","15875808667","15954703695","16130454908","16152610580","16182099651","16183714130","16194964157","16215300750","16225978401","16266432121","16286281071","16296395304","16306020934","16325922529","16336493568","16377663365","16479980049","16547212377","16566037541","17707959140","17708859621","18296163995","18328405840","18346607726","18360199343","18438077208","18454701002","18492969096","18530281768","18554597453","18619303262","18635140776","18692876636","18718998937","18729555478","18841404334","18945539070","18971344203","19000739541","19014149953","19033109585","19089641123","19179947367","19180109565","19201212771","19247803670","19415453209","19415474905","19415496764","19415517403","19415553503","19447815706","19728167402","19728195586","19728218329","19742428076","19756483940","19962190482","19972642177","20008658665","20029911411","20064645010","20088445195","20119310922","20146204393","20215674019"],
 
 moc_krzywe: [
   {"a":"16130454908","w":{"1":111,"3":111,"5":111,"10":110,"15":110,"30":110,"40":110,"60":110,"120":110,"300":109,"480":104,"600":102,"900":100,"1200":99,"1800":99,"2700":93}},
@@ -3768,9 +3793,10 @@ moc_krzywe: [
   {"a":"16479980049","w":{"1":206,"3":179,"5":135,"10":112,"15":111,"30":111,"40":111,"60":110,"120":110,"300":110,"480":110,"600":108,"900":107,"1200":106,"1800":106,"2700":104,"3600":101}},
   {"a":"16547212377","w":{"1":172,"3":157,"5":155,"10":152,"15":151,"30":149,"40":140,"60":135,"120":135,"300":135,"480":122,"600":124,"900":121,"1200":122,"1800":119,"2700":116,"3600":107}},
   {"a":"16566037541","w":{"1":119,"3":116,"5":114,"10":113,"15":112,"30":110,"40":110,"60":110,"120":110,"300":110,"480":110,"600":108,"900":106,"1200":105,"1800":105,"2700":104,"3600":104}},
+  {"a":"20215674019","w":{"1":461,"3":427,"5":381,"10":342,"15":312,"30":273,"40":278,"60":263,"120":228,"300":202,"480":193,"600":190,"900":185,"1200":183,"1800":160,"2700":134}},
 ],
 
-moc_pobrana: ["16130454908","16152610580","16182099651","16183714130","16194964157","16215300750","16225978401","16266432121","16286281071","16296395304","16306020934","16325922529","16336493568","16377663365","16479980049","16547212377","16566037541"],
+moc_pobrana: ["16130454908","16152610580","16182099651","16183714130","16194964157","16215300750","16225978401","16266432121","16286281071","16296395304","16306020934","16325922529","16336493568","16377663365","16479980049","16547212377","16566037541","20215674019"],
 
 // czas_ruchu_s — czas w ruchu. Zgodnie z regułą: wszystkie średnie zawsze z czasu w ruchu.
 aktywnosci: [
@@ -3882,6 +3908,7 @@ aktywnosci: [
   {"id":"20088445195","data":"2026-09-08T13:45:09","typ":"Ride","dystans_m":47288.6,"czas_ruchu_s":7523,"czas_calkowity_s":7627,"przewyzszenie_m":119,"nazwa":"2hr Z2 afternoon ride","ma_tetno":1,"tetno_sr":134,"kalorie":904,"rpe":6},
   {"id":"20119310922","data":"2026-09-10T17:33:52","typ":"Ride","dystans_m":29435.2,"czas_ruchu_s":3982,"czas_calkowity_s":5006,"przewyzszenie_m":134,"nazwa":"duo afternoon ride","ma_tetno":1,"tetno_sr":156,"kalorie":776,"rpe":7},
   {"id":"20146204393","data":"2026-09-12T16:26:34","typ":"Ride","dystans_m":26815.4,"czas_ruchu_s":3989,"czas_calkowity_s":4086,"przewyzszenie_m":62,"nazwa":"Afternoon Ride 170hr intervals/Z2","ma_tetno":1,"tetno_sr":149,"kalorie":658,"rpe":7,"opis":"Maciek Mar"},
+  {"id":"20215674019","data":"2026-09-17T17:23:22","typ":"VirtualRide","dystans_m":21888.4,"czas_ruchu_s":2710,"czas_calkowity_s":2710,"przewyzszenie_m":103,"nazwa":"Zwift - FTP Test [Standard]","ma_tetno":1,"tetno_sr":163,"moc_sr":134,"z_miernika":1,"rpe":9,"kalorie":345,"opis":"🗺️ R.G.V. in France\r\n⚡️ New 30sec power best (90day)\r\n⚡️ New 1min power best (90day)\r\n⚡️ New 2min power best (90day)\r\n⚡️ New 5min power best (90day)\r\n⚡️ New 10min power best (90day)\r\n⚡️ New 20min power best (90day)"},
 ]
 
 };
