@@ -1279,10 +1279,26 @@ const jazdy = D.aktywnosci.filter(a =>
 
 const dniZJazda = [...new Set(jazdy.map(a => a.data.slice(0,10)))].sort();
 
+/* PRZERWA TO DNI BEZ ROWERU, NIE ODSTĘP MIĘDZY DATAMI — poprawka z 17.09.2026,
+   zgłoszona przez Fryderyka: „nawet jak jadę dzień po dniu, to pokazuje dzień
+   przerwy, choć tak nie jest".
+
+   Miał rację i to nie była drobnostka: jazda 12.09 i 13.09 dawała słupek
+   „1 dzień przerwy", choć ani jednego dnia bez roweru między nimi nie było.
+   W jego danych takich słupków jest szesnaście. Teraz `dni` liczy DNI PUSTE:
+   różnica dat minus jeden, czyli 12→13 daje zero.
+
+   PRÓG ZOSTAŁ PRZESUNIĘTY O JEDEN, ŻEBY WERDYKT SIĘ NIE RUSZYŁ. Stara reguła
+   brzmiała `odstęp > 14`, czyli odstęp co najmniej 15, czyli 14 dni pustych
+   i więcej. To samo mówi teraz `dni >= PROG`. Liczba złamań kryterium sezonu
+   jest po tej zmianie identyczna — sprawdzone na komplecie 64 przerw.
+   Gdyby kiedyś zmieniać SAMĄ regułę (np. na „dopiero 15 dni pustych łamie"),
+   to jest decyzja Fryderyka o kryterium, a nie poprawka wyświetlania, i trzeba
+   ją zrobić świadomie: dwie przerwy z 2026 roku leżą dokładnie na tej granicy. */
 const przerwy = [];
 for (let i = 1; i < dniZJazda.length; i++){
   przerwy.push({
-    dni: roznicaDni(naDzien(dniZJazda[i-1]), naDzien(dniZJazda[i])),
+    dni: roznicaDni(naDzien(dniZJazda[i-1]), naDzien(dniZJazda[i])) - 1,
     od: dniZJazda[i-1],
     do: dniZJazda[i]
   });
@@ -1292,6 +1308,9 @@ const DZIS = dzienNaTekst(naDzien(D.meta.pobrano));
 const ostatniDzien = dniZJazda[dniZJazda.length-1];
 const przerwaTrwa = roznicaDni(naDzien(ostatniDzien), naDzien(DZIS));
 const PROG = D.kryterium_przerwy.prog_dni;
+// Złamanie w miarach „dni bez roweru": tyle dni pustych albo więcej. Patrz
+// komentarz przy `przerwy` — to jest dokładny odpowiednik dawnego `odstęp > PROG`.
+const ZLAMANIE = (p) => p.dni >= PROG;
 const WARIANT = D.kryterium_przerwy.wybor;
 /* WYJAZD KOŃCZY SIĘ W DNIU, W KTÓRYM ZNÓW WSIADŁEŚ NA ROWER — niezależnie od
    tego, co mówi zadeklarowana data końca. Wpis „bez dostępu do roweru" nie może
@@ -1327,14 +1346,22 @@ function wyjazdDla(od, doo){
 }
 przerwy.forEach(p => { p.wyjazd = wyjazdDla(p.od, p.do); });
 const przerwyLiczone = przerwy.filter(p => !p.wyjazd);
-const zlamania = przerwyLiczone.filter(p => p.dni > PROG);
+const zlamania = przerwyLiczone.filter(ZLAMANIE);
 
-// Dzień złamania to nie początek i nie koniec przerwy, tylko moment, w którym
-// przerwa przekroczyła próg: ostatnia jazda + PROG + 1 dzień.
+/* Dzień złamania to nie początek i nie koniec przerwy, tylko moment, w którym
+   przerwa dobiła do progu. W mierze „dni bez roweru" PROG-ty pusty dzień wypada
+   PROG dni po ostatniej jeździe — stąd bez „+1", które stało tu, gdy `dni`
+   liczyło odstęp między datami.
+
+   TA DATA PRZESUWA SIĘ O JEDEN DZIEŃ W TYŁ i tak ma być. Przerwa 28.07 → 12.08
+   pokazywała dawniej 12.08, czyli DZIEŃ, W KTÓRYM FRYDERYK ZNÓW JECHAŁ — a to
+   jest dzień, w którym przerwa się skończyła, nie zaczęła łamać regułę.
+   Czternastym pustym dniem jest 11.08 i to jest prawidłowa odpowiedź.
+   Liczba złamań się nie zmienia, tylko data ostatniego jest teraz poprawna. */
 const ostatnieZlamanie = (() => {
   if (!zlamania.length) return null;
   const p = zlamania[zlamania.length-1];
-  const dzien = dzienNaTekst(naDzien(p.od) + (PROG+1)*86400000);
+  const dzien = dzienNaTekst(naDzien(p.od) + PROG*86400000);
   return { dzien, przerwa: p, temu: roznicaDni(naDzien(dzien), naDzien(DZIS)) };
 })();
 const najdluzsza = przerwy.reduce((a,b) => b.dni > a.dni ? b : a);
@@ -1442,9 +1469,9 @@ function wykresPrzerw(){
     const h = Math.max(skala(p.dni), 1.5);
     const y = marGora + wys - h;
     const kolor = p.wyjazd ? "var(--slaby)"
-                : p.dni > PROG ? "var(--alarm)" : "var(--akcent)";
+                : ZLAMANIE(p) ? "var(--alarm)" : "var(--akcent)";
     s += `<rect x="${x}" y="${y}" width="${szerSlupka}" height="${h}"
-           fill="${kolor}" opacity="${p.dni > PROG ? 1 : .55}"
+           fill="${kolor}" opacity="${ZLAMANIE(p) ? 1 : .55}"
            data-i="${i}" class="slupek" rx="1.5"
            style="animation-delay:${Math.min(i*7,600)}ms"/>`;
     if (p.dni > SUFIT){
@@ -1883,10 +1910,14 @@ const c2Przerwy = () => `
   <section>
     <h2>C2 · Przerwy między jazdami</h2>
     <p class="opis">
-      Jeden słupek = jedna przerwa, od ${pl(OD)}. Liczone tylko między jazdami
-      typu <code>Ride</code> i <code>VirtualRide</code> — spacery, treki, biegi
-      i e-bike przerwy nie przerywają. Oś ucięta na 60 dniach; słupek z ząbkiem
-      jest dłuższy, liczba nad nim podaje ile naprawdę.
+      Jeden słupek = jedna przerwa, od ${pl(OD)}. Wysokość to <b>dni bez
+      roweru</b> między dwiema jazdami, a nie odstęp między datami: jazda
+      w poniedziałek i we wtorek daje zero, a nie jeden. Liczone tylko między
+      jazdami typu <code>Ride</code> i <code>VirtualRide</code> — spacery,
+      treki, biegi i e-bike przerwy nie przerywają. Oś ucięta na 60 dniach;
+      słupek z ząbkiem jest dłuższy, liczba nad nim podaje ile naprawdę.
+      Czerwona linia to próg ${PROG} dni: tyle dni pustych albo więcej łamie
+      kryterium sezonu.
     </p>
     ${wykresPrzerw()}
     <div class="info" id="info-przerwa">Dotknij słupka, żeby zobaczyć daty.</div>
@@ -1896,7 +1927,9 @@ const kryterium = () => `
   <section>
     <h2>Kryterium sezonu</h2>
     <p class="opis">
-      Żadna przerwa nie przekracza dwóch tygodni. Liczone od ${pl(OD)}.
+      Żadna przerwa nie sięga ${PROG} dni bez roweru. Liczone od ${pl(OD)}
+      i mierzone dniami pustymi: jazda w poniedziałek i we wtorek to zero dni
+      przerwy, a nie jeden.
       ${WARIANT === "B" ? `<br>Wariant B: ${D.kryterium_przerwy.zasada_B}` : ""}
     </p>
     <div class="kafelki">
@@ -1908,14 +1941,14 @@ const kryterium = () => `
       <div class="kafel uwaga">
         <div class="etykieta">Najdłuższa</div>
         <div class="liczba">${najdluzsza.dni}</div>
-        <div class="stopka">dni · ${pl(najdluzsza.od)} → ${pl(najdluzsza.do)}</div>
+        <div class="stopka">dni bez roweru · ${pl(najdluzsza.od)} → ${pl(najdluzsza.do)}</div>
       </div>
       <div class="kafel">
         <div class="etykieta">Ostatnie złamanie</div>
         <div class="liczba data">${ostatnieZlamanie
           ? pl(ostatnieZlamanie.dzien) : "—"}</div>
         <div class="stopka">${ostatnieZlamanie
-          ? `${ostatnieZlamanie.temu} dni temu · przerwa ${ostatnieZlamanie.przerwa.dni} dni`
+          ? `${ostatnieZlamanie.temu} dni temu · ${ostatnieZlamanie.przerwa.dni} dni bez roweru`
           : "kryterium nigdy nie złamane"}</div>
       </div>
     </div>
@@ -7635,11 +7668,16 @@ function podepnijSlupki(){
   document.querySelectorAll(".slupek").forEach(el => {
     const pokazInfo = () => {
       const p = przerwy[+el.dataset.i];
-      info.innerHTML = `<b>${p.dni} ${p.dni===1?"dzień":"dni"}</b> przerwy · `
+      /* Przerwa zerowa ma własne zdanie. „0 dni przerwy" jest poprawne
+         arytmetycznie i bez sensu po polsku — a od 17.09.2026 takich słupków
+         jest szesnaście, bo tyle razy Fryderyk jechał dzień po dniu. */
+      info.innerHTML = (p.dni === 0
+          ? `<b>Bez przerwy</b> · jazda dzień po dniu · `
+          : `<b>${p.dni} ${p.dni===1?"dzień":"dni"}</b> bez roweru · `)
         + `${pl(p.od)} → ${pl(p.do)}`
         + (p.wyjazd
             ? ` · <b>${p.wyjazd.opis}</b>, wyjazd zgłoszony — nie liczy się`
-            : p.dni > PROG ? ` · <b style="color:var(--alarm)">ponad limit</b>` : "");
+            : ZLAMANIE(p) ? ` · <b style="color:var(--alarm)">ponad limit</b>` : "");
     };
     el.addEventListener("click", () => { zaznacz(el); pokazInfo(); });
     el.addEventListener("mouseenter", pokazInfo);

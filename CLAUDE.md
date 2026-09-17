@@ -132,7 +132,29 @@ nie kolor: sylwetka roweru vs ekranu, słupek kreskowany vs pełny.
   - **Godziny** (C1): słupek na tydzień, linia planu IX–X, tygodnie
     odciążeniowe na szaro, słupek zielenieje po dowiezieniu planu, kafelek serii
   - **Przerwy** (C2): słupek na przerwę, oś ucięta na 60 dniach z ząbkiem,
-    czerwona linia na 14, zgłoszone wyjazdy szare
+    czerwona linia na 14, zgłoszone wyjazdy szare.
+
+    **PRZERWA TO DNI BEZ ROWERU, NIE ODSTĘP MIĘDZY DATAMI** (17.09.2026,
+    zgłoszone przez Fryderyka: „nawet jak jadę dzień po dniu, to pokazuje dzień
+    przerwy, choć tak nie jest"). Miał rację — jazda 10.09 i 12.09 dawała
+    słupek „1 dzień", a jazda w dwa kolejne dni też „1 dzień", choć pustych dni
+    było odpowiednio jeden i zero. W jego danych szesnaście słupków było
+    zawyżonych o jeden. Teraz `przerwy[].dni` = różnica dat **minus jeden**.
+
+    **Próg przesunięty o jeden, żeby werdykt się nie ruszył.** Stare `dni > PROG`
+    (odstęp ponad 14) to dokładnie to samo co nowe `dni >= PROG` (14 dni pustych
+    i więcej) — stąd helper `ZLAMANIE(p)`, jedno miejsce zamiast czterech.
+    Sprawdzone na komplecie 64 przerw: te same pięć przerw, ta sama czwórka po
+    odsianiu wyjazdów. **Zmiana samej reguły** (np. „dopiero 15 dni pustych
+    łamie") to decyzja Fryderyka o kryterium, nie poprawka wyświetlania — dwie
+    przerwy z 2026 leżą dokładnie na tej granicy i wypadłyby z listy.
+
+    **Data ostatniego złamania przesuwa się o dzień w tył i tak jest poprawnie.**
+    Przerwa 28.07 → 12.08 pokazywała 12.08, czyli dzień, w którym Fryderyk ZNÓW
+    JECHAŁ. Czternastym pustym dniem jest 11.08 i to jest prawidłowa odpowiedź.
+
+    Przerwa zerowa ma własne zdanie w odczycie („Bez przerwy · jazda dzień po
+    dniu"), bo „0 dni przerwy" jest poprawne arytmetycznie i bez sensu po polsku.
   - **Długie jazdy** (C3): najdłuższa jazda w miesiącu, oś ciągła (puste
     miesiące zostają), Zwift kreskowany, linie celu 80 km i rekordu
   - **Kryterium**: wariant B, złamania, data ostatniego złamania

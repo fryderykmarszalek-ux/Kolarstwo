@@ -2,156 +2,162 @@
 // NIE EDYTOWAĆ RĘCZNIE: plik jest nadpisywany po każdej zmianie danych.
 // Powstaje w .github/skrypty/analiza.js po nocnym pobraniu ze Stravy.
 //
-// Ta wersja jest wyjątkiem — napisana w sesji czatu 12.09.2026, bo sekretu
+// Ta wersja jest wyjątkiem — napisana w sesji czatu 17.09.2026, bo sekretu
 // ANTHROPIC_API_KEY jeszcze nie ma. Pole odcisk to prawdziwy skrót
 // dzisiejszego briefingu, a analiza jest z dzisiaj, więc automat zostawi ją
 // w spokoju do jutrzejszego wieczora.
 
 window.ANALIZA = {
  "wersja": 1,
- "utworzono": "2026-09-12T18:40",
+ "utworzono": "2026-09-17T20:05",
  "model": "asystent w sesji czatu",
- "jazd_w_danych": 91,
- "dane_pobrano": "2026-09-12T15:59",
- "odcisk": "d4a00e82a47e9d79",
+ "jazd_w_danych": 92,
+ "dane_pobrano": "2026-09-17T17:49",
+ "odcisk": "1d499da5f58f1b30",
  "bloki": [
   {
    "t": "naglowek",
-   "tekst": "Tętno 199 — dwa uderzenia od HRmax i koniec zgadywania"
+   "tekst": "Test FTP: 174 W. Jedenaście rekordów mocy w jednej jeździe"
   },
   {
    "t": "akapit",
-   "tekst": "„Afternoon Ride 170hr intervals/Z2”: 26,8 km w 66 minut, tętno średnie 149, RPE 7, 658 kcal, z Maćkiem. Nazwa mówi prawdę co do minuty — przebieg to sześć wyraźnych akcentów przedzielonych jazdą w drugiej strefie. Ale najważniejsza liczba dnia jest jedna: najwyższe tętno tej jazdy to 199."
+   "tekst": "„Zwift - FTP Test [Standard]”: 21,9 km w 45 minut, moc średnia 134 W, tętno średnie 163, RPE 9. To pierwsza jazda z miernikiem od 25 listopada 2025, czyli po 296 dniach przerwy w pomiarach mocy — i od razu test progowy. Przez ostatni miesiąc pisałem w kółko, że cała Twoja krzywa mocy jest historią z jesieni 2025 i że nie ma czym zmierzyć dzisiejszej formy. To zdanie właśnie się zdezaktualizowało."
   },
   {
    "t": "kafelki",
    "pozycje": [
     {
+     "etykieta": "FTP z testu",
+     "wartosc": "174 W",
+     "stopka": "2,48 W/kg"
+    },
+    {
+     "etykieta": "20 minut",
+     "wartosc": "183 W",
+     "stopka": "było 148 · +24%"
+    },
+    {
+     "etykieta": "Nowe rekordy",
+     "wartosc": "11",
+     "stopka": "z 16 okien"
+    },
+    {
      "etykieta": "Tętno maks.",
-     "wartosc": "199",
-     "stopka": "HRmax 201 · 99%"
-    },
-    {
-     "etykieta": "Powyżej 170",
-     "wartosc": "7:29",
-     "stopka": "na 66 minut"
-    },
-    {
-     "etykieta": "Tydzień",
-     "wartosc": "4,3 h",
-     "stopka": "plan 4 h"
-    },
-    {
-     "etykieta": "Zmęczenie",
-     "wartosc": "10/10",
-     "stopka": "trzeci raz w tygodniu"
+     "wartosc": "195",
+     "stopka": "na trenażerze"
     }
    ]
   },
   {
-   "t": "akapit",
-   "tekst": "Historia tej liczby jest krótka i ładna. 31 sierpnia rekord zapisu wynosił 170, 2 września 187, 4 września 197, dziś 199. W TRENING.md stoi HRmax 201 z pasa piersiowego z adnotacją, że nie ma dziś czym tego sprawdzić — po dzisiejszym różnica wynosi dwa uderzenia, czyli jeden procent. Uznaję to za potwierdzone. Ma to konsekwencję praktyczną: progi stref liczone jako procent HRmax stoją na prawdziwej podstawie, a nie na wzorze 220 minus wiek."
-  },
-  {
-   "t": "akapit",
-   "tekst": "Sprawdziłem, gdzie dokładnie padło te 199, bo szczyt tętna bez kontekstu nic nie znaczy. Wyszło, że na Bump 2 — 305 metrów przy 5,4% — pokonanym w 45 sekund przy tętnie średnim 187 na całym odcinku. To nie jest artefakt ani jedno dziwne uderzenie w zapisie, tylko trzydziestosekundowy podjazd na maksa. Twój rekord na Bump 2 to 40 sekund z 13 sierpnia, a Maillot de lunares wymaga 35."
-  },
-  {
    "t": "naglowek",
-   "tekst": "Struktura jazdy"
+   "tekst": "Skąd 174 i dlaczego ta liczba jest wiarygodna"
+  },
+  {
+   "t": "akapit",
+   "tekst": "Protokół standardowy liczy FTP jako 0,95 razy moc z dwudziestu minut na maksa. Twoje dwadzieścia minut to 183 W, więc 0,95 × 183 = 173,8, w zaokrągleniu 174 W. Sprawdziłem przebieg sekunda po sekundzie i test wygląda dokładnie tak, jak powinien: dziesięć minut rozgrzewki, pięciominutowy otwieracz przy 165–179 W, sześć minut zejścia na 75 W, a potem od 20. do 40. minuty równy blok."
   },
   {
    "t": "lista",
    "punkty": [
-    "0–11 min — rozjazd, tętno 136–147",
-    "12–15 min — akcent, tętno 164, szczyt 180, prędkość 34,5 km/h",
-    "18–21 min — najmocniejszy blok: tętno 172 → 186, SZCZYT 199 (Bump 2 i Kawęczyn hopka)",
-    "26–29 min — akcent, tętno 172, prędkość 36,5 km/h",
-    "40–43 min — akcent, tętno 165–169",
-    "50–53 min — akcent, tętno 162–164",
-    "60 min — ostatni zryw, szczyt 180, potem zjazd do 134"
+    "Pierwsze pięć minut bloku: 176,5 W średnio",
+    "Ostatnie pięć minut: 200,7 W — przyspieszyłeś na końcu, co jest poprawnym rozegraniem testu",
+    "Tętno w bloku: start 140, koniec 192, średnio 181",
+    "Szczyt jazdy: 461 W w 39. minucie, czyli finisz",
+    "Zmienność mocy w całej jeździe (VI) 1,19 — to test, nie jazda ERG"
    ]
   },
   {
    "t": "akapit",
-   "tekst": "Między akcentami tętno wracało do 136–143, czyli do drugiej strefy — dokładnie tak, jak zapowiada nazwa. Siedem i pół minuty spędziłeś powyżej 170, a 43,7% jazdy poniżej 142. To jest poprawnie zbudowany trening interwałowy i nie mam do niego zastrzeżeń jako do pojedynczej jednostki."
+   "tekst": "Jedna uczciwa uwaga do tej liczby. Same czyste osiemnaście minut, bez końcowego przyspieszenia, dają 178 W, czyli FTP 169. Różnica pięciu watów bierze się z tego, że finisz wjeżdża do średniej. Protokół standardowy liczy całe dwadzieścia minut i tak zostawiam — ale wiedz, że Twój prawdziwy próg leży raczej w przedziale 169–174 niż dokładnie na 174."
   },
   {
    "t": "naglowek",
-   "tekst": "Osiem rekordów, ale tym razem powiem od razu, ile są warte"
+   "tekst": "Jedenaście rekordów i jeden pozorny spadek"
   },
   {
    "t": "akapit",
-   "tekst": "Padło osiem najlepszych czasów na 38 przejazdach. Wszystkie na pętli Cieciszew–Turowice–Słomczyn, którą masz przejechaną dwa albo trzy razy — czyli konkurencją jesteś Ty sprzed kilku tygodni. Największe: cała pętla 4234 m o 52 sekundy lepiej, „Up and Down” 3053 m o 38 sekund, „Cyklista w Waw” 2502 m o 26 sekund. To są prawdziwe poprawy, ale na odcinkach o trzech próbach, a nie o czternastu jak w czwartek. Dwa dni temu trzydzieści rekordów padło na segmentach z 8–14 próbami i to był inny kaliber."
+   "tekst": "Każde okno od 30 sekund do 45 minut jest dziś nowym rekordem. Poprzednie pochodziły z wyścigu na Zwifcie z 18 października 2025 i stały nietknięte przez jedenaście miesięcy."
   },
   {
-   "t": "akapit",
-   "tekst": "Na dwudziestu segmentach z co najmniej pięcioma próbami mediana straty do rekordu wynosi dziś 29,7%. To nie jest zarzut: w treningu interwałowym połowa czasu to zjazd tętna, więc segment przejechany w tej połowie musi wypaść słabo. Najbliżej byłeś na Cieciszew–Kawęczyn (4. miejsce z 13, +5,3%) i na Bump 2 (2. z 7, +12,5%)."
+   "t": "lista",
+   "punkty": [
+    "40 s — 278 W, było 237, o 41 W lepiej",
+    "1 min — 263 W, było 210, o 53 W lepiej",
+    "2 min — 228 W, było 184, o 44 W lepiej",
+    "5 min — 202 W, było 172, o 30 W lepiej",
+    "10 min — 190 W, było 157, o 33 W lepiej",
+    "20 min — 183 W, było 148, o 35 W lepiej (+23,6%)",
+    "30 min — 160 W, było 143, o 17 W lepiej",
+    "45 min — 134 W, było 116, o 18 W lepiej"
+   ]
   },
   {
-   "t": "naglowek",
-   "tekst": "Co robisz bardzo dobrze — rytm co drugi dzień"
-  },
-  {
-   "t": "akapit",
-   "tekst": "Spójrz na daty wszystkich sześciu jazd tego września: 2, 4, 6, 8, 10, 12. Same parzyste, bez jednego wyjątku, przez dwanaście dni. Nie wiem, czy to plan, czy zbieg okoliczności, ale wygląda dokładnie jak książkowy powrót do treningu — dzień pracy, dzień regeneracji, bez ani jednej luki dłuższej niż jedna doba. Przy tym plan objętości na 8–14 września wynosi 4 godziny, a Ty masz już 4 godziny 18 minut przy dwóch dniach zapasu. Drugi tydzień z rzędu ponad plan."
-  },
-  {
-   "t": "wykres_tygodnie",
-   "tytul": "Godziny w tygodniach — drugi tydzień z rzędu ponad plan"
-  },
-  {
-   "t": "naglowek",
-   "tekst": "Co robisz źle — i to już nie jest przypadek"
-  },
-  {
-   "t": "akapit",
-   "tekst": "Sześć jazd września, a tylko JEDNA była naprawdę lekka: dwugodzinna z 8 września, 92% czasu w drugiej strefie. Pozostałe pięć to sprinty, interwały, tempo, duo w tempie i dzisiejsze interwały. Tętno średnie tych sześciu jazd: 141, 165, 153, 134, 156, 149. Jeden dołek na sześć."
-  },
-  {
-   "t": "wykres_strefy",
-   "miara": "tetno",
-   "dni": 7,
-   "tytul": "Strefy tętna, 7 dni — efektywność 28%, trzeci pomiar z rzędu poniżej 30%"
+   "t": "wykres_moc",
+   "tytul": "Krzywa rekordów mocy — środek krzywej przesunięty o 20–35 W"
   },
   {
    "t": "ostrzezenie",
-   "tekst": "Efektywność rozkładu wynosi 28% z podpisem „rozkład rozjechany”. To trzeci pomiar z rzędu w tym rejonie: 57% w poniedziałek, 29% w czwartek, 28% dziś. Tydzień wygląda tak: Z2 45,0%, Z3 34,6%, Z4 19,7%. Ponad połowa czasu od tempa w górę, przy wzorcu, który chce 80% lekko. Nie jest to kwestia progów — sam zmierzyłeś granicę Z2 na 142–143 i liczby są liczone dokładnie nią. Problem jest strukturalny: robisz co drugi dzień, co jest świetne, ale prawie każdą z tych jazd robisz średnio-mocno. Klasyczna szara strefa: za ciężko, żeby się regenerować, za lekko, żeby to był bodziec progowy."
-  },
-  {
-   "t": "akapit",
-   "tekst": "Konkretnie, co zmienić: z trzech jazd w przyszłym tygodniu jedna ma być mocna (jak dzisiejsza), jedna długa i naprawdę spokojna (jak ta z 8 września), a trzecia — regeneracyjna, poniżej 135 uderzeń, bez jednego akcentu, nawet jeśli będzie się wydawać, że jedziesz za wolno. Ta trzecia jest dziś w Twoim tygodniu całkowicie nieobecna i to ona zmieniłaby efektywność najbardziej."
+   "tekst": "Okna krótkie — 1, 3, 5, 10 i 15 sekund — pokazują dziś WARTOŚCI NIŻSZE niż Twoje rekordy i to nie jest regres. Sprint jednosekundowy wyszedł 461 W przy rekordzie 804 W z 1 listopada, bo tamto była sesja Strength ze sprintami, a to jest test progowy: nikt nie wykręca maksymalnego sprintu w czterdziestej minucie równego wysiłku. Krzywa mocy pokazuje najlepszy wynik z CAŁEJ historii dla każdego okna, więc rekordy sprinterskie stoją nietknięte tam, gdzie były. Nie próbuj ich dziś bić „dla kompletu” — to inny trening i inny dzień."
   },
   {
    "t": "naglowek",
-   "tekst": "Zmęczenie: trzeci raz 10 na 10"
+   "tekst": "Co to zmienia w prognozach"
   },
   {
-   "t": "ostrzezenie",
-   "tekst": "Napięcie zmęczenie do wytrenowania wynosi 1,52 (188 do 124), zmęczenie stoi na 10 z 10 po raz trzeci w tym tygodniu, forma −65. Licznik regeneracji daje 16 godzin. Oddaję Ci sprawiedliwość: po środowym ostrzeżeniu wziąłeś wolne 11 września i to widać — napięcie spadło z rekordowych 1,55 na 1,52 mimo dzisiejszej jazdy. Ale to jeden dzień, a prosiłem o dwa, i przy siódmej jeździe w jedenaście dni jeden dzień to za mało. Jutro i pojutrze bez roweru, a jeśli w niedzielę będziesz jechał, to wyłącznie spokojnie i długo."
+   "t": "akapit",
+   "tekst": "W danych stoi FTP 150 W jako Twoja deklaracja z 22 sierpnia. Dzisiejszy pomiar mówi 174, czyli o 24 W więcej. To trzeba poprawić w pliku, bo inaczej cała zakładka Prognozy porównuje cele do liczby, o której już wiadomo, że jest zaniżona — napisz mi, czy wpisać 174, czy wolisz ostrożniejsze 170."
+  },
+  {
+   "t": "akapit",
+   "tekst": "Cel na grudzień 2026 to FTP 225 W. Z dzisiejszych 174 brakuje 51 W w trzy i pół miesiąca, czyli 29%. Miesiąc temu, licząc od deklarowanych 150, brakowało 75 W i pisałem, że to skok, którego nie ma jak ocenić. Teraz da się: przyrost 24 W nastąpił przez rok bez miernika, ale realnie przez ostatnie pół roku jeżdżenia. Żeby dowieźć 225, potrzeba drugiego takiego przyrostu w cztery razy krótszym czasie. Nie mówię, że niemożliwe — mówię, że to najambitniejsza pozycja w całej prognozie i pierwsza, która ma teraz twardy punkt odniesienia."
+  },
+  {
+   "t": "lista",
+   "punkty": [
+    "20 min — cel 225 W, dziś 183, brakuje 42 W (23%)",
+    "5 min — cel 300 W, dziś 202, brakuje 98 W (49%)",
+    "1 min — cel 480 W, dziś 263, brakuje 217 W (83%)",
+    "40 s — cel 545 W, dziś 278, brakuje 267 W (96%)",
+    "5 s — cel 720 W, rekord 702 W z 01.11.2025, brakuje 18 W"
+   ]
+  },
+  {
+   "t": "naglowek",
+   "tekst": "Cztery dni przerwy — i to jest druga dobra wiadomość"
+  },
+  {
+   "t": "akapit",
+   "tekst": "Ostatnia jazda przed dzisiejszą to 12 września. Cztery dni bez roweru, po tym jak trzy razy z rzędu pisałem o odpoczynku przy zmęczeniu 10 na 10. Efekt widać w liczbach: forma wróciła z −65 na −17, zmęczenie ze 188 na 134, napięcie zmęczenie do wytrenowania z 1,52 na 1,15. Test progowy zrobiłeś więc na w miarę świeżych nogach i to jest jedyny sposób, żeby taki pomiar cokolwiek znaczył. Gdybyś próbował go 12 września, wynik byłby niższy i nie wiedziałbyś, o ile."
   },
   {
    "t": "wykres_forma",
-   "tytul": "Wytrenowanie i zmęczenie — wytrenowanie 124, najwyżej od lipca"
+   "tytul": "Wytrenowanie i zmęczenie — cztery dni przerwy odbudowały formę"
   },
   {
    "t": "akapit",
-   "tekst": "Bo rzecz, która za tym stoi, jest naprawdę dobra. Wytrenowanie idzie 98 → 111 → 117 → 121 → 124 od końca sierpnia. To najwyższa wartość od 21 lipca i zostało dwadzieścia dwa punkty do szczytu 146. Przy takim tempie wzrostu dogonisz go w trzy tygodnie. Cała moja wredota o odpoczynku bierze się wyłącznie stąd, że to jedyna rzecz, która może ten wzrost zatrzymać."
+   "tekst": "Koszt też jest widoczny i uczciwie go podaję: wytrenowanie zeszło ze 124 na 117, bo cztery dni bez obciążenia to cztery razy po 2,35%. Szczyt 146 z 20 lipca jest znów o 29 punktów dalej. Tak to działa i nie ma tu nic do naprawiania — odpoczynek kosztuje kapitał, ale jest jedynym sposobem, żeby ten kapitał zamienić na wynik. Dzisiejszy test jest tego dowodem."
+  },
+  {
+   "t": "naglowek",
+   "tekst": "Tydzień i co dalej"
+  },
+  {
+   "t": "akapit",
+   "tekst": "Plan na 15–21 września to 4,5 godziny, najwyższa wartość dotąd. Masz 45 minut po trzech dniach, więc zostaje niecałe cztery godziny na cztery dni. To wymaga dwóch porządnych jazd w weekend, w tym jednej długiej. Przypomnę, że wrzesień ma dziś najdłuższą jazdę 47,3 km z 8 września, a plan mówi o wzroście o 8–10 km co dwa tygodnie — kolejna długa powinna więc dobić do 55 km."
   },
   {
    "t": "lista",
    "punkty": [
-    "Jutro i pojutrze — wolne. Trzeci raz 10/10 w jednym tygodniu.",
-    "Niedziela lub poniedziałek — długa, 55 km, druga strefa, zero akcentów.",
-    "W przyszłym tygodniu dołóż jazdę REGENERACYJNĄ poniżej 135 uderzeń. Dziś nie ma jej w ogóle.",
-    "Bump 2: dziś 45 s, Twój rekord 40 s, koszulka wymaga 35 s. Przy tętnie 199 na tym podjeździe warto spróbować świadomie, na świeżych nogach.",
-    "Obory-Opacz wciąż czeka — Koszulka sprinterska stoi na 99% i dziesięciu sekundach.",
-    "Żółta koszulka: dzień 12 ze 115, przerwa 0 dni."
+    "Sobota lub niedziela — długa, 55 km, druga strefa. To główny brak tego tygodnia.",
+    "Druga jazda — spokojna, poniżej 135 uderzeń. Regeneracyjnej wciąż nie było ani razu we wrześniu.",
+    "Po teście FTP przelicz strefy MOCY: przy FTP 174 próg Z4 przesuwa się ze 136–157 na 158–183. Tabela w danych stoi na FTP 150 i jest teraz za nisko.",
+    "Koszulka sprinterska: Obory-Opacz, brakuje 10 s do rekordu. Przy formie z dzisiejszego testu to jest do wzięcia.",
+    "Żółta koszulka: dzień 17 ze 115, przerwa 0 dni."
    ]
   },
   {
    "t": "akapit",
-   "tekst": "Podsumowując: potwierdzone HRmax, poprawnie zbudowany trening interwałowy, drugi tydzień ponad planem i rytm co drugi dzień, którego nie zepsułeś ani razu przez dwanaście dni. Do tego jedna rzecz robiona konsekwentnie źle — brak jazd naprawdę lekkich — i jedna, o którą proszę trzeci raz, czyli odpoczynek. Twoje ciało nie potrzebuje teraz więcej bodźców, tylko czasu na to, żeby te sześć z ostatnich dwunastu dni zamienić w formę."
+   "tekst": "Podsumowując: to jest najważniejsza jazda od czasu, gdy powstała ta strona. Nie dlatego, że była ciężka — 45 minut i 345 kcal to mało — tylko dlatego, że po raz pierwszy od jedenastu miesięcy coś ZMIERZYŁEŚ zamiast oszacować. Cała zakładka Dane przez ten czas opisywała chłopaka z października 2025. Od dziś opisuje Ciebie: FTP 174 zamiast 150, dwudziestominutowa moc wyższa o 24%, jedenaście okien krzywej przesuniętych w górę. Reszta prognozy na grudzień jest nadal bardzo ambitna, ale po raz pierwszy wiadomo, od czego się liczy."
   }
  ]
 };
