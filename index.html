@@ -5012,13 +5012,24 @@ function rozkladStref(miara, dni){
   const jazdy = (STREFY.rozklady && STREFY.rozklady.jazdy) || {};
   let zPomiarem = 0, wszystkich = 0, zPrzebiegu = 0, zZapasu = 0, czekaja = 0;
 
-  let odsianeErg = 0;
+  /* SESJE STEROWANE (ERG) WCHODZĄ DO ROZKŁADU JAK KAŻDA INNA JAZDA —
+     decyzja Fryderyka z 19.09.2026, cytat: „każda jazda niezależnie jaka ma być
+     wliczona w wykresy".
+
+     Do tego dnia rozkład stref MOCY pomijał jazdy z ilorazem ERG poniżej 2,0,
+     z uzasadnieniem, że trenażer trzyma zadaną moc, więc wykres opisywałby plan
+     treningu, a nie zawodnika. Argument nadal jest prawdziwy i dlatego znacznik
+     ERG zostaje przy jeździe — ale to Fryderyk decyduje, co wchodzi na jego
+     wykresy. Pomijanie realnie przejechanej godziny robiło z pierścienia wykres
+     niepełny: 19.09 sesja progowa 8/6/4 znikała z niego w całości, choć była
+     najcięższą jednostką tygodnia.
+
+     REGUŁA DOTYCZY WYŁĄCZNIE WYKRESÓW. Koszulki liczą waty dalej tylko z sesji
+     swobodnych (jestErg() w MIARY) — tam nagroda ma zależeć od tego, co sam
+     wykręciłeś, a nie od tego, co ustawił plan treningu. To dwie różne sprawy
+     i nie zlewać ich w jedną. */
   for (const a of jazdyOkna(dni)){
     wszystkich++;
-    // Moc sterowana opisuje plan treningu, nie zawodnika — do rozkładu stref
-    // mocy nie wchodzi. Ta sama reguła co wszędzie indziej na stronie.
-    if (miara === "moc" && jestErg(a)){ odsianeErg++; continue; }
-
     const zzywego = rozkladJazdyZPrzebiegu(a, miara);
     if (zzywego && zzywego.length === ile){
       zPomiarem++; zPrzebiegu++;
@@ -5035,7 +5046,9 @@ function rozkladStref(miara, dni){
     for (let i = 0; i < ile; i++) sumy[i] += sek[i] || 0;
   }
   const suma = sumy.reduce((x,y) => x+y, 0);
-  return { sumy, suma, zPomiarem, wszystkich, ile, odsianeErg,
+  const sterowane = miara === "moc"
+    ? jazdyOkna(dni).filter(a => jestErg(a)).length : 0;
+  return { sumy, suma, zPomiarem, wszystkich, ile, sterowane,
            zPrzebiegu, zZapasu, czekaja };
 }
 
@@ -5055,8 +5068,7 @@ function maSeriePrzebiegu(id, miara){
    pliku z osobna dawałoby pierścień skaczący cztery razy pod rząd. */
 function dopelnijPrzebiegiStref(miara, dni){
   const brakujace = jazdyOkna(dni).filter(a =>
-    !(miara === "moc" && jestErg(a))
-    && maSeriePrzebiegu(a.id, miara)
+    maSeriePrzebiegu(a.id, miara)
     && !PRZEBIEG_GOTOWY.has(String(a.id)));
   if (!brakujace.length) return;
 
@@ -5296,12 +5308,15 @@ function objetosc(miara, arg){
         ${legendaStref(miara, rozklad)}
       </div>
     </div>
-    ${rozklad && rozklad.odsianeErg ? `
+    ${rozklad && rozklad.sterowane ? `
       <div class="info">
-        Pominięto <b>${rozklad.odsianeErg}</b> ${rozklad.odsianeErg === 1
-          ? "sesję sterowaną" : "sesji sterowanych"}
-        <span class="znacznik-erg">ERG</span> — w tym trybie trenażer trzyma
-        zadaną moc, więc rozkład stref opisywałby plan treningu, a nie Ciebie.
+        W tym oknie ${rozklad.sterowane === 1
+          ? "jest <b>jedna</b> sesja sterowana" : `są <b>${rozklad.sterowane}</b> sesje sterowane`}
+        <span class="znacznik-erg">ERG</span> i <b>wchodzi do rozkładu</b> tak
+        samo jak reszta. Warto tylko wiedzieć, co się ogląda: w trybie ERG
+        trenażer trzyma moc zadaną przez plan treningu, więc te minuty mówią,
+        ile dowiozłeś, a nie ile sam wybrałeś. Koszulki liczą waty dalej
+        wyłącznie z sesji swobodnych — tam nagroda ma zależeć od Ciebie.
       </div>` : ""}
     ${!rozklad || !rozklad.suma ? `
       <div class="info">

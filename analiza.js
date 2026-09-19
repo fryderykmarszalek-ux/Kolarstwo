@@ -9,7 +9,7 @@
 
 window.ANALIZA = {
  "wersja": 1,
- "utworzono": "2026-09-19T19:30",
+ "utworzono": "2026-09-19T21:10",
  "model": "asystent w sesji czatu",
  "jazd_w_danych": 94,
  "dane_pobrano": "2026-09-19T17:22",
@@ -77,7 +77,7 @@ window.ANALIZA = {
   },
   {
    "t": "ostrzezenie",
-   "tekst": "Po pierwsze jazda trwała równo godzinę, więc okno 60-minutowe obejmuje CAŁĄ sesję razem z rozgrzewką i schłodzeniem. Rekord mówi więc tyle, że Twoja najspokojniejsza godzina jest dziś mocniejsza niż kiedyś — a nie że wykręciłeś godzinę na maksa. Po drugie to była sesja sterowana: iloraz rekordu pięciosekundowego do piętnastominutowego wyszedł 1,43, czyli poniżej progu 2,0, więc strona oznaczyła ją znacznikiem ERG. W tym trybie trenażer trzyma zadaną moc — bloki po 165, 170 i 179 W to liczby z planu treningu, które Ty dowiozłeś, a nie liczby, które sam wybrałeś w trakcie. Rozkład stref mocy z siedmiu dni w ogóle tę sesję pomija, z tego samego powodu."
+   "tekst": "Po pierwsze jazda trwała równo godzinę, więc okno 60-minutowe obejmuje CAŁĄ sesję razem z rozgrzewką i schłodzeniem. Rekord mówi więc tyle, że Twoja najspokojniejsza godzina jest dziś mocniejsza niż kiedyś — a nie że wykręciłeś godzinę na maksa. Po drugie to była sesja sterowana: iloraz rekordu pięciosekundowego do piętnastominutowego wyszedł 1,43, czyli poniżej progu 2,0, więc strona oznaczyła ją znacznikiem ERG. W tym trybie trenażer trzyma zadaną moc — bloki po 165, 170 i 179 W to liczby z planu treningu, które Ty dowiozłeś, a nie liczby, które sam wybrałeś w trakcie. Rozkład stref mocy do 19.09 taką sesję pomijał; od dziś, na Twoją decyzję, wchodzi do pierścienia jak każda inna jazda i sama jest w nim opisana znacznikiem ERG. Koszulki liczą waty dalej wyłącznie z sesji swobodnych."
   },
   {
    "t": "wykres_moc",

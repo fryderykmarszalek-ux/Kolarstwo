@@ -389,6 +389,24 @@ nie kolor: sylwetka roweru vs ekranu, słupek kreskowany vs pełny.
   podstawionych danych, wychodzi 65,0%. Przy jazdach różnej długości waży je
   sam czas i tak ma zostać: godzina w Z2 waży więcej niż dziesięć minut w Z2.
 
+  **KAŻDA JAZDA WCHODZI DO ROZKŁADU — także sesje sterowane ERG** (19.09.2026,
+  decyzja Fryderyka, cytat: „każda jazda niezależnie jaka ma być wliczona
+  w wykresy"). Do tego dnia rozkład stref MOCY pomijał jazdy z ilorazem ERG
+  poniżej 2,0. Uzasadnienie było prawdziwe (trenażer trzyma zadaną moc, więc
+  wykres opisywałby plan treningu), ale skutek nie: 19.09 sesja progowa 8/6/4
+  znikała z pierścienia w całości, choć była najcięższą jednostką tygodnia,
+  a okno 7-dniowe pokazywało 3:07 zamiast 4:08.
+
+  Znacznik ERG przy jeździe ZOSTAJE i pod pierścieniem stoi zdanie, ile sesji
+  sterowanych jest w oknie i co to znaczy — informacja tak, odsiewanie nie.
+
+  **Koszulki to osobna sprawa i tam reguła stoi.** `jestErg()` w `MIARY` nadal
+  odsiewa sesje sterowane z warunków w watach: nagroda ma zależeć od tego, co
+  Fryderyk sam wykręcił, a nie od tego, co ustawił plan treningu. Wykres pokazuje,
+  co się wydarzyło; koszulka przyznaje za zasługę. Nie zlewać tych dwóch w jedną.
+  Sprawdzone po zmianie: postępy koszulek bez ruchu (górska 90%, sprinterska
+  99%, młodzieżowa 88%, ciclamino 77%).
+
   **Pięć stref tętna i siedem stref mocy** — tyle samo, co daje Strava (moc
   w modelu Coggana). Nazwy z `TRENING.md` §6, nie wymyślone.
 
