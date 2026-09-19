@@ -389,23 +389,39 @@ nie kolor: sylwetka roweru vs ekranu, słupek kreskowany vs pełny.
   podstawionych danych, wychodzi 65,0%. Przy jazdach różnej długości waży je
   sam czas i tak ma zostać: godzina w Z2 waży więcej niż dziesięć minut w Z2.
 
-  **KAŻDA JAZDA WCHODZI DO ROZKŁADU — także sesje sterowane ERG** (19.09.2026,
-  decyzja Fryderyka, cytat: „każda jazda niezależnie jaka ma być wliczona
-  w wykresy"). Do tego dnia rozkład stref MOCY pomijał jazdy z ilorazem ERG
-  poniżej 2,0. Uzasadnienie było prawdziwe (trenażer trzyma zadaną moc, więc
-  wykres opisywałby plan treningu), ale skutek nie: 19.09 sesja progowa 8/6/4
-  znikała z pierścienia w całości, choć była najcięższą jednostką tygodnia,
-  a okno 7-dniowe pokazywało 3:07 zamiast 4:08.
+  **ERG NIE ODSIEWA JUŻ NIGDZIE — 19.09.2026, decyzja Fryderyka, w dwóch
+  krokach tej samej rozmowy.** Najpierw o wykresach („każda jazda niezależnie
+  jaka ma być wliczona w wykresy"), a gdy zostawiłem wyjątek przy koszulkach,
+  odrzucił i to, zdaniem, które jest po prostu lepszym argumentem niż mój:
 
-  Znacznik ERG przy jeździe ZOSTAJE i pod pierścieniem stoi zdanie, ile sesji
-  sterowanych jest w oknie i co to znaczy — informacja tak, odsiewanie nie.
+  > „ERG to system, który mi ustawia moc, ale pedały same się nie pedałują.
+  > Ja muszę utrzymywać moc i jak pojadę X, to wcale nie znaczy, że ma się
+  > nie liczyć."
 
-  **Koszulki to osobna sprawa i tam reguła stoi.** `jestErg()` w `MIARY` nadal
-  odsiewa sesje sterowane z warunków w watach: nagroda ma zależeć od tego, co
-  Fryderyk sam wykręcił, a nie od tego, co ustawił plan treningu. Wykres pokazuje,
-  co się wydarzyło; koszulka przyznaje za zasługę. Nie zlewać tych dwóch w jedną.
-  Sprawdzone po zmianie: postępy koszulek bez ruchu (górska 90%, sprinterska
-  99%, młodzieżowa 88%, ciclamino 77%).
+  Ma rację. **ERG ustawia OPÓR, a nie wysiłek**: przy zadanych watach trenażer
+  nie dowiezie ich za nikogo — albo utrzymasz kadencję, albo moc siada i sesja
+  się kończy. Wat wykręcony w ERG jest wykręcony. Stare uzasadnienie („liczba
+  mówi, co kazał program") myliło ustawienie oporu z wykonaniem pracy.
+
+  Co to zmieniło w kodzie: `jestErg()` **służy wyłącznie do postawienia
+  znacznika**. Zniknęły filtry z `rozkladStref()`, `dopelnijPrzebiegiStref()`
+  i `mMocOkna()` (warunki koszulek w watach: Maglia ciclamino i Maillot verde).
+  Teksty, które mówiły „liczba mówi, co kazał program", „opisuje plan, nie
+  możliwości" i „sesje ERG odpadają", są przepisane. Wniosek „Moc sterowana"
+  w Porównaniach przestał być ostrzeżeniem i jest zwykłą informacją.
+
+  **Znacznik ERG zostaje wszędzie** — przy jeździe, w tabelach, pod słupkami
+  wykresu prób, w panelach i pod pierścieniem. Fryderyk chce widzieć, w jakim
+  trybie padła liczba; to cała jego rola: orientacja, nie odsiewanie.
+
+  **ODSIEWAMY DALEJ moc, która nie jest pomiarem** — `[S]` ze Stravy i `[E]`
+  z modelu. Ta granica zostaje i jest czym innym: tam liczby nikt nie wykręcił.
+
+  Efekt liczbowy po zmianie: okno mocy 7 dni 3:07:14 → 4:07:43, efektywność
+  81% → 82%, Z5 z 8,0% na 13,3%. Postępy koszulek bez ruchu (ciclamino 77%,
+  verde 53%) — bo najlepsze waty na ich oknach i tak pochodzą z sesji
+  swobodnych. Jedyne okno, na którym ERG jest dziś najlepszy, to 60 minut:
+  126 W wobec 107 W bez ERG, a żadna koszulka tego okna nie używa.
 
   **Pięć stref tętna i siedem stref mocy** — tyle samo, co daje Strava (moc
   w modelu Coggana). Nazwy z `TRENING.md` §6, nie wymyślone.
@@ -623,9 +639,9 @@ nie kolor: sylwetka roweru vs ekranu, słupek kreskowany vs pełny.
   (13.08.2026) — 25 W od warunku Giro sprinterskiej. Odwrócenie jej modelu
   daje CdA ≈ 0,257, czyli sylwetkę czasówkową, a nie pozycję Fryderyka.
   Bez tej reguły pierwsza koszulka padłaby za cudze założenie. Waty
-  z trenażera są pomiarem, ale **tylko z sesji swobodnych** — `jestErg()`
-  odsiewa treningi sterowane. Koszulka bez ani jednego pomiaru na swoim oknie
-  pokazuje „czeka na miernik mocy", a nie pasek postępu.
+  z trenażera są pomiarem — **także z sesji sterowanych ERG** (19.09.2026,
+  patrz §6 „ERG nie odsiewa już nigdzie"). Koszulka bez ani jednego pomiaru
+  na swoim oknie pokazuje „czeka na miernik mocy", a nie pasek postępu.
 
   **Kod nie zna żadnej koszulki z nazwy.** Progi, barwy, daty i teksty są
   w danych; w kodzie stoi tylko słownik `MIARY` — sześć nazw mówiących, JAK

@@ -9,7 +9,7 @@
 
 window.ANALIZA = {
  "wersja": 1,
- "utworzono": "2026-09-19T21:10",
+ "utworzono": "2026-09-19T21:40",
  "model": "asystent w sesji czatu",
  "jazd_w_danych": 94,
  "dane_pobrano": "2026-09-19T17:22",
@@ -77,7 +77,7 @@ window.ANALIZA = {
   },
   {
    "t": "ostrzezenie",
-   "tekst": "Po pierwsze jazda trwała równo godzinę, więc okno 60-minutowe obejmuje CAŁĄ sesję razem z rozgrzewką i schłodzeniem. Rekord mówi więc tyle, że Twoja najspokojniejsza godzina jest dziś mocniejsza niż kiedyś — a nie że wykręciłeś godzinę na maksa. Po drugie to była sesja sterowana: iloraz rekordu pięciosekundowego do piętnastominutowego wyszedł 1,43, czyli poniżej progu 2,0, więc strona oznaczyła ją znacznikiem ERG. W tym trybie trenażer trzyma zadaną moc — bloki po 165, 170 i 179 W to liczby z planu treningu, które Ty dowiozłeś, a nie liczby, które sam wybrałeś w trakcie. Rozkład stref mocy do 19.09 taką sesję pomijał; od dziś, na Twoją decyzję, wchodzi do pierścienia jak każda inna jazda i sama jest w nim opisana znacznikiem ERG. Koszulki liczą waty dalej wyłącznie z sesji swobodnych."
+   "tekst": "Po pierwsze jazda trwała równo godzinę, więc okno 60-minutowe obejmuje CAŁĄ sesję razem z rozgrzewką i schłodzeniem. Rekord mówi więc tyle, że Twoja najspokojniejsza godzina jest dziś mocniejsza niż kiedyś — a nie że wykręciłeś godzinę na maksa. Po drugie to była sesja sterowana: iloraz rekordu pięciosekundowego do piętnastominutowego wyszedł 1,43, czyli poniżej progu 2,0, więc strona oznaczyła ją znacznikiem ERG. W tym trybie trenażer trzyma zadaną moc — bloki po 165, 170 i 179 W to liczby z planu treningu, które Ty dowiozłeś, a nie liczby, które sam wybrałeś w trakcie. Do 19.09 strona traktowała to jako powód, żeby takiej sesji nie liczyć — w pierścieniu stref i w koszulkach. Od dziś, na Twoją decyzję, ERG liczy się wszędzie tak samo jak reszta, bo program ustawia OPÓR, a nie wysiłek: zadane waty trzeba utrzymać samemu. Znacznik ERG zostaje przy jeździe, żeby było widać, w jakim trybie padła liczba."
   },
   {
    "t": "wykres_moc",

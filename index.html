@@ -1826,7 +1826,7 @@ function znacznikErg(jazda, tytul){
   if (!jestErg(jazda)) return "";
   const p = PLASKOSC.get(jazda.id);
   return `<span class="znacznik-erg" title="${tytul || "Trening ze sterowaną mocą"
-    } — w trybie ERG trenażer trzyma zadaną moc, więc liczba mówi, co kazał program${
+    } — w trybie ERG trenażer trzymał zadaną moc. Liczy się normalnie: opór ustawia program, ale utrzymać go trzeba samemu${
     p != null ? `. Iloraz 5 s / 15 min: ${liczba(p,2)}` : ""}">ERG</span>`;
 }
 
@@ -2601,8 +2601,9 @@ function wykresProb(lista, wybrany, najlepszyCzas){
              font-size="9.5" font-weight="600" fill="var(--slaby)">${d.slice(0,4)}</text>`;
       rokPop = d.slice(0,4);
     }
-    // Podpis przy każdej próbie ze sterowaną mocą — na wykresie ma być widać,
-    // które słupki mówią o zawodniku, a które o tym, co kazał program.
+    // Podpis przy każdej próbie ze sterowaną mocą. Słupek liczy się jak każdy
+    // inny — podpis jest po to, żeby było widać, w jakim trybie padł czas,
+    // bo warunki na trenażerze i na szosie są różne.
     if (jestErg(pr.jazda))
       g += `<text x="${xProby(i)+G.szerSlupka/2}" y="${G.marGora+wys+45}" text-anchor="middle"
              font-size="9" font-weight="700" letter-spacing=".04em"
@@ -2818,13 +2819,19 @@ function wnioskiSegmentu(lista, seg){
       + `${liczba(rpe.reduce((a,b)=>a+b,0)/rpe.length,1)}`
       + (pb.jazda.rpe != null ? `; rekord przy RPE ${pb.jazda.rpe}.` : ".") });
 
+  /* Sesje ERG są zwykłą informacją, a nie ostrzeżeniem (19.09.2026, decyzja
+     Fryderyka). Wcześniej stało tu „czas mówi o planie treningu, nie o formie"
+     i przy samych sesjach sterowanych zapalało się na czerwono. To było
+     za mocne: w ERG trenażer ustawia OPÓR, a nie wysiłek — utrzymać go trzeba
+     samemu. Zostaje zdanie, ile prób padło w tym trybie, bo warunki na
+     trenażerze i na szosie różnią się na tyle, że warto o tym wiedzieć. */
   const ergowe = lista.filter(x => jestErg(x.jazda)).length;
   if (ergowe)
-    w.push({ etykieta:"Moc sterowana", ostrzezenie: ergowe === lista.length, tekst:
+    w.push({ etykieta:"Moc sterowana", tekst:
       `${ergowe} z ${lista.length} prób pochodzi z treningu w trybie ERG, `
       + `gdzie trenażer trzymał zadaną moc. ${ergowe === lista.length
-          ? "Wszystkie — czas na tym segmencie mówi więc o planie treningu, nie o formie."
-          : "Przy tych próbach liczba opisuje plan, nie możliwości."}` });
+          ? "Wszystkie — porównuj je więc między sobą, a nie z jazdą po szosie."
+          : "Liczą się normalnie; znacznik mówi tylko, w jakim trybie padły."}` });
 
   const zMoca = lista.filter(x => x.moc_S != null);
   if (zMoca.length)
@@ -3376,15 +3383,14 @@ const daneMocy = (arg) => {
     </div>
     <div class="info">
       Wszystkie liczby mają tag <b>[Z]</b> — to pomiar z trenażera, nie estymata.
-      Ale pomiar mocy sterowanej to wciąż moc sterowana: znacznik
-      <span class="znacznik-erg">ERG</span> stoi przy jazdach, w których trenażer
-      trzymał zadaną moc. ${(() => {
+      Znacznik <span class="znacznik-erg">ERG</span> stoi przy jazdach, w których
+      trenażer trzymał zadaną moc. ${(() => {
         const ile = JAZDY_Z_MOCA.filter(k => jestErg(k.jazda)).length;
         return `Dziś dotyczy to ${ile} z ${JAZDY_Z_MOCA.length} jazd`;
-      })()}. Taka liczba mówi, co kazał program, a nie ile potrafisz — z jednym
-      wyjątkiem: <b>sprint wewnątrz treningu jest prawdziwy</b>, bo ERG puszcza
-      przy maksymalnym wysiłku. Dlatego rekordy sekundowe z sesji „Strength"
-      są Twoje, a rekordy dwudziestominutowe z sesji „Foundation" to plan.
+      })()}. <b>Te rekordy liczą się normalnie</b> — ERG ustawia opór, a nie
+      wysiłek: przy zadanych watach trenażer nie dowiezie ich za Ciebie, albo
+      utrzymasz kadencję, albo moc siada. Znacznik jest po to, żebyś wiedział,
+      w jakim trybie padła dana liczba, a nie po to, żeby ją odsiewać.
       <br>Rozstrzyga liczba, nie nazwa: rekord 5-sekundowy podzielony przez
       rekord 15-minutowy tej samej jazdy. Treningi sterowane mieszczą się
       w 1,04–1,48, wyścig ma 2,90, a sesje ze sprintami od 5,79 do 6,50.
@@ -4107,13 +4113,30 @@ function mSegmentCzas(k){
       + `${lista.length === 1 ? "próby" : "prób"}` };
 }
 
-// Moc: tylko pomiar i tylko sesje swobodne. jestErg() już wie, jak odróżnić
-// trening sterowany od prawdziwego wysiłku.
+/* Moc: tylko POMIAR, ale każda sesja — także sterowana ERG.
+
+   Zmiana z 19.09.2026, decyzja Fryderyka, jego słowami: „ERG to system, który
+   mi ustawia moc, ale pedały same się nie pedałują. Ja muszę utrzymywać moc
+   i jak pojadę X, to wcale nie znaczy, że ma się nie liczyć".
+
+   Ma rację i to jest lepszy argument niż mój poprzedni. Do tego dnia warunki
+   w watach odsiewały sesje sterowane, żeby koszulka nie padła za liczbę
+   ustawioną przez plan treningu. Ale ERG ustawia OPÓR, a nie wysiłek: przy
+   zadanych 300 W trenażer nie dowiezie ich za nikogo — albo utrzymasz kadencję,
+   albo moc siada i sesja się kończy. Wat wykręcony w ERG jest wykręcony.
+
+   Znacznik ERG zostaje wszędzie, gdzie był — przy jeździe, w tabelach,
+   w panelach i pod pierścieniem. Fryderyk chce widzieć, w jakim trybie padła
+   dana liczba, i to jest cała rola tego znacznika: orientacja, nie odsiewanie.
+
+   NADAL ODSIEWAMY moc, która nie jest pomiarem: `[S]` ze Stravy i `[E]`
+   z modelu. Ta granica zostaje i jest czym innym — tam liczby nikt nie
+   wykręcił, tu wykręcił je Fryderyk. */
 function mMocOkna(k){
   let naj = null;
   for (const kr of (D.moc_krzywe || [])){
     const j = JAZDA_PO_ID.get(kr.a);
-    if (!j || jestErg(j) || !wOknie(k, j.data)) continue;
+    if (!j || !wOknie(k, j.data)) continue;
     const w = kr.w[k.okno_s];
     if (w == null) continue;
     if (!naj || w > naj.v) naj = { v: w, jazda: j };
@@ -4357,13 +4380,15 @@ const gablota = (arg) => {
   <textarea id="koszulki-eksport-pole" rows="5" hidden readonly></textarea>
   <div class="info">
     Warunki podane w watach liczą się <b>wyłącznie z pomiaru</b>: miernika albo
-    trenażera w sesji swobodnej. Nigdy z estymaty Stravy. Ta podała 975 W na
-    Bump 2 — 25 W od warunku Giro sprinterskiej. Gdyby liczyć jej model,
-    pierwsza koszulka padłaby za cudze założenie o pozycji na rowerze
-    (wychodzi z niego CdA 0,257, czyli sylwetka czasówkowa), a nie za Twoją moc.
-    Dlatego koszulki wattowe stoją zablokowane do miernika, a z trenażera
-    liczą się <b>tylko sesje swobodne</b> — w trybie
-    <span class="znacznik-erg">ERG</span> moc trzyma program, nie zawodnik.
+    trenażera. Nigdy z estymaty Stravy. Ta podała 975 W na Bump 2 — 25 W od
+    warunku Giro sprinterskiej. Gdyby liczyć jej model, pierwsza koszulka
+    padłaby za cudze założenie o pozycji na rowerze (wychodzi z niego CdA 0,257,
+    czyli sylwetka czasówkowa), a nie za Twoją moc. Dlatego koszulki wattowe
+    stoją zablokowane do miernika.
+    <br>Sesje <span class="znacznik-erg">ERG</span> liczą się normalnie:
+    program ustawia OPÓR, a nie wysiłek — utrzymać zadane waty trzeba samemu,
+    bo pedały same się nie kręcą. Znacznik jest po to, żeby było widać,
+    w jakim trybie padła liczba.
   </div>`;
 };
 
@@ -4550,9 +4575,9 @@ function jednaKoszulka(id){
       <div class="info">
         <b>Czeka na miernik mocy.</b> Ten warunek jest w watach, a wat bez
         pomiaru to nie wat. Estymata Stravy <b>[S]</b> i model fizyczny
-        <b>[E]</b> nie liczą się tutaj ani trochę — dopiero miernik albo sesja
-        swobodna na trenażerze. Pasek postępu pojawi się sam w dniu pierwszego
-        pomiaru na tym oknie.
+        <b>[E]</b> nie liczą się tutaj ani trochę — dopiero miernik albo
+        trenażer. Pasek postępu pojawi się sam w dniu pierwszego pomiaru
+        na tym oknie.
       </div>`;
     if (s.stan === "reczna") return `
       <div class="info">
@@ -5024,10 +5049,12 @@ function rozkladStref(miara, dni){
      niepełny: 19.09 sesja progowa 8/6/4 znikała z niego w całości, choć była
      najcięższą jednostką tygodnia.
 
-     REGUŁA DOTYCZY WYŁĄCZNIE WYKRESÓW. Koszulki liczą waty dalej tylko z sesji
-     swobodnych (jestErg() w MIARY) — tam nagroda ma zależeć od tego, co sam
-     wykręciłeś, a nie od tego, co ustawił plan treningu. To dwie różne sprawy
-     i nie zlewać ich w jedną. */
+     ROZSZERZONE 19.09.2026 NA KOSZULKI, w tej samej rozmowie. Argument
+     Fryderyka: „ERG to system, który mi ustawia moc, ale pedały same się nie
+     pedałują". Ma rację — ERG ustawia OPÓR, a nie wysiłek. Od tego dnia
+     jestErg() NIE odsiewa już nigdzie; służy wyłącznie do postawienia
+     znacznika. Odsiewamy dalej tylko moc, która nie jest pomiarem: `[S]` ze
+     Stravy i `[E]` z modelu. */
   for (const a of jazdyOkna(dni)){
     wszystkich++;
     const zzywego = rozkladJazdyZPrzebiegu(a, miara);
@@ -5291,7 +5318,8 @@ function objetosc(miara, arg){
         ? `Pojedynczą jazdę pokazuje Strava; tutaj chodzi o to, czy <b>cały
            tydzień albo miesiąc</b> wygląda tak, jak miał wyglądać.`
         : `Moc jest mierzona tylko tam, gdzie naprawdę ją zmierzono — dziś
-           znaczy to trenażer, a sesje ERG odpadają, bo opisują plan, a nie Ciebie.`}
+           znaczy to trenażer. Sesje ERG też się liczą — znacznik mówi tylko,
+           w jakim trybie padła dana liczba.`}
       <br>Barwy idą od chłodnej do gorącej: niebieski to najlżejsza strefa,
       czerwony najcięższa. Dobrane tak, żeby dwie sąsiednie dało się rozróżnić
       także przy daltonizmie — sprawdzone liczbowo, nie okiem.
@@ -6284,7 +6312,7 @@ function wierszeAktywnosci(){
            title="Pokaż szczegóły tej jazdy">${x.wnetrze
           ? `<span class="seg-zwift" title="Zwift — trenażer, nie szosa">${
               ikonaDyscypliny("VirtualRide",14)}</span>` : ""}${bezpieczny(x.nazwa)}${
-          znacznikErg(x.jazda, "Trening ze sterowaną mocą — liczba mówi, co kazał program")}<span
+          znacznikErg(x.jazda)}<span
           class="strzalka-wew" aria-hidden="true">›</span></a>
         <span class="seg-data">${pl(x.data.slice(0,10))} · ${czasNaTekst(x.czas)}${
           x.jazda.rpe != null ? " · RPE " + x.jazda.rpe : ""}</span>
@@ -7338,7 +7366,7 @@ function oknoJazdy(id){
     <div class="proba-tytul">
       <h2>${x.wnetrze ? `<span class="seg-zwift">${
         ikonaDyscypliny("VirtualRide",16)}</span>` : ""}${bezpieczny(x.nazwa)}${
-        znacznikErg(a, "Trening ze sterowaną mocą — liczba mówi, co kazał program")}</h2>
+        znacznikErg(a)}</h2>
       <span class="analiza-stempel">${pl(x.data.slice(0,10))} ·
         ${x.data.slice(11,16)}</span>
     </div>
