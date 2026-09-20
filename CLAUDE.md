@@ -544,15 +544,27 @@ nie kolor: sylwetka roweru vs ekranu, słupek kreskowany vs pełny.
 
   **Strava NIE oddaje swojej krzywej Fitness przez API** — nie ma takiego
   zapytania, więc to nie jest „przeniesienie", tylko policzenie tą samą metodą
-  u siebie. Obciążenie dnia = minuty ruchu × RPE (session-RPE, Foster 1998),
+  u siebie. Obciążenie dnia = minuty ruchu × wysiłek (session-RPE, Foster 1998),
   z niego dwie średnie wykładnicze o stałych z `dane.js`
   (`stan_wytrenowania.ctl_dni` / `atl_dni`). **Skala jest własna** i strona mówi
   to wprost: porównywalny jest wyłącznie przebieg w czasie, nie sama liczba.
 
   Wykres startuje 1.03.2026, bo **od tego dnia każda jazda ma RPE** (35 z 35 od
   1.05.2026). Wcześniejsze jazdy bez RPE liczone jako zero dawałyby fałszywy
-  dołek, a zgadywane byłyby zmyśleniem. Po pasie tętna obciążenie policzymy
-  z TRIMP, po mierniku z TSS — metoda siedzi w danych, nie w kodzie wykresu.
+  dołek, a zgadywane byłyby zmyśleniem. Po mierniku mocy policzymy z TSS —
+  metoda siedzi w danych, nie w kodzie wykresu.
+
+  **OPIS POD WYKRESEM MÓWIŁ „minuty ruchu × RPE" JESZCZE 20.09.2026, choć kod
+  liczył z tętna od 30.08.** Trzecie już takie miejsce (po stopce Regeneracji
+  i po briefingu analizy) — komentarz nad sekcją i blok `.info` zostały przy
+  starej definicji, a `wysilekJazdy()` dawno jej nie używał. Na jeździe z 20.09
+  strona pokazywała obciążenie 904, czyli 205 minut × 4,4 z tętna, a opis obok
+  obiecywał 205 × 7 z RPE. Dwa sprzeczne zdania na jednym ekranie, jak przy
+  Regeneracji 02.09. Do tego zdanie „gdy ruszy pas tętna, policzymy dokładniej
+  (TRIMP)" stało tam trzy tygodnie PO tym, jak pas ruszył. **Zmieniając
+  definicję wysiłku, przejść wszystkie cztery miejsca: `wysilekJazdy()`,
+  komentarz sekcji, blok `.info` na wykresie formy i `briefing()`
+  w `.github/skrypty/analiza.js`.**
 - **Objętość → Regeneracja** (27.08.2026) — ile godzin do pełnej gotowości po
   ostatniej jeździe, licznik tykający **na żywo**, plus stan zmęczenia 1–10.
 

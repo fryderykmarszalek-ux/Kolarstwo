@@ -2,146 +2,170 @@
 // NIE EDYTOWAĆ RĘCZNIE: plik jest nadpisywany po każdej zmianie danych.
 // Powstaje w .github/skrypty/analiza.js po nocnym pobraniu ze Stravy.
 //
-// Ta wersja jest wyjątkiem — napisana w sesji czatu 19.09.2026, bo sekretu
+// Ta wersja jest wyjątkiem — napisana w sesji czatu 20.09.2026, bo sekretu
 // ANTHROPIC_API_KEY jeszcze nie ma. Pole odcisk to prawdziwy skrót
 // dzisiejszego briefingu, a analiza jest z dzisiaj, więc automat zostawi ją
 // w spokoju do jutrzejszego wieczora.
 
 window.ANALIZA = {
  "wersja": 1,
- "utworzono": "2026-09-19T21:40",
+ "utworzono": "2026-09-20T22:05",
  "model": "asystent w sesji czatu",
- "jazd_w_danych": 94,
- "dane_pobrano": "2026-09-19T17:22",
- "odcisk": "f530a8f1be4d638c",
+ "jazd_w_danych": 95,
+ "dane_pobrano": "2026-09-20T20:54",
+ "odcisk": "a6b033c96ebda187",
  "bloki": [
   {
    "t": "naglowek",
-   "tekst": "8/6/4 minuty po 95%, 98% i 103% progu — trafione co do wata"
+   "tekst": "101,2 km, siedem rekordów mocy i pierwsze dwie koszulki z warunkiem spełnionym"
   },
   {
    "t": "akapit",
-   "tekst": "„Zwift - 8/6/4min Threshold”, Hilly Route w Watopii: 25,3 km w 60 minut, moc średnia 125 W, tętno średnie 147, RPE 5, 432 kcal. Rozbiłem przebieg na minuty i struktura jest dokładnie taka, jak zapowiada nazwa — trzy bloki progowe, każdy krótszy i mocniejszy od poprzedniego."
-  },
-  {
-   "t": "lista",
-   "punkty": [
-    "29–36 min — blok ośmiominutowy, 165 W, tętno rosnące 140 → 163",
-    "37–40 min — zejście na 95 W",
-    "41–46 min — blok sześciominutowy, 170 W, tętno 146 → 167",
-    "47–50 min — zejście na 95 W",
-    "51–54 min — blok czterominutowy, 179 W, tętno 152 → 169",
-    "Wcześniej: dziewięciominutowa rampa 79 → 154 W i cztery krótkie aktywacje do 188 W"
-   ]
+   "tekst": "„Zwift - Pacer Group Ride with Bernie”, Watopia's Waistband: 101,22 km w 3 godziny 25 minut, moc średnia 103 W, tętno średnie 140, RPE 7, 1209 kcal, kadencja 89. To pierwsza setka w Twoim życiu i najdłuższa jazda o 31 kilometrów — poprzedni rekord padł przedwczoraj i wynosił 70,2 km. Przed 18 września rekordem było 66,6 km z sierpnia 2024 i stało to dwa lata."
   },
   {
    "t": "kafelki",
    "pozycje": [
     {
-     "etykieta": "Blok 8 min",
-     "wartosc": "165 W",
-     "stopka": "95% progu"
+     "etykieta": "Dystans",
+     "wartosc": "101,2 km",
+     "stopka": "pierwsza setka"
     },
     {
-     "etykieta": "Blok 6 min",
-     "wartosc": "170 W",
-     "stopka": "98% progu"
+     "etykieta": "Szczyt mocy",
+     "wartosc": "857 W",
+     "stopka": "rekord · było 804"
     },
     {
-     "etykieta": "Blok 4 min",
-     "wartosc": "179 W",
-     "stopka": "103% progu"
+     "etykieta": "Tydzień",
+     "wartosc": "7,6 h",
+     "stopka": "rekord · było 5,3"
     },
     {
-     "etykieta": "Tętno maks.",
-     "wartosc": "173",
-     "stopka": "średnie 147"
+     "etykieta": "Zmęczenie",
+     "wartosc": "10/10",
+     "stopka": "wykończenie · napięcie 2,00"
     }
    ]
   },
   {
-   "t": "akapit",
-   "tekst": "I teraz rzecz, której nie dałoby się napisać jeszcze trzy dni temu. Twój próg zmierzony w środę to 174 W. Dzisiejsze bloki to 95%, 98% i 103% tej liczby — czyli trening progowy trafił w próg z dokładnością do kilku watów, na trzech różnych długościach. To jest jedyny powód, dla którego ta sesja cokolwiek znaczy: bez środowego testu byłyby to trzy bloki po „jakieś 165–180 W” i nikt by nie wiedział, czy to za lekko, czy za mocno."
-  },
-  {
-   "t": "akapit",
-   "tekst": "Odpowiedź tętna też się zgadza. W bloku ośmiominutowym serce doszło do 163, w sześciominutowym do 167, w czterominutowym do 169 — rośnie razem z mocą, bez żadnego odjazdu. Maksimum jazdy to 173 przy Twoim HRmax 201, więc nawet najmocniejszy blok nie wszedł w rejon, z którego się nie wraca. Tak wygląda sesja progowa zrobiona poprawnie, a nie przeciągnięta."
-  },
-  {
    "t": "naglowek",
-   "tekst": "Jeden nowy rekord i uczciwa miara tego, ile jest wart"
+   "tekst": "Pytałeś o 914 W — odpowiadam dokładnie"
   },
   {
    "t": "akapit",
-   "tekst": "Strava zgłosiła nowy rekord godzinny i to prawda: 126 W na okno 60 minut, przy poprzednim 113 W z 28 października 2025. To poprawa o 13 W, czyli 1,80 W/kg zamiast 1,61. Ale powiem od razu, ile ten rekord znaczy, bo nie chcę, żeby urósł w Twojej głowie ponad miarę."
+   "tekst": "Nie, strumień nie urywa się na trzech sekundach. Dostajemy pełny zapis sekunda po sekundzie: 12 327 sekund jazdy, z czego 12 319 ma pomiar mocy. Nasz automat liczy z niego maksima dla szesnastu okien od 1 sekundy w górę, więc okno jednosekundowe jak najbardziej istnieje i dziś wynosi 857 W."
   },
   {
    "t": "ostrzezenie",
-   "tekst": "Po pierwsze jazda trwała równo godzinę, więc okno 60-minutowe obejmuje CAŁĄ sesję razem z rozgrzewką i schłodzeniem. Rekord mówi więc tyle, że Twoja najspokojniejsza godzina jest dziś mocniejsza niż kiedyś — a nie że wykręciłeś godzinę na maksa. Po drugie to była sesja sterowana: iloraz rekordu pięciosekundowego do piętnastominutowego wyszedł 1,43, czyli poniżej progu 2,0, więc strona oznaczyła ją znacznikiem ERG. W tym trybie trenażer trzyma zadaną moc — bloki po 165, 170 i 179 W to liczby z planu treningu, które Ty dowiozłeś, a nie liczby, które sam wybrałeś w trakcie. Do 19.09 strona traktowała to jako powód, żeby takiej sesji nie liczyć — w pierścieniu stref i w koszulkach. Od dziś, na Twoją decyzję, ERG liczy się wszędzie tak samo jak reszta, bo program ustawia OPÓR, a nie wysiłek: zadane waty trzeba utrzymać samemu. Znacznik ERG zostaje przy jeździe, żeby było widać, w jakim trybie padła liczba."
+   "tekst": "Ale 914 W w tym zapisie NIE MA. Najwyższa sekunda całej jazdy to 857 W, w sekundzie 12 255, czyli 204:15 — dosłownie w ostatniej minucie. Przeszukałem wszystkie 12 319 sekund: wartości 914 nie ma ani razu, a najbliższa jej liczba to właśnie 857. Dziesięć najwyższych sekund jazdy to 857, 856, 856, 848, 831, 831, 766, 766, 685 i 613."
   },
   {
-   "t": "wykres_moc",
-   "tytul": "Krzywa rekordów mocy — nowy punkt na godzinie"
+   "t": "akapit",
+   "tekst": "Skąd więc 914 na ekranie. Zwróć uwagę, jak wyglądają sekundy wokół szczytu: 480, 856, 856, 848, 831, 831, 857, 766, 766, 685. Wartości chodzą PARAMI. W ostatnich pięciu minutach 31% sekund jest identycznych z poprzednią, przy 11% na pierwszej godzinie jazdy — to wygląda na zapis rozdzielczy co dwie sekundy, rozciągnięty na sekundy przez powtórzenie. Jeśli tak jest, to prawdziwy szczyt wypadł MIĘDZY próbkami i po prostu nie został zapisany. Zwift na ekranie pokazuje odczyt chwilowy z trenażera, a do pliku zapisuje uśrednioną sekundę — te dwie liczby nie muszą być równe i tutaj nie są."
+  },
+  {
+   "t": "akapit",
+   "tekst": "Co z tego wynika praktycznie: strona pokaże 857 W jako Twój rekord jednosekundowy, bo tylko to ma w pomiarze. To nie jest błąd strony ani mój wybór — to jest wszystko, co Strava dostała od Zwifta. Jeżeli chcesz mieć te 914 W w danych, jedyną drogą jest zrzut z Zwifta (plik .fit z pełną rozdzielczością), a nie Strava. Dla porządku: Strava po swojej stronie w ogóle nie podaje rekordu jednosekundowego — jej lista „best efforts” zaczyna się od 5 sekund i pokazuje tam 845 W, czyli dokładnie to, co my liczymy."
   },
   {
    "t": "naglowek",
-   "tekst": "Co się naprawdę poprawiło w tym tygodniu"
+   "tekst": "Siedem rekordów mocy i wszystkie krótkie"
   },
   {
    "t": "akapit",
-   "tekst": "Efektywność rozkładu tętna z siedmiu dni wynosi dziś 58%. W zeszły weekend było 28% z podpisem „rozkład rozjechany”. Podniosła to jedna rzecz: wczorajsze dwie i pół godziny w drugiej strefie. Przez cały wrzesień pisałem, że masz za dużo trzeciej strefy i za mało jazd naprawdę lekkich — jedna długa spokojna jazda przesunęła ten wskaźnik o trzydzieści punktów. To jest najlepszy dowód, że problem nie był wymyślony."
-  },
-  {
-   "t": "wykres_strefy",
-   "miara": "tetno",
-   "dni": 7,
-   "tytul": "Strefy tętna, 7 dni — efektywność 58%, było 28%"
-  },
-  {
-   "t": "akapit",
-   "tekst": "Rozkład mocy z siedmiu dni, po odsianiu sesji sterowanej, daje 81% i podpis „blisko wzorca”. Te dwie liczby — 58% z tętna i 81% z mocy — nie są sprzeczne: opisują różne próbki, bo moc masz tylko z trzech ostatnich jazd na Zwifcie, a tętno także z sześciu szosowych. Mocowa mówi, jak wygląda ten trenażerowy blok. Tętnowa mówi, jak wygląda cały wrzesień. Pierwsza jest lepsza."
-  },
-  {
-   "t": "naglowek",
-   "tekst": "O formie życiowej — połowa racji"
-  },
-  {
-   "t": "akapit",
-   "tekst": "Piszesz, że czujesz się świetnie i masz wrażenie formy życiowej. Sprawdziłem, na ile dane to potwierdzają, i odpowiedź jest podzielona. Po stronie MOCY masz rację bez zastrzeżeń: próg 174 W jest najwyższy, jaki kiedykolwiek zmierzyłeś, rekordy od 30 sekund do 45 minut padły trzy dni temu, a 70,2 km z wczoraj to najdłuższa jazda w historii. Po stronie WYTRENOWANIA jeszcze nie: stoi na 132, a szczyt to 146 z 20 lipca. Jesteś czternaście punktów poniżej najlepszego stanu tego roku — ale idziesz w górę najszybciej od wiosny i przy tym tempie dogonisz go przed końcem miesiąca."
-  },
-  {
-   "t": "wykres_forma",
-   "tytul": "Wytrenowanie i zmęczenie — 132, czternaście punktów od szczytu"
-  },
-  {
-   "t": "ostrzezenie",
-   "tekst": "I dlatego muszę napisać rzecz, która zabrzmi wredno przy takim samopoczuciu. Napięcie zmęczenie do wytrenowania wynosi dziś 1,58 — najwyżej w całej historii tych danych, wyżej niż 1,55 z 10 września. Zmęczenie 209, forma −76, stopień zmęczenia 10 na 10. To trzecia jazda w trzy dni, po czterodniowej przerwie: test na maksa, dwie i pół godziny i sesja progowa. Świetne samopoczucie i głębokie zmęczenie potrafią iść w parze przez kilka dni — właśnie na tym polega pułapka. Ciało mówi „jeszcze” dokładnie wtedy, gdy adaptacja z ostatnich trzech dni nie została jeszcze odebrana. Jutro i pojutrze wolne, a jeśli w niedzielę zostanie ci ochota, to lekko."
-  },
-  {
-   "t": "akapit",
-   "tekst": "Konkret, żeby to nie było gołosłowne: pełna gotowość po dzisiejszej jeździe wypada jutro o 9:16, a licznik po raz pierwszy od tygodnia doliczył zaległość z poprzedniej jazdy (0,6 h z niedokończonej regeneracji po wczorajszych 2h22). To znaczy, że wchodziłeś dziś na trenażer, zanim poprzednia jazda została odrobiona. Raz to nic. Trzeci raz z rzędu to już wzorzec."
-  },
-  {
-   "t": "naglowek",
-   "tekst": "Tydzień i reszta"
-  },
-  {
-   "t": "akapit",
-   "tekst": "Plan na 15–21 września to 4,5 godziny. Masz 4 godziny 8 minut po pięciu dniach, więc do domknięcia zostaje 22 minuty i dwa dni. To znaczy, że plan jest praktycznie dowieziony i nie masz żadnego powodu, żeby jutro jechać — trzeci tydzień z rzędu skończy się na planie albo ponad nim."
+   "tekst": "Sprint w ostatniej minucie przestawił całą lewą stronę krzywej. Padły wszystkie okna od 1 sekundy do 40 sekund, a poprzednie rekordy sekundowe stały od 1 listopada 2025, czyli od jedenastu miesięcy."
   },
   {
    "t": "lista",
    "punkty": [
-    "Jutro i pojutrze — wolne. Napięcie 1,58 to rekord tych danych.",
-    "Niedziela, jeśli będzie ochota — 22 minuty spokojnie domykają tydzień.",
-    "Długa SZOSOWA wciąż czeka: wrzesień ma na szosie 47,3 km z 8 września.",
-    "Trzy sesje na Zwifcie z rzędu to zmiana wzorca — szosa zniknęła z tygodnia 12 września.",
-    "Żółta koszulka: dzień 19 ze 115, przerwa 0 dni."
+    "1 s — 857 W, było 804, o 53 W lepiej",
+    "3 s — 853 W, było 766, o 87 W lepiej",
+    "5 s — 845 W, było 702, o 143 W lepiej",
+    "10 s — 778 W, było 595, o 183 W lepiej",
+    "15 s — 617 W, było 451, o 166 W lepiej",
+    "30 s — 378 W, było 273, o 105 W lepiej",
+    "40 s — 313 W, było 278, o 35 W lepiej"
+   ]
+  },
+  {
+   "t": "wykres_moc",
+   "tytul": "Krzywa rekordów mocy — cała lewa strona przesunięta w górę"
+  },
+  {
+   "t": "akapit",
+   "tekst": "Okna dłuższe niż minuta zostały bez zmian i tak miało być: trzy i pół godziny przy 103 W to jazda wytrzymałościowa, nie próba na czas. Rekord dwudziestominutowy 183 W z testu FTP stoi nietknięty."
+  },
+  {
+   "t": "naglowek",
+   "tekst": "Dwie koszulki czekają na Twoje kliknięcie"
+  },
+  {
+   "t": "akapit",
+   "tekst": "Pierwszy raz od powstania gabloty coś ma status „warunek spełniony — odblokuj”, i to od razu dwie rzeczy naraz."
+  },
+  {
+   "t": "lista",
+   "punkty": [
+    "Koszulka młodzieżowa — pierwsza jazda co najmniej 80 km. Masz 101,2 km, czyli 21 km zapasu.",
+    "Maillot rojo — 100 km w czasie CAŁKOWITYM do czterech godzin. Masz 101,22 km w 3:25:26, czyli 34 minuty zapasu.",
+    "Maglia ciclamino podeszła z 77% na 85% — warunek to 1000 W jako średnia z trzech sekund, masz 853 W.",
+    "Maillot de lunares stoi na 88%, Koszulka górska na 90%, sprinterska na 99%."
+   ]
+  },
+  {
+   "t": "ostrzezenie",
+   "tekst": "Strona kłódki nie zdejmie — to Twoja decyzja i tak było ustalone od początku. Wejdź w Gablotę, dotknij koszulki i naciśnij przycisk odblokowania. Jedna uwaga, o której mówiłem wczoraj przy okazji ERG: warunek Koszulki młodzieżowej nie mówi nic o nawierzchni, więc formalnie domyka go jazda na trenażerze. Jeśli chciałeś, żeby ta koszulka padła na szosie, to jest moment, żeby to powiedzieć — bo za chwilę będzie po sprawie. Ja bym ją wziął: sto kilometrów to sto kilometrów, a nogi nie wiedzą, czy droga była prawdziwa."
+  },
+  {
+   "t": "naglowek",
+   "tekst": "Tydzień, który rozbił wszystkie liczby"
+  },
+  {
+   "t": "akapit",
+   "tekst": "7 godzin 33 minuty w siedem dni przy planie 4,5 godziny. To 168% planu i rekord całej historii — poprzedni najmocniejszy tydzień to 5 godzin 17 minut z 10 sierpnia — dzisiejszy jest od niego o 43% wyższy. Cztery jazdy: test FTP, jazda na 70 km, sesja progowa 8/6/4 i dzisiejsze trzy i pół godziny."
+  },
+  {
+   "t": "wykres_tygodnie",
+   "tytul": "Godziny w tygodniach — słupek, którego nie było"
+  },
+  {
+   "t": "akapit",
+   "tekst": "Wytrenowanie doszło do 151 i to też jest nowy szczyt — poprzedni wynosił 146 z 20 lipca i stał dwa miesiące. Do tego trzeci tydzień z rzędu z dowiezionym planem — to też rekord, bo serii dłuższej niż trzy tygodnie w tych danych nigdy nie było. Ten szczyt zbudowały cztery dni, a nie cztery tygodnie, i dlatego następny akapit jest o rachunku, a nie o gratulacjach."
+  },
+  {
+   "t": "naglowek",
+   "tekst": "I rachunek za to wszystko"
+  },
+  {
+   "t": "ostrzezenie",
+   "tekst": "Napięcie zmęczenie do wytrenowania wynosi dokładnie 2,00 przy 301 do 151. Forma −151 to najgłębszy dołek od 16 lipca i praktycznie równy tamtemu — wtedy napięcie doszło do 2,08, po czym przyszły trzy dni bez roweru i dopiero to je ściągnęło. Licznik regeneracji przyznał 35 godzin i pełną gotowość dopiero we wtorek o 8:48 — najwięcej od założenia pasa, drugie tyle co po sesji progowej. Stan zmęczenia stoi na 10 z 10, czyli na samym szczycie skali, z podpisem „wykończenie”: pełny odpoczynek, sen, jedzenie, zero roweru. Strona nie ma mocniejszego zdania w zapasie."
+  },
+  {
+   "t": "wykres_forma",
+   "tytul": "Wytrenowanie i zmęczenie — nożyce rozwarte na maksa"
+  },
+  {
+   "t": "akapit",
+   "tekst": "Powiem to bez owijania, bo o to prosiłeś. Napięcie 2,00 znaczy, że w ostatnim tygodniu nabierałeś zmęczenia dwa razy szybciej, niż je odrabiałeś. Taki stan jest normalny na szczycie bloku i przez kilka dni nie robi krzywdy — natomiast utrzymany dłużej przestaje budować i zaczyna kopać. Wytrenowanie 151 jest realnym kapitałem, ale zamienia się w formę dopiero przy zejściu zmęczenia, a zmęczenie zejdzie tylko wtedy, gdy przestaniesz jeździć. Poniedziałek i wtorek wolne, bezwzględnie. Środa najwyżej godzina spokojnie."
+  },
+  {
+   "t": "akapit",
+   "tekst": "Dla równowagi jedna liczba z drugiej strony: wysiłek dzisiejszej jazdy policzony z czasu w strefach tętna wyszedł 4,4 na 10, a nie 7, które wpisałeś. Z tętna wychodzi 35 godzin regeneracji, z RPE wyszłoby 83. Innymi słowy trzy i pół godziny było ciężkie długością, a nie intensywnością — ponad połowa czasu w dwóch najniższych strefach tętna i ani jednej sekundy w piątej. To jest najlepszy możliwy rodzaj ciężkiej jazdy i dlatego kończę na tym, a nie na ostrzeżeniu."
+  },
+  {
+   "t": "lista",
+   "punkty": [
+    "Poniedziałek i wtorek — wolne. Pełna gotowość wypada we wtorek rano.",
+    "Gablota — dwie koszulki czekają na odblokowanie.",
+    "Plan na 22–28 września to 3,5 h i jest to tydzień ODCIĄŻENIOWY. Po tym tygodniu trafia idealnie.",
+    "Długa szosowa nadal nie padła — wrzesień ma na szosie 47,3 km z 8 września.",
+    "Żółta koszulka: dzień 20 ze 115, przerwa 0 dni."
    ]
   },
   {
    "t": "akapit",
-   "tekst": "Poza liczbami: dwa awanse poziomu w dwa dni, 1,1 miliona dropów i pierwszy kupiony rower. To nie wchodzi do żadnego wykresu na tej stronie, bo Zwift trzyma to u siebie i przez Stravę nie przechodzi — ale zapisuję to tutaj, bo w tym projekcie od początku stoi zdanie, że Twoim ograniczeniem jest motywacja, a nie wydolność. Tydzień, w którym zmierzyłeś próg, pobiłeś rekord dystansu i trafiłeś trzy bloki progowe w próg co do wata, jest dobrym tygodniem także z tego powodu. Ride on — tylko po dwóch dniach wolnego."
+   "tekst": "Podsumowując: w cztery dni zmierzyłeś próg po jedenastu miesiącach, pobiłeś rekord dystansu dwa razy, wykręciłeś siedem rekordów mocy, dowiozłeś 168% planu tygodniowego, ustanowiłeś nowy szczyt wytrenowania i spełniłeś warunki dwóch pierwszych koszulek w gablocie. To jest najlepszy tydzień w całej historii tych danych i nie ma drugiego, który by się do niego zbliżył. Teraz dwa dni nic — po to, żeby ten tydzień w ogóle zamienił się w formę."
   }
  ]
 };

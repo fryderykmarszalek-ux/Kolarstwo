@@ -5455,9 +5455,11 @@ function podepnijStrefy(){
    takiego zapytania. Liczymy więc u siebie, tą samą metodą co ona, z danych,
    które API oddaje.
 
-   Obciążenie dnia = minuty ruchu × RPE (session-RPE, Foster 1998). Przy braku
-   miernika mocy i pasa tętna to najlepsza dostępna miara wysiłku — tak samo
-   mówi TRENING.md §8.6. Z obciążenia dwie średnie wykładnicze:
+   Obciążenie dnia = minuty ruchu × wysiłek (session-RPE, Foster 1998), gdzie
+   wysiłek bierze wysilekJazdy(): z czasu w strefach tętna, gdy pas był
+   założony, a z wpisanego RPE dopiero wtedy, gdy tętna nie ma. DOKŁADNIE TA
+   SAMA funkcja liczy licznik regeneracji — dwie definicje wysiłku na jednej
+   stronie rozjechałyby oba wykresy. Z obciążenia dwie średnie wykładnicze:
 
      wytrenowanie (42 dni)  — ile pracy siedzi w nogach
      zmęczenie   (7 dni)    — ile z tego jeszcze boli
@@ -5621,7 +5623,7 @@ function stanWytrenowania(){
     <div class="info">
       <b>To nie jest liczba ze Stravy.</b> Strava rysuje własną krzywą Fitness, ale
       nie oddaje jej przez API — nie ma takiego zapytania. Liczymy ją u siebie tą
-      samą metodą: obciążenie dnia to <b>minuty ruchu × RPE</b> (session-RPE,
+      samą metodą: obciążenie dnia to <b>minuty ruchu × wysiłek</b> (session-RPE,
       Foster 1998), a z niego dwie średnie wykładnicze o stałych
       ${KONF_FORMY.ctl_dni} i ${KONF_FORMY.atl_dni} dni.
       <br>Skala jest więc <b>własna</b> i nie da się jej porównywać z liczbą ze
@@ -5629,9 +5631,12 @@ function stanWytrenowania(){
       Wykres startuje ${pl(KONF_FORMY.od_daty)}, bo od tego dnia każda jazda ma
       wpisane RPE${seria.bezRPE ? ` (${seria.bezRPE} bez RPE zostało pominiętych)` : ""};
       wcześniejsze jazdy liczone jako zero dawałyby fałszywy dołek.
-      <br>Gdy ruszy pas tętna, obciążenie policzymy dokładniej (TRIMP), a po
-      mierniku mocy jeszcze dokładniej (TSS) — metoda siedzi w
-      <code>dane.js</code>, więc zmiana nie wymaga ruszania wykresu.
+      <br><b>Wysiłek liczymy z czasu w strefach tętna</b> (metodą Edwardsa,
+      przeskalowaną do 1–10), gdy pas był założony, a z wpisanego RPE dopiero
+      wtedy, gdy tętna nie ma — pomiar wygrywa z deklaracją. To ta sama liczba,
+      której używa licznik regeneracji. Po mierniku mocy policzymy jeszcze
+      dokładniej (TSS) — metoda siedzi w <code>dane.js</code>, więc zmiana nie
+      wymaga ruszania wykresu.
     </div>
   </section>`;
 }
