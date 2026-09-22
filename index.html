@@ -665,6 +665,15 @@ rect.proba-punkt{cursor:pointer}
 .wiersz-szczegolu .etykieta{color:var(--slaby);flex:0 0 88px}
 .wiersz-szczegolu .tresc{flex:1 1 auto;min-width:0}
 .info.alarmowy{border-left:3px solid var(--alarm)}
+/* Lista koszulek, których nie ma jeszcze w dane.js, i gotowy JSON pod nią.
+   Pole jest widoczne od razu, bez naciskania — schowane za przyciskiem było
+   dokładnie tym, o czym łatwo zapomnieć. */
+.lista-brudnopisow{margin:8px 0 10px;padding-left:20px}
+.lista-brudnopisow li{margin:2px 0;color:var(--tekst)}
+.pole-brudnopisow{margin-top:6px;font-size:11.5px;width:100%;
+  font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+  background:var(--tlo);color:var(--tekst);border:1px solid var(--linia);
+  border-radius:8px;padding:8px;resize:vertical;-webkit-text-size-adjust:100%}
 .info.alarmowy b{color:var(--alarm)}
 .uwaga-koszulki{font-size:12.5px;line-height:1.5}
 
@@ -4614,6 +4623,35 @@ const gablota = (arg) => {
       </section>`;
   }).join("");
 
+  /* CO SIEDZI TYLKO W TEJ PRZEGLĄDARCE — 22.09.2026.
+     Fryderyk odblokował dwie koszulki i po odświeżeniu ich nie zobaczył.
+     Kod działał poprawnie (sprawdzone: dwie koszulki przeżywają trzy
+     odświeżenia w Chromium), zawiodło samo założenie — localStorage w Safari
+     NIE JEST trwały. Kasuje go tryb prywatny, wyczyszczenie danych witryn,
+     siedmiodniowy limit ITP, a ikona z ekranu początkowego ma w ogóle własny,
+     osobny schowek niż zakładka w Safari: odblokowane w jednym miejscu nie
+     istnieje w drugim.
+
+     Jedyne trwałe miejsce to dane.js. Do 22.09 strona mówiła o tym drobnym
+     podpisem na dole i chowała JSON za przyciskiem — czyli dokładnie tak,
+     żeby dało się o tym zapomnieć. Teraz mówi to na górze, wymienia koszulki
+     po nazwie i pokazuje gotowy tekst do wklejenia bez naciskania czegokolwiek. */
+  const doPrzeniesienia = (() => {
+    const l = koszulkiLokalne(), lista = [];
+    for (const k of KOSZULKI){
+      if (!Object.prototype.hasOwnProperty.call(l, k.id)) continue;
+      lista.push({ nazwa: k.nazwa, id: k.id,
+                   data: l[k.id] ? l[k.id].data : null,
+                   zdjeta: !l[k.id] });
+    }
+    return lista;
+  })();
+  const jsonDoPrzeniesienia = doPrzeniesienia.length
+    ? JSON.stringify(Object.fromEntries(doPrzeniesienia.map(x =>
+        [x.id, x.zdjeta ? { nazwa: x.nazwa, zdjeta: true }
+                        : { nazwa: x.nazwa, data: x.data }])), null, 1)
+    : "";
+
   return `
   <section>
     <h2>Gablota</h2>
@@ -4634,11 +4672,28 @@ const gablota = (arg) => {
         <div class="stopka">stan na ${pl(DZIS)}</div>
       </div>
     </div>
+    ${doPrzeniesienia.length ? `
+    <div class="info alarmowy">
+      <b>${doPrzeniesienia.length === 1 ? "Jedna koszulka żyje"
+          : doPrzeniesienia.length + " koszulki żyją"} tylko w tej przeglądarce.</b>
+      Strona nie umie zapisać niczego do repozytorium — klucz do zapisu
+      w publicznym repo byłby kluczem dla wszystkich — więc dopóki tego nie
+      przeniosę do <code>dane.js</code>, zniknie przy wyczyszczeniu danych
+      Safari, po siedmiu dniach bez wejścia, a na iPadzie także wtedy, gdy raz
+      otworzysz stronę z ikony na ekranie początkowym, a raz z zakładki
+      w Safari — to są dwa osobne schowki.
+      <ul class="lista-brudnopisow">${doPrzeniesienia.map(x => `<li>${
+        bezpieczny(x.nazwa)} — ${x.zdjeta ? "zdjęta" : "odblokowana " + pl(x.data)}</li>`).join("")}</ul>
+      <b>Wklej mi to w czacie, a wpiszę na stałe:</b>
+      <textarea class="pole-brudnopisow" rows="${Math.min(2 + doPrzeniesienia.length * 3, 12)}"
+        readonly onclick="this.select()">${bezpieczny(jsonDoPrzeniesienia)}</textarea>
+    </div>` : ""}
   </section>
   ${grupy}
   <div class="prognoza-dol">
-    <span class="odblok-podpis">Odblokowania z tego urządzenia trzeba przenieść
-      do <code>dane.js</code>, żeby przetrwały wyczyszczenie przeglądarki.</span>
+    <span class="odblok-podpis">Trwałe jest wyłącznie to, co stoi
+      w <code>dane.js</code> — tylko to widać na każdym urządzeniu i tylko to
+      przeżyje wyczyszczenie Safari.</span>
     <button class="link-tekstowy" data-akcja="eksport">Koszulki dla Claude'a…</button>
   </div>
   <textarea id="koszulki-eksport-pole" rows="5" hidden readonly></textarea>

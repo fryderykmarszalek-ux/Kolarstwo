@@ -670,6 +670,38 @@ nie kolor: sylwetka roweru vs ekranu, słupek kreskowany vs pełny.
   przeglądarce** — to jedyna cena za odblokowywanie z telefonu i Fryderyk
   ją zna.
 
+  **PIERWSZE DWIE KOSZULKI ZDOBYTE — 22.09.2026.** Koszulka młodzieżowa
+  (`tdp-mlodziezowa`) i Maillot rojo (`vuelta-lidera`), obie za jazdę
+  `20260244166` z 20.09.2026: 101,22 km w 3:25:26. Wpisane do `dane.js` →
+  `koszulki.lista[].zdobyta`, więc są trwałe i widać je na każdym urządzeniu.
+
+  **LOCALSTORAGE NIE JEST TRWAŁY I NIE WOLNO UDAWAĆ, ŻE JEST.** Fryderyk
+  odblokował te dwie na iPadzie, odświeżył i ich nie zobaczył — po czym
+  napisał, że „jak raz kliknę, ma być odblokowane na stałe". Sprawdziłem kod
+  sondą w Chromium: dwie koszulki przeżywają trzy odświeżenia, wejście z listy
+  i wejście przez adres, a przy zablokowanym schowku strona uczciwie krzyczy
+  alertem. **Błędu w kodzie nie ma** — zawiodło samo założenie. W Safari
+  localStorage kasuje tryb prywatny, wyczyszczenie danych witryn i
+  siedmiodniowy limit ITP, a ikona z ekranu początkowego ma **osobny schowek**
+  niż zakładka w Safari: odblokowane w jednym miejscu nie istnieje w drugim.
+
+  Wniosek, który zostaje: **jedyną odpowiedzią na „na stałe" jest wpis
+  w `dane.js`**. Strona nadal nie będzie pisać do repozytorium — klucz do
+  zapisu w publicznym repo byłby kluczem dla wszystkich — więc przeniesienie
+  robi Claude w czacie. Zmieniło się to, że strona przestała o tym szeptać.
+
+  **Alarm zamiast drobnego podpisu** (22.09.2026). Do tego dnia Gablota mówiła
+  o brudnopisie jedną linijką na dole i chowała JSON za przyciskiem „Koszulki
+  dla Claude'a…" — czyli dokładnie tak, żeby dało się o tym zapomnieć, i tak
+  się stało. Teraz blok `info alarmowy` stoi **na górze**, zaraz pod licznikiem
+  zdobytych: wymienia koszulki po nazwie z datą, mówi wprost, co je kasuje,
+  i pokazuje **gotowy JSON w widocznym polu**, bez naciskania czegokolwiek.
+  Blok znika sam, gdy wszystko jest już w danych. Obsługuje też wpis `zdjeta`
+  — cofnięcie zdobycia wpisanego w `dane.js` też jest zmianą do przeniesienia.
+  Sprawdzone na trzech scenariuszach: czysta przeglądarka (brak alarmu,
+  2 z 18 z datami z danych), odblokowanie trzeciej (alarm przeżywa
+  odświeżenie), cofnięcie zdobycia z danych (pozycja „zdjęta" w JSON-ie).
+
   **Zablokowana koszulka nosi kłódkę**, nie tylko wyszarzenie. Przy osiemnastu
   kafelkach naraz oko potrzebuje znaku, nie odcienia — i będzie go potrzebowało
   tym bardziej, im więcej koszulek zdobytych.
