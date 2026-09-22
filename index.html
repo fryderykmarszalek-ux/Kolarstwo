@@ -286,7 +286,16 @@ header .pod{color:var(--slaby);font-size:12.5px;margin-top:3px}
   padding:9px 12px;background:var(--sek-tlo-slabe);
   overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;
 }
-.pasek2 .wiersz{display:flex;gap:6px;width:max-content;margin:0 auto}
+/* CENTROWANIE PRZEZ justify-content, NIE PRZEZ margin:0 auto — poprawka
+   z 22.09.2026, po dołożeniu piątej mini-zakładki w Regularności.
+   Przy "margin:0 auto" pasek szerszy od ekranu jest wyśrodkowany, więc
+   nadmiar wystaje po OBU stronach, a tego z lewej nie da się doscrollować:
+   na 500 px "Kryterium" wychodziło 19 px za krawędź i było nie do dotknięcia.
+   "min-width:100%" plus "justify-content:center" daje to samo wyśrodkowanie,
+   gdy pastylki się mieszczą, a gdy nie — rząd zaczyna się przy lewej krawędzi
+   i normalnie się przewija. Po dołożeniu zakładki SPRAWDZIĆ TO MIARĄ. */
+.pasek2 .wiersz{display:flex;gap:6px;width:max-content;min-width:100%;
+  justify-content:center}
 .pasek2::-webkit-scrollbar{display:none}
 .pasek2 button{
   appearance:none;border:1px solid transparent;cursor:pointer;
@@ -424,6 +433,63 @@ table.segmenty tr:last-child td{border-bottom:0}
 table.segmenty th:last-child,table.segmenty td:last-child{padding-right:16px}
 table.segmenty th:last-child button{padding-right:16px}
 table.segmenty tbody tr:hover td{background:var(--plyta)}
+/* --- C4: kilometry w miesiącu. Ta sama tabela co segmenty, ale sześć kolumn
+   krótkich napisów zamiast jednej długiej nazwy, więc szerokości są własne.
+   Policzone z NAJDŁUŻSZEGO NAPISU, a tym jest nagłówek, nie liczba: przy
+   min-width 560 px najciaśniejsza kolumna ma 33 px luzu ponad napis.
+   Po dołożeniu kolumny sprawdzić to miarą, nie okiem.
+
+   KOLEJNOŚĆ KOLUMN NIE JEST DOWOLNA. Pasek stoi zaraz za sumą, a nie na
+   końcu, bo przy 500 px tabela i tak przewija się w poziomie i ostatnia
+   kolumna jest na telefonie niewidoczna. Widać więc miesiąc, sumę i rysunek
+   — czyli odpowiedź na pytanie — a rozbicie na szosę i Zwift dojeżdża
+   przewinięciem. --- */
+table.segmenty.kilometry{min-width:560px}
+table.segmenty.kilometry th:first-child,
+table.segmenty.kilometry td:first-child{width:17%}
+table.segmenty.kilometry th:nth-child(2),table.segmenty.kilometry td:nth-child(2){width:15%}
+table.segmenty.kilometry th:nth-child(3),table.segmenty.kilometry td:nth-child(3){width:26%}
+table.segmenty.kilometry th:nth-child(4),table.segmenty.kilometry td:nth-child(4){width:14%}
+table.segmenty.kilometry th:nth-child(5),table.segmenty.kilometry td:nth-child(5){width:14%}
+table.segmenty.kilometry th:last-child,table.segmenty.kilometry td:last-child{width:14%}
+table.segmenty.kilometry th{padding:9px 10px;text-align:right;color:var(--slaby)}
+table.segmenty.kilometry th:first-child{text-align:left}
+table.segmenty.kilometry th:last-child{padding-right:16px}
+/* Wiersz roku jest podsumowaniem, nie miesiącem — stąd płyta pod spodem
+   i mocniejszy napis. Stoi NAD swoimi miesiącami, bo tabela idzie od
+   najnowszego i podsumowanie na dole opisywałoby to, czego jeszcze nie widać. */
+table.segmenty.kilometry tr.km-rok td{background:var(--plyta);color:var(--tekst);
+  font-weight:600;border-bottom:1px solid var(--linia)}
+table.segmenty.kilometry tr.km-rok td:first-child{letter-spacing:.02em}
+table.segmenty.kilometry tbody tr.km-rok:hover td{background:var(--plyta)}
+/* Miesiąc bez jazdy zostaje w tabeli, ale nie ma się czym chwalić. */
+table.segmenty.kilometry tr.km-pusty td{opacity:.5}
+/* Bieżący miesiąc — kreska przy krawędzi, bo to on jest powodem wejścia tutaj. */
+table.segmenty.kilometry tr.km-teraz td:first-child{
+  box-shadow:inset 3px 0 0 var(--akcent)}
+.km-znacznik{font-size:10px;font-weight:700;letter-spacing:.04em;color:var(--akcent);
+  border:1px solid var(--akcent);border-radius:99px;padding:1px 6px;margin-left:5px;
+  vertical-align:1px;opacity:.85}
+table.segmenty.kilometry tfoot td{padding:9px 10px;text-align:right;
+  border-top:1px solid var(--linia);color:var(--tekst);font-weight:600;
+  font-variant-numeric:tabular-nums;background:var(--plyta)}
+table.segmenty.kilometry tfoot td:first-child{text-align:left}
+table.segmenty.kilometry tfoot td:last-child{padding-right:16px}
+/* POZYCJONOWANIE WZGLĘDNE JEST WYMAGANE, nie kosmetyczne: kawałki paska są
+   pozycjonowane absolutnie i przy statycznym rodzicu szukałyby najbliższego
+   pozycjonowanego przodka — dokładnie tak rozlał się kiedyś pasek postępu
+   w Gablocie. */
+.km-pasek{position:relative;height:9px;border-radius:99px;
+  background:var(--plyta);overflow:hidden}
+.km-pasek i{position:absolute;top:0;bottom:0;display:block}
+/* Szosa i Zwift różnią się KSZTAŁTEM, nie barwą — obie są niebieskie, bo obie
+   są jazdą. Ta sama zasada co słupek pełny i kreskowany na C3. */
+.km-szosa{background:var(--akcent);opacity:.8}
+.km-zwift{background-image:repeating-linear-gradient(135deg,
+  var(--akcent) 0 2.5px, transparent 2.5px 5.5px);opacity:.9}
+/* Próbka w legendzie nosi dokładnie ten sam wypełniacz co pasek w tabeli. */
+.km-probka{display:inline-block;width:22px;height:9px;border-radius:99px;
+  vertical-align:-1px}
 .seg-nazwa{color:inherit;display:block;overflow-wrap:anywhere;text-decoration:none}
 .seg-nazwa .strzalka-wew{color:var(--slaby);margin-left:5px;font-size:15px;line-height:1}
 .seg-nazwa:hover{text-decoration:underline}
@@ -1987,6 +2053,59 @@ const miesiace = (() => {
 })();
 
 const rekordKm = Math.max(...miesiace.map(x => x.km));
+
+/* --- C4: KILOMETRY W MIESIĄCU ---------------------------------------------
+
+   To samo żebro miesięcy co przy C3 (ta sama oś czasu, te same puste miesiące),
+   tylko liczymy SUMĘ przejechanych kilometrów, a nie najdłuższą jazdę. Suma
+   i maksimum odpowiadają na dwa różne pytania i w tych danych rozchodzą się:
+   maj 2026 ma trzynaście jazd i 320 km przy najdłuższej 45, a lipiec jedenaście
+   jazd i 372 km przy najdłuższej 64.
+
+   Szosa i Zwift liczą się RAZEM — prośba Fryderyka z 22.09.2026 — ale stoją
+   też osobno, bo kilometr na trenażerze nie jest tym samym kilometrem co na
+   szosie. Rozróżnienie niesie KSZTAŁT, nie barwa: pasek szosy jest pełny,
+   zwiftowy kreskowany, dokładnie jak słupek na C3.
+
+   Wariant B: w danych leży dystans pojedynczej jazdy, sumy liczą się tutaj. */
+const kmMiesiace = (() => {
+  const wynik = miesiace.map(m => ({ klucz:m.klucz, rok:m.rok, miesiac:m.miesiac,
+                                     szosa:0, zwift:0, jazd:0, razem:0 }));
+  const poKluczu = new Map(wynik.map(x => [x.klucz, x]));
+  for (const a of jazdy){
+    const w = poKluczu.get(a.data.slice(0,7));
+    if (!w) continue;                       // jazda sprzed OD — nie nasza sprawa
+    // Ten sam podział co w Aktywnościach: typ ze Stravy, nigdy nazwa jazdy.
+    if (a.typ === "VirtualRide") w.zwift += a.dystans_m; else w.szosa += a.dystans_m;
+    w.jazd++;
+  }
+  /* ZAOKRĄGLAMY TU, RAZ, I DALEJ LICZYMY NA KILOMETRACH — nie na metrach.
+     Suma roku policzona z metrów wychodzi 1564,4, a dodanie tych samych
+     miesięcy tak, jak stoją w tabeli, daje 1564,3. Obie liczby są poprawne
+     i jedna z nich jest w tabeli nie do obrony: kto doda kolumnę, dostanie
+     inny wynik niż wiersz podsumowania. Różnica to najwyżej 5 metrów na
+     miesiąc, czyli grubo poniżej dokładności samego pomiaru GPS, więc
+     wybieramy tabelę, która się zgadza. */
+  for (const w of wynik){
+    w.szosa = Math.round(w.szosa/100)/10;
+    w.zwift = Math.round(w.zwift/100)/10;
+    w.razem = Math.round((w.szosa + w.zwift)*10)/10;
+  }
+  return wynik;
+})();
+
+const kmSuma = (() => {
+  const s = kmMiesiace.reduce((s,m) => ({
+    szosa: s.szosa + m.szosa, zwift: s.zwift + m.zwift,
+    razem: s.razem + m.razem, jazd: s.jazd + m.jazd
+  }), { szosa:0, zwift:0, razem:0, jazd:0 });
+  // Sumowanie ułamków dziesiętnych w float64 zostawia ogon (0,1+0,2 = 0,30000000000000004).
+  for (const k of ["razem","szosa","zwift"]) s[k] = Math.round(s[k]*10)/10;
+  return s;
+})();
+
+const kmNajlepszy = kmMiesiace.reduce((a,b) => b.razem > a.razem ? b : a, kmMiesiace[0]);
+const kmBiezacy   = kmMiesiace[kmMiesiace.length - 1];
 const rekordMies = miesiace.find(x => x.km === rekordKm);
 
 function wykresDlugich(){
@@ -2121,6 +2240,151 @@ const c3Dlugie = () => {
         <div class="etykieta">Miesiące z jazdą</div>
         <div class="liczba">${zJazda}</div>
         <div class="stopka">z ${miesiace.length} w zakresie</div>
+      </div>
+    </div>
+  </section>`;
+};
+
+/* ==========================================================================
+   C4 · KILOMETRY W MIESIĄCU
+
+   Fryderyk poprosił o TABELĘ, nie o wykres (22.09.2026) — i słusznie, bo
+   pytanie „ile w którym miesiącu" ma odpowiedź liczbową, a nie kształtem.
+   Wykres dokłada się drugą warstwą, wewnątrz wiersza: pasek długi na tyle,
+   ile ten miesiąc ma wobec najlepszego. Dzięki temu tabela czyta się też
+   jednym rzutem oka, a żadna kolumna nie musiała ustąpić miejsca rysunkowi.
+
+   KOLEJNOŚĆ OD NAJNOWSZEGO. Na telefonie liczy się to, co widać bez
+   przewijania, a bieżący miesiąc jest tym, o który się pyta. Ta sama zasada
+   co w Aktywnościach, gdzie pierwsza kolumna sortuje po dacie, nie po nazwie.
+
+   Rok ma własny wiersz z sumą i stoi NAD swoimi miesiącami — przy kolejności
+   malejącej podsumowanie na dole opisywałoby to, czego jeszcze nie widać.
+
+   Puste miesiące ZOSTAJĄ w tabeli, tak jak zostają na osi C3. Wiersz z kreską
+   mówi „nie jechałem", wiersz usunięty nie mówi nic.
+   ========================================================================== */
+
+// Pasek w wierszu: szosa pełna, Zwift kreskowany. Skala wspólna dla całej
+// tabeli — najlepszy miesiąc zajmuje pełną szerokość, reszta proporcjonalnie.
+function paskKm(m, naj){
+  if (!m.razem) return `<div class="km-pasek" aria-hidden="true"></div>`;
+  const pS = 100 * m.szosa / naj, pZ = 100 * m.zwift / naj;
+  return `<div class="km-pasek" aria-hidden="true">
+    ${m.szosa ? `<i class="km-szosa" style="left:0;width:${pS.toFixed(2)}%"></i>` : ""}
+    ${m.zwift ? `<i class="km-zwift" style="left:${pS.toFixed(2)}%;width:${pZ.toFixed(2)}%"></i>` : ""}
+  </div>`;
+}
+
+// Wszystko w kilometrach z jednym miejscem — tak, jak stoi w tabeli.
+const km1 = x => x ? liczba(x, 1) : "\u2014";
+
+function tabelaKilometrow(){
+  const naj = kmNajlepszy.razem || 1;
+  const lata = [...new Set(kmMiesiace.map(m => m.rok))].sort((a,b) => b - a);
+  let w = "";
+  for (const rok of lata){
+    const wRoku = kmMiesiace.filter(m => m.rok === rok).sort((a,b) => b.miesiac - a.miesiac);
+    // Suma roku dodaje DOKŁADNIE to, co widać w wierszach — patrz kmMiesiace.
+    const sR = wRoku.reduce((s,m) => ({ razem:s.razem+m.razem, szosa:s.szosa+m.szosa,
+                                        zwift:s.zwift+m.zwift, jazd:s.jazd+m.jazd }),
+                            { razem:0, szosa:0, zwift:0, jazd:0 });
+    for (const k of ["razem","szosa","zwift"]) sR[k] = Math.round(sR[k]*10)/10;
+    w += `<tr class="km-rok">
+      <td>${rok}</td><td>${km1(sR.razem)}</td><td></td>
+      <td>${km1(sR.szosa)}</td><td>${km1(sR.zwift)}</td>
+      <td>${sR.jazd || "\u2014"}</td></tr>`;
+    for (const m of wRoku){
+      const teraz = m.klucz === kmBiezacy.klucz;
+      w += `<tr class="${m.razem ? "" : "km-pusty"}${teraz ? " km-teraz" : ""}">
+        <td>${MIESIACE_RZYM[m.miesiac-1]}${teraz ? ` <span class="km-znacznik">trwa</span>` : ""}</td>
+        <td class="${m.razem ? "akt" : ""}">${km1(m.razem)}</td>
+        <td>${paskKm(m, naj)}</td>
+        <td>${km1(m.szosa)}</td>
+        <td>${km1(m.zwift)}</td>
+        <td>${m.jazd || "\u2014"}</td></tr>`;
+    }
+  }
+  return `<div class="tabelka"><table class="segmenty kilometry">
+    <thead><tr>
+      <th>Miesiąc</th><th>Razem</th><th>Rozkład</th><th>Szosa</th><th>Zwift</th>
+      <th>Jazd</th>
+    </tr></thead>
+    <tbody>${w}</tbody>
+    <tfoot><tr>
+      <td>Razem</td><td>${km1(kmSuma.razem)}</td><td></td>
+      <td>${km1(kmSuma.szosa)}</td><td>${km1(kmSuma.zwift)}</td><td>${kmSuma.jazd}</td>
+    </tr></tfoot>
+  </table></div>`;
+}
+
+const c4Kilometry = () => {
+  const srednia = kmSuma.razem / kmMiesiace.length;
+  const zJazda  = kmMiesiace.filter(m => m.razem).length;
+  const rekordTeraz = kmNajlepszy.klucz === kmBiezacy.klucz;
+  // Ile dni zostało w bieżącym miesiącu — liczone od meta.pobrano, a nie od
+  // zegara urządzenia. Cała strona poza paskiem świeżości i licznikiem
+  // regeneracji liczy się względem tego, co strona naprawdę wie.
+  const dzien = +DZIS.slice(8,10);
+  const wMiesiacu = new Date(Date.UTC(kmBiezacy.rok, kmBiezacy.miesiac, 0)).getUTCDate();
+  const zostalo = wMiesiacu - dzien;
+  const udzialZwift = kmSuma.razem ? 100 * kmSuma.zwift / kmSuma.razem : 0;
+  return `
+  <section>
+    <h2>C4 · Kilometry w miesiącu</h2>
+    <p class="opis">
+      Ile kilometrów w którym miesiącu — szosa i Zwift razem, bo przejechane
+      jest przejechane. Pasek obok sumy to ta sama liczba rysunkiem: najdłuższy
+      ma najlepszy miesiąc (${liczba(kmNajlepszy.razem,1)} km), reszta
+      jest do niego w skali. Pełny kawałek paska to szosa, kreskowany to
+      trenażer, a dwie kolumny dalej stoją te same kilometry liczbą.
+      Miesiąc bez ani jednej jazdy zostaje w tabeli z kreską — tak samo jak
+      zostaje pusty na osi obok.
+    </p>
+    ${tabelaKilometrow()}
+    <div class="legenda">
+      <span><i class="km-probka km-szosa"></i>szosa</span>
+      <span><i class="km-probka km-zwift"></i>${ikonaDyscypliny("VirtualRide",15)} Zwift</span>
+    </div>
+    <div class="info">
+      Liczone od ${pl(OD)}, jak wszystkie wykresy — wcześniejsza historia
+      została w pliku, ale nie wchodzi tutaj. Pierwszy wiersz obejmuje więc
+      tylko końcówkę swojego miesiąca. Kilometry biorą się wprost z tego, co
+      zapisała Strava; jazda, która nagrała się w połowie, wejdzie tu w połowie
+      i żadna suma tego nie naprawi.
+    </div>
+  </section>
+
+  <section>
+    <div class="kafelki">
+      <div class="kafel">
+        <div class="etykieta">Razem</div>
+        <div class="liczba">${liczba(kmSuma.razem,0)}</div>
+        <div class="stopka">km · ${kmSuma.jazd} jazd w ${zJazda} miesiącach</div>
+      </div>
+      <div class="kafel">
+        <div class="etykieta">Najlepszy miesiąc</div>
+        <div class="liczba"${rekordTeraz ? ` style="color:var(--plan)"` : ""}>${
+          liczba(kmNajlepszy.razem,1)}</div>
+        <div class="stopka">km · ${miesiacNaTekst(kmNajlepszy.klucz)}${
+          rekordTeraz ? " · trwa" : ""}</div>
+      </div>
+      <div class="kafel">
+        <div class="etykieta">Średnia miesięczna</div>
+        <div class="liczba">${liczba(srednia,1)}</div>
+        <div class="stopka">km · licząc puste miesiące</div>
+      </div>
+      <div class="kafel">
+        <div class="etykieta">Udział Zwiftu</div>
+        <div class="liczba">${liczba(udzialZwift,0)}%</div>
+        <div class="stopka">${liczba(kmSuma.zwift,0)} z ${
+          liczba(kmSuma.razem,0)} km</div>
+      </div>
+      <div class="kafel">
+        <div class="etykieta">Ten miesiąc</div>
+        <div class="liczba">${liczba(kmBiezacy.razem,1)}</div>
+        <div class="stopka">km · ${kmBiezacy.jazd} jazd · ${
+          zostalo > 0 ? `zostało ${zostalo} dni` : "miesiąc zamknięty"}</div>
       </div>
     </div>
   </section>`;
@@ -7533,6 +7797,7 @@ const SEKCJE = [
       { id:"godziny",   tytul:"Godziny",   rysuj: c1Godziny },
       { id:"przerwy",   tytul:"Przerwy",   rysuj: c2Przerwy },
       { id:"dlugie",    tytul:"Długie jazdy", rysuj: c3Dlugie },
+      { id:"kilometry", tytul:"Kilometry", rysuj: c4Kilometry },
       { id:"kryterium", tytul:"Kryterium", rysuj: kryterium }
   ]},
   { id:"postepy", tytul:"Postępy", barwa:"fiolet", pod:[

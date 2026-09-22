@@ -157,6 +157,38 @@ nie kolor: sylwetka roweru vs ekranu, słupek kreskowany vs pełny.
     dniu"), bo „0 dni przerwy" jest poprawne arytmetycznie i bez sensu po polsku.
   - **Długie jazdy** (C3): najdłuższa jazda w miesiącu, oś ciągła (puste
     miesiące zostają), Zwift kreskowany, linie celu 80 km i rekordu
+  - **Kilometry** (C4, 22.09.2026): tabela — ile kilometrów w każdym miesiącu,
+    **szosa i Zwift razem** (prośba Fryderyka). Rok ma własny wiersz z sumą,
+    stopka sumę całości. Kolumny: Miesiąc, Razem, Rozkład, Szosa, Zwift, Jazd.
+
+    **TABELA MA SIĘ ZGADZAĆ PO DODANIU W SŁUPKU.** Suma roku policzona
+    z metrów daje 1564,4 km, a dodanie miesięcy tak, jak stoją w tabeli —
+    1564,3. Obie są poprawne, ale jedna jest w tabeli nie do obrony: kto doda
+    kolumnę, dostanie inny wynik niż wiersz podsumowania. Zaokrąglamy więc
+    **raz, w `kmMiesiace`**, i dalej liczymy na kilometrach; błąd to najwyżej
+    5 m na miesiąc, czyli grubo poniżej dokładności GPS. Sprawdzane sondą:
+    każdy miesiąc (razem = szosa + Zwift), każdy rok (= suma swoich miesięcy)
+    i stopka (= suma lat).
+
+    **Pasek w wierszu stoi ZARAZ ZA SUMĄ, nie na końcu.** Tabela sześciu
+    kolumn przewija się przy 500 px w poziomie, więc ostatnia kolumna jest na
+    telefonie niewidoczna — a pasek jest właśnie tym, co ma być widać od razu.
+    Rozbicie na szosę i Zwift dojeżdża przewinięciem. Szosa jest pełna, Zwift
+    kreskowany: **kształt, nie barwa**, jak słupek na C3. Barwa jedna —
+    `--akcent`, bo jedno i drugie to jazda.
+
+    Skala paska: najlepszy miesiąc = pełna szerokość. Puste miesiące zostają
+    w tabeli z kreską, tak jak zostają na osi C3 — wiersz usunięty nie mówi nic.
+    Kolejność **od najnowszego**, bo bieżący miesiąc jest tym, o który się pyta.
+
+    **PIĄTA MINI-ZAKŁADKA ZEPSUŁA PASEK NAWIGACJI — poprawka tego samego dnia.**
+    `.pasek2 .wiersz` miał `margin:0 auto`, więc rząd szerszy od ekranu był
+    wyśrodkowany i nadmiar wystawał po OBU stronach, a tego z lewej nie da się
+    doscrollować. Na 500 px „Kryterium" wychodziło 19 px za krawędź i było
+    **nie do dotknięcia**. Teraz `min-width:100%` + `justify-content:center`:
+    to samo wyśrodkowanie, gdy pastylki się mieszczą, normalne przewijanie,
+    gdy nie. Sprawdzone przy 360, 500, 800 i 1200 px. **Dokładając zakładkę,
+    sprawdzić to miarą.**
   - **Kryterium**: wariant B, złamania, data ostatniego złamania
 - **Postępy → Segmenty** (20.08.2026) — tabela wszystkich segmentów od
   `meta.segmenty_od`: nazwa, najlepszy czas, prędkość, długość, nachylenie,
