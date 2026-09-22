@@ -1634,18 +1634,34 @@ const indeksDzis = tygodnie.findIndex(t => t.od === poniedzialek(DZIS));
 // niższy plan i jego dowiezienie jest tak samo zaplanowane.
 const tygodnieZPlanem = tygodnie.filter(t => !t.przyszly && t.plan != null);
 
+/* TYDZIEŃ, KTÓRY TRWA, NIE JEST JESZCZE OCENIONY — poprawka z 22.09.2026.
+   Komentarz wyżej od początku mówił „które miały plan i JUŻ MINĘŁY", ale filtr
+   mówił co innego: `!t.przyszly` przepuszcza także tydzień bieżący. Skutek był
+   widoczny dopiero we wtorek: po 1,2 h z planu 3,5 h strona pokazywała
+   **0 tygodni z rzędu**, choć nic się nie zerwało — trzy poprzednie tygodnie
+   były dowiezione, a bieżący po prostu jeszcze się nie skończył. W poniedziałek
+   rano seria zerowałaby się zawsze, co czyni ten kafelek bezużytecznym przez
+   większość tygodnia.
+
+   Tydzień bieżący wchodzi do oceny WYŁĄCZNIE wtedy, gdy plan jest już
+   dowieziony — bo tego faktu dalsza jazda nie cofnie. Dopóki nie jest,
+   nie przedłuża serii ani jej nie zrywa. Mianownik („rekord X z Y") liczy
+   tyle samo tygodni co licznik, żeby nie obiecywał oceny, której nie ma. */
 const seria = (() => {
+  const teraz = poniedzialek(DZIS);
+  const oceniane = tygodnieZPlanem.filter(t =>
+    t.od !== teraz || t.godziny >= t.plan);
   let biezaca = 0;
-  for (let i = tygodnieZPlanem.length - 1; i >= 0; i--){
-    if (tygodnieZPlanem[i].godziny >= tygodnieZPlanem[i].plan) biezaca++;
+  for (let i = oceniane.length - 1; i >= 0; i--){
+    if (oceniane[i].godziny >= oceniane[i].plan) biezaca++;
     else break;
   }
   let najdluzsza = 0, licznik = 0;
-  for (const t of tygodnieZPlanem){
+  for (const t of oceniane){
     if (t.godziny >= t.plan){ licznik++; najdluzsza = Math.max(najdluzsza, licznik); }
     else licznik = 0;
   }
-  return { biezaca, najdluzsza, ocenionych: tygodnieZPlanem.length };
+  return { biezaca, najdluzsza, ocenionych: oceniane.length };
 })();
 
 function wykresGodzin(){

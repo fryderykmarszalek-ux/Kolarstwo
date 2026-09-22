@@ -131,6 +131,26 @@ nie kolor: sylwetka roweru vs ekranu, słupek kreskowany vs pełny.
 - **Regularność** — cztery mini-zakładki:
   - **Godziny** (C1): słupek na tydzień, linia planu IX–X, tygodnie
     odciążeniowe na szaro, słupek zielenieje po dowiezieniu planu, kafelek serii
+    **TYDZIEŃ, KTÓRY TRWA, NIE JEST JESZCZE OCENIONY** (22.09.2026). Kafelek
+    „Seria z dowiezionym planem" pokazał **0 tygodni z rzędu**, choć nic się nie
+    zerwało: trzy poprzednie tygodnie były dowiezione, a bieżący miał dopiero
+    1,2 h z planu 3,5 h, bo był wtorek. Komentarz nad kodem od początku mówił
+    „liczymy tygodnie, które miały plan i JUŻ MINĘŁY", ale filtr mówił co innego
+    — `!t.przyszly` przepuszcza także tydzień bieżący, który ma `przyszly:false`
+    od poniedziałku rano. Skutek: seria zerowała się w każdy poniedziałek
+    i wracała dopiero po dowiezieniu planu, czyli kafelek kłamał przez większość
+    tygodnia. Wyszło to dopiero teraz, bo 20.09 tydzień bieżący był już
+    dowieziony (7,55 h z 4,5 h) i liczba przypadkiem się zgadzała.
+
+    Tydzień bieżący wchodzi teraz do oceny **wyłącznie wtedy, gdy plan jest już
+    dowieziony** — tego faktu dalsza jazda nie cofnie, więc wolno mu przedłużyć
+    serię. Dopóki nie jest, nie przedłuża jej ani nie zrywa. Mianownik
+    („rekord X z Y") liczy tyle samo tygodni co licznik. Sprawdzone sondą na
+    samym kodzie ze strony, nie na kopii, w sześciu przypadkach: trzy dowiezione
+    plus bieżący niedowieziony → 3 z 3; ten sam stan po dowiezieniu bieżącego
+    → 4 z 4; seria przerwana w środku → 1 z 3; poniedziałek rano z zerem godzin
+    → nie zrywa; sam bieżący tydzień → 0 z 0; ostatni miniony niedowieziony
+    → 0 z 2.
   - **Przerwy** (C2): słupek na przerwę, oś ucięta na 60 dniach z ząbkiem,
     czerwona linia na 14, zgłoszone wyjazdy szare.
 
