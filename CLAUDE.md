@@ -584,6 +584,17 @@ nie kolor: sylwetka roweru vs ekranu, słupek kreskowany vs pełny.
   Wpisane dziś tabele to **propozycje Claude'a do nadpisania**: tętno z HRmax
   201 (`TRENING.md` §6), moc z modelu Coggana przy FTP 150 W.
 
+  **TABELA MOCY STOI NA FTP 150 W, A ZMIERZONY PRÓG TO JUŻ 174 W** (23.09.2026,
+  z testu progowego z 17.09: rekord 20-minutowy 183 W, reguła 0,95 × 20 min).
+  Widać to na jeździe z 23.09: 120 W przez półtorej godziny to według tabeli
+  **trzecia strefa mocy** (113–135 W), a tętno siedziało w tym czasie w 96%
+  w **drugiej** strefie. Rozjazd jest realny i idzie w jedną stronę — tabela
+  mocy zaniża. **Nie poprawiać jej z własnej inicjatywy.** Progi, FTP
+  i wszystkie liczby tego typu to decyzje Fryderyka, powiedział to wprost
+  19.09: „Ja ustawiam sobie FTP i wszystkie liczby to moje decyzje, jak coś
+  będę chciał, to ci powiem". Wolno zauważyć rozjazd w analizie, nie wolno go
+  załatwić za niego.
+
   `strefy.rozklady.jazdy` jest dziś już wypełnione (4 jazdy z tętnem od
   30.08.2026, 17 ze Zwiftu z mocą), ale po zmianie z 5.09 służy tylko za zapas.
   Gdyby kiedyś było puste, wykres pokazuje pusty pierścień i mówi wprost
