@@ -322,10 +322,10 @@ koszulki: {
         "wzor": "gladka"
       },
       "zdobyta": {
-        "data": "2026-09-22",
+        "data": "2026-09-21",
         "jazda": "20260244166",
         "wynik": "101,22 km",
-        "skad": "odblokowana przez Fryderyka; przeniesione z urządzenia 22.09.2026"
+        "skad": "odblokowana przez Fryderyka 21.09.2026; przeniesione z urządzenia 23.09.2026"
       },
       "_uwaga": "Ten sam próg co cele.dluga_jazda_km — jeśli tam się zmieni, tutaj trzeba zmienić świadomie, a nie przez zapomnienie."
     },
@@ -434,10 +434,10 @@ koszulki: {
         "wzor": "gladka"
       },
       "zdobyta": {
-        "data": "2026-09-22",
+        "data": "2026-09-21",
         "jazda": "20260244166",
         "wynik": "101,22 km w 3:25:26",
-        "skad": "odblokowana przez Fryderyka; przeniesione z urządzenia 22.09.2026"
+        "skad": "odblokowana przez Fryderyka 21.09.2026; przeniesione z urządzenia 23.09.2026"
       },
       "_uwaga": "Czas całkowity, nie czas w ruchu: kawa w połowie trasy też się liczy. To warunek na średnią 25 km/h drzwi w drzwi."
     },

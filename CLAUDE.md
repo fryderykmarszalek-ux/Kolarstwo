@@ -690,10 +690,22 @@ nie kolor: sylwetka roweru vs ekranu, słupek kreskowany vs pełny.
   przeglądarce** — to jedyna cena za odblokowywanie z telefonu i Fryderyk
   ją zna.
 
-  **PIERWSZE DWIE KOSZULKI ZDOBYTE — 22.09.2026.** Koszulka młodzieżowa
+  **PIERWSZE DWIE KOSZULKI ZDOBYTE — 21.09.2026.** Koszulka młodzieżowa
   (`tdp-mlodziezowa`) i Maillot rojo (`vuelta-lidera`), obie za jazdę
   `20260244166` z 20.09.2026: 101,22 km w 3:25:26. Wpisane do `dane.js` →
   `koszulki.lista[].zdobyta`, więc są trwałe i widać je na każdym urządzeniu.
+
+  **DATA ZDOBYCIA TO DZIEŃ KLIKNIĘCIA I TRZEBA JĄ WZIĄĆ Z BRUDNOPISU, NIE
+  ZGADNĄĆ** (23.09.2026). Wpisałem najpierw 22.09, bo tego dnia Fryderyk o tym
+  napisał — a klikał 21.09, co widać dopiero w JSON-ie z przycisku „Koszulki
+  dla Claude'a…". Rozjazd nie jest kosmetyczny: przy różnych datach
+  `sprzatnijKoszulki()` uznaje brudnopis za inny niż dane i **zostawia go
+  w przeglądarce**, więc alarm o nieprzeniesionej koszulce stoi dalej, choć
+  wszystko jest już w `dane.js`. Po zrównaniu dat brudnopis kasuje się sam
+  (`localStorage` schodzi do `{}`) i alarm znika. Sprawdzone na jego dokładnym
+  brudnopisie: wejście → brudnopis pusty, alarm zniknął, obie koszulki z datą
+  21.09.2026; potem `localStorage.clear()` i odświeżenie → obie nadal stoją,
+  bo żyją już w danych. **Nie wpisywać daty z głowy — poprosić o JSON.**
 
   **LOCALSTORAGE NIE JEST TRWAŁY I NIE WOLNO UDAWAĆ, ŻE JEST.** Fryderyk
   odblokował te dwie na iPadzie, odświeżył i ich nie zobaczył — po czym
