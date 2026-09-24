@@ -2,105 +2,122 @@
 // NIE EDYTOWAĆ RĘCZNIE: plik jest nadpisywany po każdej zmianie danych.
 // Powstaje w .github/skrypty/analiza.js po nocnym pobraniu ze Stravy.
 //
-// Ta wersja jest wyjątkiem — napisana w sesji czatu 23.09.2026, bo sekretu
+// Ta wersja jest wyjątkiem — napisana w sesji czatu 24.09.2026, bo sekretu
 // ANTHROPIC_API_KEY jeszcze nie ma. Pole odcisk to prawdziwy skrót
 // dzisiejszego briefingu, a analiza jest z dzisiaj, więc automat zostawi ją
 // w spokoju do jutrzejszego wieczora.
 
 window.ANALIZA = {
  "wersja": 1,
- "utworzono": "2026-09-23T21:00",
+ "utworzono": "2026-09-24T21:00",
  "model": "asystent w sesji czatu",
- "jazd_w_danych": 98,
- "dane_pobrano": "2026-09-23T18:42",
- "odcisk": "08511f3a30d74686",
+ "jazd_w_danych": 100,
+ "dane_pobrano": "2026-09-24T16:18",
+ "odcisk": "86067c366f307bfe",
  "bloki": [
   {
    "t": "naglowek",
-   "tekst": "Półtorej godziny równego tempa, nowy szczyt wytrenowania i wrzesień na 470 km"
+   "tekst": "Dwa rekordy długich okien, czwarty tydzień z rzędu z planem i wrzesień ponad 500 km"
   },
   {
    "t": "akapit",
-   "tekst": "„Zwift - New Workout” na Coast Crusher w Watopii: 42,86 km w 1 godzinę 31 minut 12 sekund, moc średnia 112 W, tętno średnie 132, 588 kcal, 209 metrów przewyższenia. Do tego awans poziomu. Najdłuższa sesja na trenażerze od niedzielnej setki i najspokojniejsza od tygodnia."
+   "tekst": "Dwie jazdy. Najpierw „What Goes Up, Must Come Down on low cadence” na Classique w Londynie: 28,46 km w równą godzinę i 43 sekundy, moc średnia 138 W, tętno średnie 139, RPE 6, 478 kcal, 191 metrów. Potem jedenaście minut schłodzenia na Tick Tock — 5,83 km przy 119 W i RPE 3. Razem 34,3 km i 72 minuty w ruchu."
   },
   {
    "t": "kafelki",
    "pozycje": [
     {
-     "etykieta": "Dystans",
-     "wartosc": "42,9 km",
-     "stopka": "1:31:12 w ruchu"
+     "etykieta": "Rekord 45 min",
+     "wartosc": "150 W",
+     "stopka": "było 134 · +16 W"
     },
     {
-     "etykieta": "Rekord 90 min",
-     "wartosc": "110 W",
-     "stopka": "było 106 · +4 W"
+     "etykieta": "Rekord 60 min",
+     "wartosc": "139 W",
+     "stopka": "było 126 · +13 W"
     },
     {
      "etykieta": "Wrzesień",
-     "wartosc": "470 km",
-     "stopka": "13 jazd · 17,6 h"
+     "wartosc": "504 km",
+     "stopka": "15 jazd · 18,8 h"
     },
     {
      "etykieta": "Wytrenowanie",
-     "wartosc": "155",
-     "stopka": "nowy szczyt · było 151"
+     "wartosc": "158",
+     "stopka": "trzeci szczyt w trzy dni"
     }
    ]
   },
   {
    "t": "naglowek",
-   "tekst": "ERG jak z podręcznika"
+   "tekst": "Te dwa rekordy są mocniejsze niż wczorajszy i zaraz wyjaśnię dlaczego"
   },
   {
    "t": "akapit",
-   "tekst": "Spójrz na krzywą mocy tej jazdy: 167 W na jedną sekundę, 146 na pięć, a potem 120 W i już nic się nie rusza — dziesięć sekund, minuta, pięć minut, kwadrans, pół godziny, czterdzieści pięć minut, wszystko dokładnie 120 W. Płaska linia przez sześć rzędów wielkości czasu. Tak wygląda zapis sesji, w której trenażer trzymał zadaną moc, a Ty ją dowoziłeś bez ani jednego odjazdu w górę czy w dół."
-  },
-  {
-   "t": "akapit",
-   "tekst": "Iloraz, którym strona rozpoznaje ERG — pięć sekund podzielone przez kwadrans — wyszedł 1,22 przy progu 2,0. Nie jest to Twój najbardziej sterowany trening w historii, bo jesienne „Foundation” schodziły do 1,04, ale mieści się w tej samej rodzinie. Znacznik ERG stoi przy jeździe i to cała jego rola: masz wiedzieć, w jakim trybie padła liczba."
-  },
-  {
-   "t": "wykres_moc",
-   "tytul": "Krzywa rekordów mocy — nowy punkt na 90 minutach"
-  },
-  {
-   "t": "ostrzezenie",
-   "tekst": "Rekord 90-minutowy 110 W jest prawdziwy, ale powiem od razu, ile znaczy, żeby nie urósł ponad miarę. W całej historii Twoich pomiarów mocy TRZY jazdy w ogóle trwały półtorej godziny: 18 września (106 W), 20 września (105 W) i dzisiejsza. Rekord bije więc pole złożone z dwóch przejazdów, oba sprzed pięciu dni. To nie znaczy, że jest nic nie wart — znaczy, że okno 90 minut dopiero zaczyna mieć historię, bo dopiero od tygodnia jeździsz tak długo z miernikiem."
-  },
-  {
-   "t": "naglowek",
-   "tekst": "Tętno i moc mówią dwie różne rzeczy i obie są prawdziwe"
-  },
-  {
-   "t": "akapit",
-   "tekst": "Rozkład tej jazdy jest zdumiewająco czysty i warto się mu przyjrzeć, bo pokazuje coś, czego nie widać po samych średnich."
+   "tekst": "Wczoraj ostrzegałem, że rekord 90-minutowy bije pole złożone z dwóch przejazdów. Dziś jest inaczej. Okno 45-minutowe ma w Twoich danych dwadzieścia dwie jazdy i pełną historię: 93 W w październiku 2025, potem 100, potem 116, potem 134 z testu progowego sprzed tygodnia, a teraz 150. Okno godzinne ma trzynaście jazd i ciąg 112 → 113 → 126 → 139. To są rekordy z głębokim tłem, nie z braku konkurencji."
   },
   {
    "t": "lista",
    "punkty": [
-    "Tętno — 96% czasu w drugiej strefie, 4% w pierwszej, reszta zero. Dziewięćdziesiąt jeden minut i praktycznie ani jednej sekundy powyżej bazy.",
-    "Moc — 61% w trzeciej strefie (tempo), 35% w drugiej, zero powyżej. Program trzymał Cię nad progiem tlenowym przez większość sesji.",
-    "Jedenaście przejazdów na segmentach i ani jednego rekordu. Przy równym tempie to jest dokładnie to, czego się spodziewać."
+    "45 minut: 150 W wobec 134 W z 17 września — poprawa o 16 W, czyli 12%.",
+    "60 minut: 139 W wobec 126 W z 19 września — poprawa o 13 W, czyli 10%.",
+    "Oba poprzednie rekordy padły w tym samym tygodniu, więc bijesz własną świeżą formę, a nie coś sprzed roku.",
+    "Siedemnaście przejazdów na segmentach dało pięć rekordów."
    ]
   },
   {
+   "t": "wykres_moc",
+   "tytul": "Krzywa rekordów mocy — prawa strona przesunięta w górę"
+  },
+  {
    "t": "akapit",
-   "tekst": "Te dwie rzeczy nie są sprzeczne. Moc 120 W to dla Ciebie trzecia strefa, czyli tempo, a tętno przy niej stoi w drugiej — i to jest dobra wiadomość, nie błąd pomiaru. Znaczy, że serce radzi sobie z tą mocą taniej niż zakłada tabela mocy. Jedna z dwóch tabel jest więc nieco przesunięta względem Twojej dzisiejszej formy i podejrzewam, że to tabela mocy, bo stoi na FTP 150 W, a Twój zmierzony próg to 174 W. Nie ruszam jej — to Twoja decyzja i Twoje liczby."
+   "tekst": "Strava zgłosiła Ci rekord godzinny jako 90-dniowy. W Twoich danych jest rekordem całej historii pomiarów — tak samo jak przedwczoraj. To nie jest błąd Stravy, tylko różnica okna: ona patrzy na kwartał, strona patrzy na wszystko, co kiedykolwiek zmierzył trenażer."
+  },
+  {
+   "t": "naglowek",
+   "tekst": "Rzecz, która wygląda na sprzeczność i nią nie jest"
+  },
+  {
+   "t": "akapit",
+   "tekst": "Rozkład tej godzinnej sesji jest najdziwniejszy, jaki do tej pory widziałem w Twoich danych, i wart jest osobnego akapitu. Według tabeli mocy spędziłeś 53% czasu w piątej strefie, czyli w VO2 max — ponad trzydzieści minut powyżej 158 W. Według tętna nie wszedłeś ani na sekundę powyżej trzeciej strefy: 55% w tempie, 37% w bazie, zero w progu i zero w VO2."
+  },
+  {
+   "t": "akapit",
+   "tekst": "Wyjaśnienie stoi w nazwie treningu: „on low cadence”, czyli na niskiej kadencji. Przy wolnym kręceniu tę samą moc robisz większą siłą na pedał, a mniejszą liczbą powtórzeń. Obciążenie przenosi się z układu krążenia na mięśnie — nogi pracują ciężko, serce nie musi tak gonić. Dlatego moc mówi „VO2”, a tętno mówi „tempo”, i obie mają rację. To jest właśnie sens takiego treningu."
+  },
+  {
+   "t": "ostrzezenie",
+   "tekst": "Druga część wyjaśnienia jest mniej przyjemna i dotyczy tabeli, nie Ciebie. Twoja tabela mocy stoi na FTP 150 W, a zmierzony próg z 17 września to 174 W. Piąta strefa zaczyna się więc u Ciebie na papierze od 158 W, a powinna dużo wyżej. Część tych „53% w VO2” to artefakt zaniżonej tabeli, nie trening VO2. Nie ruszam jej — progi i FTP to Twoje liczby i Twoja decyzja, powiedziałeś to wprost. Ale dopóki tabela zostaje taka, pierścień mocy będzie systematycznie zawyżał intensywność, a efektywność rozkładu mocy (dziś 74%) trzeba czytać z tą poprawką w głowie."
   },
   {
    "t": "wykres_strefy",
    "miara": "tetno",
    "dni": 7,
-   "tytul": "Strefy tętna z siedmiu dni — efektywność 71%"
+   "tytul": "Strefy tętna z siedmiu dni — efektywność 61%"
   },
   {
    "t": "akapit",
-   "tekst": "Na oknie siedmiodniowym efektywność rozkładu wynosi 71% z podpisem „blisko wzorca”. Cztery dni temu, po sesji progowej, liczyłem tam 58%. Podniosła to jedna rzecz, o której pisałem przez cały wrzesień: więcej czasu w drugiej strefie. Masz jej teraz 6 godzin 11 minut z dziesięciu godzin, czyli 60%, przy trzeciej strefie na 29%. Wzorzec spolaryzowany chce około 80% na dole, więc nadal nie jesteś tam, gdzie trzeba — ale w dwa tygodnie przeszedłeś od „rozkład rozjechany” do „blisko wzorca”."
+   "tekst": "Na oknie siedmiodniowym efektywność rozkładu tętna spadła z 71% na 61% i podpis zmienił się z „blisko wzorca” na „da się poprawić”. Powód jest prosty: dzisiejsza godzina dołożyła trzydzieści cztery minuty trzeciej strefy, więc tempo urosło do 32% przy bazie 61%. Wzorzec spolaryzowany chce około 80% na dole i najwyżej kilku procent w środku. Spadek nie jest wpadką — to cena za konkretny trening, ale warto wiedzieć, że jutrzejsza przerwa ten wskaźnik sama naprawi, bo okno się przesunie."
   },
   {
    "t": "naglowek",
-   "tekst": "Wytrenowanie 155 — najwyżej, jak kiedykolwiek było"
+   "tekst": "Czwarty tydzień z rzędu z dowiezionym planem"
+  },
+  {
+   "t": "wykres_tygodnie",
+   "tytul": "Godziny w tygodniach"
+  },
+  {
+   "t": "akapit",
+   "tekst": "Tydzień 21–27 września ma 3 godziny 54 minuty przy planie 3,5 godziny — dowieziony, i to w tygodniu ODCIĄŻENIOWYM, trzy dni przed końcem. Seria wskoczyła na cztery tygodnie z rzędu i to nowy rekord tych danych. Dwa dni temu ten sam kafelek pokazywał zero, bo liczył tydzień, który jeszcze trwał; po poprawce liczy go dopiero wtedy, gdy plan naprawdę padł, i właśnie to się stało."
+  },
+  {
+   "t": "akapit",
+   "tekst": "Wrzesień przekroczył pięćset kilometrów: 504,5 km w piętnastu jazdach i 18,8 godziny. Poprzedni rekord miesiąca to 372,2 km z lipca, więc jesteś o 132 km wyżej przy sześciu dniach do końca. Na Zwifcie 328 km, na szosie 176,5 — i ta druga liczba nie ruszyła się od 12 września, czyli od dwunastu dni."
+  },
+  {
+   "t": "naglowek",
+   "tekst": "Bilans przed przerwą"
   },
   {
    "t": "wykres_forma",
@@ -108,38 +125,34 @@ window.ANALIZA = {
   },
   {
    "t": "akapit",
-   "tekst": "Wytrenowanie doszło do 155 i to nowy szczyt całej historii — poprzedni wynosił 151 i stał od niedzieli, a przed tym blokiem rekordem było 146 z 20 lipca. Zmęczenie 274, forma −119. Napięcie zmęczenia do wytrenowania to 1,77, czyli tyle samo co wczoraj: dzisiejsza jazda dołożyła dokładnie tyle, ile zeszło przez dobę."
+   "tekst": "Wytrenowanie 158 — trzeci nowy szczyt w trzy dni, po 151 w niedzielę i 155 wczoraj. Zmęczenie 279, forma −121, napięcie 1,76. Licznik regeneracji przyznał 1,4 godziny za samo schłodzenie plus 5,3 godziny zaległości z poprzedniej jazdy, razem 8,5 godziny i pełną gotowość o 00:51 w nocy z dziś na jutro. Stan zmęczenia stoi na 10 z 10."
   },
   {
    "t": "ostrzezenie",
-   "tekst": "I dlatego stan zmęczenia nadal stoi na 10 z 10 z podpisem „wykończenie”, a licznik regeneracji przyznał 9,6 godziny i pełną gotowość dopiero jutro o 6:19 rano. Wysiłek z tętna wyszedł 3,4 na 10, czyli jazda była naprawdę lekka — ale półtorej godziny to półtorej godziny i przy wytrenowaniu 155 każda następna sesja dokłada się do stosu, który i tak jest najwyższy w historii. Plan na ten tydzień to 3,5 godziny i jest to tydzień ODCIĄŻENIOWY. Masz 2 godziny 43 minuty, czyli zostało 47 minut na cztery dni. Nie rób więcej — ten tydzień ma zamienić wytrenowanie w formę, a nie dołożyć kolejny szczyt."
+   "tekst": "I dlatego jutrzejsza przerwa jest najlepszą rzeczą, jaką możesz teraz zrobić — mówię to jako pochwałę decyzji, nie jako ostrzeżenie. Wytrenowanie 158 to kapitał, ale zamienia się w formę dopiero wtedy, gdy zmęczenie zejdzie, a zmęczenie schodzi wyłącznie przez nieruszanie roweru. Przy jednym dniu wolnego zmęczenie spada mniej więcej o 13%, wytrenowanie o niecałe 3% — czyli forma poprawia się sama, bez żadnego wysiłku. Plan tygodnia masz już dowieziony, więc przerwa nic nie kosztuje."
   },
   {
    "t": "naglowek",
-   "tekst": "Wrzesień, który już jest najlepszym miesiącem"
+   "tekst": "RPE — zrobiłeś to, o co prosiłem, i wyszła z tego jedna ciekawa liczba"
   },
   {
    "t": "akapit",
-   "tekst": "470,2 km w trzynastu jazdach i 17,6 godziny. Poprzedni rekord miesiąca to 372,2 km z lipca, więc jesteś o 98 km wyżej i zostało jeszcze siedem dni. Na Zwifcie 293,7 km, na szosie 176,5 — i to jest jedyna liczba w tym miesiącu, która mnie martwi, bo szosa stanęła 12 września."
+   "tekst": "Wszystkie piętnaście wrześniowych jazd ma teraz wpisane RPE, łącznie z obiema dzisiejszymi (6 i 3) i wczorajszą, której wczoraj brakowało. To jest realna poprawa jakości danych i dziękuję."
   },
   {
-   "t": "wykres_tygodnie",
-   "tytul": "Godziny w tygodniach"
+   "t": "akapit",
+   "tekst": "Przy okazji wyszedł rozjazd, który wart jest jednego zdania. Wczorajszej jeździe wpisałeś RPE 8, a wysiłek policzony z czasu w strefach tętna wyszedł 3,4 na 10. To największa różnica, jaka do tej pory wystąpiła. Strona bierze do wzoru liczbę z tętna, bo pomiar wygrywa z deklaracją, więc na wykresach nic się nie przesunęło. Ale różnica sama w sobie coś mówi: albo półtorej godziny równego kręcenia było dla Ciebie subiektywnie dużo cięższe, niż pokazuje serce, albo osiem było wpisane na wyrost. Obie odpowiedzi są ciekawe, a tętno tej pierwszej nie wyklucza."
   },
   {
    "t": "lista",
    "punkty": [
-    "Tydzień 21–27 września: 2 h 43 min z planu 3,5 h. Zostało 47 minut.",
-    "Seria dowiezionych planów: trzy tygodnie z rzędu, rekord tych danych.",
-    "Rok 2026: 1639,3 km w 53 jazdach.",
-    "Żółta koszulka: okno minęło w 19%, najdłuższa przerwa w nim to 5 dni przy limicie 14.",
-    "Gablota: 2 z 18 — obie koszulki mają teraz datę 21.09 i siedzą na stałe w danych.",
-    "Ostatnia jazda na szosie: 12 września, czyli jedenaście dni temu."
+    "Tydzień 21–27 września: 3 h 54 min z planu 3,5 h — dowieziony.",
+    "Seria dowiezionych planów: cztery tygodnie z rzędu, rekord.",
+    "Rok 2026: 1673,6 km w 55 jazdach.",
+    "Żółta koszulka: okno minęło w 20%, najdłuższa przerwa w nim to 5 dni przy limicie 14.",
+    "Pełna gotowość: 25 września o 00:51, czyli tej nocy. Jutro wolne, więc wstaniesz odrobiony.",
+    "Ostatnia jazda na szosie: 12 września."
    ]
-  },
-  {
-   "t": "akapit",
-   "tekst": "Na koniec rzecz, którą trzeba pochwalić, bo jej nie odpuściłem wczoraj: dopisałeś RPE do obu wtorkowych jazd, po 5 na każdą. Dzięki temu strona ma i pomiar z tętna, i Twoją własną ocenę, a przy jazdach bez pasa to jedyne, co w ogóle zostaje. Dzisiejsza jeszcze go nie ma — wpisz i wejdzie przy najbliższym odświeżeniu."
   }
  ]
 };
