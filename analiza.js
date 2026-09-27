@@ -2,119 +2,114 @@
 // NIE EDYTOWAĆ RĘCZNIE: plik jest nadpisywany po każdej zmianie danych.
 // Powstaje w .github/skrypty/analiza.js po nocnym pobraniu ze Stravy.
 //
-// Ta wersja jest wyjątkiem — napisana w sesji czatu 26.09.2026, bo sekretu
+// Ta wersja jest wyjątkiem — napisana w sesji czatu 27.09.2026, bo sekretu
 // ANTHROPIC_API_KEY jeszcze nie ma. Pole odcisk to prawdziwy skrót
 // dzisiejszego briefingu, a analiza jest z dzisiaj, więc automat zostawi ją
 // w spokoju do jutrzejszego wieczora.
 
 window.ANALIZA = {
  "wersja": 1,
- "utworzono": "2026-09-26T21:00",
+ "utworzono": "2026-09-27T21:00",
  "model": "asystent w sesji czatu",
- "jazd_w_danych": 101,
- "dane_pobrano": "2026-09-26T19:14",
- "odcisk": "8a8dea8d46baedb7",
+ "jazd_w_danych": 102,
+ "dane_pobrano": "2026-09-27T18:23",
+ "odcisk": "bd2e7a665c7b826e",
  "bloki": [
   {
    "t": "naglowek",
-   "tekst": "Dwie godziny równego tempa, czwarty szczyt wytrenowania i tydzień odciążeniowy na 169%"
+   "tekst": "913 watów — te, o które pytałeś tydzień temu, właśnie się pojawiły"
   },
   {
    "t": "akapit",
-   "tekst": "„Zwift - Norwegian Method Endurance” na Flat Out Fast: 56,44 km w 2 godziny i 15 sekund, moc średnia 115 W, tętno średnie 140, RPE 8, 795 kcal, 350 metrów. Plus awans poziomu. Wczoraj nie jechałeś w ogóle — przerwa, o której mówiliśmy, została wzięta w całości."
+   "tekst": "Dwudziestego września zapytałeś, czy strona widzi, że zrobiłeś 914 watów, czy strumień urywa się na trzysekundowej mocy. Odpowiedź brzmiała wtedy: strumień jest pełny, ale najwyższa sekunda tamtej jazdy to 857 W i liczby 914 nie ma w nim ani razu. Dzisiaj, na „Pacer Group Ride with Bernie” na Tick Tock, w zapisie stoi 913 W. Jeden wat poniżej tego, co wtedy zobaczyłeś na ekranie — i tym razem jest to pomiar, nie wspomnienie."
   },
   {
    "t": "kafelki",
    "pozycje": [
     {
-     "etykieta": "Dystans",
-     "wartosc": "56,4 km",
-     "stopka": "2:00:15 w ruchu"
+     "etykieta": "Rekord 1 s",
+     "wartosc": "913 W",
+     "stopka": "13,04 W/kg · było 857"
     },
     {
-     "etykieta": "Wrzesień",
-     "wartosc": "561 km",
-     "stopka": "16 jazd · 20,8 h"
+     "etykieta": "Rekord 3 s",
+     "wartosc": "884 W",
+     "stopka": "było 853 · +31 W"
     },
     {
-     "etykieta": "Wytrenowanie",
-     "wartosc": "164",
-     "stopka": "czwarty szczyt w tygodniu"
+     "etykieta": "Rekord 5 s",
+     "wartosc": "859 W",
+     "stopka": "12,27 W/kg · +14 W"
     },
     {
      "etykieta": "Tydzień",
-     "wartosc": "169%",
+     "wartosc": "201%",
      "stopka": "planu odciążeniowego"
     }
    ]
   },
   {
    "t": "naglowek",
-   "tekst": "Sama jazda: najczystszy ERG, jaki do tej pory zrobiłeś"
+   "tekst": "Trzy rekordy sprinterskie i wszystkie z głębokim tłem"
   },
   {
    "t": "akapit",
-   "tekst": "Krzywa mocy tej jazdy stoi jak wmurowana: 132 W na sekundę, 130 W na wszystko od dziesięciu sekund do ośmiu minut, a potem 122–125 W przez resztę dwóch godzin. Iloraz rozpoznający ERG wyszedł 1,06 przy progu 2,0 — to drugi najniższy wynik w całej Twojej historii, zaraz po „Foundation on Red Zone Repeats” z października 2025. Program trzymał moc, a Ty ją dowiozłeś przez sto dwadzieścia minut bez jednego odjazdu."
+   "tekst": "Padły trzy okna: sekunda 913 W wobec 857, trzy sekundy 884 wobec 853, pięć sekund 859 wobec 845. Poprzednie rekordy stały od 20 września, czyli od tygodnia. Pula, z której te rekordy biją, to dwadzieścia siedem jazd z pomiarem mocy — to nie jest przypadek okna bez historii, jak przy 90 minutach."
   },
   {
    "t": "lista",
    "punkty": [
-    "Tętno — 54% czasu w trzeciej strefie, 45% w drugiej, zero powyżej i zero poniżej pierwszej.",
-    "Moc — 68% w trzeciej strefie, 26% w drugiej, zero powyżej.",
-    "Jedenaście przejazdów na segmentach dało pięć rekordów.",
-    "Rekord 90-minutowy: 122 W wobec 110 W sprzed trzech dni. To samo zastrzeżenie co wtedy — okno ma dopiero cztery jazdy w historii."
+    "Historia rekordu pięciosekundowego: 633 W (X 2025) → 677 → 702 → 845 (20 IX) → 859 dzisiaj.",
+    "Sekunda: 804 W z 1 listopada 2025 stało prawie rok, potem 857 przed tygodniem, teraz 913.",
+    "Strava zgłosiła to jako rekord 90-dniowy — w Twoich danych jest rekordem całej historii pomiarów.",
+    "Cztery przejazdy na segmentach, jeden rekord."
    ]
   },
   {
    "t": "wykres_moc",
-   "tytul": "Krzywa rekordów mocy"
-  },
-  {
-   "t": "naglowek",
-   "tekst": "A teraz rzecz, którą muszę powiedzieć wprost"
+   "tytul": "Krzywa rekordów mocy — lewa krawędź znowu w górę"
   },
   {
    "t": "akapit",
-   "tekst": "Tydzień 21–27 września jest w planie oznaczony jako ODCIĄŻENIOWY i ma 3,5 godziny. Masz w nim 5 godzin 55 minut, czyli 169% planu, i został jeszcze jeden dzień. Plan dowiozłeś w czwartek — od tamtej pory jedziesz ponad niego. Tydzień odciążeniowy nie jest tygodniem z niższym celem do pobicia; jest tygodniem, w którym niższa objętość JEST zadaniem."
+   "tekst": "Sama jazda była lekka i taka miała być: 34,78 km w 1 godzinę 7 minut, moc średnia 108 W, tętno średnie 133. Tętno spędziło 83% czasu w drugiej strefie, czyli w bazie, i ani sekundy powyżej trzeciej. Rozkład mocy jest za to rozstrzelony po wszystkich siedmiu strefach, z trzema procentami w siódmej — bo to jest właśnie kształt jazdy w grupie: długie spokojne kręcenie i kilka pełnych otwarć. Iloraz ERG wyszedł 7,22, czyli daleko powyżej progu 2,0 — to była jazda całkowicie swobodna, żaden program nie trzymał Ci mocy."
+  },
+  {
+   "t": "naglowek",
+   "tekst": "Tydzień zamknięty: 201% planu odciążeniowego"
+  },
+  {
+   "t": "wykres_tygodnie",
+   "tytul": "Godziny w tygodniach"
   },
   {
    "t": "ostrzezenie",
-   "tekst": "Wytrenowanie stoi na 164 i jest to czwarty nowy szczyt w ciągu tygodnia: 151, 155, 158, teraz 164. Zmęczenie 283, forma −119, napięcie 1,73. Stan zmęczenia pokazuje 10 z 10 z podpisem „wykończenie” — tak samo jak przy każdej aktualizacji w tym tygodniu. Licznik regeneracji przyznał 22 godziny za samą dzisiejszą jazdę i pełną gotowość dopiero jutro o 17:04. Wczorajsza przerwa ścięła zmęczenie o kilkanaście procent, a dzisiejsze dwie godziny oddały to z nawiązką — jeden dzień wolnego nie odrabia tygodnia, w którym każdy kolejny dzień był cięższy od poprzedniego."
+   "tekst": "Tydzień 21–27 września skończył się na 7 godzinach 2 minutach przy planie 3,5 godziny. To 201% — dokładnie dwa razy tyle, ile miał mieć tydzień oznaczony jako ODCIĄŻENIOWY, i drugi najmocniejszy tydzień w całej historii tych danych, zaraz po 7,55 h z tygodnia poprzedniego. Plan dowiozłeś w czwartek; przez kolejne trzy dni doszło jeszcze 3 godziny 8 minut. Mówiłem to wczoraj i powtarzam raz, bez dalszego wracania: tydzień odciążeniowy to nie jest tydzień z niższą poprzeczką do przeskoczenia."
+  },
+  {
+   "t": "akapit",
+   "tekst": "Następny tydzień, 28 września – 4 października, ma w planie 5 godzin i NIE jest odciążeniowy. To dobra wiadomość: przy takiej objętości jak przez ostatnie dwa tygodnie dowieziesz go bez wysiłku. Zła jest taka, że wchodzisz w niego z wytrenowaniem 166, które jest piątym nowym szczytem z rzędu, i z zapasem zmęczenia, którego nie odrobiłeś."
   },
   {
    "t": "wykres_forma",
    "tytul": "Wytrenowanie i zmęczenie"
   },
   {
-   "t": "naglowek",
-   "tekst": "I liczba, która to potwierdza z zupełnie innej strony"
-  },
-  {
    "t": "akapit",
-   "tekst": "Masz teraz osiemnaście jazd, w których jest i pas tętna, i wpisane RPE. To wystarczy, żeby porównać, jak wysiłek się CZUJE, z tym, co pokazuje serce. Średnio wpisujesz o 1,0 punktu więcej, niż wychodzi z tętna — to normalne i nic nie znaczy, bo RPE mierzy co innego. Znaczenie ma to, jak ta różnica się zmienia."
-  },
-  {
-   "t": "lista",
-   "punkty": [
-    "Pierwsze dziewięć jazd z pasem: średnia różnica +0,7.",
-    "Ostatnie dziewięć: +1,3.",
-    "Trzy największe różnice w całej historii to 23 września (+4,6), dzisiaj (+3,4) i 20 września (+2,6) — czyli wszystkie z ostatniego tygodnia.",
-    "Dzisiaj: wpisałeś 8, z tętna wyszło 4,6. Gdyby wzór brał Twoje RPE, licznik regeneracji pokazałby 63 godziny zamiast 22."
-   ]
-  },
-  {
-   "t": "akapit",
-   "tekst": "Są dwa wytłumaczenia i oba są ciekawe. Albo zacząłeś oceniać wysiłek surowiej, albo — i to jest wersja, którą traktowałbym poważnie przy wytrenowaniu 164 — ta sama praca naprawdę zaczyna kosztować więcej, mimo że serce jeszcze tego nie pokazuje. Rozjeżdżanie się odczucia z tętnem w górę jest klasycznym wczesnym znakiem nazbieranego zmęczenia, wcześniejszym niż cokolwiek, co widać na wykresie formy. Strona liczy z tętna, bo pomiar wygrywa z deklaracją — ale jeśli Twoje ósemki są uczciwe, to wykres formy w tej chwili ZANIŻA Twoje zmęczenie, a nie zawyża."
+   "tekst": "Są jednak sygnały w dobrą stronę i warto je nazwać, bo nie wszystko idzie w dół. Napięcie zmęczenia do wytrenowania spadło z 1,76 w czwartek przez 1,73 wczoraj na 1,68 dzisiaj — trzy dni z rzędu w dół. Forma poprawiła się z −119 wczoraj na −113. Zmęczenie zeszło z 283 na 279, mimo że dzisiaj jechałeś. To znaczy, że dzisiejsza godzina była dla organizmu tańsza niż średnia z ostatniego tygodnia, czyli że lekka jazda naprawdę zadziałała jak lekka jazda."
   },
   {
    "t": "wykres_strefy",
    "miara": "tetno",
    "dni": 7,
-   "tytul": "Strefy tętna z siedmiu dni — efektywność 54%"
+   "tytul": "Strefy tętna z siedmiu dni — efektywność 63%"
   },
   {
    "t": "akapit",
-   "tekst": "Efektywność rozkładu tętna spadła z 71% w środę na 61% w czwartek i 54% dzisiaj. Powód jest ten sam za każdym razem: trzecia strefa. Masz jej teraz 3 godziny 20 minut z dziewięciu i pół, czyli 36%, przy bazie 58%. Wzorzec spolaryzowany chce około 80% na dole i kilku procent w środku. Trzy ostatnie jazdy siedziały w tempie po połowie czasu każda — to nie jest ani baza, ani trening progowy, tylko pas pomiędzy, który kosztuje dużo i daje mało."
+   "tekst": "Efektywność rozkładu tętna wróciła z 54% na 63%, bo okno siedmiodniowe wypuściło twarde jazdy z zeszłego tygodnia, a dzisiejsze 83% w bazie przesunęło środek ciężkości w dół. Baza ma teraz 63,5% przy tempie 29,2% — nadal za dużo tempa wobec wzorca, ale kierunek jest właściwy pierwszy raz od czterech dni."
+  },
+  {
+   "t": "ostrzezenie",
+   "tekst": "Osobno: efektywność rozkładu MOCY pokazuje dziś 38% z podpisem „rozkład rozjechany” i tej liczby nie traktuj dosłownie. Dzisiejsze sprinty wrzuciły czas do piątej, szóstej i siódmej strefy mocy, a te strefy są u Ciebie policzone od FTP 150 W, przy zmierzonym progu 174 W. Przy zaniżonej tabeli każdy sprint liczy się jako więcej pracy powyżej progu, niż był naprawdę. Pierścień tętna nie ma tego problemu, bo tabela tętna stoi na zmierzonym HRmax — dlatego przy rozbieżności obu liczb wierz dziś tej z tętna."
   },
   {
    "t": "naglowek",
@@ -122,26 +117,22 @@ window.ANALIZA = {
   },
   {
    "t": "akapit",
-   "tekst": "560,9 km w szesnastu jazdach i 20,8 godziny. Poprzedni rekord miesiąca to 372,2 km z lipca, więc jesteś o 189 km wyżej przy czterech dniach do końca. Rok 2026 przekroczył 1730 km."
-  },
-  {
-   "t": "wykres_tygodnie",
-   "tytul": "Godziny w tygodniach"
+   "tekst": "595,7 km w siedemnastu jazdach i 21,9 godziny. Do sześciuset kilometrów brakuje 4,3 km i zostały trzy dni, więc to jest formalność. Poprzedni rekord miesiąca to 372,2 km z lipca — jesteś o 223 km wyżej. Rok 2026 ma 1764,8 km w pięćdziesięciu siedmiu jazdach."
   },
   {
    "t": "lista",
    "punkty": [
-    "Tydzień 21–27 września: 5 h 55 min z planu 3,5 h — 169%.",
+    "Tydzień 21–27 września: 7 h 2 min z planu 3,5 h — 201%, siedem jazd.",
     "Seria dowiezionych planów: cztery tygodnie z rzędu, rekord.",
-    "Wrzesień: 384,4 km na Zwifcie, 176,5 km na szosie.",
-    "Ostatnia jazda na szosie: 12 września, czyli czternaście dni temu.",
-    "Pełna gotowość po dzisiejszej jeździe: jutro o 17:04.",
-    "Żółta koszulka: przerwa 0 dni, najdłuższa w oknie to 5 dni przy limicie 14."
+    "Wrzesień: 419,2 km na Zwifcie, 176,5 km na szosie.",
+    "Ostatnia jazda na szosie: 12 września, czyli piętnaście dni temu.",
+    "Pełna gotowość po dzisiejszej jeździe: jutro o 4:26 nad ranem.",
+    "Dzisiejsza jazda nie ma jeszcze wpisanego RPE — wpisz, wejdzie przy najbliższym odświeżeniu."
    ]
   },
   {
    "t": "akapit",
-   "tekst": "Na koniec, żeby to nie zabrzmiało jak same zarzuty: dwie godziny równej mocy to porządna robota i wytrenowanie 164 jest prawdziwym kapitałem, którego dwa miesiące temu nie miałeś. Rzecz w tym, że kapitał zamienia się w formę wyłącznie wtedy, gdy zmęczenie zejdzie, a zmęczenie schodzi tylko przez nieruszanie roweru. Jutro kończy się tydzień odciążeniowy, który odciążeniowy nie był. Następny ma w planie 5 godzin i będzie łatwiejszy do dowiezienia niż ten — pod warunkiem, że wejdziesz w niego wypoczęty."
+   "tekst": "Na koniec wracam do początku, bo to jest dzisiaj najważniejsze. 913 W to 13,04 wata na kilogram. Jedenaście miesięcy temu Twój najlepszy sprint dawał 804 W, a dwa tygodnie temu 857. Przyrost o 56 watów w tydzień na oknie sekundowym nie bierze się z wytrzymałości ani z objętości — bierze się z tego, że nogi są mocniejsze niż były. To jest jedyna liczba w tym tygodniu, która rośnie z właściwego powodu."
   }
  ]
 };
