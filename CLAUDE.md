@@ -416,11 +416,12 @@ nie kolor: sylwetka roweru vs ekranu, słupek kreskowany vs pełny.
   a znak zostaje decyzją.
 
   **Dwa różne FTP i to jest celowe.** `zalozenia.FTP_W` = 180 W z tagiem
-  `[E]` (estymata z modelu, przedział 170–200). `prognozy.ftp_biezace` = 150 W
-  — deklaracja Fryderyka z 22.08.2026. Zmierzone dwadzieścia minut to 148 W,
-  czyli reguła „FTP ≈ 0,95 × 20 min" daje 141 W, a własna estymata Stravy
-  też 141 W. Bliżej prawdy jest liczba niższa i strona to mówi wprost
-  w bloku pod kartą FTP. Nie zlewać tych dwóch pól w jedno.
+  `[E]` (estymata z modelu, przedział 170–200). `prognozy.ftp_biezace` = **174 W
+  od 29.09.2026** (wcześniej 150 W, deklaracja z 22.08.2026) — to liczba, którą
+  Fryderyk uznaje za swoją, i zgadza się z pomiarem: rekord 20-minutowy 183 W
+  z 17.09 i reguła „FTP ≈ 0,95 × 20 min". Nie zlewać tych dwóch pól w jedno.
+  **Z `ftp_biezace` liczy się teraz tabela `strefy.moc`** — patrz §6, Objętość
+  → Tętno i Moc.
 
   **Okno 40 s weszło do `CZASY_KRZYWEJ`** w automacie, bo Fryderyk postawił
   na nie cel, a celu, którego nikt nie mierzy, nie da się nigdy rozstrzygnąć.
@@ -583,6 +584,52 @@ nie kolor: sylwetka roweru vs ekranu, słupek kreskowany vs pełny.
 
   Wpisane dziś tabele to **propozycje Claude'a do nadpisania**: tętno z HRmax
   201 (`TRENING.md` §6), moc z modelu Coggana przy FTP 150 W.
+
+  **FTP 174 W I TABELA MOCY PRZELICZONA WSTECZ — 29.09.2026, na wyraźne
+  polecenie Fryderyka.** Zgłosił: „mam ewidentnie wpisane 174 i ja to widzę;
+  jeżeli ty tego nie widzisz, to jest błąd w kodzie". Miał rację co do sedna,
+  choć przyczyna leżała gdzie indziej — i to w dwóch warstwach naraz:
+
+  1. **Jego 174 siedziało wyłącznie w `localStorage` iPada.** Pole FTP
+     w Prognozach działało poprawnie (brudnopis wygrywa z danymi), ale
+     `dane.js` trzymał dalej 150, więc on widział swoją liczbę, a ja swoją.
+     Ta sama pułapka co przy koszulkach tydzień wcześniej — **Prognozy nie
+     miały alarmu o brudnopisie, bo dostała go tylko Gablota.** Teraz mają
+     (`prognozyDoPrzeniesienia()` / `alarmPrognoz()`). **Dokładając
+     gdziekolwiek warstwę brudnopisu, dołożyć w tym samym commicie alarm.**
+  2. **FTP nie było z niczym połączone.** `ftpBiezace()` czytały wyłącznie
+     Prognozy; `strefy.moc.tabele` było osobną listą progów, wpisaną raz z FTP
+     150 i nigdy nieprzeliczaną — a strona pisała przy tym wprost, że „z FTP
+     biorą się strefy treningowe". Zdanie było nieprawdziwe i kosztowało:
+     efektywność rozkładu mocy z 7 dni wyszła **32% „rozkład rozjechany"**,
+     a po przeliczeniu na 174 — **89% „rozkład jak z podręcznika"**
+     (30 i 90 dni: 63%). Przez tydzień pierścień mocy opisywał trening,
+     którego nie było.
+
+  Nowe progi: `Z1 0-95 | Z2 96-130 | Z3 131-156 | Z4 157-182 | Z5 183-208 |
+  Z6 209-261 | Z7 262+`. Tabela zostaje pod datą **`od: "2026-08-27"`**, czyli
+  najstarszą — to semantyka przycisku ⟳ Poprawka, więc obejmuje wrzesień
+  i wszystko wcześniejsze, zgodnie z jego „wcześniejsze też". Tabela tętna
+  nietknięta: to osobny pomiar i osobna decyzja.
+
+  **Strona NADAL nie przelicza tabeli sama** — progi to decyzja Fryderyka
+  i wolno mu odejść od modelu. Robi jedno: `rozjazdFtp()` liczy, jak wyglądałby
+  model Coggana przy bieżącym FTP, a `ostrzezenieFtp()` pokazuje nad tabelą
+  obie listy progów, gdy się różnią. Zmieniając FTP w `dane.js`, przeliczyć
+  tabelę ręcznie — albo zostawić rozjazd świadomie, ale wtedy strona o nim
+  mówi na głos.
+
+  **PIERŚCIEŃ W ANALIZIE AI LICZYŁ SIĘ Z ZAPASU, NIE Z PRZEBIEGÓW** — złapane
+  przy tej samej zmianie. `dopelnijPrzebiegiStref()` wisiało wyłącznie na
+  zakładce Objętość, więc blok `wykres_strefy` w Analizie rysował sekundy
+  policzone przez automat STARĄ tabelą: to samo okno siedmiu dni pokazywało
+  89% w Objętości i **32% w Analizie**. Dwie sprzeczne liczby na jednej
+  stronie, ten sam błąd co 5.09. Stąd `dopelnijStrefyAnalizy()`, wołane z tego
+  samego miejsca co reszta podpięć i **tylko przy otwartej zakładce** (inaczej
+  każde wejście gdziekolwiek ciągnęłoby kilkanaście plików przebiegów).
+  **Dokładając gdziekolwiek pierścień stref, podpiąć doczytywanie.**
+
+  Zapis poniżej jest już nieaktualny — zostaje jako ślad decyzji:
 
   **TABELA MOCY STOI NA FTP 150 W, A ZMIERZONY PRÓG TO JUŻ 174 W** (23.09.2026,
   z testu progowego z 17.09: rekord 20-minutowy 183 W, reguła 0,95 × 20 min).

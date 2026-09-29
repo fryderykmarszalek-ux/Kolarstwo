@@ -13,7 +13,7 @@ window.ANALIZA = {
  "model": "asystent w sesji czatu",
  "jazd_w_danych": 104,
  "dane_pobrano": "2026-09-29T17:10",
- "odcisk": "a39cf820d21af510",
+ "odcisk": "5d34eb45e2b35a7c",
  "bloki": [
   {
    "t": "naglowek",
@@ -91,20 +91,43 @@ window.ANALIZA = {
   },
   {
    "t": "naglowek",
-   "tekst": "I rzecz, o której musisz zdecydować Ty, nie ja"
+   "tekst": "Miałeś rację — FTP 174 nie było na stronie z niczym połączone"
   },
   {
-   "t": "ostrzezenie",
-   "tekst": "Strava zgłosiła dziś „New FTP set!”. Twój rekord dwudziestominutowy wzrósł ze 183 na 185 W, a reguła FTP ≈ 0,95 × 20 minut daje z tego 176 W. Na stronie, w Prognozach, jako FTP bieżące stoi nadal 150 W — liczba, którą zadeklarowałeś 22 sierpnia. Różnica wynosi 26 watów i to nie jest drobiazg: z FTP biorą się wszystkie siedem stref mocy, więc póki tam stoi 150, pierścień mocy będzie każdą mocniejszą jazdę wrzucał o strefę lub dwie za wysoko. Dziś pokazał 32% i podpis „rozkład rozjechany” — po części właśnie dlatego. Nie zmieniam tej liczby, bo progi i FTP to Twoje decyzje i powiedziałeś to wprost. Ale zmierzona podstawa przesunęła się drugi raz w tym miesiącu i wypada Ci to powiedzieć."
+   "t": "akapit",
+   "tekst": "Napisałeś: „mam ewidentnie wpisane 174 i ja to widzę; jeżeli ty tego nie widzisz, to jest błąd w kodzie”. Sprawdziłem i błąd był, tylko w innym miejscu, niż obaj myśleliśmy. Pole FTP w Prognozach działało poprawnie — Twoje 174 siedziało w pamięci iPada i strona je pokazywała. Nie widziałem go, bo pamięć przeglądarki zostaje na urządzeniu i do repozytorium nie trafia; w danych stało dalej 150. Ale prawdziwa wpadka jest głębsza: tabela stref mocy była osobną listą progów, wpisaną raz z FTP 150 i nigdy nieprzeliczaną. Strona pisała przy tym wprost, że „z FTP biorą się strefy treningowe” — i to zdanie było nieprawdą."
+  },
+  {
+   "t": "akapit",
+   "tekst": "Poprawione dziś, zgodnie z Twoim poleceniem, i wstecz — także na wrześniowe i wcześniejsze jazdy. FTP 174 W stoi teraz w danych, więc widać je na każdym urządzeniu, a nie tylko na tym, na którym klikałeś. Progi mocy przeliczone modelem Coggana od nowa."
   },
   {
    "t": "lista",
    "punkty": [
-    "Historia rekordu 20-minutowego: 99 W (X 2025) → 108 → 148 → 183 (17 IX) → 185 dzisiaj.",
-    "Odpowiadające temu FTP z reguły 0,95×: 94 → 103 → 141 → 174 → 176 W.",
-    "FTP wpisane w Prognozach: 150 W, z 22 sierpnia.",
-    "Prognoza na grudzień 2026: 225 W."
+    "Stara tabela (FTP 150): Z1 0–82 · Z2 83–112 · Z3 113–135 · Z4 136–157 · Z5 158–180 · Z6 181–225 · Z7 226+",
+    "Nowa tabela (FTP 174): Z1 0–95 · Z2 96–130 · Z3 131–156 · Z4 157–182 · Z5 183–208 · Z6 209–261 · Z7 262+",
+    "Efektywność rozkładu mocy z 7 dni: 32% „rozkład rozjechany” zmieniło się na 89% „rozkład jak z podręcznika”.",
+    "Na oknach 30 i 90 dni: 63%.",
+    "Tabela tętna nietknięta — to osobny pomiar i osobna decyzja."
    ]
+  },
+  {
+   "t": "wykres_strefy",
+   "miara": "moc",
+   "dni": 7,
+   "tytul": "Strefy mocy po przeliczeniu na FTP 174"
+  },
+  {
+   "t": "akapit",
+   "tekst": "Ta różnica 57 punktów procentowych to nie kosmetyka. Przy tabeli z FTP 150 każda mocniejsza jazda lądowała o strefę czy dwie za wysoko, więc pierścień mocy przez ostatni tydzień opisywał trening, którego nie było — wyglądało to na ciągłe siedzenie w progu i powyżej, choć naprawdę jechałeś w bazie. Dokładnie ten sam błąd, który złapaliśmy 5 września przy strefach tętna: nowe podpisy nad starymi liczbami, bez słowa ostrzeżenia."
+  },
+  {
+   "t": "akapit",
+   "tekst": "Żeby to nie wróciło, strona ma teraz dwie nowe rzeczy. Pierwsza: w zakładce Moc liczy sobie, jak wyglądałaby tabela Coggana przy Twoim bieżącym FTP, i gdy progi się z tym rozjeżdżają, mówi to na głos razem z obiema listami liczb. Sama niczego nie przelicza — progi są Twoją decyzją i wolno Ci odejść od modelu. Druga: Prognozy dostały ten sam głośny alarm, który Gablota ma od 22 września — jeśli FTP albo ptaszek żyje wyłącznie w jednej przeglądarce, na górze stoi blok z gotowym JSON-em do wklejenia mi w czacie. Gdyby ten alarm był tam tydzień temu, w ogóle nie doszłoby do tej rozmowy."
+  },
+  {
+   "t": "ostrzezenie",
+   "tekst": "Jedna liczba nadal Cię czeka, i to Twoja decyzja, nie moja. Dzisiejszy rekord 20-minutowy to 185 W, więc reguła FTP ≈ 0,95 × 20 minut daje już 176 W, a nie 174. Różnica dwóch watów nie rusza ani jednego progu (Coggan przy 176 daje Z2 od 97 zamiast 96), więc nic nie zmieniam. Mówię tylko, że podstawa przesunęła się drugi raz w tym miesiącu."
   },
   {
    "t": "naglowek",

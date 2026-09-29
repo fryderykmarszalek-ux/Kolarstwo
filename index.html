@@ -4017,6 +4017,62 @@ function uwagaSpojnosci(okres){
   return t;
 }
 
+/* CO SIEDZI TYLKO W TEJ PRZEGLĄDARCE — dodane 29.09.2026, po tym jak Fryderyk
+   napisał: „moje FTP stoi na 174, a ty mówisz 150".
+
+   Miał rację, że coś jest nie tak, i to był dokładnie ten sam mechanizm co przy
+   koszulkach: wpisał 174 na iPadzie, brudnopis usiadł w localStorage, a
+   `dane.js` dalej trzymał 150. On widział swoją liczbę, ja widziałem swoją
+   i obaj mieliśmy rację co do tego, co mamy przed oczami.
+
+   Gablota dostała za to głośny blok 22.09. Prognozy nie dostały — i przez to
+   ta sama pułapka zadziałała drugi raz, siedem dni później, tylko w innym
+   miejscu. **Dokładając gdziekolwiek warstwę brudnopisu, dołożyć też alarm.**
+
+   Tutaj stawka jest wyższa niż przy koszulce: FTP zostało 29.09 podłączone do
+   tabeli stref mocy, więc liczba żyjąca wyłącznie w jednej przeglądarce
+   rozjeżdża rozkłady na każdym innym urządzeniu. */
+function prognozyDoPrzeniesienia(){
+  const l = prognozyLokalne();
+  const poz = [];
+  if (l.ftp != null && l.ftp !== ftpZRepo())
+    poz.push({ co: "FTP bieżące", wartosc: l.ftp + " W",
+               wdanych: ftpZRepo() == null ? "brak" : ftpZRepo() + " W" });
+  for (const [k, v] of Object.entries(l.znaki || {})){
+    const ciecie = k.indexOf("/");
+    if (ciecie < 0) continue;
+    poz.push({ co: "Znak " + k, wartosc: v === null ? "zdjęty" : v,
+               wdanych: znakZRepo(k.slice(0,ciecie), k.slice(ciecie+1)) || "brak" });
+  }
+  return poz;
+}
+
+function alarmPrognoz(){
+  const poz = prognozyDoPrzeniesienia();
+  if (!poz.length) return "";
+  const l = prognozyLokalne();
+  const wyniki = {};
+  for (const [k, v] of Object.entries(l.znaki || {})){
+    const c = k.indexOf("/"); if (c < 0) continue;
+    (wyniki[k.slice(0,c)] = wyniki[k.slice(0,c)] || {})[k.slice(c+1)] = v;
+  }
+  const json = JSON.stringify(
+    l.ftp != null ? { ftp_biezace: l.ftp, wyniki } : { wyniki }, null, 1);
+  return `
+    <div class="info alarmowy">
+      <b>${poz.length === 1 ? "Jedna rzecz żyje" : poz.length + " rzeczy żyją"}
+      tylko w tej przeglądarce.</b> Strona nie umie zapisać niczego do
+      repozytorium, więc dopóki tego nie przeniosę do <code>dane.js</code>,
+      widzisz to wyłącznie Ty i wyłącznie tutaj — a na każdym innym urządzeniu,
+      w nocnym automacie i u mnie w czacie stoi stara wartość.
+      <ul class="lista-brudnopisow">${poz.map(x => `<li>${bezpieczny(x.co)}:
+        <b>${bezpieczny(x.wartosc)}</b> — w danych ${bezpieczny(x.wdanych)}</li>`).join("")}</ul>
+      <b>Wklej mi to w czacie, a wpiszę na stałe:</b>
+      <textarea class="pole-brudnopisow" rows="${Math.min(2 + poz.length * 2, 10)}"
+        readonly onclick="this.select()">${bezpieczny(json)}</textarea>
+    </div>`;
+}
+
 function prognozaMocy(idOkresu){
   const okres = okresPrognozy(idOkresu);
   if (!okres) return pusto("Prognozy");
@@ -4118,6 +4174,7 @@ function prognozaMocy(idOkresu){
       <button class="link-tekstowy" id="prognoza-eksport">Zaznaczenia dla Claude'a…</button>
     </div>
     <textarea id="prognoza-eksport-pole" rows="6" hidden readonly></textarea>
+    ${alarmPrognoz()}
     <div class="info">
       ${uwagaSpojnosci(okres)}
       <br>Bieżące FTP i wszystkie ptaszki zapisują się <b>na tym urządzeniu</b>.
@@ -5079,6 +5136,80 @@ const IKONA_SERCA = `<svg class="ikona-tabeli" viewBox="0 0 20 20" aria-hidden="
 const IKONA_BLYSKAWICY = `<svg class="ikona-tabeli" viewBox="0 0 20 20" aria-hidden="true">
   <path d="M11.4 2 4.6 11.2h4.2L8.2 18l7.2-9.6h-4.4L11.4 2Z" fill="currentColor"/></svg>`;
 
+/* CZY TABELA MOCY ZGADZA SIĘ Z FTP — dodane 29.09.2026.
+
+   Fryderyk zgłosił: „moje FTP stoi na 174, a ty mówisz 150; jeżeli tego nie
+   widzisz, to jest błąd w kodzie". Sprawdziłem i miał rację co do sedna,
+   choć przyczyna leżała gdzie indziej. Pole FTP w Prognozach działało
+   poprawnie — jego 174 siedziało w brudnopisie urządzenia i strona je
+   pokazywała. Błąd polegał na czymś innym: **FTP nie było z niczym
+   połączone**. Prognozy czytały je w jednym miejscu (`ftpTeraz`), a tabela
+   stref mocy stała jako osobna lista progów, wpisana raz z FTP 150 i nigdy
+   nieprzeliczana. Strona pisała przy tym wprost, że „z FTP biorą się strefy
+   treningowe" — i to zdanie było nieprawdziwe.
+
+   Skutek był policzalny: przy tabeli z FTP 150 każda mocniejsza jazda lądowała
+   o strefę czy dwie za wysoko. Po przeliczeniu na 174 efektywność rozkładu
+   mocy z siedmiu dni podskoczyła z 32% („rozkład rozjechany") na 89%
+   („rozkład jak z podręcznika") — czyli przez tydzień pierścień mocy opisywał
+   trening, którego nie było.
+
+   Strona NIE przelicza tabeli sama, bo progi to decyzja Fryderyka i ma prawo
+   odstąpić od modelu. Robi jedno: liczy, jak wyglądałby Coggan przy bieżącym
+   FTP, i gdy tabela się z tym nie zgadza, mówi to na głos razem z liczbami. */
+const COGGAN = [0.55, 0.75, 0.90, 1.05, 1.20, 1.50];
+
+function tabelaZFtp(ftp){
+  if (!ftp) return null;
+  const gorne = COGGAN.map(p => Math.floor(p * ftp));
+  return gorne.map((g,i) => ({ min: i === 0 ? 0 : gorne[i-1] + 1, max: g }))
+              .concat([{ min: gorne[5] + 1, max: null }]);
+}
+
+// Zwraca null, gdy wszystko się zgadza albo nie ma czego porównać.
+function rozjazdFtp(){
+  const ftp = ftpBiezace();
+  const wzor = tabelaZFtp(ftp);
+  const teraz = tabelaBiezaca("moc");
+  if (!wzor || !teraz || teraz.strefy.length !== wzor.length) return null;
+  const rozne = teraz.strefy.some((z,i) =>
+    z.min !== wzor[i].min || (z.max == null ? wzor[i].max != null : z.max !== wzor[i].max));
+  return rozne ? { ftp, wzor, teraz: teraz.strefy } : null;
+}
+
+function ostrzezenieFtp(){
+  const r = rozjazdFtp();
+  if (!r) return "";
+  const opis = (s) => s.map((z,i) =>
+    `Z${i+1} ${z.min}–${z.max == null ? "∞" : z.max}`).join(" · ");
+  return `
+    <div class="info alarmowy">
+      <b>Tabela mocy nie zgadza się z Twoim FTP.</b> W Prognozach masz
+      <b>${r.ftp} W</b>, a progi poniżej odpowiadają innej liczbie. Z FTP liczą
+      się wszystkie siedem stref, więc dopóki się różnią, pierścień wyżej
+      pokazuje intensywność, której nie było.
+      <ul class="lista-brudnopisow">
+        <li>Tabela w użyciu: ${opis(r.teraz)}</li>
+        <li>Model Coggana przy ${r.ftp} W: ${opis(r.wzor)}</li>
+      </ul>
+      Strona nie przelicza tego sama, bo progi są Twoją decyzją i wolno Ci
+      odejść od modelu. Jeśli chcesz wersję z modelu — wpisz te liczby w tabeli
+      pod spodem i użyj <b>⟳</b>, żeby objęła też starsze jazdy.
+    </div>`;
+}
+
+/* Polska odmiana po liczebniku: 1 → „jest jedna sesja", 2–4 → „są trzy
+   sesje", 5+ → „jest pięć sesji" (z wyjątkiem nastek: 12, 13, 14 idą jak 5).
+   Szablon miał tylko dwie formy i przy pięciu sesjach pisał „są 5 sesje
+   sterowane". */
+function odmianaSesji(n){
+  const d = n % 10, s = n % 100;
+  if (n === 1) return "jest <b>jedna</b> sesja sterowana";
+  if (d >= 2 && d <= 4 && (s < 12 || s > 14))
+    return `są <b>${n}</b> sesje sterowane`;
+  return `jest <b>${n}</b> sesji sterowanych`;
+}
+
 function tabelaStrefHTML(miara){
   const def = STREFY[miara];
   const biezaca = tabelaBiezaca(miara);
@@ -5428,23 +5559,70 @@ function maSeriePrzebiegu(id, miara){
 
    Rysujemy dopiero, gdy WSZYSTKIE się doczytają. Przerysowanie po każdym
    pliku z osobna dawałoby pierścień skaczący cztery razy pod rząd. */
-function dopelnijPrzebiegiStref(miara, dni){
+function dopelnijPrzebiegiStref(miara, dni, przerysuj){
   const brakujace = jazdyOkna(dni).filter(a =>
     maSeriePrzebiegu(a.id, miara)
     && !PRZEBIEG_GOTOWY.has(String(a.id)));
   if (!brakujace.length) return;
 
+  przerysuj = przerysuj || (() => {
+    // Zakładka mogła się w międzyczasie zmienić — wtedy nie ma co rysować.
+    const korzen = document.getElementById("objetosc");
+    if (!korzen || korzen.dataset.miara !== miara || +korzen.dataset.dni !== dni) return;
+    const tresc = document.getElementById("tresc");
+    if (!tresc) return;
+    const [, , arg] = zHasha();
+    tresc.innerHTML = objetosc(miara, arg);
+  });
+
   let zostalo = brakujace.length;
   for (const a of brakujace){
-    wczytajPrzebieg(String(a.id), () => {
+    wczytajPrzebieg(String(a.id), () => { if (!--zostalo) przerysuj(); });
+  }
+}
+
+/* PIERŚCIEŃ W ANALIZIE MUSI LICZYĆ SIĘ TAK SAMO JAK W OBJĘTOŚCI —
+   naprawione 29.09.2026, przy okazji przeliczenia stref na FTP 174.
+
+   Doczytywanie przebiegów wisiało wyłącznie na zakładce Objętość, a blok
+   `wykres_strefy` w Analizie AI rysował z zapasu w `dane.js` — czyli
+   z sekund policzonych przez automat STARĄ tabelą progów. Skutek był widoczny
+   gołym okiem: ten sam pierścień, to samo okno siedmiu dni, a w Objętości
+   efektywność 89%, w Analizie 32%. Dwie sprzeczne liczby na jednej stronie,
+   dokładnie ten sam błąd co 5.09 (nowe podpisy nad starymi liczbami), tylko
+   w drugim miejscu.
+
+   Dokładając gdziekolwiek pierścień stref, podpiąć to doczytywanie. */
+function dopelnijStrefyAnalizy(){
+  // Tylko przy otwartej zakładce — inaczej każde wejście gdziekolwiek
+  // ciągnęłoby kilkanaście plików przebiegów bez powodu.
+  const [sek, pod] = zHasha();
+  if (!sek || sek.id !== "postepy" || !pod || pod.id !== "analiza") return;
+  if (!ANALIZA || !Array.isArray(ANALIZA.bloki)) return;
+  const pary = new Map();
+  for (const b of ANALIZA.bloki){
+    if (!b || b.t !== "wykres_strefy") continue;
+    const miara = b.miara === "moc" ? "moc" : "tetno";
+    const dni = [7,30,90].includes(+b.dni) ? +b.dni : 30;
+    pary.set(miara + "/" + dni, { miara, dni });
+  }
+  if (!pary.size) return;
+
+  const brakujace = new Set();
+  for (const { miara, dni } of pary.values())
+    for (const a of jazdyOkna(dni))
+      if (maSeriePrzebiegu(a.id, miara) && !PRZEBIEG_GOTOWY.has(String(a.id)))
+        brakujace.add(String(a.id));
+  if (!brakujace.size) return;
+
+  let zostalo = brakujace.size;
+  for (const id of brakujace){
+    wczytajPrzebieg(id, () => {
       if (--zostalo) return;
-      // Zakładka mogła się w międzyczasie zmienić — wtedy nie ma co rysować.
-      const korzen = document.getElementById("objetosc");
-      if (!korzen || korzen.dataset.miara !== miara || +korzen.dataset.dni !== dni) return;
+      const [sek, pod] = zHasha();
+      if (!sek || sek.id !== "postepy" || !pod || pod.id !== "analiza") return;
       const tresc = document.getElementById("tresc");
-      if (!tresc) return;
-      const [, , arg] = zHasha();
-      tresc.innerHTML = objetosc(miara, arg);
+      if (tresc) tresc.innerHTML = analizaAI();
     });
   }
 }
@@ -5673,13 +5851,13 @@ function objetosc(miara, arg){
     </div>
     ${rozklad && rozklad.sterowane ? `
       <div class="info">
-        W tym oknie ${rozklad.sterowane === 1
-          ? "jest <b>jedna</b> sesja sterowana" : `są <b>${rozklad.sterowane}</b> sesje sterowane`}
-        <span class="znacznik-erg">ERG</span> i <b>wchodzi do rozkładu</b> tak
-        samo jak reszta. Warto tylko wiedzieć, co się ogląda: w trybie ERG
-        trenażer trzyma moc zadaną przez plan treningu, więc te minuty mówią,
-        ile dowiozłeś, a nie ile sam wybrałeś. Koszulki liczą waty dalej
-        wyłącznie z sesji swobodnych — tam nagroda ma zależeć od Ciebie.
+        W tym oknie ${odmianaSesji(rozklad.sterowane)}
+        <span class="znacznik-erg">ERG</span> i ${rozklad.sterowane === 1
+          ? "<b>wchodzi</b>" : "<b>wchodzą</b>"} do rozkładu tak samo jak
+        reszta. Warto tylko wiedzieć, co się ogląda: w trybie ERG trenażer
+        trzyma moc zadaną przez plan treningu, więc te minuty mówią, ile
+        dowiozłeś, a nie ile sam wybrałeś. Do warunków koszulek te waty liczą
+        się tak samo — ERG ustawia opór, a nie wysiłek.
       </div>` : ""}
     ${!rozklad || !rozklad.suma ? `
       <div class="info">
@@ -5697,6 +5875,7 @@ function objetosc(miara, arg){
         <code>TRENING.md</code>.
       </div>` : ""}
     ${blokEfektywnosci(miara, rozklad)}
+    ${miara === "moc" ? ostrzezenieFtp() : ""}
     ${tabelaStrefHTML(miara)}
     <div class="info">
       <b>Jak liczony jest procent.</b> Sumujemy sekundy w danej strefie ze
@@ -7978,6 +8157,7 @@ function pokaz(){
     const k = document.getElementById("objetosc");
     if (k) dopelnijPrzebiegiStref(k.dataset.miara, +k.dataset.dni);
   }
+  dopelnijStrefyAnalizy();
   podepnijForme();
   podepnijRegeneracje();
   podepnijAktywnosci();

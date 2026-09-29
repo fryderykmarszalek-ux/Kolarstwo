@@ -116,11 +116,12 @@ cele: {
 prognozy: {
   "_opis": "Prognozy mocy — DECYZJE Fryderyka, nie pomiary. Wykres i lista na zakładce Prognozy czytają je STĄD, tak samo jak cel 80 km czy plan objętości. Liczba wpisana w kod wykresu byłaby drugim źródłem prawdy. Dopisanie okresu do listy tworzy nową mini-zakładkę — kod jej nie zna z nazwy.",
   "ftp_biezace": {
-    "v": 150,
+    "v": 174,
     "tag": "Z",
-    "od": "2026-08-22",
-    "zrodlo": "deklaracja Fryderyka 22.08.2026",
-    "uwaga": "To NIE jest to samo co zalozenia.FTP_W (180 W, tag [E], estymata z modelu). Tu stoi liczba, którą Fryderyk uznaje za swoją; strona pozwala ją zmienić na urządzeniu, a trwale zmienia ją wpis TUTAJ."
+    "od": "2026-09-29",
+    "zrodlo": "decyzja Fryderyka 29.09.2026; wpisał 174 W na urządzeniu, przeniesione do danych. Zgadza się z pomiarem: rekord 20-minutowy 183 W z 17.09 i reguła FTP = 0,95 x 20 min dają 174 W.",
+    "poprzednio": "150 W od 22.08.2026 (deklaracja z tamtego dnia)",
+    "uwaga": "To NIE jest to samo co zalozenia.FTP_W (180 W, tag [E], estymata z modelu). Tu stoi liczba, którą Fryderyk uznaje za swoją; strona pozwala ją zmienić na urządzeniu, a trwale zmienia ją wpis TUTAJ. Z TEJ liczby liczy się tabela strefy.moc — po jej zmianie tabelę trzeba przeliczyć, bo sama się nie przelicza."
   },
   "okresy": [
     {
@@ -699,53 +700,55 @@ strefy: {
   "moc": {
     "_opis": "Siedem stref, tyle samo co daje Strava dla mocy (model Coggana).",
     "od_daty": null,
-    "od_daty_powod": "Moc jest mierzona wyłącznie na Zwifcie do czasu miernika; sesje ERG opisują plan, nie zawodnika, więc do rozkładu nie wchodzą.",
+    "od_daty_powod": "Moc jest mierzona wyłącznie na Zwifcie do czasu miernika. Sesje ERG wchodzą do rozkładu normalnie — decyzja Fryderyka z 19.09.2026; ERG ustawia opór, a nie wysiłek.",
     "jednostka": "W",
     "tabele": [
       {
         "od": "2026-08-27",
-        "zrodlo": "Propozycja Claude z modelu Coggana przy FTP 150 W (prognozy.ftp_biezace). Do nadpisania przez Fryderyka.",
+        "zrodlo": "Model Coggana przy FTP 174 W (prognozy.ftp_biezace), przeliczone 29.09.2026 na polecenie Fryderyka. Progi to floor(FTP x 0,55 / 0,75 / 0,90 / 1,05 / 1,20 / 1,50).",
+        "poprzednio": "Ten sam model przy FTP 150 W: 0-82 / 83-112 / 113-135 / 136-157 / 158-180 / 181-225 / 226+",
+        "data_celowo_najstarsza": "Fryderyk poprosił, żeby przeliczyć WSZYSTKIE jazdy, także wrześniowe i wcześniejsze. Data zostaje najstarsza, więc nowa tabela obowiązuje wstecz — to ta sama semantyka co przycisk ⟳ Poprawka na stronie.",
         "strefy": [
           {
             "id": "z1",
             "nazwa": "Z1 regeneracja",
             "min": 0,
-            "max": 82
+            "max": 95
           },
           {
             "id": "z2",
             "nazwa": "Z2 baza",
-            "min": 83,
-            "max": 112
+            "min": 96,
+            "max": 130
           },
           {
             "id": "z3",
             "nazwa": "Z3 tempo",
-            "min": 113,
-            "max": 135
+            "min": 131,
+            "max": 156
           },
           {
             "id": "z4",
             "nazwa": "Z4 próg",
-            "min": 136,
-            "max": 157
+            "min": 157,
+            "max": 182
           },
           {
             "id": "z5",
             "nazwa": "Z5 VO2",
-            "min": 158,
-            "max": 180
+            "min": 183,
+            "max": 208
           },
           {
             "id": "z6",
             "nazwa": "Z6 beztlenowa",
-            "min": 181,
-            "max": 225
+            "min": 209,
+            "max": 261
           },
           {
             "id": "z7",
             "nazwa": "Z7 neuromięśniowa",
-            "min": 226,
+            "min": 262,
             "max": null
           }
         ]
