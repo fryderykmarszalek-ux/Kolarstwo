@@ -5,7 +5,7 @@
 
 window.DANE = {
 
-meta: {"pobrano":"2026-10-02T11:18","zrodlo":"Strava API (GitHub Actions): /athlete/activities + /activities/{id}","athlete_id":143761800,"liczba_aktywnosci":122,"zakres":["2024-07-31","2026-10-01"],"liczone_od":"2025-08-31","liczone_od_powod":"Decyzja Fryderyka z 19.08.2026: wcześniejsze daty nieistotne. Historia zostaje w pliku w całości — po prostu nie jest liczona. Zmiana tej jednej daty przywraca wszystko.","linia_podzialu":"2026-08-19","linia_podzialu_opis":"Przed tą datą jazdy mają tylko to, co daje Strava — bez wiatru, składu grupy i tętna. Nie uzupełniać wstecz.","typy_kolarskie":["Ride","VirtualRide"],"typy_kolarskie_opis":"Tylko te przerywają przerwę. E-bike, spacery, treki i biegi — nie.","pola_pominiete":["pr_count","achievement_count","kudos_count"],"pola_pominiete_powod":"Zmienne w czasie — stan na moment pobrania, nie fakt historyczny (13.08: 60 -> 59 w kilkanaście minut). Zapisać dopiero z datą pobrania obok.","segmenty_od":"2025-08-01","liczba_segmentow":418,"liczba_prob":2169,"jazd_z_moca":31,"jazd_z_rozkladem":39,"jazd_z_trasa":105,"jazd_z_przebiegiem":105},
+meta: {"pobrano":"2026-10-02T23:58","zrodlo":"Strava API (GitHub Actions): /athlete/activities + /activities/{id}","athlete_id":143761800,"liczba_aktywnosci":123,"zakres":["2024-07-31","2026-10-02"],"liczone_od":"2025-08-31","liczone_od_powod":"Decyzja Fryderyka z 19.08.2026: wcześniejsze daty nieistotne. Historia zostaje w pliku w całości — po prostu nie jest liczona. Zmiana tej jednej daty przywraca wszystko.","linia_podzialu":"2026-08-19","linia_podzialu_opis":"Przed tą datą jazdy mają tylko to, co daje Strava — bez wiatru, składu grupy i tętna. Nie uzupełniać wstecz.","typy_kolarskie":["Ride","VirtualRide"],"typy_kolarskie_opis":"Tylko te przerywają przerwę. E-bike, spacery, treki i biegi — nie.","pola_pominiete":["pr_count","achievement_count","kudos_count"],"pola_pominiete_powod":"Zmienne w czasie — stan na moment pobrania, nie fakt historyczny (13.08: 60 -> 59 w kilkanaście minut). Zapisać dopiero z datą pobrania obok.","segmenty_od":"2025-08-01","liczba_segmentow":420,"liczba_prob":2172,"jazd_z_moca":32,"jazd_z_rozkladem":40,"jazd_z_trasa":106,"jazd_z_przebiegiem":106},
 
 zalozenia: {
   "_opis": "Wariant B: tu i tylko tu żyją stałe modelu. Nigdy nie wpisywać ich w kod wykresu. Zmiana jednej liczby przelicza całą historię.",
@@ -1371,6 +1371,26 @@ strefy: {
         ],
         "tabela_tetno": "2026-08-27",
         "tabela_moc": "2026-08-27"
+      },
+      "20424105379": {
+        "tetno": [
+          241,
+          1016,
+          542,
+          650,
+          84
+        ],
+        "moc": [
+          1584,
+          207,
+          131,
+          30,
+          9,
+          572,
+          0
+        ],
+        "tabela_tetno": "2026-08-27",
+        "tabela_moc": "2026-08-27"
       }
     }
   },
@@ -1667,6 +1687,8 @@ segmenty: [
   {"id":"39006988","nazwa":"Dycha na Gassach by Przystanek Gassy","dystans_m":9827.8,"nachylenie_proc":0,"przewyzszenie_m":7.2},
   {"id":"20216571","nazwa":"Dzida od zakrętu!","dystans_m":1068.8,"nachylenie_proc":2.3,"przewyzszenie_m":28.2},
   {"id":"36483541","nazwa":"Enjoy the new asphalt","dystans_m":1461.2,"nachylenie_proc":-1.9,"przewyzszenie_m":28.6},
+  {"id":"28778320","nazwa":"Epic KOM Bypass - Eastbound ","dystans_m":2430.8,"nachylenie_proc":0.9,"przewyzszenie_m":21},
+  {"id":"28770163","nazwa":"Epic KOM Reverse - Start to Jungle Intersection ","dystans_m":1179.8,"nachylenie_proc":5.7,"przewyzszenie_m":67},
   {"id":"9771861","nazwa":"Fabryka - Warszawska","dystans_m":1717,"nachylenie_proc":0.1,"przewyzszenie_m":5.5},
   {"id":"28488033","nazwa":"Farmland Flats CCW","dystans_m":3951.4,"nachylenie_proc":0,"przewyzszenie_m":5.6},
   {"id":"37250137","nazwa":"FAST GAZ","dystans_m":624.5,"nachylenie_proc":-0.1,"przewyzszenie_m":5.4},
@@ -3070,6 +3092,7 @@ proby: [
   {"od":654,"do":810,"id":"3530283246747594000","s":"27818087","a":"20008658665","czas_s":156,"moc_S":null,"z_miernika":0,"tetno":138},
   {"od":682,"do":790,"id":"3416179293698753500","s":"27992422","a":"16225978401","czas_s":108,"moc_S":158.2,"z_miernika":1,"tetno":null},
   {"od":2466,"do":2611,"id":"3416179293696969700","s":"27992422","a":"16225978401","czas_s":145,"moc_S":107.6,"z_miernika":1,"tetno":null},
+  {"od":685,"do":808,"id":"3541188936505101300","s":"27992422","a":"20424105379","czas_s":123,"moc_S":135.8,"z_miernika":1,"tetno":140},
   {"od":765,"do":1070,"id":"3489685609685903400","s":"28139102","a":"18492969096","czas_s":306,"moc_S":null,"z_miernika":0,"tetno":null},
   {"od":739,"do":1014,"id":"3502002307635743000","s":"28139102","a":"18945539070","czas_s":275,"moc_S":null,"z_miernika":0,"tetno":null},
   {"od":820,"do":1189,"id":"3530283246745723400","s":"28139102","a":"20008658665","czas_s":369,"moc_S":null,"z_miernika":0,"tetno":136},
@@ -3107,11 +3130,13 @@ proby: [
   {"od":1766,"do":2105,"id":"3531729840276791300","s":"28455715","a":"20064645010","czas_s":339,"moc_S":null,"z_miernika":0,"tetno":157},
   {"od":5136,"do":5583,"id":"3532404668276667400","s":"28455715","a":"20088445195","czas_s":447,"moc_S":null,"z_miernika":0,"tetno":132},
   {"od":1333,"do":1852,"id":"3418726362369042400","s":"28488033","a":"16296395304","czas_s":519,"moc_S":106,"z_miernika":1,"tetno":null},
+  {"od":1265,"do":1612,"id":"3541188936503263000","s":"28770163","a":"20424105379","czas_s":347,"moc_S":163.5,"z_miernika":1,"tetno":156},
   {"od":3761,"do":3932,"id":"3493618722149460500","s":"28775417","a":"18635140776","czas_s":171,"moc_S":null,"z_miernika":0,"tetno":null},
   {"od":3696,"do":3866,"id":"3502678738860806000","s":"28775417","a":"18971344203","czas_s":170,"moc_S":null,"z_miernika":0,"tetno":null},
   {"od":3591,"do":3744,"id":"3506029802972853000","s":"28775417","a":"19089641123","czas_s":153,"moc_S":null,"z_miernika":0,"tetno":null},
   {"od":6768,"do":6934,"id":"3523035685477331500","s":"28775417","a":"19728167402","czas_s":166,"moc_S":null,"z_miernika":0,"tetno":null},
   {"od":4316,"do":4492,"id":"3532404668279742500","s":"28775417","a":"20088445195","czas_s":176,"moc_S":null,"z_miernika":0,"tetno":134},
+  {"od":1643,"do":2052,"id":"3541188936502937600","s":"28778320","a":"20424105379","czas_s":409,"moc_S":96.3,"z_miernika":1,"tetno":141},
   {"od":4420,"do":4820,"id":"3467532362567144000","s":"29377950","a":"17707959140","czas_s":411,"moc_S":null,"z_miernika":0,"tetno":null},
   {"od":2436,"do":2682,"id":"3486018211758264300","s":"29377950","a":"18360199343","czas_s":246,"moc_S":null,"z_miernika":0,"tetno":null},
   {"od":2090,"do":2304,"id":"3491445343996534000","s":"29377950","a":"18554597453","czas_s":216,"moc_S":null,"z_miernika":0,"tetno":null},
@@ -4174,7 +4199,7 @@ proby: [
   {"od":2182,"do":2284,"id":"3533175688004559400","s":"9926797","a":"20119310922","czas_s":102,"moc_S":null,"z_miernika":0,"tetno":169},
 ],
 
-segmenty_pobrane: ["15650458577","15659929857","15718034220","15820597167","15875808667","15954703695","16130454908","16152610580","16182099651","16183714130","16194964157","16215300750","16225978401","16266432121","16286281071","16296395304","16306020934","16325922529","16336493568","16377663365","16479980049","16547212377","16566037541","17707959140","17708859621","18296163995","18328405840","18346607726","18360199343","18438077208","18454701002","18492969096","18530281768","18554597453","18619303262","18635140776","18692876636","18718998937","18729555478","18841404334","18945539070","18971344203","19000739541","19014149953","19033109585","19089641123","19179947367","19180109565","19201212771","19247803670","19415453209","19415474905","19415496764","19415517403","19415553503","19447815706","19728167402","19728195586","19728218329","19742428076","19756483940","19962190482","19972642177","20008658665","20029911411","20064645010","20088445195","20119310922","20146204393","20215674019","20231606233","20244006712","20260244166","20284521636","20285717904","20300861319","20312261598","20312457977","20340622812","20355804866","20380594844","20380985840","20411147741"],
+segmenty_pobrane: ["15650458577","15659929857","15718034220","15820597167","15875808667","15954703695","16130454908","16152610580","16182099651","16183714130","16194964157","16215300750","16225978401","16266432121","16286281071","16296395304","16306020934","16325922529","16336493568","16377663365","16479980049","16547212377","16566037541","17707959140","17708859621","18296163995","18328405840","18346607726","18360199343","18438077208","18454701002","18492969096","18530281768","18554597453","18619303262","18635140776","18692876636","18718998937","18729555478","18841404334","18945539070","18971344203","19000739541","19014149953","19033109585","19089641123","19179947367","19180109565","19201212771","19247803670","19415453209","19415474905","19415496764","19415517403","19415553503","19447815706","19728167402","19728195586","19728218329","19742428076","19756483940","19962190482","19972642177","20008658665","20029911411","20064645010","20088445195","20119310922","20146204393","20215674019","20231606233","20244006712","20260244166","20284521636","20285717904","20300861319","20312261598","20312457977","20340622812","20355804866","20380594844","20380985840","20411147741","20424105379"],
 
 moc_krzywe: [
   {"a":"16130454908","w":{"1":111,"3":111,"5":111,"10":110,"15":110,"30":110,"40":110,"60":110,"120":110,"300":109,"480":104,"600":102,"900":100,"1200":99,"1800":99,"2700":93}},
@@ -4208,9 +4233,10 @@ moc_krzywe: [
   {"a":"20380594844","w":{"1":724,"3":602,"5":488,"10":411,"15":366,"30":338,"40":319,"60":295,"120":252,"300":232,"480":222,"600":215,"900":207,"1200":185}},
   {"a":"20380985840","w":{"1":98,"3":96,"5":96,"10":95,"15":95,"30":95,"40":95,"60":95,"120":94,"300":94,"480":94,"600":94,"900":91,"1200":85}},
   {"a":"20411147741","w":{"1":129,"3":127,"5":127,"10":126,"15":125,"30":125,"40":125,"60":125,"120":125,"300":124,"480":124,"600":124,"900":124,"1200":124,"1800":124,"2700":117,"3600":119,"5400":115}},
+  {"a":"20424105379","w":{"1":258,"3":255,"5":253,"10":251,"15":251,"30":250,"40":250,"60":248,"120":232,"300":185,"480":153,"600":150,"900":147,"1200":139,"1800":135}},
 ],
 
-moc_pobrana: ["16130454908","16152610580","16182099651","16183714130","16194964157","16215300750","16225978401","16266432121","16286281071","16296395304","16306020934","16325922529","16336493568","16377663365","16479980049","16547212377","16566037541","20215674019","20231606233","20244006712","20260244166","20284521636","20285717904","20300861319","20312261598","20312457977","20340622812","20355804866","20380594844","20380985840","20411147741"],
+moc_pobrana: ["16130454908","16152610580","16182099651","16183714130","16194964157","16215300750","16225978401","16266432121","16286281071","16296395304","16306020934","16325922529","16336493568","16377663365","16479980049","16547212377","16566037541","20215674019","20231606233","20244006712","20260244166","20284521636","20285717904","20300861319","20312261598","20312457977","20340622812","20355804866","20380594844","20380985840","20411147741","20424105379"],
 
 // czas_ruchu_s — czas w ruchu. Zgodnie z regułą: wszystkie średnie zawsze z czasu w ruchu.
 aktywnosci: [
@@ -4336,6 +4362,7 @@ aktywnosci: [
   {"id":"20380594844","data":"2026-09-29T18:00:19","typ":"VirtualRide","dystans_m":13087.8,"czas_ruchu_s":1727,"czas_calkowity_s":1727,"przewyzszenie_m":236,"nazwa":"Zwift - Climb Portal: Col du Rosier at 100% Elevation in France","ma_tetno":1,"tetno_sr":165,"moc_sr":151,"z_miernika":1,"kalorie":248,"rpe":8,"opis":"⚡️ New 1min power best (90day)\r\n⚡️ New 2min power best (90day)\r\n⚡️ New 5min power best (90day)\r\n⚡️ New 10min power best (90day)\r\n⚡️ New 20min power best (90day)\r\n⚡️ New FTP set!"},
   {"id":"20380985840","data":"2026-09-29T18:34:37","typ":"VirtualRide","dystans_m":7360.2,"czas_ruchu_s":1209,"czas_calkowity_s":1209,"przewyzszenie_m":82,"nazwa":"Zwift - Half an Hour of Relaxation","ma_tetno":1,"tetno_sr":139,"moc_sr":84,"z_miernika":1,"kalorie":97,"rpe":3,"opis":"🗺️ Glasgow Crit Circuit in Scotland\r\n🎉 Leveled up today"},
   {"id":"20411147741","data":"2026-10-01T19:33:45","typ":"VirtualRide","dystans_m":28320.7,"czas_ruchu_s":5409,"czas_calkowity_s":5409,"przewyzszenie_m":570,"nazwa":"Zwift - 2x30min Z2 125 blocks","ma_tetno":1,"tetno_sr":133,"moc_sr":115,"z_miernika":1,"kalorie":595,"rpe":4,"opis":"🗺️ 2018 Worlds Short Lap in Innsbruck"},
+  {"id":"20424105379","data":"2026-10-02T20:57:17","typ":"VirtualRide","dystans_m":17468.2,"czas_ruchu_s":2532,"czas_calkowity_s":2532,"przewyzszenie_m":145,"nazwa":"Zwift - 130% of FTP Hangers","ma_tetno":1,"tetno_sr":145,"moc_sr":117,"z_miernika":1,"kalorie":282,"opis":"🗺️ Ocean Lava Cliffside Loop in Watopia"},
 ]
 
 };
