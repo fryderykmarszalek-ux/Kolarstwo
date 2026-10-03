@@ -2,180 +2,161 @@
 // NIE EDYTOWAĆ RĘCZNIE: plik jest nadpisywany po każdej zmianie danych.
 // Powstaje w .github/skrypty/analiza.js po nocnym pobraniu ze Stravy.
 //
-// Ta wersja jest wyjątkiem — napisana w sesji czatu 29.09.2026, bo sekretu
+// Ta wersja jest wyjątkiem — napisana w sesji czatu 3.10.2026, bo sekretu
 // ANTHROPIC_API_KEY jeszcze nie ma. Pole odcisk to prawdziwy skrót
 // dzisiejszego briefingu, a analiza jest z dzisiaj, więc automat zostawi ją
 // w spokoju do jutrzejszego wieczora.
 
 window.ANALIZA = {
  "wersja": 1,
- "utworzono": "2026-09-29T21:00",
+ "utworzono": "2026-10-03T19:30",
  "model": "asystent w sesji czatu",
- "jazd_w_danych": 104,
- "dane_pobrano": "2026-09-29T17:10",
- "odcisk": "5d34eb45e2b35a7c",
+ "jazd_w_danych": 124,
+ "dane_pobrano": "2026-10-03T16:19",
+ "odcisk": "2da555fec905504b",
  "bloki": [
   {
    "t": "naglowek",
-   "tekst": "Osiem rekordów mocy w dwadzieścia dziewięć minut — cały środek krzywej przepisany"
+   "tekst": "Wytrenowanie najwyżej w całej historii pomiaru — 173"
   },
   {
    "t": "akapit",
-   "tekst": "„Climb Portal: Col du Rosier at 100% Elevation in France”: 13,09 km w 28 minut 47 sekund, moc średnia 151 W, tętno średnie 165, RPE 8, 248 kcal, 236 metrów przewyższenia. Potem „Half an Hour of Relaxation” na Glasgow Crit Circuit: 7,36 km w 20 minut 9 sekund przy 84 W, tętnie 139 i RPE 3. Razem 20,4 km i 49 minut."
+   "tekst": "Trzy jazdy od ostatniej analizy, wszystkie na Zwifcie, plus jeden dzień wolny. Środa 30.09 bez roweru. Czwartek 1.10 „2x30min Z2 125 blocks”: 28,32 km w 1:30:09, moc średnia 115 W, tętno średnie 133, RPE 4, 570 m przewyższenia, 595 kcal. Piątek 2.10 „130% of FTP Hangers”: 17,47 km w 42:12, moc 117 W, tętno 145, 145 m, 282 kcal. Dziś „Active Recovery”: 29,81 km w 1:55:11, moc 100 W, tętno 134, 791 m przewyższenia, 657 kcal. Razem w tym tygodniu 4,94 godziny i 96,0 km."
   },
   {
    "t": "kafelki",
    "pozycje": [
     {
-     "etykieta": "Rekord 1 min",
-     "wartosc": "295 W",
-     "stopka": "4,21 W/kg · było 268"
+     "etykieta": "Wytrenowanie",
+     "wartosc": "173",
+     "stopka": "najwyżej od 1 III"
     },
     {
-     "etykieta": "Rekord 5 min",
-     "wartosc": "232 W",
-     "stopka": "3,31 W/kg · było 202"
+     "etykieta": "Forma",
+     "wartosc": "−82",
+     "stopka": "zmęczenie 255"
     },
     {
-     "etykieta": "Rekord 20 min",
-     "wartosc": "185 W",
-     "stopka": "2,64 W/kg · było 183"
+     "etykieta": "Tydzień",
+     "wartosc": "4,94 h",
+     "stopka": "plan 5 h"
     },
     {
-     "etykieta": "Rekordów naraz",
-     "wartosc": "8",
-     "stopka": "od 40 s do 20 min"
+     "etykieta": "Październik",
+     "wartosc": "75,6 km",
+     "stopka": "trzy jazdy"
     }
    ]
   },
   {
-   "t": "naglowek",
-   "tekst": "Wszystkie osiem, po kolei"
-  },
-  {
    "t": "akapit",
-   "tekst": "Podjazd na Col du Rosier przepisał krzywą mocy od czterdziestu sekund aż do dwudziestu minut. To nie jest jeden rekord z przypadku — to cały środek krzywej, czyli dokładnie ten zakres, który opisuje moc progową i wytrzymałość tlenową. Pula, z której te rekordy biją, to dwadzieścia osiem jazd z pomiarem mocy."
-  },
-  {
-   "t": "lista",
-   "punkty": [
-    "40 sekund — 319 W, było 313, o 6 W lepiej",
-    "1 minuta — 295 W, było 268, o 27 W lepiej",
-    "2 minuty — 252 W, było 233, o 19 W lepiej",
-    "5 minut — 232 W, było 202, o 30 W lepiej",
-    "8 minut — 222 W, było 193, o 29 W lepiej",
-    "10 minut — 215 W, było 190, o 25 W lepiej",
-    "15 minut — 207 W, było 185, o 22 W lepiej",
-    "20 minut — 185 W, było 183, o 2 W lepiej"
-   ]
-  },
-  {
-   "t": "wykres_moc",
-   "tytul": "Krzywa rekordów mocy — środek podniesiony na całej długości"
-  },
-  {
-   "t": "akapit",
-   "tekst": "Największe skoki są na pięciu i ośmiu minutach: po 30 i 29 watów, czyli 15% w górę. Najmniejszy jest na dwudziestu minutach — tylko 2 waty, bo tamten rekord padł dwanaście dni temu w teście progowym i był świeży. Reszta poprzednich rekordów pochodziła z 17 i 19 września, więc bijesz własne liczby sprzed niecałych dwóch tygodni."
-  },
-  {
-   "t": "naglowek",
-   "tekst": "To była prawdziwa jazda na maksa i tętno to potwierdza"
-  },
-  {
-   "t": "akapit",
-   "tekst": "Tętno średnie 165 przy Twoim HRmax 201. Rozkład: 31% czasu w piątej strefie (VO2), 29% w czwartej (próg), 24% w tempie, 16% w bazie. To pierwsza jazda od testu progowego z 17 września, czyli od dwunastu dni, która weszła w piątą strefę tętna — dziewięć jazd pomiędzy miało tam równe zero. Iloraz ERG wyszedł 2,36, czyli powyżej progu 2,0: żaden program nie trzymał Ci mocy, to Ty ją wykręciłeś."
-  },
-  {
-   "t": "akapit",
-   "tekst": "Druga jazda była dokładnie tym, co mówi nazwa: dwadzieścia minut przy 84 W, 64% czasu w drugiej strefie mocy i zero powyżej trzeciej strefy tętna. Iloraz 1,05 — czysty ERG. Schłodzenie po ciężkim podjeździe, zrobione poprawnie."
-  },
-  {
-   "t": "naglowek",
-   "tekst": "Miałeś rację — FTP 174 nie było na stronie z niczym połączone"
-  },
-  {
-   "t": "akapit",
-   "tekst": "Napisałeś: „mam ewidentnie wpisane 174 i ja to widzę; jeżeli ty tego nie widzisz, to jest błąd w kodzie”. Sprawdziłem i błąd był, tylko w innym miejscu, niż obaj myśleliśmy. Pole FTP w Prognozach działało poprawnie — Twoje 174 siedziało w pamięci iPada i strona je pokazywała. Nie widziałem go, bo pamięć przeglądarki zostaje na urządzeniu i do repozytorium nie trafia; w danych stało dalej 150. Ale prawdziwa wpadka jest głębsza: tabela stref mocy była osobną listą progów, wpisaną raz z FTP 150 i nigdy nieprzeliczaną. Strona pisała przy tym wprost, że „z FTP biorą się strefy treningowe” — i to zdanie było nieprawdą."
-  },
-  {
-   "t": "akapit",
-   "tekst": "Poprawione dziś, zgodnie z Twoim poleceniem, i wstecz — także na wrześniowe i wcześniejsze jazdy. FTP 174 W stoi teraz w danych, więc widać je na każdym urządzeniu, a nie tylko na tym, na którym klikałeś. Progi mocy przeliczone modelem Coggana od nowa."
-  },
-  {
-   "t": "lista",
-   "punkty": [
-    "Stara tabela (FTP 150): Z1 0–82 · Z2 83–112 · Z3 113–135 · Z4 136–157 · Z5 158–180 · Z6 181–225 · Z7 226+",
-    "Nowa tabela (FTP 174): Z1 0–95 · Z2 96–130 · Z3 131–156 · Z4 157–182 · Z5 183–208 · Z6 209–261 · Z7 262+",
-    "Efektywność rozkładu mocy z 7 dni: 32% „rozkład rozjechany” zmieniło się na 89% „rozkład jak z podręcznika”.",
-    "Na oknach 30 i 90 dni: 63%.",
-    "Tabela tętna nietknięta — to osobny pomiar i osobna decyzja."
-   ]
-  },
-  {
-   "t": "wykres_strefy",
-   "miara": "moc",
-   "dni": 7,
-   "tytul": "Strefy mocy po przeliczeniu na FTP 174"
-  },
-  {
-   "t": "akapit",
-   "tekst": "Ta różnica 57 punktów procentowych to nie kosmetyka. Przy tabeli z FTP 150 każda mocniejsza jazda lądowała o strefę czy dwie za wysoko, więc pierścień mocy przez ostatni tydzień opisywał trening, którego nie było — wyglądało to na ciągłe siedzenie w progu i powyżej, choć naprawdę jechałeś w bazie. Dokładnie ten sam błąd, który złapaliśmy 5 września przy strefach tętna: nowe podpisy nad starymi liczbami, bez słowa ostrzeżenia."
-  },
-  {
-   "t": "akapit",
-   "tekst": "Żeby to nie wróciło, strona ma teraz dwie nowe rzeczy. Pierwsza: w zakładce Moc liczy sobie, jak wyglądałaby tabela Coggana przy Twoim bieżącym FTP, i gdy progi się z tym rozjeżdżają, mówi to na głos razem z obiema listami liczb. Sama niczego nie przelicza — progi są Twoją decyzją i wolno Ci odejść od modelu. Druga: Prognozy dostały ten sam głośny alarm, który Gablota ma od 22 września — jeśli FTP albo ptaszek żyje wyłącznie w jednej przeglądarce, na górze stoi blok z gotowym JSON-em do wklejenia mi w czacie. Gdyby ten alarm był tam tydzień temu, w ogóle nie doszłoby do tej rozmowy."
-  },
-  {
-   "t": "ostrzezenie",
-   "tekst": "Jedna liczba nadal Cię czeka, i to Twoja decyzja, nie moja. Dzisiejszy rekord 20-minutowy to 185 W, więc reguła FTP ≈ 0,95 × 20 minut daje już 176 W, a nie 174. Różnica dwóch watów nie rusza ani jednego progu (Coggan przy 176 daje Z2 od 97 zamiast 96), więc nic nie zmieniam. Mówię tylko, że podstawa przesunęła się drugi raz w tym miesiącu."
-  },
-  {
-   "t": "naglowek",
-   "tekst": "Zmęczenie wreszcie odpuściło"
+   "tekst": "Wytrenowanie 172,6 to najwyższa wartość w całej serii, czyli od 1 marca 2026 — 217 dni. Poprzedni szczyt wynosił 166,3 i padł wczoraj, a przed nim 166,2 dnia 27 września; dzisiejszy skok o ponad sześć punktów w dobę zrobiło samo obciążenie 433. Rośnie, bo od 26 września jechałeś sześć dni z ośmiu, a dzienne obciążenia szły 551, 254, 0, 285, 0, 330, 211 i dziś 433. To jest dokładnie to, co ma robić blok budujący, i jest to pierwsza liczba w tym projekcie, która mówi „jestem w najlepszej formie bazowej, jaką zmierzyliśmy”."
   },
   {
    "t": "wykres_forma",
-   "tytul": "Wytrenowanie i zmęczenie — nożyce zamykają się pierwszy raz"
-  },
-  {
-   "t": "akapit",
-   "tekst": "Wczorajsza przerwa zrobiła dokładnie to, co miała zrobić, i warto rozłożyć to na dni. W niedzielę było: wytrenowanie 166, zmęczenie 279, forma −113, napięcie 1,68. Po poniedziałku bez roweru: 162, 242, −80 i 1,49. Dziś, już z podjazdem w nogach: 165, 248, −83 i 1,50. Czyli jeden dzień wolnego ściął zmęczenie o 37 punktów i poprawił formę o 33, a dzisiejsze pół godziny na maksa oddało z tego zaledwie sześć i trzy. Forma −83 jest drugą najlepszą od 20 września, zaraz po wczorajszych −80. Dla uczciwej skali: przez pierwszą połowę września siedziała między −76 a +14, więc do tamtego stanu nadal daleko — ten blok wykopał głęboki dół i zasypuje się go dniami wolnymi, nie tygodniami."
-  },
-  {
-   "t": "akapit",
-   "tekst": "Licznik regeneracji przyznał łącznie 10,5 godziny i pełną gotowość jutro o 3:45 nad ranem. Przy jeździe na maksa trwającej niecałe pół godziny to niedużo — bo koszt liczy się z czasu w strefach, a tego czasu było mało. Ciężka i krótka wychodzi taniej niż lekka i długa, i to jest argument za tym, żeby tak trenować częściej."
-  },
-  {
-   "t": "wykres_strefy",
-   "miara": "tetno",
-   "dni": 7,
-   "tytul": "Strefy tętna z siedmiu dni"
+   "tytul": "Wytrenowanie i zmęczenie — szczyt serii"
   },
   {
    "t": "naglowek",
-   "tekst": "Wrzesień przekroczył 600 kilometrów"
+   "tekst": "Do planu brakuje czterech minut"
   },
   {
    "t": "akapit",
-   "tekst": "616,2 km w dziewiętnastu jazdach i 22,7 godziny. Poprzedni rekord miesiąca to 372,2 km z lipca — jesteś o 244 km wyżej, czyli o 66% ponad. Został jeden dzień. Rok 2026 ma 1785,3 km w pięćdziesięciu dziewięciu jazdach."
+   "tekst": "Plan na tydzień 29.09–5.10 to 5 godzin. Masz 4 godziny 56 minut, czyli 4,94 h. Brakuje około czterech minut i zostały dwa dni — jutro i poniedziałek. Dopóki plan nie jest dowieziony, bieżący tydzień nie wchodzi do serii: kafelek pokazuje więc 4 tygodnie z rzędu z rekordem 4 z 4, licząc same tygodnie zamknięte."
+  },
+  {
+   "t": "lista",
+   "punkty": [
+    "Tydzień 29.09–5.10: 4:56 z planu 5:00, dwa dni przed sobą.",
+    "Następny tydzień 6–12.10 ma plan 5,5 h, potem 13–19.10 odciążeniowy (4 h).",
+    "Październik: 75,6 km, wszystko na Zwifcie, zero kilometrów na szosie.",
+    "Ostatnia jazda na szosie: 12 września, czyli 21 dni temu.",
+    "Rok 2026: 1860,9 km w 62 jazdach."
+   ]
   },
   {
    "t": "wykres_tygodnie",
    "tytul": "Godziny w tygodniach"
   },
   {
+   "t": "naglowek",
+   "tekst": "„130% of FTP Hangers” mówi wprost, jakie FTP masz ustawione w Zwifcie"
+  },
+  {
+   "t": "akapit",
+   "tekst": "To najciekawsza rzecz w tych trzech jazdach i wychodzi z samej nazwy treningu. Rozpakowałem przebieg z 2.10 sekunda po sekundzie i policzyłem bloki: piętnaście odcinków ułożonych w drabinkę 20-30-40-50-60 sekund, powtórzoną trzy razy, razem 9 minut 31 sekund powyżej 240 W. Każdy odcinek trzymany na 243–250 W, większość dokładnie na 249–250. W ERG trenażer trzyma liczbę zadaną przez plan, a plan nazywa ją „130% FTP”. Odwracam więc działanie: 250 ÷ 1,30 = 192 W."
+  },
+  {
    "t": "lista",
    "punkty": [
-    "Nowy tydzień 28.09–4.10: 49 minut z planu 5 godzin, pięć dni przed sobą. Nie jest odciążeniowy.",
-    "Seria dowiezionych planów: cztery tygodnie z rzędu.",
-    "Wrzesień: 439,7 km na Zwifcie, 176,5 km na szosie.",
-    "Ostatnia jazda na szosie: 12 września, czyli siedemnaście dni temu.",
-    "Obie dzisiejsze jazdy mają wpisane RPE — 8 i 3."
+    "Zwift (z arytmetyki bloków): FTP ≈ 192 W.",
+    "Wpisane przez Ciebie na tej stronie: 174 W.",
+    "Z reguły 0,95 × rekord 20-minutowy (185 W): 176 W.",
+    "Estymata z modelu fizycznego w założeniach: 180 W, tag [E]."
    ]
   },
   {
    "t": "akapit",
-   "tekst": "Podsumowując: 29 minut na podjeździe dało osiem rekordów mocy na oknach od czterdziestu sekund do dwudziestu minut, z czego pięć poprawiło poprzednie wyniki o ponad 20 watów. Do tego zmęczenie 248, czyli blisko najniższego poziomu całego tego bloku, i forma, która drugi dzień z rzędu stoi powyżej −85 — wcześniej ostatni raz było tak 19 września. Dzień wolny w poniedziałek i jedna ciężka jazda we wtorek — to jest wzorzec, który daje więcej niż siedem godzin równego kręcenia. Zapamiętaj go."
+   "tekst": "Czyli Zwift pracuje na liczbie o 18 watów wyższej niż ta, którą sam wpisałeś, i o 16 wyższej niż daje pomiar z testu. Dwa zastrzeżenia, żeby to było uczciwe: Zwift mógł mieć podkręcony suwak intensywności (wtedy 250 W to nie jest czyste 130%), a swojego ustawienia FTP w Zwifcie strona nie widzi — nie ma do niego dostępu, więc liczbę 192 wyliczam, a nie czytam. Nie zmieniam przy tym nic w danych: FTP i progi to Twoje decyzje i powiedziałeś to wprost. Ale jeżeli Zwift liczy Ci strefy od 192, a strona od 174, to te same waty dostają na dwóch ekranach dwie różne nazwy."
+  },
+  {
+   "t": "akapit",
+   "tekst": "Jeden fakt z tej samej jazdy mówi jednak, że 192 jest dla Ciebie liczbą drogą: dowiozłeś te hangery, ale tętno sięgnęło 185, czyli 92% Twojego HRmax 201. Dwadzieścia sześć procent czasu siedziało w czwartej strefie tętna, a 84 sekundy w piątej — i to przy odcinkach po minutę, nie przy godzinie. FTP jest definiowane na godzinę, więc jednominutowe 250 W niczego o nim nie dowodzi; Twój rekord 20-minutowy to 185 W, a godzinny 139 W. Zwift mógł więc podnieść sobie FTP po którymś mocnym podjeździe — robi to automatycznie — i liczy Ci teraz strefy od liczby, której nie potwierdza żaden Twój dłuższy pomiar."
+  },
+  {
+   "t": "naglowek",
+   "tekst": "Zero nowych rekordów mocy i tak miało być"
+  },
+  {
+   "t": "akapit",
+   "tekst": "Sprawdziłem wszystkie osiemnaście okien od 1 sekundy do 90 minut: żadne nie drgnęło. To nie zarzut, tylko potwierdzenie, że te trzy jazdy były tym, co mówią ich nazwy — dwa treningi po planie i jedna jazda regeneracyjna. Rekordy padają na podjazdach i w sprintach, a od wtorkowego Col du Rosier nie było ani jednego takiego wysiłku. Krzywa stoi tam, gdzie ją ustawiłeś cztery dni temu."
+  },
+  {
+   "t": "wykres_moc",
+   "tytul": "Krzywa rekordów mocy — bez zmian od 29 września"
+  },
+  {
+   "t": "naglowek",
+   "tekst": "Jazda nazwana „Active Recovery” była najcięższym dniem tygodnia"
+  },
+  {
+   "t": "akapit",
+   "tekst": "Tu dane nie zgadzają się z nazwą i warto to nazwać. Dzisiejsze obciążenie wyszło 433 — najwyższe od 26 września i o 31% wyższe niż czwartkowe 2×30 minut w Z2 (330). Wysiłek policzony z tętna to 3,76/10, czyli więcej niż czwartkowe 3,66, choć czwartek nazywał się treningiem, a dziś miała być regeneracja. Powód jest prosty: 1 godzina 55 minut przy tętnie średnim 134 i 791 metrach przewyższenia. Z czasu w strefach tętna 78,4% siedziało w drugiej strefie, a 16,7% w trzeciej; w czwartej ani jednej sekundy, tętno maksymalne 150 — intensywność była niska. Tylko że regeneracja nie liczy się samą intensywnością: dwie godziny w Z2 to nadal dwie godziny pracy."
+  },
+  {
+   "t": "akapit",
+   "tekst": "Licznik regeneracji przyznał łącznie 16 godzin i pełną gotowość jutro o 8:27, z czego 14 godzin za samą jazdę, a resztę za zaległość z piątku. Jeżeli dzisiejsza jazda miała być odpoczynkiem przed czymś, to go nie dała. Jeżeli miała być spokojną objętością — zrobiła dokładnie to."
+  },
+  {
+   "t": "wykres_strefy",
+   "miara": "tetno",
+   "dni": 7,
+   "tytul": "Strefy tętna z siedmiu dni — 89%"
+  },
+  {
+   "t": "naglowek",
+   "tekst": "Dwa pierścienie, dwie oceny: 89% na tętnie, 49% na mocy"
+  },
+  {
+   "t": "akapit",
+   "tekst": "Ta różnica wygląda na błąd, a nie jest nim, i warto wiedzieć, skąd się bierze. Okno tętna mówi: 4,6% w Z1, 70,0% w Z2, 17,2% w Z3, 5,3% w Z4 i 2,8% w Z5 — kształt niemal wzorcowo spolaryzowany, stąd 89%. Okno mocy na tych samych minutach mówi: 50,1% w Z1, 37,7% w Z2 i tylko 12% powyżej, stąd 49% i podpis „rozkład rozjechany”."
+  },
+  {
+   "t": "akapit",
+   "tekst": "Przyczyna jest mechaniczna, nie fizjologiczna. Moc jest natychmiastowa i na każdym zjeździe spada do zera — dzisiejsza trasa miała 791 metrów przewyższenia, czyli tyle samo metrów zjazdu, a na zjeździe w Zwifcie nie trzeba pedałować. Tętno tych przerw nie zauważa, bo spada z opóźnieniem kilkudziesięciu sekund. Pierwsza strefa mocy sięga u Ciebie 95 W, więc każda sekunda wybiegu wpada do niej i podbija ją do połowy czasu. Przy ocenie kształtu treningu wierzyłbym tu tętnu: ono mierzy, co robił organizm, a nie co pokazywał trenażer w sekundzie, w której jechałeś z góry."
+  },
+  {
+   "t": "lista",
+   "punkty": [
+    "Dwie z trzech ostatnich jazd nie mają wpisanego RPE (2.10 i 3.10).",
+    "Dziś to nic nie kosztuje: pas piersiowy był założony, a tętno wygrywa z RPE jako pomiar.",
+    "Koszt pojawi się dopiero przy jeździe bez pasa — tam bez RPE wysiłek jest nieznany i jazda wypada z wykresu formy.",
+    "Wszystkie trzy jazdy mają znacznik ERG, czyli moc trzymał program. To informacja, nie zarzut — waty z trenażera liczą się normalnie."
+   ]
+  },
+  {
+   "t": "akapit",
+   "tekst": "Podsumowując: wytrenowanie 173 jest rekordem całej serii, zmęczenie 255 i forma −82 są wysokie, ale nie najwyższe w tym bloku, a tydzień zamkniesz dowolnym kwadransem na rowerze. Dwie rzeczy do rozważenia, oba Twoje decyzje: rozjazd między FTP w Zwifcie (≈192 W z arytmetyki) a 174 W na tej stronie, oraz 21 dni bez jazdy na szosie przy planie, który rośnie do 6 godzin pod koniec miesiąca."
   }
  ]
 };
