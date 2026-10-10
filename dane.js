@@ -49,10 +49,12 @@ zalozenia: {
     "od": "2026-08-19"
   },
   "HRmax_bpm": {
-    "v": 201,
+    "v": 207,
     "tag": "Z",
-    "od": "2026-08-19",
-    "uwaga": "pas piersiowy; NIE nadpisywać wzorem 220-wiek"
+    "od": "2026-10-10",
+    "zrodlo": "Decyzja Fryderyka z 10.10.2026, po wyścigu Tour of Watopia Stage 1 (2. miejsce z 68 zawodników); wcześniej 201 od 19.08.2026.",
+    "poprzednio": 201,
+    "uwaga": "pas piersiowy; NIE nadpisywać wzorem 220-wiek. Z tej liczby liczy się tabela strefy.tetno — po jej zmianie tabelę trzeba przeliczyć, bo sama się nie przelicza."
   },
   "VT1_bpm": {
     "v": 140,
@@ -116,11 +118,11 @@ cele: {
 prognozy: {
   "_opis": "Prognozy mocy — DECYZJE Fryderyka, nie pomiary. Wykres i lista na zakładce Prognozy czytają je STĄD, tak samo jak cel 80 km czy plan objętości. Liczba wpisana w kod wykresu byłaby drugim źródłem prawdy. Dopisanie okresu do listy tworzy nową mini-zakładkę — kod jej nie zna z nazwy.",
   "ftp_biezace": {
-    "v": 174,
+    "v": 210,
     "tag": "Z",
-    "od": "2026-09-29",
-    "zrodlo": "decyzja Fryderyka 29.09.2026; wpisał 174 W na urządzeniu, przeniesione do danych. Zgadza się z pomiarem: rekord 20-minutowy 183 W z 17.09 i reguła FTP = 0,95 x 20 min dają 174 W.",
-    "poprzednio": "150 W od 22.08.2026 (deklaracja z tamtego dnia)",
+    "od": "2026-10-10",
+    "zrodlo": "Decyzja Fryderyka z 10.10.2026, po wyścigu Tour of Watopia Stage 1 (2. miejsce z 68). Zwift sam podniósł FTP tego dnia (New FTP set! w opisie jazdy), a Fryderyk ustawił 210 W.",
+    "poprzednio": "174 W od 29.09.2026, przedtem 150 W od 22.08.2026",
     "uwaga": "To NIE jest to samo co zalozenia.FTP_W (180 W, tag [E], estymata z modelu). Tu stoi liczba, którą Fryderyk uznaje za swoją; strona pozwala ją zmienić na urządzeniu, a trwale zmienia ją wpis TUTAJ. Z TEJ liczby liczy się tabela strefy.moc — po jej zmianie tabelę trzeba przeliczyć, bo sama się nie przelicza."
   },
   "okresy": [
@@ -694,6 +696,43 @@ strefy: {
             "max": null
           }
         ]
+      },
+      {
+        "od": "2026-10-10",
+        "zrodlo": "Przeliczone z HRmax 207 na polecenie Fryderyka 10.10.2026: progi to floor(HRmax x 0,60 / 0,70 / 0,80 / 0,90) — ta sama reguła co w tabeli z 27.08.2026, tylko z nowym HRmax.",
+        "data_od_dnia_wyscigu": "Nowa wersja, nie poprawka. Jazdy do 9.10.2026 liczą się dalej tabelą z HRmax 201 i tak ma zostać, dopóki Fryderyk nie powie inaczej — wtedy wystarczy przycisk ⟳ Poprawka na stronie. NOWE TABELE DOPISUJEMY NA KOŃCU TEJ LISTY: automat czyta ją bez sortowania i bierze ostatni wpis z datą nie większą niż dzień jazdy.",
+        "strefy": [
+          {
+            "id": "z1",
+            "nazwa": "Z1 regeneracja",
+            "min": 0,
+            "max": 124
+          },
+          {
+            "id": "z2",
+            "nazwa": "Z2 baza",
+            "min": 125,
+            "max": 144
+          },
+          {
+            "id": "z3",
+            "nazwa": "Z3 tempo",
+            "min": 145,
+            "max": 165
+          },
+          {
+            "id": "z4",
+            "nazwa": "Z4 próg",
+            "min": 166,
+            "max": 186
+          },
+          {
+            "id": "z5",
+            "nazwa": "Z5 VO2",
+            "min": 187,
+            "max": null
+          }
+        ]
       }
     ]
   },
@@ -749,6 +788,55 @@ strefy: {
             "id": "z7",
             "nazwa": "Z7 neuromięśniowa",
             "min": 262,
+            "max": null
+          }
+        ]
+      },
+      {
+        "od": "2026-10-10",
+        "zrodlo": "Model Coggana przy FTP 210 W (prognozy.ftp_biezace), przeliczone 10.10.2026 na polecenie Fryderyka. Progi to floor(FTP x 0,55 / 0,75 / 0,90 / 1,05 / 1,20 / 1,50).",
+        "data_od_dnia_wyscigu": "Nowa wersja, nie poprawka: FTP 210 to skok formy potwierdzony wyścigiem, a nie naprawa złej estymaty. Jazdy do 9.10.2026 liczą się dalej tabelą przy FTP 174, bo wtedy tyle wynosił próg.",
+        "strefy": [
+          {
+            "id": "z1",
+            "nazwa": "Z1 regeneracja",
+            "min": 0,
+            "max": 115
+          },
+          {
+            "id": "z2",
+            "nazwa": "Z2 baza",
+            "min": 116,
+            "max": 157
+          },
+          {
+            "id": "z3",
+            "nazwa": "Z3 tempo",
+            "min": 158,
+            "max": 189
+          },
+          {
+            "id": "z4",
+            "nazwa": "Z4 próg",
+            "min": 190,
+            "max": 220
+          },
+          {
+            "id": "z5",
+            "nazwa": "Z5 VO2",
+            "min": 221,
+            "max": 252
+          },
+          {
+            "id": "z6",
+            "nazwa": "Z6 beztlenowa",
+            "min": 253,
+            "max": 315
+          },
+          {
+            "id": "z7",
+            "nazwa": "Z7 neuromięśniowa",
+            "min": 316,
             "max": null
           }
         ]

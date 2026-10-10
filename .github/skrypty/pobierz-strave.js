@@ -431,10 +431,16 @@ function ktoraStrefa(v, strefy){
   return strefy.length - 1;
 }
 
+/* Tabela obowiązująca danego dnia. SORTUJEMY, zanim wybierzemy — strona robi
+   to samo w tabeleStref(). Bez sortowania wystarczyło dopisać nową wersję na
+   POCZĄTKU listy w dane.js, żeby automat po cichu policzył świeżą jazdę
+   starymi progami: pętla kończyłaby na wpisie najstarszym. Złapane 10.10.2026
+   przy dopisywaniu tabel z FTP 210 i HRmax 207. */
 function tabelaNaDzien(tabele, data){
   if (!tabele || !tabele.length) return null;
-  let wynik = tabele[0];
-  for (const t of tabele) if (t.od <= data) wynik = t;
+  const lista = [...tabele].sort((x, y) => x.od < y.od ? -1 : 1);
+  let wynik = lista[0];
+  for (const t of lista) if (t.od <= data) wynik = t;
   return wynik;                       // jazda starsza od wszystkich tabel bierze najstarszą
 }
 
