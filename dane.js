@@ -350,8 +350,13 @@ koszulki: {
         "tlo": "#D0021B",
         "wzor": "gladka"
       },
-      "zdobyta": null,
-      "_uwaga": "Strava nie oddaje wyników wyścigów Zwifta. Zgadywanie z nazwy aktywności byłoby wpisaniem domysłu w miejsce pomiaru."
+      "zdobyta": {
+        "data": "2026-10-10",
+        "jazda": "20530326337",
+        "wynik": "2. miejsce z 68 zawodników — Tour of Watopia 2026, Stage 1",
+        "skad": "odblokowana przez Fryderyka 10.10.2026, przeniesiona z urządzenia tego samego dnia (data wzięta z JSON-a z przycisku Koszulki dla Claude'a)"
+      },
+      "_uwaga": "Strava nie oddaje wyników wyścigów Zwifta. Zgadywanie z nazwy aktywności byłoby wpisaniem domysłu w miejsce pomiaru — dlatego weryfikacja jest ręczna. Tu wynik stoi wprost w nazwie aktywności nadanej przez Zwift (Race, 2nd place/68riders), a odblokowanie i tak zrobił Fryderyk."
     },
     {
       "id": "giro-rozowa",

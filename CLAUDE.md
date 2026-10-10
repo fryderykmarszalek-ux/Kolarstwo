@@ -800,6 +800,16 @@ nie kolor: sylwetka roweru vs ekranu, słupek kreskowany vs pełny.
   `20260244166` z 20.09.2026: 101,22 km w 3:25:26. Wpisane do `dane.js` →
   `koszulki.lista[].zdobyta`, więc są trwałe i widać je na każdym urządzeniu.
 
+  **TRZECIA KOSZULKA: KOSZULKA WALECZNEGO — 10.10.2026.** Warunek to podium
+  w wyścigu na Zwifcie, a wyścig Tour of Watopia Stage 1 dał **2. miejsce
+  z 68 zawodników**. Wpisana do `dane.js` z datą z JSON-a (jazda
+  `20530326337`). To pierwsza koszulka z weryfikacją **ręczną**, której
+  warunek dał się w ogóle sprawdzić: Strava nie oddaje wyników wyścigów
+  Zwifta, ale tutaj wynik stoi wprost w nazwie aktywności nadanej przez
+  Zwift („Race, 2nd place/68riders"), a odblokowanie i tak zrobił Fryderyk.
+  Zgadywanie miejsca z nazwy przy innych jazdach pozostaje zakazane —
+  tu nazwa jest zapisem samego organizatora, nie domysłem.
+
   **DATA ZDOBYCIA TO DZIEŃ KLIKNIĘCIA I TRZEBA JĄ WZIĄĆ Z BRUDNOPISU, NIE
   ZGADNĄĆ** (23.09.2026). Wpisałem najpierw 22.09, bo tego dnia Fryderyk o tym
   napisał — a klikał 21.09, co widać dopiero w JSON-ie z przycisku „Koszulki
@@ -1393,6 +1403,22 @@ Reguła klasyfikacji jest DOKŁADNIE ta sama co na stronie: wartość trafia do
 pierwszej strefy, której górny próg jest od niej nie mniejszy, a ostatnia
 (max = null) łapie resztę. Dziura w zapisie dłuższa niż 10 s to postój i nie
 liczy się do żadnej strefy; brak pomiaru nie jest zerem.
+
+**ZERO PRÓB NA ŚWIEŻEJ JEŹDZIE NIE ZNACZY „BRAK SEGMENTÓW" — poprawka
+z 10.10.2026.** Fryderyk zgłosił, że na jeździe z wyścigu nie wczytały się
+segmenty. Sprawdzone u źródła: Strava oddaje tę aktywność **bez pola
+`segment_efforts`** (warmup z tego samego dnia i jazda z 6.10 po tej samej
+trasie mają je normalnie), czyli dopasowywanie segmentów po jej stronie jeszcze
+nie przeszło — jest asynchroniczne i przy Zwifcie potrafi się spóźnić.
+W danych nie ma więc czego poprawiać; zmyślanie przejazdów byłoby tym samym
+błędem co moc `[E]` udająca pomiar.
+
+Prawdziwy błąd był w automacie: jazda wracała z zerem prób, a mimo to trafiała
+na listę `segmenty_pobrane`, czyli **nigdy więcej nie byłaby pytana**.
+Teraz świeża jazda (do `OKNO_PONOWNYCH_SEGMENTOW_DNI` = 3 dni) bez ani jednej
+próby jest pytana ponownie w każdym przebiegu, a po tym oknie zero przyjmujemy
+za prawdę — jazdy bez segmentów naprawdę istnieją. Koszt: jedno zapytanie na
+przebieg na taką jazdę. Log mówi wprost, że spyta jeszcze raz.
 
 `has_heartrate` ze Stravy zapisujemy przy jeździe jako `ma_tetno` — bez tego
 faktu skrypt musiałby pytać o strumień każdej jazdy albo żadnej. Rozkład raz

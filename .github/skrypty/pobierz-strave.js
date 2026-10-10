@@ -692,6 +692,19 @@ if (require.main !== module) return;
     .toISOString().slice(0,10);
 
   const SEGMENTY_OD = stare.meta.segmenty_od || "2026-04-28";
+  /* ILE DNI PONAWIAMY PYTANIE O SEGMENTY, GDY JAZDA WRÓCIŁA Z ZEREM PRÓB.
+     Dodane 10.10.2026, po wyścigu Tour of Watopia: Strava oddała tę jazdę
+     bez pola segment_efforts, a automat i tak wpisał ją na listę
+     segmenty_pobrane — czyli nigdy więcej by o nią nie zapytał. Dopasowywanie
+     segmentów po stronie Stravy jest asynchroniczne i przy jazdach z Zwifta
+     potrafi się spóźnić o godziny, więc „zero prób" świeżej jazdy nie znaczy
+     „ta jazda nie ma segmentów". Przez trzy dni pytamy więc jeszcze raz
+     (jedno zapytanie na przebieg na taką jazdę), a potem przyjmujemy zero
+     za prawdę — bo jazdy bez ani jednego segmentu naprawdę istnieją
+     i nie ma sensu pytać o nie do końca świata. */
+  const OKNO_PONOWNYCH_SEGMENTOW_DNI = 3;
+  const granicaSegmentow = new Date(Date.now() - OKNO_PONOWNYCH_SEGMENTOW_DNI*86400000)
+    .toISOString().slice(0,10);
   const jazdyZeSegmentami = new Set(stare.segmenty_pobrane || []);
   const wszystkieId = new Set(nowe.map(a => a.id));
 
@@ -721,8 +734,13 @@ if (require.main !== module) return;
     // nie da się wyciąć segmentu z przebiegu. Dociągamy je ponownie, ale
     // z budżetem, żeby nie wpaść w limit Stravy przy 61 jazdach naraz.
     const probyBezIndeksow = proby.some(x => x.a === a.id && x.od == null);
+    // Świeża jazda, o którą już pytaliśmy, a nie ma z niej ani jednej próby:
+    // najpewniej Strava jeszcze nie dopasowała segmentów. Pytamy ponownie.
+    const zeroProb = jazdyZeSegmentami.has(a.id)
+      && a.data.slice(0,10) >= granicaSegmentow
+      && !proby.some(x => x.a === a.id);
     const chceSegmenty = kolarska && a.data.slice(0,10) >= SEGMENTY_OD
-      && (!jazdyZeSegmentami.has(a.id) || PELNE_SEGMENTY
+      && (!jazdyZeSegmentami.has(a.id) || PELNE_SEGMENTY || zeroProb
           || (probyBezIndeksow && budzet > 0));
 
     const staryRpe = rpeStare.get(a.id);
@@ -864,7 +882,9 @@ if (require.main !== module) return;
       for (const seg of w.segmenty) segmenty.set(seg.id, seg);
       jazdyZeSegmentami.add(a.id);
       nowychProb += w.proby.length;
-      console.log(`  segmenty: ${a.data.slice(0,10)} ${a.nazwa} — ${w.proby.length} prób`);
+      console.log(`  segmenty: ${a.data.slice(0,10)} ${a.nazwa} — ${w.proby.length} prób`
+        + (w.proby.length === 0 && a.data.slice(0,10) >= granicaSegmentow
+           ? " (Strava nie oddała segment_efforts; spytamy jeszcze raz w kolejnym przebiegu)" : ""));
     }
   }
   console.log(`Zapytań o jazdy: ${zapytan}. Opisów zmienionych: ${zmienionych}. `
