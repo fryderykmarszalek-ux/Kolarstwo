@@ -416,10 +416,12 @@ nie kolor: sylwetka roweru vs ekranu, słupek kreskowany vs pełny.
   a znak zostaje decyzją.
 
   **Dwa różne FTP i to jest celowe.** `zalozenia.FTP_W` = 180 W z tagiem
-  `[E]` (estymata z modelu, przedział 170–200). `prognozy.ftp_biezace` = **174 W
-  od 29.09.2026** (wcześniej 150 W, deklaracja z 22.08.2026) — to liczba, którą
-  Fryderyk uznaje za swoją, i zgadza się z pomiarem: rekord 20-minutowy 183 W
-  z 17.09 i reguła „FTP ≈ 0,95 × 20 min". Nie zlewać tych dwóch pól w jedno.
+  `[E]` (estymata z modelu, przedział 170–200; dziś wyraźnie już za niska —
+  nie ruszana, bo to osobne pole o osobnym znaczeniu). `prognozy.ftp_biezace`
+  = **210 W od 10.10.2026** (przedtem 174 W od 29.09, a wcześniej 150 W od
+  22.08) — to liczba, którą Fryderyk uznaje za swoją, i zgadza się z pomiarem
+  co do wata: rekord 20-minutowy z wyścigu 222 W razy 0,95 daje 210,9 W.
+  Nie zlewać tych dwóch pól w jedno.
   **Z `ftp_biezace` liczy się teraz tabela `strefy.moc`** — patrz §6, Objętość
   → Tętno i Moc.
 
@@ -582,8 +584,53 @@ nie kolor: sylwetka roweru vs ekranu, słupek kreskowany vs pełny.
   sprzeczne tabele na jeden dzień nie mają sensu. Zapis odmawia, gdy dolny próg
   nie jest mniejszy od górnego albo strefy zachodzą na siebie.
 
-  Wpisane dziś tabele to **propozycje Claude'a do nadpisania**: tętno z HRmax
-  201 (`TRENING.md` §6), moc z modelu Coggana przy FTP 150 W.
+  Pierwsze tabele (27.08.2026) były **propozycjami Claude'a do nadpisania**:
+  tętno z HRmax 201 (`TRENING.md` §6), moc z modelu Coggana przy FTP 150 W.
+  Obie są dziś nadpisane — patrz wpis z 10.10.2026 poniżej.
+
+  **FTP 210 W I HRmax 207 — 10.10.2026, na polecenie Fryderyka po wyścigu.**
+  Tour of Watopia Stage 1, drugie miejsce z 68 zawodników: 22,99 km w 35:32
+  przy mocy średniej 196 W i tętnie 183/207. Po jeździe Fryderyk ustawił sobie
+  FTP 210 i HRmax 207, i poprosił o przeliczenie progów oraz policzenie TEJ
+  jazdy na nowych wartościach.
+
+  Obie tabele przeliczone **tą samą regułą, którą miały dotąd** — zmieniła się
+  tylko liczba wejściowa:
+
+  | | reguła | nowe progi |
+  |---|---|---|
+  | tętno | `floor(HRmax × 0,60/0,70/0,80/0,90)` | 0-124 / 125-144 / 145-165 / 166-186 / 187+ |
+  | moc | `floor(FTP × 0,55/0,75/0,90/1,05/1,20/1,50)` | 0-115 / 116-157 / 158-189 / 190-220 / 221-252 / 253-315 / 316+ |
+
+  **Weszły jako NOWA WERSJA z datą `od: "2026-10-10"`, nie jako poprawka** —
+  w odróżnieniu od zmiany z 29.09, która sięgnęła wstecz. Powód jest
+  rzeczowy: tam naprawiało się tabelę stojącą na FTP, o którym już wiadomo
+  było, że jest złe, a tu doszedł skok formy potwierdzony wyścigiem i **nowy
+  pomiar** tętna (207 to dokładnie maksimum z tej jazdy, poprzednie 199
+  z 12.09). Jazdy do 9.10 liczą się dalej starymi progami, bo wtedy naprawdę
+  tyle wynosiły. Przeniesienie wstecz to jedno dotknięcie ⟳ Poprawki.
+
+  **FTP zgadza się teraz z pomiarem co do wata**: rekord 20-minutowy z wyścigu
+  to 222 W, a `0,95 × 222 = 210,9`. Przy okazji padł argument z 7.10, że Zwift
+  ze swoim FTP 190 przesadza — nie przesadzał, był zbyt ostrożny.
+
+  **AUTOMAT CZYTAŁ LISTĘ DATOWANYCH TABEL BEZ SORTOWANIA** — złapane przy tej
+  zmianie, naprawione. `tabelaNaDzien()` w `.github/skrypty/pobierz-strave.js`
+  brała **ostatni** pasujący wpis z listy w kolejności zapisu, podczas gdy
+  strona sortuje po `od` w `tabeleStref()`. Dopisanie nowej wersji na POCZĄTKU
+  listy dawało więc świeżej jeździe stare progi, po cichu i bez śladu w logu.
+  Pierwsza wersja tej zmiany wpadła dokładnie w tę pułapkę. Teraz automat
+  sortuje tak samo jak strona, a w `dane.js` stoi komentarz, że nowe tabele
+  dopisuje się na końcu listy. **Zmieniając format listy tabel, sprawdzić oba
+  miejsca.**
+
+  Wyścig był **bodźcem VO2max, nie progowym** — warto zapamiętać metodę, bo
+  Fryderyk pytał wprost. Średnie kłamią (196 W = 93% FTP, 30 min = 205 W = 98%),
+  rozstrzyga rozkład: 38,9% czasu powyżej progu, 24,4% powyżej 120% progu,
+  12,5% powyżej 150% progu w 24 osobnych skokach, przy 21,1% czasu w pierwszej
+  strefie mocy (koło). Tętno: 65,2% w Z4, 34,2% w Z5, maksimum 207. Rekord
+  pięciominutowy 258 W = 123% FTP, czyli praktyczny odpowiednik mocy przy
+  VO2max — i to tam padł największy względny skok.
 
   **FTP 174 W I TABELA MOCY PRZELICZONA WSTECZ — 29.09.2026, na wyraźne
   polecenie Fryderyka.** Zgłosił: „mam ewidentnie wpisane 174 i ja to widzę;
