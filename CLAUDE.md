@@ -1182,6 +1182,51 @@ przycinamy tylko to, jak długo naprawdę obowiązują. Kontrola: przerwa
 się jako przerwa, jeśli zgłoszony **zanim** przerwa przekroczy 14 dni. Maks. dwa
 w roku. Lista w `dane.js` → `kryterium_przerwy.wyjazdy_bez_roweru`.
 
+**DRUGA FURTKA: `przerwy_wylaczone` — 1.11.2026, na polecenie Fryderyka.**
+Napisał wprost: „nie dawaj alertu o przekroczeniu przerwy, to choroba + wyjazd
+połączone". Chodziło o przerwę 18–31.10.2026, czyli **równo czternaście dni
+pustych** — dokładnie na progu.
+
+Ta przerwa nie spełniała ANI JEDNEGO z dwóch warunków zasady B: nie była
+wyjazdem (choroba, a wyjazd doszedł na jej końcu) i została zgłoszona 1.11,
+czyli dzień po czternastym pustym dniu. Dałoby się ją wcisnąć do
+`wyjazdy_bez_roweru` z datą zgłoszenia wpisaną wstecz — i **tego nie wolno
+robić**: warunek terminu istnieje właśnie po to, żeby wymówka nie mogła udawać
+reguły, a data wpisana wstecz to ten sam gatunek kłamstwa co moc `[E]` udająca
+pomiar.
+
+Dlatego osobna lista i osobny podpis na stronie. Przerwa z `przerwy_wylaczone`
+nie wchodzi do kryterium, ale strona **nigdy nie mówi przy niej „wyjazd
+zgłoszony"** — mówi „wyłączona Twoją decyzją" z powodem i datą decyzji. Zasada
+B zostaje nietknięta i nadal wymaga zgłoszenia w terminie.
+
+Wpięte w **sześciu** miejscach, wszystkie trzeba ruszać razem: `wylaczenieDla()`,
+`przerwyLiczone`, barwa słupka na C2, odczyt pod wykresem C2, kafelek „Od
+ostatniej jazdy" (`wylaczenieTrwa`) i koszulka `bez_przerwy_dni` — ta ostatnia
+dlatego, że kryterium sezonu i koszulka odpowiadają na to samo pytanie, więc
+dwie różne odpowiedzi byłyby gorsze niż jedna.
+
+**Zakładka Kryterium wypisuje teraz wyjątki JAWNIE** (`blokWyjatkow()`): obie
+listy, każda nazwana po imieniu, z powodem i datą. Licznik „złamań: 4" nie jest
+czystym pomiarem, tylko pomiarem po decyzjach Fryderyka — i te decyzje muszą
+stać pod licznikiem, nie w komentarzu w kodzie. Sprawdzone: przerwa szara,
+ostatnie złamanie nadal 11.08.2026, złamań 4 jak przed zmianą.
+
+**SERIA DOWIEZIONYCH PLANÓW NIE MA FURTKI NA CHOROBĘ i tak zostaje** — zerwała
+się na dwóch tygodniach choroby (0 z rzędu, rekord 5 z 8). To osobny licznik od
+kryterium sezonu; gdyby miał dostać wyjątek, to będzie osobna decyzja Fryderyka.
+
+**JEDNA SEKUNDA 2000 W CZEKA NA JEGO DECYZJĘ** (12.10.2026, jazda
+`20558172583`). W przebiegu siedzi pojedyncza sekunda równo 2000 W, a jej
+otoczenie to `668, 363, 720, 2000, 38, 0, 0` — wejście skokiem o 1280 W
+i natychmiastowy zgon do 38 W. To skok zapisu trenażera, nie sprint. Zabiera
+przy tym prawdziwy rekord: po potraktowaniu tej sekundy jako BRAKU POMIARU
+(nie zera) wychodzi 1 s = **1068 W**, 3 s 982 W, 5 s 862 W — trzy rekordy, w tym
+pierwsze przekroczenie tysiąca watów. Od 15 s w górę skok nie zmienia nic.
+**Nie filtrować z własnej inicjatywy** — rekordy to jego liczby; pytanie stoi
+w analizie z 1.11 i czeka na odpowiedź. Jeśli powie „odetnij", reguła ma wejść
+do automatu i objąć całą historię, nie tę jedną jazdę.
+
 ---
 
 ## 7. Zasady pracy, które się sprawdziły

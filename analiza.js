@@ -2,166 +2,133 @@
 // NIE EDYTOWAĆ RĘCZNIE: plik jest nadpisywany po każdej zmianie danych.
 // Powstaje w .github/skrypty/analiza.js po nocnym pobraniu ze Stravy.
 //
-// Ta wersja jest wyjątkiem — napisana w sesji czatu 10.10.2026, bo sekretu
+// Ta wersja jest wyjątkiem — napisana w sesji czatu 1.11.2026, bo sekretu
 // ANTHROPIC_API_KEY jeszcze nie ma. Pole odcisk to prawdziwy skrót
 // dzisiejszego briefingu, a analiza jest z dzisiaj, więc automat zostawi ją
 // w spokoju do jutrzejszego wieczora.
 
 window.ANALIZA = {
  "wersja": 1,
- "utworzono": "2026-10-10T21:30",
+ "utworzono": "2026-11-01T21:40",
  "model": "asystent w sesji czatu",
- "jazd_w_danych": 130,
- "dane_pobrano": "2026-10-10T18:44",
- "odcisk": "e5094805abf3d548",
+ "jazd_w_danych": 136,
+ "dane_pobrano": "2026-11-01T20:32",
+ "odcisk": "d95cb2eec3c5bb5c",
  "bloki": [
   {
    "t": "naglowek",
-   "tekst": "Drugie miejsce z 68 zawodników i jedenaście rekordów mocy w 35 minut"
+   "tekst": "Powrót po czternastu dniach — przerwa wyłączona, forma najwyższa w serii, wytrenowanie o trzecią część niżej"
   },
   {
    "t": "akapit",
-   "tekst": "Tour of Watopia 2026, Stage 1, trasa Sand And Sequoias: 22,99 km w 35 minut 32 sekundy, czyli 38,8 km/h, przy zupełnie płaskim profilu. Moc średnia 196 W, maksymalna 877 W. Tętno średnie 183, maksymalne 207. RPE 9, 425 kcal. Przed startem rozgrzewka: 13,11 km w 28:34 przy 94 W i tętnie 129, RPE 2 — i to właśnie w niej padł Twój dwutysięczny kilometr w 2026 roku."
+   "tekst": "Od ostatniej analizy pięć jazd między 12 a 17 października, potem czternaście dni bez roweru (18–31.10), a dziś powrót: „Chapman's Peak in Video”, 11,58 km w 26 minut 53 sekundy, moc średnia 132 W, tętno średnie 149, 189 m przewyższenia. Przerwa jest w danych wyłączona z kryterium sezonu Twoją decyzją z dzisiaj — powód: choroba, a na jej końcu wyjazd. Alarm o przekroczeniu limitu zniknął, słupek na wykresie przerw stoi na szaro i podpisuje się prawdziwym powodem."
   },
   {
    "t": "kafelki",
    "pozycje": [
     {
-     "etykieta": "Miejsce",
-     "wartosc": "2 / 68",
-     "stopka": "Tour of Watopia, etap 1"
+     "etykieta": "Wytrenowanie",
+     "wartosc": "123",
+     "stopka": "szczyt 183 · 10.10"
     },
     {
-     "etykieta": "Rekord 20 min",
-     "wartosc": "222 W",
-     "stopka": "było 185 · +37 W"
+     "etykieta": "Forma",
+     "wartosc": "+86",
+     "stopka": "najwyżej w całej serii"
     },
     {
-     "etykieta": "Moc średnia",
-     "wartosc": "196 W",
-     "stopka": "93% FTP przez 35 minut"
+     "etykieta": "Przerwa",
+     "wartosc": "14 dni",
+     "stopka": "wyłączona decyzją"
     },
     {
      "etykieta": "Rok 2026",
-     "wartosc": "2029,9 km",
-     "stopka": "dwa tysiące przekroczone"
+     "wartosc": "2132,3 km",
+     "stopka": "74 jazdy"
     }
    ]
   },
   {
    "t": "naglowek",
-   "tekst": "Krzywa mocy przed wyścigiem a krzywa z wyścigu"
-  },
-  {
-   "t": "akapit",
-   "tekst": "Prosiłeś o to porównanie, więc po lewej stronie każdego wiersza stoi Twój najlepszy wynik na tym oknie ze WSZYSTKICH jazd przed dzisiejszym dniem, a po prawej to, co zrobiłeś w samym wyścigu. Jedenaście okien z osiemnastu zostało przepisanych — od piętnastu sekund do trzydziestu minut."
-  },
-  {
-   "t": "lista",
-   "punkty": [
-    "15 s: 617 → 620 W (+3)",
-    "30 s: 378 → 527 W (+149, czyli o 39% więcej)",
-    "40 s: 319 → 473 W (+154, o 48%)",
-    "1 min: 295 → 382 W (+87, o 29%)",
-    "2 min: 252 → 295 W (+43)",
-    "5 min: 232 → 258 W (+26)",
-    "8 min: 222 → 236 W (+14)",
-    "10 min: 215 → 233 W (+18)",
-    "15 min: 207 → 230 W (+23)",
-    "20 min: 185 → 222 W (+37, o 20%)",
-    "30 min: 160 → 205 W (+45, o 28%)"
-   ]
-  },
-  {
-   "t": "akapit",
-   "tekst": "Teraz druga strona tego porównania, bo jest równie ciekawa: krótki koniec krzywej NIE drgnął. Jedna sekunda 877 W wobec rekordu 913 W z 27 września, pięć sekund 731 wobec 859, dziesięć sekund 634 wobec 778. Wyścig nie wymagał od Ciebie jednego maksymalnego sprintu — wymagał dwudziestu czterech przyspieszeń pod rząd i trzymania wysokiej mocy między nimi. Dlatego przepisał całą środkową część krzywej i zostawił sam szczyt w spokoju."
-  },
-  {
-   "t": "akapit",
-   "tekst": "I rzecz, która domyka sprawę FTP z ostatnich tygodni: rekord dwudziestominutowy wynosi teraz 222 W, a klasyczna reguła FTP ≈ 0,95 × moc 20-minutowa daje z tego 210,9 W. Ustawiłeś 210. Czyli Twoja własna decyzja i pomiar zgadzają się do jednego wata — pierwszy raz od sierpnia, kiedy te dwie liczby były rozjechane o 26 W. Przy okazji przestał działać argument z 7 października, że Zwift z FTP 190 przesadza. Nie przesadzał, tylko był o dwadzieścia watów zbyt ostrożny."
-  },
-  {
-   "t": "wykres_moc",
-   "tytul": "Krzywa rekordów mocy po wyścigu"
-  },
-  {
-   "t": "naglowek",
-   "tekst": "VO2max czy próg? Jednoznacznie VO2max, z warstwą beztlenową"
-  },
-  {
-   "t": "akapit",
-   "tekst": "Średnia kłamie i trzeba zacząć od tego. Moc średnia 196 W to 93% Twojego nowego FTP, a 30-minutowy odcinek wyszedł 205 W, czyli 98% — gdyby patrzeć tylko na te dwie liczby, wyglądałoby to na porządną sesję progową. Ale to są średnie z wysiłku, który ani chwili nie był równy, a próg polega właśnie na równości."
-  },
-  {
-   "t": "akapit",
-   "tekst": "Rozkład samego wyścigu, sekunda po sekundzie, mówi coś innego. Powyżej progu (210 W) siedziałeś 13 minut 50 sekund, czyli 38,9% czasu. Powyżej 120% progu (252 W) — 8 minut 40 sekund, 24,4%. Powyżej 150% progu (316 W) — 4 minuty 27 sekund, 12,5%, rozbite na dwadzieścia cztery osobne przyspieszenia. Jednocześnie 21,1% czasu spędziłeś w pierwszej strefie mocy, poniżej 115 W, czyli odpoczywając w kole. Tak nie wygląda próg. Tak wygląda sesja interwałowa, której nikt Ci nie zaplanował."
-  },
-  {
-   "t": "akapit",
-   "tekst": "Tętno potwierdza to samo jeszcze mocniej. Średnia 183 to 88% HRmax. W czwartej strefie (166–186) siedziałeś 65,2% czasu, a w piątej (187 i powyżej) 34,2% — dwanaście minut i dziewięć sekund. Powyżej 190 uderzeń było 9 minut 27 sekund, powyżej 200 pięćdziesiąt trzy sekundy, a szczyt 207. Sesja progowa trzyma tętno w czwartej strefie i prawie nie wchodzi w piątą; tutaj co trzecia sekunda była w piątej."
-  },
-  {
-   "t": "akapit",
-   "tekst": "Dowód rozstrzygający jest w rekordzie pięciominutowym: 258 W, czyli 123% FTP. Moc pięciominutowa to w fizjologii praktyczny odpowiednik mocy przy VO2max — i właśnie na tym oknie zrobiłeś największy względny skok w środkowej części krzywej. Werdykt: był to bodziec VO2max z wyraźną domieszką beztlenową (te 24 skoki powyżej 150% progu), a nie trening progowy. Jedna uwaga praktyczna: taki bodziec kosztuje znacznie więcej regeneracji niż próg o tej samej średniej mocy, i licznik to pokazuje."
-  },
-  {
-   "t": "naglowek",
-   "tekst": "Nowe progi: FTP 210 i HRmax 207 wpisane, obie tabele przeliczone"
-  },
-  {
-   "t": "akapit",
-   "tekst": "Zrobione tak, jak prosiłeś. FTP 210 W i HRmax 207 siedzą teraz w danych, nie w pamięci przeglądarki, więc widzisz je na każdym urządzeniu. Obie tabele przeliczyłem tą samą regułą, którą miały dotąd — żadnej nowej metody nie wprowadzam, zmieniła się tylko liczba, od której się liczy."
-  },
-  {
-   "t": "lista",
-   "punkty": [
-    "Tętno, floor(207 × 0,60/0,70/0,80/0,90): Z1 0–124 · Z2 125–144 · Z3 145–165 · Z4 166–186 · Z5 187+",
-    "Moc, model Coggana floor(210 × 0,55/0,75/0,90/1,05/1,20/1,50): Z1 0–115 · Z2 116–157 · Z3 158–189 · Z4 190–220 · Z5 221–252 · Z6 253–315 · Z7 316+",
-    "Oba progi wchodzą z datą 10.10.2026, więc dzisiejszy wyścig i rozgrzewka są już policzone na nich.",
-    "Jazdy do 9.10 liczą się dalej starymi progami — bo wtedy naprawdę tyle wynosiły. Gdybyś chciał przeliczyć całą historię, wystarczy jedno dotknięcie przycisku ⟳ Poprawka pod tabelą.",
-    "HRmax 207 nie jest deklaracją na wyczucie: dokładnie tyle pokazał Twój pas w tym wyścigu. Poprzednie maksimum to 199 z 12 września."
-   ]
-  },
-  {
-   "t": "akapit",
-   "tekst": "Przy okazji wyszła pułapka w nocnym automacie i jest już naprawiona. Automat czytał listę datowanych tabel BEZ sortowania i brał z niej ostatni pasujący wpis, więc gdyby nowa wersja trafiła na początek listy, dzisiejszy wyścig policzyłby się po cichu starymi progami. Teraz sortuje tak samo jak strona. Wyścig jest policzony tabelami z 10.10 — sprawdzone w danych, nie założone."
-  },
-  {
-   "t": "naglowek",
-   "tekst": "Co to zrobiło z formą"
+   "tekst": "Co czternaście dni zrobiło z liczbami"
   },
   {
    "t": "wykres_forma",
-   "tytul": "Wytrenowanie i zmęczenie"
+   "tytul": "Wytrenowanie i zmęczenie — koszt przerwy widać na jednym rysunku"
   },
   {
    "t": "akapit",
-   "tekst": "Obciążenie dnia 379 z 35 minut jazdy — dla porównania wczorajszy dzień wolny dał zero, a środowe 3×10 minut 457 przy 92 minutach na rowerze. Wysiłek policzony z tętna wyszedł 8,15/10 i to jest najwyższa wartość, jaką pas kiedykolwiek u Ciebie zmierzył (poprzednio 6,99 z podjazdu Col du Rosier). Twoje RPE 9 jest tu praktycznie zgodne z pomiarem — po dwóch jazdach, na których te liczby się rozjeżdżały, dziś mówią to samo."
+   "tekst": "Wytrenowanie spadło ze 182,6 (10.10, rekord całej serii) na 123,4 dzisiaj. To 59,2 punktu, czyli 32,4% w czternaście dni. Zgadza się z arytmetyką modelu: średnia wykładnicza o stałej 42 dni traci około 2,4% na każdy dzień bez treningu, a 0,976 do czternastej potęgi daje 0,71. Nic się więc nie zepsuło — tak po prostu działa ta miara. Dla skali: ostatni raz wytrenowanie było na tym poziomie 17 września."
   },
   {
    "t": "akapit",
-   "tekst": "Wytrenowanie 182,6 to kolejny rekord całej serii, zmęczenie 245, forma −62, napięcie 1,34. Licznik regeneracji dał 19 godzin 22 minuty i pełną gotowość 11.10 o 14:09. Zwracam uwagę, że zmęczenie jest DZIŚ niższe niż 7 października (264), mimo że dziś jechałeś wyścig — bo wczorajszy dzień wolny zdążył je ściąć. Dokładnie tak powinien wyglądać tydzień przed startem."
-  },
-  {
-   "t": "wykres_strefy",
-   "miara": "tetno",
-   "dni": 7,
-   "tytul": "Strefy tętna z siedmiu dni"
+   "tekst": "Druga strona tego samego medalu: zmęczenie zeszło z 245 na 38, a forma z −62 na +85,7, przy szczycie +100,4 w sam dzień 31 października. To najwyższa forma w całej serii, czyli od 1 marca — i jest to liczba, którą trzeba czytać ostrożnie. Wysoka forma znaczy „wypoczęty względem własnego wytrenowania”, a nie „mocny”. Jesteś wypoczęty do liczby, która sama spadła o trzecią część. Napięcie zmęczenie/wytrenowanie 0,30 mówi dokładnie to samo."
   },
   {
    "t": "lista",
    "punkty": [
-    "Efektywność rozkładu tętna z 7 dni spadła na 38%. To nie jest zarzut — jeden wyścig na 35 minut wrzuca do okna dwanaście minut piątej strefy i model Seilera przestaje widzieć kształt spolaryzowany. Okno 30-dniowe stoi na 69%.",
-    "To okno miesza dwie tabele progów: jazdy do 9.10 policzone z HRmax 201, dzisiejsze z 207. Tak działa datowanie progów i jest to zamierzone.",
-    "Pierścień MOCY z 7 dni pokazuje 17% i to też nie jest błąd: połowa okna (50,6%) leży w pierwszej strefie, bo doszła spokojna jazda w kole z 8.10 i czas spędzony na kole w wyścigu, a 18% leży powyżej czwartej strefy. Kształt tygodnia startowego, nie bloku bazowego.",
-    "Tydzień 6–12.10: 5,2 h z planu 5,5 h, dwa dni przed sobą.",
-    "Październik: 244,6 km w dziewięciu jazdach po dziesięciu dniach, czyli 24,5 km na dzień. Wrzesień miał 20,5.",
-    "Rok 2026: 2029,9 km w 68 jazdach."
+    "10.10: wytrenowanie 182,6 · zmęczenie 245 · forma −62",
+    "17.10 (ostatnia jazda przed przerwą): 171,8 · 168 · +4",
+    "24.10: 145,4 · 62 · +84",
+    "31.10 (czternasty pusty dzień): 123,1 · 23 · +100",
+    "01.11 (dziś, po jeździe): 123,4 · 38 · +86"
+   ]
+  },
+  {
+   "t": "naglowek",
+   "tekst": "Rekord 1 sekundy pokazuje 2000 W i to nie jesteś Ty"
+  },
+  {
+   "t": "akapit",
+   "tekst": "Na jeździe z 12 października („Downtown Eruption”) w zapisie siedzi jedna sekunda z wartością równo 2000 W. Rozpakowałem ten przebieg sekunda po sekundzie i otoczenie tej sekundy wygląda tak: 668, 363, 720, 2000, 38, 0, 0. Czyli: moc rośnie do 720, potem jedna sekunda 2000, a w następnej 38 W i całkowite zero. Prawdziwy sprint tak nie wygląda — po maksymalnym wysiłku moc schodzi, a nie znika, i nie wchodzi się na szczyt z 720 W jednym skokiem o 1280 W. Do tego 2000 to liczba podejrzanie równa. To skok zapisu trenażera, nie Twoja moc."
+  },
+  {
+   "t": "akapit",
+   "tekst": "Ważne, bo ta jedna sekunda zabrała Ci prawdziwy rekord. Na tej samej jeździe są trzy sprinty, które wyglądają jak sprinty: 555 → 812 → 879 → 937 → 937 → 745, potem 600 → 596 → 986 → 986 → 973, i wreszcie 780 → 780 → 1068 → 687. Przeliczyłem krzywą tej jazdy, traktując sekundę z 2000 W jako brak pomiaru, a nie jako zero — i wychodzi, że pierwszy raz przekroczyłeś tysiąc watów."
+  },
+  {
+   "t": "lista",
+   "punkty": [
+    "1 sekunda: w danych 2000 W, po odjęciu skoku 1068 W — poprzedni rekord 913 W z 27.09, czyli i tak rekord, o 155 W.",
+    "3 sekundy: w danych 1028 W, po odjęciu skoku 982 W — poprzedni rekord 884 W, nadal rekord.",
+    "5 sekund: w danych 892 W, po odjęciu skoku 862 W — poprzedni rekord 859 W, rekord o 3 W.",
+    "10 sekund: w danych 716 W, po odjęciu skoku 662 W — tu rekord 778 W z 20.09 zostaje w mocy.",
+    "Od 15 sekund w górę skok nie zmienia nic: 533 W na 15 s i 324 W na 30 s są czyste."
+   ]
+  },
+  {
+   "t": "ostrzezenie",
+   "tekst": "Niczego w danych nie ruszam, bo rekordy to Twoje liczby i nie będę ich poprawiał z własnej inicjatywy. Pytanie jest jedno: zostawić 2000 W jako pomiar, czy odciąć tę jedną sekundę i wpisać rekord 1068 W? Jeśli powiesz „odetnij”, dołożę do automatu regułę na pojedynczą sekundę odstającą od sąsiadów o kilkaset watów i przeliczę całą historię tą samą miarą, nie tylko tę jazdę."
+  },
+  {
+   "t": "wykres_moc",
+   "tytul": "Krzywa rekordów mocy — lewy koniec z jedną sekundą do rozstrzygnięcia"
+  },
+  {
+   "t": "naglowek",
+   "tekst": "Plan skończył się 26 października i seria się zerwała"
+  },
+  {
+   "t": "akapit",
+   "tekst": "Dwie rzeczy do uporządkowania, obie wymagają Twojej decyzji, nie mojej. Pierwsza: plan objętości w danych kończy się na tygodniu 20–26.10. Od 27 października wykres godzin nie ma czego rysować jako linii planu, więc kolejne tygodnie są bez odniesienia. Druga: seria dowiezionych planów pokazuje 0 tygodni z rzędu przy rekordzie 5 z 8 — zerwały ją dwa tygodnie choroby, bo plan był na 4 i 6 godzin, a jazd nie było. Kryterium sezonu wyłączyliśmy, ale seria planów to osobny licznik i on nie ma furtki na chorobę."
+  },
+  {
+   "t": "wykres_tygodnie",
+   "tytul": "Godziny w tygodniach"
+  },
+  {
+   "t": "lista",
+   "punkty": [
+    "Październik: 335,4 km w czternastu jazdach — 26,3 km na szosie, 309,1 na Zwifcie.",
+    "Listopad: 11,6 km, jedna jazda.",
+    "Rok 2026: 2132,3 km w 74 jazdach.",
+    "Dzisiejsza jazda: wysiłek z tętna 5,0/10, regeneracja 5 godzin 22 minuty, gotowość o 1:57 w nocy.",
+    "Okno stref tętna z 7 dni to dziś wyłącznie ta jedna jazda (26 minut), więc jego 24% nic nie znaczy. Okno 30-dniowe stoi na 71%."
    ]
   },
   {
    "t": "akapit",
-   "tekst": "Podsumowując: było grubo i liczby to potwierdzają. Drugie miejsce z 68 zawodników, jedenaście rekordów mocy od 15 sekund do 30 minut, najwyższy wysiłek z tętna w historii pomiaru i FTP, które po raz pierwszy zgadza się z własnym pomiarem co do wata. Bodziec był VO2max, nie progowy — i to znaczy, że jutro należy Ci się dzień wolny albo spokojna jazda w pierwszej strefie, a nie kolejne interwały."
+   "tekst": "Podsumowując: przerwa jest załatwiona po Twojemu i widoczna na stronie z prawdziwym powodem, a nie schowana. Zapłaciłeś za nią jedną trzecią wytrenowania i zerwaną serią planów — to nie zarzut, tak działa choroba. Dzisiejsze 27 minut przy 132 W to dobry sposób wejścia z powrotem; przy wytrenowaniu 123 pierwszy tydzień ma być łatwy, a nie nadrabiany. Do rozstrzygnięcia zostawiam Ci dwie rzeczy: tamtą sekundę z 2000 W i nowe tygodnie planu od 3 listopada."
   }
  ]
 };

@@ -1419,8 +1419,31 @@ function wyjazdDla(od, doo){
     w.od <= doo && w.do >= od && w.zgloszony <= granica
   ) || null;
 }
-przerwy.forEach(p => { p.wyjazd = wyjazdDla(p.od, p.do); });
-const przerwyLiczone = przerwy.filter(p => !p.wyjazd);
+/* PRZERWY WYŁĄCZONE WPROST — druga, osobna furtka (1.11.2026).
+
+   Zasada B wyłącza tylko WYJAZDY bez dostępu do roweru i tylko zgłoszone,
+   ZANIM przerwa dobije do progu. Przerwa 18–31.10.2026 nie spełniała żadnego
+   z tych warunków: była chorobą, na której końcu doszedł wyjazd, a Fryderyk
+   zgłosił ją dzień po czternastym pustym dniu. Dałoby się ją wcisnąć do
+   `wyjazdy_bez_roweru` z datą zgłoszenia wpisaną wstecz — i to byłoby
+   dokładnie to, przed czym broni warunek terminu: wymówka udająca regułę.
+
+   Dlatego jest osobna lista i osobny podpis. Przerwa z tej listy nie wchodzi
+   do kryterium, ale strona nigdy nie mówi przy niej „wyjazd zgłoszony" —
+   mówi „wyłączona decyzją" z powodem i datą decyzji. Zasada B zostaje
+   nietknięta i nadal wymaga zgłoszenia w terminie. */
+const WYLACZENIA = D.kryterium_przerwy.przerwy_wylaczone || [];
+function wylaczenieDla(od, doo){
+  return WYLACZENIA.find(w => w.od <= doo && w.do >= od) || null;
+}
+
+przerwy.forEach(p => {
+  p.wyjazd = wyjazdDla(p.od, p.do);
+  p.wylaczenie = p.wyjazd ? null : wylaczenieDla(p.od, p.do);
+});
+// Nie liczymy przerwy wyłączonej żadną z dwóch furtek — ale każda z nich ma
+// na stronie własny podpis, bo to dwie różne rzeczy.
+const przerwyLiczone = przerwy.filter(p => !p.wyjazd && !p.wylaczenie);
 const zlamania = przerwyLiczone.filter(ZLAMANIE);
 
 /* Dzień złamania to nie początek i nie koniec przerwy, tylko moment, w którym
@@ -1454,6 +1477,7 @@ for (const a of jazdy){
 const tenTydzien = godzinyWTygodniu[poniedzialek(DZIS)] || 0;
 const ostatniaJazda = jazdy[jazdy.length-1];
 const wyjazdTrwa = wyjazdDla(ostatniDzien, DZIS);
+const wylaczenieTrwa = wyjazdTrwa ? null : wylaczenieDla(ostatniDzien, DZIS);
 
 /* ==========================================================================
    WIEK DANYCH — jedyne miejsce, w którym strona pyta o zegar urządzenia.
@@ -1543,7 +1567,7 @@ function wykresPrzerw(){
     const x = 4 + i*(szerSlupka+odstep);
     const h = Math.max(skala(p.dni), 1.5);
     const y = marGora + wys - h;
-    const kolor = p.wyjazd ? "var(--slaby)"
+    const kolor = (p.wyjazd || p.wylaczenie) ? "var(--slaby)"
                 : ZLAMANIE(p) ? "var(--alarm)" : "var(--akcent)";
     s += `<rect x="${x}" y="${y}" width="${szerSlupka}" height="${h}"
            fill="${kolor}" opacity="${ZLAMANIE(p) ? 1 : .55}"
@@ -1949,11 +1973,13 @@ const przegladStart = () => `
     <h2>Jak mi idzie</h2>
     <p class="opis">Stan na ${pl(DZIS)}. Liczone od ${pl(OD)}.</p>
     <div class="kafelki">
-      <div class="kafel ${przerwaTrwa > PROG && !wyjazdTrwa ? "uwaga" : ""}">
+      <div class="kafel ${przerwaTrwa > PROG && !wyjazdTrwa && !wylaczenieTrwa ? "uwaga" : ""}">
         <div class="etykieta">Od ostatniej jazdy</div>
         <div class="liczba">${przerwaTrwa}</div>
         <div class="stopka">${wyjazdTrwa
           ? wyjazdTrwa.opis + " · nie liczy się"
+          : wylaczenieTrwa
+          ? bezpieczny(wylaczenieTrwa.powod) + " · wyłączona, nie liczy się"
           : "dni · limit " + PROG}${DANE_STOJA
           ? ` · <b style="color:var(--alarm)" title="Dane sprzed ${WIEK} dni — ta liczba jest zaniżona">[?]</b>`
           : ""}</div>
@@ -2014,6 +2040,31 @@ const c2Przerwy = () => `
     <div class="info" id="info-przerwa">Dotknij słupka, żeby zobaczyć daty.</div>
   </section>`;
 
+/* Wyjątki wypisane JAWNIE. Przerwa, która nie weszła do kryterium, musi być
+   widoczna razem z powodem — inaczej licznik „złamań: 0" wyglądałby na pomiar,
+   a byłby wynikiem cichego odsiewu. */
+function blokWyjatkow(){
+  const wyj = WYJAZDY.filter(w => przerwy.some(p => p.wyjazd === w));
+  const wyl = WYLACZENIA.filter(w => przerwy.some(p => p.wylaczenie === w));
+  if (!wyj.length && !wyl.length) return "";
+  const wiersze = [
+    ...wyj.map(w => `<li><b>${bezpieczny(w.opis)}</b> · ${pl(w.od)} → ${pl(w.do)}
+      — wyjazd bez dostępu do roweru, zgłoszony ${pl(w.zgloszony)}, czyli
+      w terminie z zasady B.</li>`),
+    ...wyl.map(w => `<li><b>${bezpieczny(w.powod)}</b> · ${pl(w.od)} → ${pl(w.do)}
+      (${w.dni_pustych} dni pustych) — <b>wyłączona Twoją decyzją</b>
+      z ${pl(w.decyzja)}. ${bezpieczny(w.uwaga)}</li>`)
+  ].join("");
+  return `
+    <div class="info">
+      <b>Przerwy, które nie weszły do kryterium (${wyj.length + wyl.length}):</b>
+      <ul class="lista-brudnopisow">${wiersze}</ul>
+      Kryterium liczy się po odjęciu tych przerw, więc licznik wyżej nie jest
+      czystym pomiarem — jest pomiarem po Twoich decyzjach i dlatego one stoją
+      tutaj, a nie w komentarzu w kodzie.
+    </div>`;
+}
+
 const kryterium = () => `
   <section>
     <h2>Kryterium sezonu</h2>
@@ -2043,6 +2094,7 @@ const kryterium = () => `
           : "kryterium nigdy nie złamane"}</div>
       </div>
     </div>
+    ${blokWyjatkow()}
   </section>`;
 
 /* ==========================================================================
@@ -4502,7 +4554,9 @@ function mBezPrzerwy(k){
   let najwieksza = 0, ktora = null;
   for (let i = 1; i < dni.length; i++){
     if (k.od_daty && dni[i] < k.od_daty) continue;
-    if (wyjazdDla(dni[i-1], dni[i])) continue;
+    // Ta sama furtka co w kryterium sezonu — dwie różne odpowiedzi na to samo
+    // pytanie byłyby gorsze niż jedna.
+    if (wyjazdDla(dni[i-1], dni[i]) || wylaczenieDla(dni[i-1], dni[i])) continue;
     const g = roznicaDni(naDzien(dni[i-1]), naDzien(dni[i]));
     if (g > najwieksza){ najwieksza = g; ktora = { od: dni[i-1], do: dni[i] }; }
   }
@@ -8241,6 +8295,9 @@ function podepnijSlupki(){
         + `${pl(p.od)} → ${pl(p.do)}`
         + (p.wyjazd
             ? ` · <b>${p.wyjazd.opis}</b>, wyjazd zgłoszony — nie liczy się`
+            : p.wylaczenie
+            ? ` · <b>${bezpieczny(p.wylaczenie.powod)}</b> — wyłączona decyzją
+                z ${pl(p.wylaczenie.decyzja)}, nie liczy się`
             : ZLAMANIE(p) ? ` · <b style="color:var(--alarm)">ponad limit</b>` : "");
     };
     el.addEventListener("click", () => { zaznacz(el); pokazInfo(); });

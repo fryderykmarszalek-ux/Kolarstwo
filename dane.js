@@ -102,6 +102,18 @@ kryterium_przerwy: {
       "opis": "Francja",
       "zgloszony": "2026-08-19"
     }
+  ],
+  "zasada_wylaczen": "DRUGA, OSOBNA FURTKA — dodana 1.11.2026 na polecenie Fryderyka. Wariant B wyłącza wyłącznie WYJAZDY bez dostępu do roweru zgłoszone ZANIM przerwa dobije do progu. Przerwa z 18-31.10.2026 nie spełnia ani jednego z tych dwóch warunków: była chorobą, na której końcu doszedł wyjazd, a zgłoszona została 1.11, czyli dzień po czternastym pustym dniu. Nie wolno więc udawać, że to wyjazd zgłoszony z góry — data zgłoszenia wpisana wstecz byłaby wymówką, nie regułą. Zamiast tego przerwa jest wyłączona WPROST, jako decyzja Fryderyka o własnym kryterium, z podanym powodem i datą decyzji. Strona mówi to otwarcie: nie pisze 'wyjazd zgłoszony', tylko 'wyłączona decyzją'. Zasada B zostaje nietknięta i nadal wymaga zgłoszenia w terminie.",
+  "przerwy_wylaczone": [
+    {
+      "od": "2026-10-18",
+      "do": "2026-10-31",
+      "powod": "Choroba, a na jej końcu wyjazd",
+      "rodzaj": "choroba + wyjazd",
+      "decyzja": "2026-11-01",
+      "dni_pustych": 14,
+      "uwaga": "Zgłoszone po czternastym pustym dniu, więc poza warunkiem zgłoszenia z góry z zasady B. Wyłączenie jest decyzją Fryderyka, nie działaniem reguły, i strona tak to podpisuje."
+    }
   ]
 },
 
