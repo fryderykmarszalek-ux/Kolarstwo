@@ -5,7 +5,7 @@
 
 window.DANE = {
 
-meta: {"pobrano":"2026-11-01T11:59","zrodlo":"Strava API (GitHub Actions): /athlete/activities + /activities/{id}","athlete_id":143761800,"liczba_aktywnosci":135,"zakres":["2024-07-31","2026-10-17"],"liczone_od":"2025-08-31","liczone_od_powod":"Decyzja Fryderyka z 19.08.2026: wcześniejsze daty nieistotne. Historia zostaje w pliku w całości — po prostu nie jest liczona. Zmiana tej jednej daty przywraca wszystko.","linia_podzialu":"2026-08-19","linia_podzialu_opis":"Przed tą datą jazdy mają tylko to, co daje Strava — bez wiatru, składu grupy i tętna. Nie uzupełniać wstecz.","typy_kolarskie":["Ride","VirtualRide"],"typy_kolarskie_opis":"Tylko te przerywają przerwę. E-bike, spacery, treki i biegi — nie.","pola_pominiete":["pr_count","achievement_count","kudos_count"],"pola_pominiete_powod":"Zmienne w czasie — stan na moment pobrania, nie fakt historyczny (13.08: 60 -> 59 w kilkanaście minut). Zapisać dopiero z datą pobrania obok.","segmenty_od":"2025-08-01","liczba_segmentow":437,"liczba_prob":2272,"jazd_z_moca":43,"jazd_z_rozkladem":52,"jazd_z_trasa":117,"jazd_z_przebiegiem":118},
+meta: {"pobrano":"2026-11-01T20:32","zrodlo":"Strava API (GitHub Actions): /athlete/activities + /activities/{id}","athlete_id":143761800,"liczba_aktywnosci":136,"zakres":["2024-07-31","2026-11-01"],"liczone_od":"2025-08-31","liczone_od_powod":"Decyzja Fryderyka z 19.08.2026: wcześniejsze daty nieistotne. Historia zostaje w pliku w całości — po prostu nie jest liczona. Zmiana tej jednej daty przywraca wszystko.","linia_podzialu":"2026-08-19","linia_podzialu_opis":"Przed tą datą jazdy mają tylko to, co daje Strava — bez wiatru, składu grupy i tętna. Nie uzupełniać wstecz.","typy_kolarskie":["Ride","VirtualRide"],"typy_kolarskie_opis":"Tylko te przerywają przerwę. E-bike, spacery, treki i biegi — nie.","pola_pominiete":["pr_count","achievement_count","kudos_count"],"pola_pominiete_powod":"Zmienne w czasie — stan na moment pobrania, nie fakt historyczny (13.08: 60 -> 59 w kilkanaście minut). Zapisać dopiero z datą pobrania obok.","segmenty_od":"2025-08-01","liczba_segmentow":443,"liczba_prob":2278,"jazd_z_moca":44,"jazd_z_rozkladem":53,"jazd_z_trasa":118,"jazd_z_przebiegiem":119},
 
 zalozenia: {
   "_opis": "Wariant B: tu i tylko tu żyją stałe modelu. Nigdy nie wpisywać ich w kod wykresu. Zmiana jednej liczby przelicza całą historię.",
@@ -1716,6 +1716,26 @@ strefy: {
         ],
         "tabela_tetno": "2026-10-10",
         "tabela_moc": "2026-10-10"
+      },
+      "20821659456": {
+        "tetno": [
+          73,
+          676,
+          452,
+          413,
+          0
+        ],
+        "moc": [
+          893,
+          246,
+          141,
+          108,
+          77,
+          82,
+          67
+        ],
+        "tabela_tetno": "2026-10-10",
+        "tabela_moc": "2026-10-10"
       }
     }
   },
@@ -1962,6 +1982,11 @@ segmenty: [
   {"id":"38170243","nazwa":"Champion’s Sprint","dystans_m":200.5,"nachylenie_proc":-0.4,"przewyzszenie_m":1.2},
   {"id":"24674235","nazwa":"Champs-Élysées","dystans_m":6623.1,"nachylenie_proc":0,"przewyzszenie_m":30},
   {"id":"38169117","nazwa":"Champs-Élysées Sprint","dystans_m":151.4,"nachylenie_proc":3.3,"przewyzszenie_m":5},
+  {"id":"42353647","nazwa":"Chapman's Peak","dystans_m":11304.2,"nachylenie_proc":-0.1,"przewyzszenie_m":162.8},
+  {"id":"42461471","nazwa":"Chapman's Peak - Noordhoek Climb","dystans_m":1344.6,"nachylenie_proc":4.3,"przewyzszenie_m":57.8},
+  {"id":"42461460","nazwa":"Chapman's Peak Climb","dystans_m":2357.6,"nachylenie_proc":4.5,"przewyzszenie_m":105.2},
+  {"id":"16258098","nazwa":"Chapmans Peak - From Noordhoek","dystans_m":4409.6,"nachylenie_proc":2.8,"przewyzszenie_m":175.5},
+  {"id":"25128853","nazwa":"Chapmans Peak Nh - Fulgaz","dystans_m":1756.5,"nachylenie_proc":5,"przewyzszenie_m":88},
   {"id":"7917821","nazwa":"Charz-CHojniczki","dystans_m":495,"nachylenie_proc":3.9,"przewyzszenie_m":19.2},
   {"id":"12917120","nazwa":"Charzykowy -> Chojniczki","dystans_m":2128.2,"nachylenie_proc":1,"przewyzszenie_m":23.3},
   {"id":"13258795","nazwa":"Chylicka podjazd","dystans_m":432.7,"nachylenie_proc":2.7,"przewyzszenie_m":12.8},
@@ -2234,6 +2259,7 @@ segmenty: [
   {"id":"5469466","nazwa":"Prusa w stronę Piaseczna","dystans_m":1135.5,"nachylenie_proc":0.4,"przewyzszenie_m":4.5},
   {"id":"34904434","nazwa":"przez Dziki","dystans_m":503.1,"nachylenie_proc":2.1,"przewyzszenie_m":10.8},
   {"id":"41305205","nazwa":"przez progi","dystans_m":903.2,"nachylenie_proc":0,"przewyzszenie_m":2.2},
+  {"id":"11627547","nazwa":"Purito Rodriguez","dystans_m":1286.1,"nachylenie_proc":10.8,"przewyzszenie_m":139.2},
   {"id":"24685955","nazwa":"R.G.V.","dystans_m":24078.9,"nachylenie_proc":0,"przewyzszenie_m":23.6},
   {"id":"37716248","nazwa":"Radio Rendezvous","dystans_m":20393.8,"nachylenie_proc":2.5,"przewyzszenie_m":514.4},
   {"id":"14120182","nazwa":"Radio Tower Climb","dystans_m":1096.1,"nachylenie_proc":13.7,"przewyzszenie_m":149.8},
@@ -2424,6 +2450,7 @@ proby: [
   {"od":1510,"do":1629,"id":"3523772482857008000","s":"10464552","a":"19756483940","czas_s":119,"moc_S":null,"z_miernika":0,"tetno":null},
   {"od":2063,"do":2171,"id":"3533175688006094300","s":"10464552","a":"20119310922","czas_s":108,"moc_S":null,"z_miernika":0,"tetno":171},
   {"od":1988,"do":2110,"id":"3541781146611397000","s":"10464552","a":"20445544821","czas_s":122,"moc_S":null,"z_miernika":0,"tetno":157},
+  {"od":847,"do":1178,"id":"3552053070394611700","s":"11627547","a":"20821659456","czas_s":331,"moc_S":165.5,"z_miernika":1,"tetno":169},
   {"od":1424,"do":2008,"id":"3467532362563410400","s":"11700992","a":"17707959140","czas_s":584,"moc_S":null,"z_miernika":0,"tetno":null},
   {"od":1862,"do":2304,"id":"3496163362891099000","s":"11700992","a":"18729555478","czas_s":444,"moc_S":null,"z_miernika":0,"tetno":null},
   {"od":1900,"do":2352,"id":"3503483347651825000","s":"11700992","a":"19000739541","czas_s":452,"moc_S":null,"z_miernika":0,"tetno":null},
@@ -2751,6 +2778,7 @@ proby: [
   {"od":5588,"do":5663,"id":"3523035685475498500","s":"16126462","a":"19728167402","czas_s":75,"moc_S":null,"z_miernika":0,"tetno":null},
   {"od":3176,"do":3253,"id":"3532404668279296000","s":"16126462","a":"20088445195","czas_s":77,"moc_S":null,"z_miernika":0,"tetno":127},
   {"od":4507,"do":4699,"id":"3523772482852384000","s":"16126814","a":"19756483940","czas_s":192,"moc_S":null,"z_miernika":0,"tetno":null},
+  {"od":294,"do":1148,"id":"3552053070393362400","s":"16258098","a":"20821659456","czas_s":854,"moc_S":164.9,"z_miernika":1,"tetno":162},
   {"od":1850,"do":1979,"id":"3397259412306990000","s":"16511033","a":"15650458577","czas_s":130,"moc_S":null,"z_miernika":0,"tetno":null},
   {"od":2920,"do":3083,"id":"3399421775685776400","s":"16511033","a":"15718034220","czas_s":163,"moc_S":null,"z_miernika":0,"tetno":null},
   {"od":2024,"do":2174,"id":"3404465238672854000","s":"16511033","a":"15875808667","czas_s":150,"moc_S":null,"z_miernika":0,"tetno":null},
@@ -3380,6 +3408,7 @@ proby: [
   {"od":524,"do":593,"id":"3532404668279180300","s":"25021870","a":"20088445195","czas_s":69,"moc_S":null,"z_miernika":0,"tetno":127},
   {"od":461,"do":527,"id":"3533883506823998000","s":"25021870","a":"20146204393","czas_s":66,"moc_S":null,"z_miernika":0,"tetno":143},
   {"od":578,"do":1214,"id":"3508553211403588600","s":"25100546","a":"19180109565","czas_s":636,"moc_S":null,"z_miernika":0,"tetno":null},
+  {"od":733,"do":1140,"id":"3552053070393657300","s":"25128853","a":"20821659456","czas_s":407,"moc_S":177,"z_miernika":1,"tetno":168},
   {"od":3383,"do":3531,"id":"3467557096528833000","s":"25388104","a":"17708859621","czas_s":148,"moc_S":null,"z_miernika":0,"tetno":null},
   {"od":2355,"do":2455,"id":"3489685609685157000","s":"25388104","a":"18492969096","czas_s":100,"moc_S":null,"z_miernika":0,"tetno":null},
   {"od":4493,"do":4579,"id":"3491445343995924500","s":"25388104","a":"18554597453","czas_s":86,"moc_S":null,"z_miernika":0,"tetno":null},
@@ -4231,6 +4260,9 @@ proby: [
   {"od":2165,"do":2261,"id":"3530862089921392600","s":"42138019","a":"20029911411","czas_s":96,"moc_S":null,"z_miernika":0,"tetno":164},
   {"od":6935,"do":7063,"id":"3532404668277344000","s":"42138019","a":"20088445195","czas_s":128,"moc_S":null,"z_miernika":0,"tetno":141},
   {"od":3452,"do":3558,"id":"3533883506818694700","s":"42138019","a":"20146204393","czas_s":106,"moc_S":null,"z_miernika":0,"tetno":145},
+  {"od":15,"do":1585,"id":"3552053070393244700","s":"42353647","a":"20821659456","czas_s":1570,"moc_S":134.1,"z_miernika":1,"tetno":150},
+  {"od":645,"do":1148,"id":"3552053070394454000","s":"42461460","a":"20821659456","czas_s":503,"moc_S":175.4,"z_miernika":1,"tetno":167},
+  {"od":280,"do":576,"id":"3552053070393803000","s":"42461471","a":"20821659456","czas_s":296,"moc_S":163.4,"z_miernika":1,"tetno":155},
   {"od":3867,"do":4311,"id":"3523772482851533000","s":"4326136","a":"19756483940","czas_s":444,"moc_S":null,"z_miernika":0,"tetno":null},
   {"od":2592,"do":3137,"id":"3529426695373868000","s":"4326136","a":"19972642177","czas_s":545,"moc_S":null,"z_miernika":0,"tetno":135},
   {"od":2212,"do":2742,"id":"3531729840278822000","s":"4326136","a":"20064645010","czas_s":530,"moc_S":null,"z_miernika":0,"tetno":162},
@@ -4641,7 +4673,7 @@ proby: [
   {"od":2123,"do":2248,"id":"3541781146610977300","s":"9926797","a":"20445544821","czas_s":125,"moc_S":null,"z_miernika":0,"tetno":157},
 ],
 
-segmenty_pobrane: ["15650458577","15659929857","15718034220","15820597167","15875808667","15954703695","16130454908","16152610580","16182099651","16183714130","16194964157","16215300750","16225978401","16266432121","16286281071","16296395304","16306020934","16325922529","16336493568","16377663365","16479980049","16547212377","16566037541","17707959140","17708859621","18296163995","18328405840","18346607726","18360199343","18438077208","18454701002","18492969096","18530281768","18554597453","18619303262","18635140776","18692876636","18718998937","18729555478","18841404334","18945539070","18971344203","19000739541","19014149953","19033109585","19089641123","19179947367","19180109565","19201212771","19247803670","19415453209","19415474905","19415496764","19415517403","19415553503","19447815706","19728167402","19728195586","19728218329","19742428076","19756483940","19962190482","19972642177","20008658665","20029911411","20064645010","20088445195","20119310922","20146204393","20215674019","20231606233","20244006712","20260244166","20284521636","20285717904","20300861319","20312261598","20312457977","20340622812","20355804866","20380594844","20380985840","20411147741","20424105379","20435941951","20445544821","20474133210","20492364319","20505156505","20529357359","20530326337","20558172583","20568766154","20568952153","20612799201","20621852935"],
+segmenty_pobrane: ["15650458577","15659929857","15718034220","15820597167","15875808667","15954703695","16130454908","16152610580","16182099651","16183714130","16194964157","16215300750","16225978401","16266432121","16286281071","16296395304","16306020934","16325922529","16336493568","16377663365","16479980049","16547212377","16566037541","17707959140","17708859621","18296163995","18328405840","18346607726","18360199343","18438077208","18454701002","18492969096","18530281768","18554597453","18619303262","18635140776","18692876636","18718998937","18729555478","18841404334","18945539070","18971344203","19000739541","19014149953","19033109585","19089641123","19179947367","19180109565","19201212771","19247803670","19415453209","19415474905","19415496764","19415517403","19415553503","19447815706","19728167402","19728195586","19728218329","19742428076","19756483940","19962190482","19972642177","20008658665","20029911411","20064645010","20088445195","20119310922","20146204393","20215674019","20231606233","20244006712","20260244166","20284521636","20285717904","20300861319","20312261598","20312457977","20340622812","20355804866","20380594844","20380985840","20411147741","20424105379","20435941951","20445544821","20474133210","20492364319","20505156505","20529357359","20530326337","20558172583","20568766154","20568952153","20612799201","20621852935","20821659456"],
 
 moc_krzywe: [
   {"a":"16130454908","w":{"1":111,"3":111,"5":111,"10":110,"15":110,"30":110,"40":110,"60":110,"120":110,"300":109,"480":104,"600":102,"900":100,"1200":99,"1800":99,"2700":93}},
@@ -4687,9 +4719,10 @@ moc_krzywe: [
   {"a":"20568952153","w":{"1":286,"3":240,"5":168,"10":135,"15":135,"30":134,"40":133,"60":132,"120":129,"300":120,"480":117,"600":113}},
   {"a":"20612799201","w":{"1":225,"3":223,"5":221,"10":220,"15":220,"30":220,"40":220,"60":214,"120":170,"300":161,"480":144,"600":139,"900":133,"1200":131,"1800":119}},
   {"a":"20621852935","w":{"1":148,"3":146,"5":146,"10":145,"15":145,"30":145,"40":145,"60":145,"120":144,"300":143,"480":136,"600":135,"900":134,"1200":133,"1800":132,"2700":128,"3600":122}},
+  {"a":"20821659456","w":{"1":681,"3":647,"5":522,"10":436,"15":349,"30":255,"40":231,"60":218,"120":189,"300":184,"480":178,"600":170,"900":163,"1200":148}},
 ],
 
-moc_pobrana: ["16130454908","16152610580","16182099651","16183714130","16194964157","16215300750","16225978401","16266432121","16286281071","16296395304","16306020934","16325922529","16336493568","16377663365","16479980049","16547212377","16566037541","20215674019","20231606233","20244006712","20260244166","20284521636","20285717904","20300861319","20312261598","20312457977","20340622812","20355804866","20380594844","20380985840","20411147741","20424105379","20435941951","20474133210","20492364319","20505156505","20529357359","20530326337","20558172583","20568766154","20568952153","20612799201","20621852935"],
+moc_pobrana: ["16130454908","16152610580","16182099651","16183714130","16194964157","16215300750","16225978401","16266432121","16286281071","16296395304","16306020934","16325922529","16336493568","16377663365","16479980049","16547212377","16566037541","20215674019","20231606233","20244006712","20260244166","20284521636","20285717904","20300861319","20312261598","20312457977","20340622812","20355804866","20380594844","20380985840","20411147741","20424105379","20435941951","20474133210","20492364319","20505156505","20529357359","20530326337","20558172583","20568766154","20568952153","20612799201","20621852935","20821659456"],
 
 // czas_ruchu_s — czas w ruchu. Zgodnie z regułą: wszystkie średnie zawsze z czasu w ruchu.
 aktywnosci: [
@@ -4828,6 +4861,7 @@ aktywnosci: [
   {"id":"20568952153","data":"2026-10-13T16:58:26","typ":"VirtualRide","dystans_m":6722.2,"czas_ruchu_s":777,"czas_calkowity_s":777,"przewyzszenie_m":12,"nazwa":"Zwift - Half an Hour in Zone 2 (1)","ma_tetno":1,"tetno_sr":132,"moc_sr":107,"z_miernika":1,"kalorie":79,"opis":"🗺️ Tick Tock in Watopia"},
   {"id":"20612799201","data":"2026-10-16T21:43:40","typ":"VirtualRide","dystans_m":14592.7,"czas_ruchu_s":1809,"czas_calkowity_s":1809,"przewyzszenie_m":63,"nazwa":"Zwift - 9. Sleepless","ma_tetno":1,"tetno_sr":148,"moc_sr":119,"z_miernika":1,"kalorie":204,"opis":"🗺️ Greater London Flat in London"},
   {"id":"20621852935","data":"2026-10-17T14:44:53","typ":"VirtualRide","dystans_m":31977.8,"czas_ruchu_s":3615,"czas_calkowity_s":3615,"przewyzszenie_m":93,"nazwa":"Zwift - Day 3","ma_tetno":1,"tetno_sr":145,"moc_sr":121,"z_miernika":1,"kalorie":418,"opis":"🗺️ Tick Tock in Watopia"},
+  {"id":"20821659456","data":"2026-11-01T19:42:35","typ":"VirtualRide","dystans_m":11577.8,"czas_ruchu_s":1613,"czas_calkowity_s":1613,"przewyzszenie_m":189,"nazwa":"Zwift - Chapman's Peak in Video","ma_tetno":1,"tetno_sr":149,"moc_sr":132,"z_miernika":1,"kalorie":203},
 ]
 
 };
