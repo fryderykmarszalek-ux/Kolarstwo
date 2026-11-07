@@ -5,7 +5,7 @@
 
 window.DANE = {
 
-meta: {"pobrano":"2026-11-06T13:11","zrodlo":"Strava API (GitHub Actions): /athlete/activities + /activities/{id}","athlete_id":143761800,"liczba_aktywnosci":138,"zakres":["2024-07-31","2026-11-03"],"liczone_od":"2025-08-31","liczone_od_powod":"Decyzja Fryderyka z 19.08.2026: wcześniejsze daty nieistotne. Historia zostaje w pliku w całości — po prostu nie jest liczona. Zmiana tej jednej daty przywraca wszystko.","linia_podzialu":"2026-08-19","linia_podzialu_opis":"Przed tą datą jazdy mają tylko to, co daje Strava — bez wiatru, składu grupy i tętna. Nie uzupełniać wstecz.","typy_kolarskie":["Ride","VirtualRide"],"typy_kolarskie_opis":"Tylko te przerywają przerwę. E-bike, spacery, treki i biegi — nie.","pola_pominiete":["pr_count","achievement_count","kudos_count"],"pola_pominiete_powod":"Zmienne w czasie — stan na moment pobrania, nie fakt historyczny (13.08: 60 -> 59 w kilkanaście minut). Zapisać dopiero z datą pobrania obok.","segmenty_od":"2025-08-01","liczba_segmentow":460,"liczba_prob":2295,"jazd_z_moca":46,"jazd_z_rozkladem":55,"jazd_z_trasa":120,"jazd_z_przebiegiem":121},
+meta: {"pobrano":"2026-11-07T00:17","zrodlo":"Strava API (GitHub Actions): /athlete/activities + /activities/{id}","athlete_id":143761800,"liczba_aktywnosci":139,"zakres":["2024-07-31","2026-11-06"],"liczone_od":"2025-08-31","liczone_od_powod":"Decyzja Fryderyka z 19.08.2026: wcześniejsze daty nieistotne. Historia zostaje w pliku w całości — po prostu nie jest liczona. Zmiana tej jednej daty przywraca wszystko.","linia_podzialu":"2026-08-19","linia_podzialu_opis":"Przed tą datą jazdy mają tylko to, co daje Strava — bez wiatru, składu grupy i tętna. Nie uzupełniać wstecz.","typy_kolarskie":["Ride","VirtualRide"],"typy_kolarskie_opis":"Tylko te przerywają przerwę. E-bike, spacery, treki i biegi — nie.","pola_pominiete":["pr_count","achievement_count","kudos_count"],"pola_pominiete_powod":"Zmienne w czasie — stan na moment pobrania, nie fakt historyczny (13.08: 60 -> 59 w kilkanaście minut). Zapisać dopiero z datą pobrania obok.","segmenty_od":"2025-08-01","liczba_segmentow":469,"liczba_prob":2304,"jazd_z_moca":47,"jazd_z_rozkladem":56,"jazd_z_trasa":121,"jazd_z_przebiegiem":122},
 
 zalozenia: {
   "_opis": "Wariant B: tu i tylko tu żyją stałe modelu. Nigdy nie wpisywać ich w kod wykresu. Zmiana jednej liczby przelicza całą historię.",
@@ -1788,6 +1788,26 @@ strefy: {
         ],
         "tabela_tetno": "2026-10-10",
         "tabela_moc": "2026-10-10"
+      },
+      "20887153516": {
+        "tetno": [
+          22,
+          3151,
+          309,
+          0,
+          0
+        ],
+        "moc": [
+          1356,
+          2111,
+          6,
+          2,
+          3,
+          2,
+          2
+        ],
+        "tabela_tetno": "2026-10-10",
+        "tabela_moc": "2026-10-10"
       }
     }
   },
@@ -2073,6 +2093,14 @@ segmenty: [
   {"id":"35697049","nazwa":"Coast Crusher","dystans_m":34663.9,"nachylenie_proc":0,"przewyzszenie_m":14},
   {"id":"36336062","nazwa":"Col du Rosier (France Climb Portal)","dystans_m":4991.5,"nachylenie_proc":4.5,"przewyzszenie_m":222.6},
   {"id":"36336067","nazwa":"Col du Rosier Descent (France Climb Portal)","dystans_m":4987.2,"nachylenie_proc":-4.5,"przewyzszenie_m":222.6},
+  {"id":"42423245","nazwa":"Colorado River Sunrise","dystans_m":24417.5,"nachylenie_proc":0.3,"przewyzszenie_m":74.2},
+  {"id":"42423225","nazwa":"Colorado River Sunrise - Big Bend","dystans_m":885.1,"nachylenie_proc":0,"przewyzszenie_m":3.6},
+  {"id":"42423234","nazwa":"Colorado River Sunrise - Chasing the Sun","dystans_m":298,"nachylenie_proc":0.2,"przewyzszenie_m":1.4},
+  {"id":"42423241","nazwa":"Colorado River Sunrise - Corise Opener","dystans_m":389.9,"nachylenie_proc":-0.2,"przewyzszenie_m":2.6},
+  {"id":"42423305","nazwa":"Colorado River Sunrise - La Sal","dystans_m":430.4,"nachylenie_proc":2.7,"przewyzszenie_m":11.8},
+  {"id":"42429625","nazwa":"Colorado River Sunrise - Onion Climb","dystans_m":1617.5,"nachylenie_proc":2.8,"przewyzszenie_m":45.2},
+  {"id":"42429648","nazwa":"Colorado River Sunrise - River Rising","dystans_m":400.5,"nachylenie_proc":5.5,"przewyzszenie_m":22.4},
+  {"id":"42476972","nazwa":"Colorado River Sunrise - When You Gotta Go!","dystans_m":190.2,"nachylenie_proc":1.5,"przewyzszenie_m":2.8},
   {"id":"38168940","nazwa":"Country Sprint Reverse","dystans_m":147.9,"nachylenie_proc":-1.1,"przewyzszenie_m":1.6},
   {"id":"10259595","nazwa":"Cyklista w Waw (Słomczyn)","dystans_m":2502.1,"nachylenie_proc":0,"przewyzszenie_m":21.8},
   {"id":"35500573","nazwa":"Czyczkowy - Wielkie Chełmy ścieżką","dystans_m":2039.3,"nachylenie_proc":0.1,"przewyzszenie_m":5},
@@ -2108,6 +2136,7 @@ segmenty: [
   {"id":"11287415","nazwa":"FINAL 2 KM TO THE TOP","dystans_m":2042.8,"nachylenie_proc":8.2,"przewyzszenie_m":167.8},
   {"id":"40052476","nazwa":"Finish im. Jurka Pasty","dystans_m":4823.3,"nachylenie_proc":-0.1,"przewyzszenie_m":21},
   {"id":"9358510","nazwa":"Finisz dla Valverde","dystans_m":779.6,"nachylenie_proc":1.3,"przewyzszenie_m":11},
+  {"id":"23139391","nazwa":"First Hump","dystans_m":870.7,"nachylenie_proc":2.9,"przewyzszenie_m":25.4},
   {"id":"39873080","nazwa":"Flat Out Fast","dystans_m":21425.9,"nachylenie_proc":0.1,"przewyzszenie_m":17.2},
   {"id":"40057861","nazwa":"fly away","dystans_m":505.7,"nachylenie_proc":0,"przewyzszenie_m":1.6},
   {"id":"20350107","nazwa":"Fuego Flats Forward Sprint","dystans_m":496.6,"nachylenie_proc":0.2,"przewyzszenie_m":1.2},
@@ -3379,6 +3408,7 @@ proby: [
   {"od":7293,"do":7346,"id":"3532404668278161400","s":"23132249","a":"20088445195","czas_s":53,"moc_S":null,"z_miernika":0,"tetno":135},
   {"od":3818,"do":3874,"id":"3533883506819369500","s":"23132249","a":"20146204393","czas_s":56,"moc_S":null,"z_miernika":0,"tetno":133},
   {"od":0,"do":186,"id":"3402702039987523600","s":"23132336","a":"15820597167","czas_s":186,"moc_S":null,"z_miernika":0,"tetno":null},
+  {"od":1385,"do":1594,"id":"3553900252503686700","s":"23139391","a":"20887153516","czas_s":209,"moc_S":116.2,"z_miernika":1,"tetno":139},
   {"od":336,"do":428,"id":"3402702039985097700","s":"23179948","a":"15820597167","czas_s":93,"moc_S":null,"z_miernika":0,"tetno":null},
   {"od":324,"do":590,"id":"3485655031685292000","s":"23191462","a":"18346607726","czas_s":266,"moc_S":null,"z_miernika":0,"tetno":null},
   {"od":1495,"do":1560,"id":"3399421775688750000","s":"23414067","a":"15718034220","czas_s":65,"moc_S":null,"z_miernika":0,"tetno":null},
@@ -4347,8 +4377,16 @@ proby: [
   {"od":3452,"do":3558,"id":"3533883506818694700","s":"42138019","a":"20146204393","czas_s":106,"moc_S":null,"z_miernika":0,"tetno":145},
   {"od":15,"do":1585,"id":"3552053070393244700","s":"42353647","a":"20821659456","czas_s":1570,"moc_S":134.1,"z_miernika":1,"tetno":150},
   {"od":9,"do":511,"id":"3552672676379630000","s":"42374295","a":"20841633124","czas_s":502,"moc_S":104.9,"z_miernika":1,"tetno":138},
+  {"od":1043,"do":1153,"id":"3553900252505151000","s":"42423225","a":"20887153516","czas_s":110,"moc_S":116.6,"z_miernika":1,"tetno":141},
+  {"od":1918,"do":1956,"id":"3553900252502588000","s":"42423234","a":"20887153516","czas_s":38,"moc_S":106.5,"z_miernika":1,"tetno":146},
+  {"od":347,"do":394,"id":"3553900252506937000","s":"42423241","a":"20887153516","czas_s":47,"moc_S":119.5,"z_miernika":1,"tetno":140},
+  {"od":12,"do":3460,"id":"3553900252504340000","s":"42423245","a":"20887153516","czas_s":3448,"moc_S":113.8,"z_miernika":1,"tetno":140},
+  {"od":2715,"do":2811,"id":"3553900252502974000","s":"42423305","a":"20887153516","czas_s":96,"moc_S":109.9,"z_miernika":1,"tetno":139},
+  {"od":3048,"do":3406,"id":"3553900252502419000","s":"42429625","a":"20887153516","czas_s":358,"moc_S":112.3,"z_miernika":1,"tetno":139},
+  {"od":1448,"do":1594,"id":"3553900252501859000","s":"42429648","a":"20887153516","czas_s":146,"moc_S":116.1,"z_miernika":1,"tetno":139},
   {"od":645,"do":1148,"id":"3552053070394454000","s":"42461460","a":"20821659456","czas_s":503,"moc_S":175.4,"z_miernika":1,"tetno":167},
   {"od":280,"do":576,"id":"3552053070393803000","s":"42461471","a":"20821659456","czas_s":296,"moc_S":163.4,"z_miernika":1,"tetno":155},
+  {"od":588,"do":625,"id":"3553900252503753000","s":"42476972","a":"20887153516","czas_s":37,"moc_S":119.6,"z_miernika":1,"tetno":138},
   {"od":3867,"do":4311,"id":"3523772482851533000","s":"4326136","a":"19756483940","czas_s":444,"moc_S":null,"z_miernika":0,"tetno":null},
   {"od":2592,"do":3137,"id":"3529426695373868000","s":"4326136","a":"19972642177","czas_s":545,"moc_S":null,"z_miernika":0,"tetno":135},
   {"od":2212,"do":2742,"id":"3531729840278822000","s":"4326136","a":"20064645010","czas_s":530,"moc_S":null,"z_miernika":0,"tetno":162},
@@ -4759,7 +4797,7 @@ proby: [
   {"od":2123,"do":2248,"id":"3541781146610977300","s":"9926797","a":"20445544821","czas_s":125,"moc_S":null,"z_miernika":0,"tetno":157},
 ],
 
-segmenty_pobrane: ["15650458577","15659929857","15718034220","15820597167","15875808667","15954703695","16130454908","16152610580","16182099651","16183714130","16194964157","16215300750","16225978401","16266432121","16286281071","16296395304","16306020934","16325922529","16336493568","16377663365","16479980049","16547212377","16566037541","17707959140","17708859621","18296163995","18328405840","18346607726","18360199343","18438077208","18454701002","18492969096","18530281768","18554597453","18619303262","18635140776","18692876636","18718998937","18729555478","18841404334","18945539070","18971344203","19000739541","19014149953","19033109585","19089641123","19179947367","19180109565","19201212771","19247803670","19415453209","19415474905","19415496764","19415517403","19415553503","19447815706","19728167402","19728195586","19728218329","19742428076","19756483940","19962190482","19972642177","20008658665","20029911411","20064645010","20088445195","20119310922","20146204393","20215674019","20231606233","20244006712","20260244166","20284521636","20285717904","20300861319","20312261598","20312457977","20340622812","20355804866","20380594844","20380985840","20411147741","20424105379","20435941951","20445544821","20474133210","20492364319","20505156505","20529357359","20530326337","20558172583","20568766154","20568952153","20612799201","20621852935","20821659456","20841633124","20842371402"],
+segmenty_pobrane: ["15650458577","15659929857","15718034220","15820597167","15875808667","15954703695","16130454908","16152610580","16182099651","16183714130","16194964157","16215300750","16225978401","16266432121","16286281071","16296395304","16306020934","16325922529","16336493568","16377663365","16479980049","16547212377","16566037541","17707959140","17708859621","18296163995","18328405840","18346607726","18360199343","18438077208","18454701002","18492969096","18530281768","18554597453","18619303262","18635140776","18692876636","18718998937","18729555478","18841404334","18945539070","18971344203","19000739541","19014149953","19033109585","19089641123","19179947367","19180109565","19201212771","19247803670","19415453209","19415474905","19415496764","19415517403","19415553503","19447815706","19728167402","19728195586","19728218329","19742428076","19756483940","19962190482","19972642177","20008658665","20029911411","20064645010","20088445195","20119310922","20146204393","20215674019","20231606233","20244006712","20260244166","20284521636","20285717904","20300861319","20312261598","20312457977","20340622812","20355804866","20380594844","20380985840","20411147741","20424105379","20435941951","20445544821","20474133210","20492364319","20505156505","20529357359","20530326337","20558172583","20568766154","20568952153","20612799201","20621852935","20821659456","20841633124","20842371402","20887153516"],
 
 moc_krzywe: [
   {"a":"16130454908","w":{"1":111,"3":111,"5":111,"10":110,"15":110,"30":110,"40":110,"60":110,"120":110,"300":109,"480":104,"600":102,"900":100,"1200":99,"1800":99,"2700":93}},
@@ -4808,9 +4846,10 @@ moc_krzywe: [
   {"a":"20821659456","w":{"1":681,"3":647,"5":522,"10":436,"15":349,"30":255,"40":231,"60":218,"120":189,"300":184,"480":178,"600":170,"900":163,"1200":148}},
   {"a":"20841633124","w":{"1":175,"3":129,"5":120,"10":120,"15":120,"30":120,"40":120,"60":118,"120":110,"300":108,"480":105}},
   {"a":"20842371402","w":{"1":853,"3":543,"5":487,"10":346,"15":331,"30":301,"40":289,"60":267,"120":232,"300":208,"480":202,"600":201,"900":194,"1200":191,"1800":186,"2700":181}},
+  {"a":"20887153516","w":{"1":445,"3":241,"5":182,"10":144,"15":137,"30":127,"40":125,"60":122,"120":120,"300":120,"480":120,"600":119,"900":118,"1200":118,"1800":117,"2700":115}},
 ],
 
-moc_pobrana: ["16130454908","16152610580","16182099651","16183714130","16194964157","16215300750","16225978401","16266432121","16286281071","16296395304","16306020934","16325922529","16336493568","16377663365","16479980049","16547212377","16566037541","20215674019","20231606233","20244006712","20260244166","20284521636","20285717904","20300861319","20312261598","20312457977","20340622812","20355804866","20380594844","20380985840","20411147741","20424105379","20435941951","20474133210","20492364319","20505156505","20529357359","20530326337","20558172583","20568766154","20568952153","20612799201","20621852935","20821659456","20841633124","20842371402"],
+moc_pobrana: ["16130454908","16152610580","16182099651","16183714130","16194964157","16215300750","16225978401","16266432121","16286281071","16296395304","16306020934","16325922529","16336493568","16377663365","16479980049","16547212377","16566037541","20215674019","20231606233","20244006712","20260244166","20284521636","20285717904","20300861319","20312261598","20312457977","20340622812","20355804866","20380594844","20380985840","20411147741","20424105379","20435941951","20474133210","20492364319","20505156505","20529357359","20530326337","20558172583","20568766154","20568952153","20612799201","20621852935","20821659456","20841633124","20842371402","20887153516"],
 
 // czas_ruchu_s — czas w ruchu. Zgodnie z regułą: wszystkie średnie zawsze z czasu w ruchu.
 aktywnosci: [
@@ -4940,7 +4979,7 @@ aktywnosci: [
   {"id":"20435941951","data":"2026-10-03T16:09:40","typ":"VirtualRide","dystans_m":29807.6,"czas_ruchu_s":6911,"czas_calkowity_s":6911,"przewyzszenie_m":791,"nazwa":"Zwift - Active Recovery","ma_tetno":1,"tetno_sr":134,"moc_sr":100,"z_miernika":1,"opis":"🗺️ Radio Rendezvous in Watopia\n🎉 Leveled up today","kalorie":657},
   {"id":"20445544821","data":"2026-10-04T11:49:39","typ":"Ride","dystans_m":26310.9,"czas_ruchu_s":3467,"czas_calkowity_s":3719,"przewyzszenie_m":62,"nazwa":"Activation","ma_tetno":1,"tetno_sr":161,"rpe":3,"kalorie":714},
   {"id":"20474133210","data":"2026-10-06T14:14:50","typ":"VirtualRide","dystans_m":29203.1,"czas_ruchu_s":3654,"czas_calkowity_s":3654,"przewyzszenie_m":206,"nazwa":"Zwift - Sand And Sequoias in Watopia","ma_tetno":1,"tetno_sr":135,"moc_sr":109,"z_miernika":1,"opis":"🎉 Leveled up today","rpe":3,"kalorie":380},
-  {"id":"20492364319","data":"2026-10-07T18:18:18","typ":"VirtualRide","dystans_m":32223.6,"czas_ruchu_s":5533,"czas_calkowity_s":5533,"przewyzszenie_m":717,"nazwa":"Zwift - 3x10min 100%","ma_tetno":1,"tetno_sr":144,"moc_sr":126,"z_miernika":1,"kalorie":665,"rpe":9,"opis":"🗺️ Climber's Gambit in Watopia\r\n⚡️ New 60min power best (90day)"},
+  {"id":"20492364319","data":"2026-10-07T18:18:18","typ":"VirtualRide","dystans_m":32223.6,"czas_ruchu_s":5533,"czas_calkowity_s":5533,"przewyzszenie_m":717,"nazwa":"Zwift - 3x10min 100%","ma_tetno":1,"tetno_sr":144,"moc_sr":126,"z_miernika":1,"opis":"🗺️ Climber's Gambit in Watopia\r\n⚡️ New 60min power best (90day)","rpe":9,"kalorie":665},
   {"id":"20505156505","data":"2026-10-08T17:37:09","typ":"VirtualRide","dystans_m":45159.1,"czas_ruchu_s":5538,"czas_calkowity_s":5538,"przewyzszenie_m":223,"nazwa":"Zwift - Pacer Group Ride with Mochi","ma_tetno":1,"tetno_sr":115,"moc_sr":89,"z_miernika":1,"kalorie":469,"rpe":2,"opis":"🗺️ Volcano Circuit CCW in Watopia\r\n🎉 Leveled up today"},
   {"id":"20529357359","data":"2026-10-10T16:21:14","typ":"VirtualRide","dystans_m":13105.1,"czas_ruchu_s":1714,"czas_calkowity_s":1714,"przewyzszenie_m":48,"nazwa":"PRE-RACE WARMUP","ma_tetno":1,"tetno_sr":129,"moc_sr":94,"z_miernika":1,"kalorie":153,"rpe":2,"opis":"🎉 Leveled up today"},
   {"id":"20530326337","data":"2026-10-10T17:12:23","typ":"VirtualRide","dystans_m":22990.7,"czas_ruchu_s":2132,"czas_calkowity_s":2132,"przewyzszenie_m":0,"nazwa":"Zwift - Race, 2nd place/68riders: Stage 1 - Race - Tour of Watopia 2026","ma_tetno":1,"tetno_sr":183,"moc_sr":196,"z_miernika":1,"kalorie":425,"rpe":9,"opis":"🗺️ Sand And Sequoias in Watopia\r\n⚡️ New 30sec power best (90day)\r\n⚡️ New 1min power best (90day)\r\n⚡️ New 2min power best (90day)\r\n⚡️ New 5min power best (90day)\r\n⚡️ New 10min power best (90day)\r\n⚡️ New 20min power best (90day)\r\n⚡️ New FTP set!"},
@@ -4952,6 +4991,7 @@ aktywnosci: [
   {"id":"20821659456","data":"2026-11-01T19:42:35","typ":"VirtualRide","dystans_m":11577.8,"czas_ruchu_s":1613,"czas_calkowity_s":1613,"przewyzszenie_m":189,"nazwa":"Zwift - Chapman's Peak in Video","ma_tetno":1,"tetno_sr":149,"moc_sr":132,"z_miernika":1,"kalorie":203},
   {"id":"20841633124","data":"2026-11-03T13:03:29","typ":"VirtualRide","dystans_m":4204.9,"czas_ruchu_s":545,"czas_calkowity_s":545,"przewyzszenie_m":12,"nazwa":"Caldera Coaster in Watopia warmup","ma_tetno":1,"tetno_sr":138,"moc_sr":99,"z_miernika":1,"kalorie":51},
   {"id":"20842371402","data":"2026-11-03T13:19:12","typ":"VirtualRide","dystans_m":10024.6,"czas_ruchu_s":2898,"czas_calkowity_s":2898,"przewyzszenie_m":676,"nazwa":"Zwift - Sa Calobra TT","ma_tetno":1,"tetno_sr":179,"moc_sr":177,"z_miernika":1,"kalorie":489,"rpe":9},
+  {"id":"20887153516","data":"2026-11-06T21:31:47","typ":"VirtualRide","dystans_m":24604.4,"czas_ruchu_s":3481,"czas_calkowity_s":3481,"przewyzszenie_m":256,"nazwa":"Zwift - Colorado River Sunrise in Video","ma_tetno":1,"tetno_sr":140,"moc_sr":113,"z_miernika":1,"kalorie":376},
 ]
 
 };
