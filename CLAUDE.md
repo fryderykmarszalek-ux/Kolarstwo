@@ -1498,6 +1498,32 @@ nienaruszalność bloków ręcznych.
 
 ---
 
+## 7c. `surowe/` — pełne dane każdej jazdy (11.11.2026)
+
+Decyzja Fryderyka: „pobierz wszystkie dane z jazd dokładnie i szczegółowo, każdy
+strumień w jak najmniejszym detalu, nic nie zmieniaj na stronie”. `dane.js`
+i `przebiegi/` to **wyciąg** pod obecną stronę: 6 strumieni, zaokrąglone, część pól
+pominięta. `surowe/` to **wszystko**, dla Kolarstwa2 i przyszłego AI.
+Format, strumienie i jednostki opisuje `surowe/README.md`, a plik tłumaczy sam siebie.
+
+- Osobny automat `strava-surowe.yml` + `pobierz-surowe.js`, osobny od nocnego.
+  Nocny dodaje tylko swoje pliki (`git add` z listą), więc się nie zderzają.
+- **Wszystkie 11 strumieni w pełnej rozdzielczości, liczby bez zaokrągleń**,
+  plus pełne szczegóły jazdy (`include_all_efforts=true`), pola nazwane jak Strava.
+- **Prywatność ostrzejsza niż `trasy.js`:** GPS = `null` w promieniu 500 m od
+  KAŻDEGO miejsca z ≥3 startami/końcami (nie tylko domu) oraz od startu i końca
+  każdej jazdy, **także w środku jazdy**. Polilinie, `private_note` i `embed_token`
+  wylatują. Zwift (świat gry) nie jest przycinany. Miejsc chronionych nie ma ani
+  w plikach, ani w logach.
+- **Limity Stravy czytane z nagłówków** (`x-readratelimit-*`). Blisko limitu kwadransa
+  skrypt czeka, blisko limitu doby kończy, a commit ma `if: always()` — nic, co
+  zdążyło przyjść, nie ginie. Następny przebieg dokańcza brakujące (wznawialność).
+- Test offline (podstawiony `fetch`, 56 kontroli) **przeszedł też próbę mutacji**:
+  wyłączona prywatność, niewyrzucona `private_note` i zostawiona polilinia — każda
+  z trzech zmian została złapana.
+
+---
+
 ## 8. Co dalej
 
 **Automat POTWIERDZONY 20.08.2026.** Przebieg #2 zakończył się sukcesem

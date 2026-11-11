@@ -1,0 +1,83 @@
+# Archiwum SUROWYCH danych jazd: wszystko, co Strava oddaje o każdej jeździe,
+# wszystkie strumienie w pełnej rozdzielczości. Pliki w surowe/ — format opisany
+# w surowe/README.md. Strona tych plików nie ładuje; to zapas danych dla
+# Kolarstwa2 i przyszłego AI. Decyzja Fryderyka z 11.11.2026.
+#
+# Pierwszy przebieg (cała historia) to ok. 270 zapytań, czyli trzy kwadranse
+# limitu Stravy — skrypt sam czeka między nimi. Każdy następny: 1 zapytanie na
+# listę + 2 na każdą nową jazdę + 1 na odświeżenie każdej jazdy z ostatnich
+# 14 dni (RPE i opis dopisuje się po jeździe).
+
+name: Strava — surowe dane jazd
+
+on:
+  schedule:
+    # 21:17 UTC — 40 minut po nocnym automacie (20:37), żeby nie dzielić z nim
+    # kwadransa limitu Stravy. Minuta 17, nie pełna godzina: GitHub gubi zadania
+    # z crona, gdy startuje pół świata (lekcja z 26.08.2026).
+    - cron: "17 21 * * *"
+  workflow_dispatch:
+    inputs:
+      pelne:
+        description: "Pobierz od nowa WSZYSTKIE jazdy (ok. 270 zapytań, ok. godziny)"
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: strava-surowe
+  cancel-in-progress: false
+
+jobs:
+  pobierz:
+    runs-on: ubuntu-latest
+    timeout-minutes: 200
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "lts/*"
+
+      - name: Pobierz surowe dane ze Stravy
+        env:
+          STRAVA_CLIENT_ID: ${{ secrets.STRAVA_CLIENT_ID }}
+          STRAVA_CLIENT_SECRET: ${{ secrets.STRAVA_CLIENT_SECRET }}
+          STRAVA_REFRESH_TOKEN: ${{ secrets.STRAVA_REFRESH_TOKEN }}
+          PELNE_SUROWE: ${{ inputs.pelne }}
+        run: node .github/skrypty/pobierz-surowe.js
+
+      # always(): to, co zdążyło się pobrać przed błędem albo limitem, i tak
+      # trafia do repo — następny przebieg zaczyna od jazd, których brakuje.
+      - name: Commituj, jeśli są zmiany
+        if: always()
+        run: |
+          git config user.name "Automat Stravy"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A surowe/
+
+          if git diff --cached --quiet; then
+            echo "Bez zmian — nic do zrobienia."
+            exit 0
+          fi
+          for f in $(git diff --cached --name-only -- 'surowe/*.json' 'surowe/jazdy/*.json'); do
+            node -e "JSON.parse(require('fs').readFileSync('$f','utf8'))" || { echo "Plik $f się nie parsuje — nie commituję."; exit 1; }
+          done
+          git commit -q -m "Surowe dane jazd — $(date -u +%Y-%m-%d)"
+
+          # Ten sam wyścig o push co w strava-sync.yml — trzy próby z rebase.
+          for proba in 1 2 3; do
+            if git push; then
+              echo "Zmiany wypchnięte (próba $proba)."
+              exit 0
+            fi
+            echo "Ktoś wyprzedził automat — dociągam i próbuję ponownie ($proba/3)."
+            git pull --rebase origin main || {
+              echo "Rebase się nie udał — przerywam, żeby niczego nie nadpisać."
+              exit 1
+            }
+          done
+          echo "Nie udało się wypchnąć po trzech próbach."
+          exit 1
