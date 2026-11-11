@@ -1,0 +1,2561 @@
+{
+ "format": 1,
+ "opis": "Indeks archiwum surowych danych jazd — szczegóły w surowe/README.md",
+ "jazdy": {
+  "20913272956": {
+   "data": "2026-11-08T20:12:39Z",
+   "typ": "VirtualRide",
+   "nazwa": "Zwift - Race: Stage 5 - Race - Tour of Watopia 2026 (C)",
+   "probek": 2756,
+   "strumienie": [
+    "time",
+    "distance",
+    "latlng",
+    "altitude",
+    "velocity_smooth",
+    "heartrate",
+    "cadence",
+    "watts",
+    "moving",
+    "grade_smooth"
+   ],
+   "rowne_dlugosci": true,
+   "ukryte_gps": 0,
+   "pobrano": "2026-11-11T19:36Z"
+  },
+  "20899342292": {
+   "data": "2026-11-07T19:08:39Z",
+   "typ": "VirtualRide",
+   "nazwa": "Zwift - Pacer Group Ride with Bernie",
+   "probek": 3653,
+   "strumienie": [
+    "time",
+    "distance",
+    "latlng",
+    "altitude",
+    "velocity_smooth",
+    "cadence",
+    "watts",
+    "moving",
+    "grade_smooth"
+   ],
+   "rowne_dlugosci": true,
+   "ukryte_gps": 0,
+   "pobrano": "2026-11-11T19:36Z"
+  },
+  "20887153516": {
+   "data": "2026-11-06T21:31:47Z",
+   "typ": "VirtualRide",
+   "nazwa": "Zwift - Colorado River Sunrise in Video",
+   "probek": 3482,
+   "strumienie": [
+    "time",
+    "distance",
+    "latlng",
+    "altitude",
+    "velocity_smooth",
+    "heartrate",
+    "cadence",
+    "watts",
+    "moving",
+    "grade_smooth"
+   ],
+   "rowne_dlugosci": true,
+   "ukryte_gps": 0,
+   "pobrano": "2026-11-11T19:36Z"
+  },
+  "20842371402": {
+   "data": "2026-11-03T13:19:12Z",
+   "typ": "VirtualRide",
+   "nazwa": "Zwift - Sa Calobra TT",
+   "probek": 2899,
+   "strumienie": [
+    "time",
+    "distance",
+    "latlng",
+    "altitude",
+    "velocity_smooth",
+    "heartrate",
+    "cadence",
+    "watts",
+    "moving",
+    "grade_smooth"
+   ],
+   "rowne_dlugosci": true,
+   "ukryte_gps": 0,
+   "pobrano": "2026-11-11T19:36Z"
+  },
+  "20841633124": {
+   "data": "2026-11-03T13:03:29Z",
+   "typ": "VirtualRide",
+   "nazwa": "Caldera Coaster in Watopia warmup",
+   "probek": 546,
+   "strumienie": [
+    "time",
+    "distance",
+    "latlng",
+    "altitude",
+    "velocity_smooth",
+    "heartrate",
+    "cadence",
+    "watts",
+    "moving",
+    "grade_smooth"
+   ],
+   "rowne_dlugosci": true,
+   "ukryte_gps": 0,
+   "pobrano": "2026-11-11T19:36Z"
+  },
+  "20821659456": {
+   "data": "2026-11-01T19:42:35Z",
+   "typ": "VirtualRide",
+   "nazwa": "Zwift - Chapman's Peak in Video",
+   "probek": 1614,
+   "strumienie": [
+    "time",
+    "distance",
+    "latlng",
+    "altitude",
+    "velocity_smooth",
+    "heartrate",
+    "cadence",
+    "watts",
+    "moving",
+    "grade_smooth"
+   ],
+   "rowne_dlugosci": true,
+   "ukryte_gps": 0,
+   "pobrano": "2026-11-11T19:36Z"
+  },
+  "20621852935": {
+   "data": "2026-10-17T14:44:53Z",
+   "typ": "VirtualRide",
+   "nazwa": "Zwift - Day 3",
+   "probek": 3616,
+   "strumienie": [
+    "time",
+    "distance",
+    "latlng",
+    "altitude",
+    "velocity_smooth",
+    "heartrate",
+    "cadence",
+    "watts",
+    "moving",
+    "grade_smooth"
+   ],
+   "rowne_dlugosci": true,
+   "ukryte_gps": 0,
+   "pobrano": "2026-11-11T19:36Z"
+  },
+  "20612799201": {
+   "data": "2026-10-16T21:43:40Z",
+   "typ": "VirtualRide",
+   "nazwa": "Zwift - 9. Sleepless",
+   "probek": 1810,
+   "strumienie": [
+    "time",
+    "distance",
+    "latlng",
+    "altitude",
+    "velocity_smooth",
+    "heartrate",
+    "cadence",
+    "watts",
+    "moving",
+    "grade_smooth"
+   ],
+   "rowne_dlugosci": true,
+   "ukryte_gps": 0,
+   "pobrano": "2026-11-11T19:36Z"
+  },
+  "20568952153": {
+   "data": "2026-10-13T16:58:26Z",
+   "typ": "VirtualRide",
+   "nazwa": "Zwift - Half an Hour in Zone 2 (1)",
+   "probek": 778,
+   "strumienie": [
+    "time",
+    "distance",
+    "latlng",
+    "altitude",
+    "velocity_smooth",
+    "heartrate",
+    "cadence",
+    "watts",
+    "moving",
+    "grade_smooth"
+   ],
+   "rowne_dlugosci": true,
+   "ukryte_gps": 0,
+   "pobrano": "2026-11-11T19:36Z"
+  },
+  "20568766154": {
+   "data": "2026-10-13T16:32:12Z",
+   "typ": "VirtualRide",
+   "nazwa": "Zwift - warmup",
+   "probek": 1415,
+   "strumienie": [
+    "time",
+    "distance",
+    "latlng",
+    "altitude",
+    "velocity_smooth",
+    "heartrate",
+    "cadence",
+    "watts",
+    "moving",
+    "grade_smooth"
+   ],
+   "rowne_dlugosci": true,
+   "ukryte_gps": 0,
+   "pobrano": "2026-11-11T19:36Z"
+  },
+  "20558172583": {
+   "data": "2026-10-12T19:27:05Z",
+   "typ": "VirtualRide",
+   "nazwa": "Zwift - Downtown Eruption in Watopia",
+   "probek": 3635,
+   "strumienie": [
+    "time",
+    "distance",
+    "latlng",
+    "altitude",
+    "velocity_smooth",
+    "heartrate",
+    "cadence",
+    "watts",
+    "moving",
+    "grade_smooth"
+   ],
+   "rowne_dlugosci": true,
+   "ukryte_gps": 0,
+   "pobrano": "2026-11-11T19:37Z"
+  },
+  "20530326337": {
+   "data": "2026-10-10T17:12:23Z",
+   "typ": "VirtualRide",
+   "nazwa": "Zwift - Race, 2nd place/68riders: Stage 1 - Race - Tour of Watopia 2026",
+   "probek": 2133,
+   "strumienie": [
+    "time",
+    "distance",
+    "altitude",
+    "velocity_smooth",
+    "heartrate",
+    "cadence",
+    "watts",
+    "moving",
+    "grade_smooth"
+   ],
+   "rowne_dlugosci": true,
+   "ukryte_gps": 0,
+   "pobrano": "2026-11-11T19:37Z"
+  },
+  "20529357359": {
+   "data": "2026-10-10T16:21:14Z",
+   "typ": "VirtualRide",
+   "nazwa": "PRE-RACE WARMUP",
+   "probek": 1715,
+   "strumienie": [
+    "time",
+    "distance",
+    "latlng",
+    "altitude",
+    "velocity_smooth",
+    "heartrate",
+    "cadence",
+    "watts",
+    "moving",
+    "grade_smooth"
+   ],
+   "rowne_dlugosci": true,
+   "ukryte_gps": 0,
+   "pobrano": "2026-11-11T19:37Z"
+  },
+  "20505156505": {
+   "data": "2026-10-08T17:37:09Z",
+   "typ": "VirtualRide",
+   "nazwa": "Zwift - Pacer Group Ride with Mochi",
+   "probek": 5539,
+   "strumienie": [
+    "time",
+    "distance",
+    "latlng",
+    "altitude",
+    "velocity_smooth",
+    "heartrate",
+    "cadence",
+    "watts",
+    "moving",
+    "grade_smooth"
+   ],
+   "rowne_dlugosci": true,
+   "ukryte_gps": 0,
+   "pobrano": "2026-11-11T19:37Z"
+  },
+  "20492364319": {
+   "data": "2026-10-07T18:18:18Z",
+   "typ": "VirtualRide",
+   "nazwa": "Zwift - 3x10min 100%",
+   "probek": 5534,
+   "strumienie": [
+    "time",
+    "distance",
+    "latlng",
+    "altitude",
+    "velocity_smooth",
+    "heartrate",
+    "cadence",
+    "watts",
+    "moving",
+    "grade_smooth"
+   ],
+   "rowne_dlugosci": true,
+   "ukryte_gps": 0,
+   "pobrano": "2026-11-11T19:37Z"
+  },
+  "20474133210": {
+   "data": "2026-10-06T14:14:50Z",
+   "typ": "VirtualRide",
+   "nazwa": "Zwift - Sand And Sequoias in Watopia",
+   "probek": 3645,
+   "strumienie": [
+    "time",
+    "distance",
+    "latlng",
+    "altitude",
+    "velocity_smooth",
+    "heartrate",
+    "cadence",
+    "watts",
+    "moving",
+    "grade_smooth"
+   ],
+   "rowne_dlugosci": true,
+   "ukryte_gps": 0,
+   "pobrano": "2026-11-11T19:37Z"
+  },
+  "20445544821": {
+   "data": "2026-10-04T11:49:39Z",
+   "typ": "Ride",
+   "nazwa": "Activation",
+   "probek": 3409,
+   "strumienie": [
+    "time",
+    "distance",
+    "latlng",
+    "altitude",
+    "velocity_smooth",
+    "heartrate",
+    "temp",
+    "moving",
+    "grade_smooth"
+   ],
+   "rowne_dlugosci": true,
+   "ukryte_gps": 500,
+   "pobrano": "2026-11-11T19:37Z"
+  },
+  "20435941951": {
+   "data": "2026-10-03T16:09:40Z",
+   "typ": "VirtualRide",
+   "nazwa": "Zwift - Active Recovery",
+   "probek": 6912,
+   "strumienie": [
+    "time",
+    "distance",
+    "latlng",
+    "altitude",
+    "velocity_smooth",
+    "heartrate",
+    "cadence",
+    "watts",
+    "moving",
+    "grade_smooth"
+   ],
+   "rowne_dlugosci": true,
+   "ukryte_gps": 0,
+   "pobrano": "2026-11-11T19:37Z"
+  },
+  "20424105379": {
+   "data": "2026-10-02T20:57:17Z",
+   "typ": "VirtualRide",
+   "nazwa": "Zwift - 130% of FTP Hangers",
+   "probek": 2533,
+   "strumienie": [
+    "time",
+    "distance",
+    "latlng",
+    "altitude",
+    "velocity_smooth",
+    "heartrate",
+    "cadence",
+    "watts",
+    "moving",
+    "grade_smooth"
+   ],
+   "rowne_dlugosci": true,
+   "ukryte_gps": 0,
+   "pobrano": "2026-11-11T19:37Z"
+  },
+  "20411147741": {
+   "data": "2026-10-01T19:33:45Z",
+   "typ": "VirtualRide",
+   "nazwa": "Zwift - 2x30min Z2 125 blocks",
+   "probek": 5410,
+   "strumienie": [
+    "time",
+    "distance",
+    "latlng",
+    "altitude",
+    "velocity_smooth",
+    "heartrate",
+    "cadence",
+    "watts",
+    "moving",
+    "grade_smooth"
+   ],
+   "rowne_dlugosci": true,
+   "ukryte_gps": 0,
+   "pobrano": "2026-11-11T19:37Z"
+  },
+  "20380985840": {
+   "data": "2026-09-29T18:34:37Z",
+   "typ": "VirtualRide",
+   "nazwa": "Zwift - Half an Hour of Relaxation",
+   "probek": 1210,
+   "strumienie": [
+    "time",
+    "distance",
+    "latlng",
+    "altitude",
+    "velocity_smooth",
+    "heartrate",
+    "cadence",
+    "watts",
+    "moving",
+    "grade_smooth"
+   ],
+   "rowne_dlugosci": true,
+   "ukryte_gps": 0,
+   "pobrano": "2026-11-11T19:37Z"
+  },
+  "20380594844": {
+   "data": "2026-09-29T18:00:19Z",
+   "typ": "VirtualRide",
+   "nazwa": "Zwift - Climb Portal: Col du Rosier at 100% Elevation in France",
+   "probek": 1728,
+   "strumienie": [
+    "time",
+    "distance",
+    "latlng",
+    "altitude",
+    "velocity_smooth",
+    "heartrate",
+    "cadence",
+    "watts",
+    "moving",
+    "grade_smooth"
+   ],
+   "rowne_dlugosci": true,
+   "ukryte_gps": 0,
+   "pobrano": "2026-11-11T19:37Z"
+  },
+  "20355804866": {
+   "data": "2026-09-27T18:51:42Z",
+   "typ": "VirtualRide",
+   "nazwa": "Zwift - Pacer Group Ride with Bernie",
+   "probek": 4057,
+   "strumienie": [
+    "time",
+    "distance",
+    "latlng",
+    "altitude",
+    "velocity_smooth",
+    "heartrate",
+    "cadence",
+    "watts",
+    "moving",
+    "grade_smooth"
+   ],
+   "rowne_dlugosci": true,
+   "ukryte_gps": 0,
+   "pobrano": "2026-11-11T19:37Z"
+  },
+  "20340622812": {
+   "data": "2026-09-26T17:13:14Z",
+   "typ": "VirtualRide",
+   "nazwa": "Zwift - Norwegian Method Endurance",
+   "probek": 7216,
+   "strumienie": [
+    "time",
+    "distance",
+    "latlng",
+    "altitude",
+    "velocity_smooth",
+    "heartrate",
+    "cadence",
+    "watts",
+    "moving",
+    "grade_smooth"
+   ],
+   "rowne_dlugosci": true,
+   "ukryte_gps": 0,
+   "pobrano": "2026-11-11T19:37Z"
+  },
+  "20312457977": {
+   "data": "2026-09-24T17:59:41Z",
+   "typ": "VirtualRide",
+   "nazwa": "Zwift - cool down Pacer Group Ride with Miguel",
+   "probek": 653,
+   "strumienie": [
+    "time",
+    "distance",
+    "latlng",
+    "altitude",
+    "velocity_smooth",
+    "heartrate",
+    "cadence",
+    "watts",
+    "moving",
+    "grade_smooth"
+   ],
+   "rowne_dlugosci": true,
+   "ukryte_gps": 0,
+   "pobrano": "2026-11-11T19:37Z"
+  },
+  "20312261598": {
+   "data": "2026-09-24T16:53:55Z",
+   "typ": "VirtualRide",
+   "nazwa": "Zwift - What Goes Up, Must Come Down on low cadence",
+   "probek": 3638,
+   "strumienie": [
+    "time",
+    "distance",
+    "latlng",
+    "altitude",
+    "velocity_smooth",
+    "heartrate",
+    "cadence",
+    "watts",
+    "moving",
+    "grade_smooth"
+   ],
+   "rowne_dlugosci": true,
+   "ukryte_gps": 0,
+   "pobrano": "2026-11-11T19:37Z"
+  },
+  "20300861319": {
+   "data": "2026-09-23T19:06:40Z",
+   "typ": "VirtualRide",
+   "nazwa": "Zwift- Z2 blocks",
+   "probek": 5476,
+   "strumienie": [
+    "time",
+    "distance",
+    "latlng",
+    "altitude",
+    "velocity_smooth",
+    "heartrate",
+    "cadence",
+    "watts",
+    "moving",
+    "grade_smooth"
+   ],
+   "rowne_dlugosci": true,
+   "ukryte_gps": 0,
+   "pobrano": "2026-11-11T19:37Z"
+  },
+  "20285717904": {
+   "data": "2026-09-22T19:46:08Z",
+   "typ": "VirtualRide",
+   "nazwa": "Zwift - Hilly Route in Watopia",
+   "probek": 1282,
+   "strumienie": [
+    "time",
+    "distance",
+    "latlng",
+    "altitude",
+    "velocity_smooth",
+    "heartrate",
+    "cadence",
+    "watts",
+    "moving",
+    "grade_smooth"
+   ],
+   "rowne_dlugosci": true,
+   "ukryte_gps": 0,
+   "pobrano": "2026-11-11T19:37Z"
+  },
+  "20284521636": {
+   "data": "2026-09-22T18:10:15Z",
+   "typ": "VirtualRide",
+   "nazwa": "Zwift - INEOS Grenadiers Virtual Training Camp | The Ganna",
+   "probek": 3020,
+   "strumienie": [
+    "time",
+    "distance",
+    "latlng",
+    "altitude",
+    "velocity_smooth",
+    "heartrate",
+    "cadence",
+    "watts",
+    "moving",
+    "grade_smooth"
+   ],
+   "rowne_dlugosci": true,
+   "ukryte_gps": 0,
+   "pobrano": "2026-11-11T19:37Z"
+  },
+  "20260244166": {
+   "data": "2026-09-20T18:52:07Z",
+   "typ": "VirtualRide",
+   "nazwa": "Zwift - Pacer Group Ride with Bernie",
+   "probek": 12319,
+   "strumienie": [
+    "time",
+    "distance",
+    "latlng",
+    "altitude",
+    "velocity_smooth",
+    "heartrate",
+    "cadence",
+    "watts",
+    "moving",
+    "grade_smooth"
+   ],
+   "rowne_dlugosci": true,
+   "ukryte_gps": 0,
+   "pobrano": "2026-11-11T19:37Z"
+  },
+  "20244006712": {
+   "data": "2026-09-19T18:04:52Z",
+   "typ": "VirtualRide",
+   "nazwa": "Zwift - 8/6/4min Threshold",
+   "probek": 3629,
+   "strumienie": [
+    "time",
+    "distance",
+    "latlng",
+    "altitude",
+    "velocity_smooth",
+    "heartrate",
+    "cadence",
+    "watts",
+    "moving",
+    "grade_smooth"
+   ],
+   "rowne_dlugosci": true,
+   "ukryte_gps": 0,
+   "pobrano": "2026-11-11T19:37Z"
+  },
+  "20231606233": {
+   "data": "2026-09-18T20:03:09Z",
+   "typ": "VirtualRide",
+   "nazwa": "Zwift - Pacer Group Ride with Bernie",
+   "probek": 8523,
+   "strumienie": [
+    "time",
+    "distance",
+    "latlng",
+    "altitude",
+    "velocity_smooth",
+    "heartrate",
+    "cadence",
+    "watts",
+    "moving",
+    "grade_smooth"
+   ],
+   "rowne_dlugosci": true,
+   "ukryte_gps": 0,
+   "pobrano": "2026-11-11T19:37Z"
+  },
+  "20215674019": {
+   "data": "2026-09-17T17:23:22Z",
+   "typ": "VirtualRide",
+   "nazwa": "Zwift - FTP Test [Standard]",
+   "probek": 2711,
+   "strumienie": [
+    "time",
+    "distance",
+    "latlng",
+    "altitude",
+    "velocity_smooth",
+    "heartrate",
+    "cadence",
+    "watts",
+    "moving",
+    "grade_smooth"
+   ],
+   "rowne_dlugosci": true,
+   "ukryte_gps": 0,
+   "pobrano": "2026-11-11T19:37Z"
+  },
+  "20146204393": {
+   "data": "2026-09-12T16:26:34Z",
+   "typ": "Ride",
+   "nazwa": "Afternoon Ride 170hr intervals/Z2",
+   "probek": 3941,
+   "strumienie": [
+    "time",
+    "distance",
+    "latlng",
+    "altitude",
+    "velocity_smooth",
+    "heartrate",
+    "temp",
+    "moving",
+    "grade_smooth"
+   ],
+   "rowne_dlugosci": true,
+   "ukryte_gps": 452,
+   "pobrano": "2026-11-11T19:37Z"
+  },
+  "20119310922": {
+   "data": "2026-09-10T17:33:52Z",
+   "typ": "Ride",
+   "nazwa": "duo afternoon ride",
+   "probek": 3931,
+   "strumienie": [
+    "time",
+    "distance",
+    "latlng",
+    "altitude",
+    "velocity_smooth",
+    "heartrate",
+    "temp",
+    "moving",
+    "grade_smooth"
+   ],
+   "rowne_dlugosci": true,
+   "ukryte_gps": 525,
+   "pobrano": "2026-11-11T19:37Z"
+  },
+  "20088445195": {
+   "data": "2026-09-08T13:45:09Z",
+   "typ": "Ride",
+   "nazwa": "2hr Z2 afternoon ride",
+   "probek": 7403,
+   "strumienie": [
+    "time",
+    "distance",
+    "latlng",
+    "altitude",
+    "velocity_smooth",
+    "heartrate",
+    "temp",
+    "moving",
+    "grade_smooth"
+   ],
+   "rowne_dlugosci": true,
+   "ukryte_gps": 691,
+   "pobrano": "2026-11-11T19:37Z"
+  },
+  "20064645010": {
+   "data": "2026-09-06T17:48:46Z",
+   "typ": "Ride",
+   "nazwa": "Z3/4 intervals",
+   "probek": 4892,
+   "strumienie": [
+    "time",
+    "distance",
+    "latlng",
+    "altitude",
+    "velocity_smooth",
+    "heartrate",
+    "temp",
+    "moving",
+    "grade_smooth"
+   ],
+   "rowne_dlugosci": true,
+   "ukryte_gps": 571,
+   "pobrano": "2026-11-11T19:37Z"
+  },
+  "20029911411": {
+   "data": "2026-09-04T08:44:19Z",
+   "typ": "Ride",
+   "nazwa": "Morning 10min,4 min + 30s+10s",
+   "probek": 2556,
+   "strumienie": [
+    "time",
+    "distance",
+    "latlng",
+    "altitude",
+    "velocity_smooth",
+    "heartrate",
+    "temp",
+    "moving",
+    "grade_smooth"
+   ],
+   "rowne_dlugosci": true,
+   "ukryte_gps": 430,
+   "pobrano": "2026-11-11T19:37Z"
+  },
+  "20008658665": {
+   "data": "2026-09-02T18:27:53Z",
+   "typ": "Ride",
+   "nazwa": "Evening LTHR+ sprints",
+   "probek": 3172,
+   "strumienie": [
+    "time",
+    "distance",
+    "latlng",
+    "altitude",
+    "velocity_smooth",
+    "heartrate",
+    "temp",
+    "moving",
+    "grade_smooth"
+   ],
+   "rowne_dlugosci": true,
+   "ukryte_gps": 661,
+   "pobrano": "2026-11-11T19:37Z"
+  },
+  "19972642177": {
+   "data": "2026-08-31T09:09:45Z",
+   "typ": "Ride",
+   "nazwa": "Morning 90min",
+   "probek": 5341,
+   "strumienie": [
+    "time",
+    "distance",
+    "latlng",
+    "altitude",
+    "velocity_smooth",
+    "heartrate",
+    "temp",
+    "moving",
+    "grade_smooth"
+   ],
+   "rowne_dlugosci": true,
+   "ukryte_gps": 490,
+   "pobrano": "2026-11-11T19:37Z"
+  },
+  "19962190482": {
+   "data": "2026-08-30T12:56:00Z",
+   "typ": "Ride",
+   "nazwa": "Z2 1 HR",
+   "probek": 3538,
+   "strumienie": [
+    "time",
+    "distance",
+    "latlng",
+    "altitude",
+    "velocity_smooth",
+    "heartrate",
+    "temp",
+    "moving",
+    "grade_smooth"
+   ],
+   "rowne_dlugosci": true,
+   "ukryte_gps": 554,
+   "pobrano": "2026-11-11T19:37Z"
+  },
+  "19756483940": {
+   "data": "2026-08-15T16:48:04Z",
+   "typ": "Ride",
+   "nazwa": "duo high Z3",
+   "probek": 5475,
+   "strumienie": [
+    "time",
+    "distance",
+    "latlng",
+    "altitude",
+    "velocity_smooth",
+    "temp",
+    "moving",
+    "grade_smooth"
+   ],
+   "rowne_dlugosci": true,
+   "ukryte_gps": 233,
+   "pobrano": "2026-11-11T19:37Z"
+  },
+  "19742428076": {
+   "data": "2026-08-14T17:50:21Z",
+   "typ": "Ride",
+   "nazwa": "HR check",
+   "probek": 4668,
+   "strumienie": [
+    "time",
+    "distance",
+    "latlng",
+    "altitude",
+    "velocity_smooth",
+    "temp",
+    "moving",
+    "grade_smooth"
+   ],
+   "rowne_dlugosci": true,
+   "ukryte_gps": 297,
+   "pobrano": "2026-11-11T19:37Z"
+  },
+  "19728218329": {
+   "data": "2026-08-13T16:45:01Z",
+   "typ": "Ride",
+   "nazwa": "gassy obory pętle na kole",
+   "probek": 5185,
+   "strumienie": [
+    "time",
+    "distance",
+    "latlng",
+    "altitude",
+    "velocity_smooth",
+    "temp",
+    "moving",
+    "grade_smooth"
+   ],
+   "rowne_dlugosci": true,
+   "ukryte_gps": 422,
+   "pobrano": "2026-11-11T19:37Z"
+  },
+  "19728195586": {
+   "data": "2026-08-12T13:01:13Z",
+   "typ": "Ride",
+   "nazwa": "return 1h extended gassy",
+   "probek": 3526,
+   "strumienie": [
+    "time",
+    "distance",
+    "latlng",
+    "altitude",
+    "velocity_smooth",
+    "temp",
+    "moving",
+    "grade_smooth"
+   ],
+   "rowne_dlugosci": true,
+   "ukryte_gps": 449,
+   "pobrano": "2026-11-11T19:37Z"
+  },
+  "19728167402": {
+   "data": "2026-07-28T11:27:46Z",
+   "typ": "Ride",
+   "nazwa": "60k z2/3 gk",
+   "probek": 8504,
+   "strumienie": [
+    "time",
+    "distance",
+    "latlng",
+    "altitude",
+    "velocity_smooth",
+    "temp",
+    "moving",
+    "grade_smooth"
+   ],
+   "rowne_dlugosci": true,
+   "ukryte_gps": 934,
+   "pobrano": "2026-11-11T19:37Z"
+  },
+  "19447815706": {
+   "data": "2026-07-22T11:30:25Z",
+   "typ": "Ride",
+   "nazwa": "morning short pace",
+   "probek": 2174,
+   "strumienie": [
+    "time",
+    "distance",
+    "latlng",
+    "altitude",
+    "velocity_smooth",
+    "temp",
+    "moving",
+    "grade_smooth"
+   ],
+   "rowne_dlugosci": true,
+   "ukryte_gps": 316,
+   "pobrano": "2026-11-11T19:37Z"
+  },
+  "19415553503": {
+   "data": "2026-07-20T14:49:00Z",
+   "typ": "Ride",
+   "nazwa": "evening rain 3x habdzin gassy",
+   "probek": 7705,
+   "strumienie": [
+    "time",
+    "distance",
+    "latlng",
+    "altitude",
+    "velocity_smooth",
+    "temp",
+    "moving",
+    "grade_smooth"
+   ],
+   "rowne_dlugosci": true,
+   "ukryte_gps": 650,
+   "pobrano": "2026-11-11T19:37Z"
+  },
+  "19415517403": {
+   "data": "2026-07-16T17:13:05Z",
+   "typ": "Ride",
+   "nazwa": "gassy 2x pętla",
+   "probek": 5336,
+   "strumienie": [
+    "time",
+    "distance",
+    "latlng",
+    "altitude",
+    "velocity_smooth",
+    "temp",
+    "moving",
+    "grade_smooth"
+   ],
+   "rowne_dlugosci": true,
+   "ukryte_gps": 1172,
+   "pobrano": "2026-11-11T19:37Z"
+  },
+  "19415496764": {
+   "data": "2026-07-14T12:23:30Z",
+   "typ": "Ride",
+   "nazwa": "gravel 60k morning ride",
+   "probek": 9500,
+   "strumienie": [
+    "time",
+    "distance",
+    "latlng",
+    "altitude",
+    "velocity_smooth",
+    "temp",
+    "moving",
+    "grade_smooth"
+   ],
+   "rowne_dlugosci": true,
+   "ukryte_gps": 612,
+   "pobrano": "2026-11-11T19:37Z"
+  },
+  "19415474905": {
+   "data": "2026-07-12T19:38:48Z",
+   "typ": "Ride",
+   "nazwa": "evening brusy rec way back",
+   "probek": 2496,
+   "strumienie": [
+    "time",
+    "distance",
+    "latlng",
+    "altitude",
+    "velocity_smooth",
+    "temp",
+    "moving",
+    "grade_smooth"
+   ],
+   "rowne_dlugosci": true,
+   "ukryte_gps": 362,
+   "pobrano": "2026-11-11T19:37Z"
+  },
+  "19415453209": {
+   "data": "2026-07-12T12:32:16Z",
+   "typ": "Ride",
+   "nazwa": "gravel brusy",
+   "probek": 2028,
+   "strumienie": [
+    "time",
+    "distance",
+    "latlng",
+    "altitude",
+    "velocity_smooth",
+    "temp",
+    "moving",
+    "grade_smooth"
+   ],
+   "rowne_dlugosci": true,
+   "ukryte_gps": 304,
+   "pobrano": "2026-11-11T19:37Z"
+  },
+  "19247803670": {
+   "data": "2026-07-09T17:35:11Z",
+   "typ": "Ride",
+   "nazwa": "Charzykowy gravel",
+   "probek": 4820,
+   "strumienie": [
+    "time",
+    "distance",
+    "latlng",
+    "altitude",
+    "velocity_smooth",
+    "temp",
+    "moving",
+    "grade_smooth"
+   ],
+   "rowne_dlugosci": true,
+   "ukryte_gps": 260,
+   "pobrano": "2026-11-11T19:37Z"
+  },
+  "19201212771": {
+   "data": "2026-07-06T14:20:41Z",
+   "typ": "Ride",
+   "nazwa": "rain gravel/hilly rec ride",
+   "probek": 2445,
+   "strumienie": [
+    "time",
+    "distance",
+    "latlng",
+    "altitude",
+    "velocity_smooth",
+    "moving",
+    "grade_smooth"
+   ],
+   "rowne_dlugosci": true,
+   "ukryte_gps": 263,
+   "pobrano": "2026-11-11T19:37Z"
+  },
+  "19180109565": {
+   "data": "2026-07-04T18:02:28Z",
+   "typ": "Ride",
+   "nazwa": "Czersk powrót pod wiatr",
+   "probek": 3540,
+   "strumienie": [
+    "time",
+    "distance",
+    "latlng",
+    "altitude",
+    "velocity_smooth",
+    "moving",
+    "grade_smooth"
+   ],
+   "rowne_dlugosci": true,
+   "ukryte_gps": 269,
+   "pobrano": "2026-11-11T19:37Z"
+  },
+  "19179947367": {
+   "data": "2026-07-04T15:32:58Z",
+   "typ": "Ride",
+   "nazwa": "Przez Męcikał szosą",
+   "probek": 2690,
+   "strumienie": [
+    "time",
+    "distance",
+    "latlng",
+    "altitude",
+    "velocity_smooth",
+    "moving",
+    "grade_smooth"
+   ],
+   "rowne_dlugosci": true,
+   "ukryte_gps": 213,
+   "pobrano": "2026-11-11T19:37Z"
+  },
+  "19089641123": {
+   "data": "2026-06-27T19:12:34Z",
+   "typ": "Ride",
+   "nazwa": "Wieczorna jazda na rowerze do GK",
+   "probek": 4892,
+   "strumienie": [
+    "time",
+    "distance",
+    "latlng",
+    "altitude",
+    "velocity_smooth",
+    "moving",
+    "grade_smooth"
+   ],
+   "rowne_dlugosci": true,
+   "ukryte_gps": 617,
+   "pobrano": "2026-11-11T19:37Z"
+  },
+  "19033109585": {
+   "data": "2026-06-23T11:03:45Z",
+   "typ": "Ride",
+   "nazwa": "Morning Gassy ride",
+   "probek": 2551,
+   "strumienie": [
+    "time",
+    "distance",
+    "latlng",
+    "altitude",
+    "velocity_smooth",
+    "moving",
+    "grade_smooth"
+   ],
+   "rowne_dlugosci": true,
+   "ukryte_gps": 428,
+   "pobrano": "2026-11-11T19:37Z"
+  },
+  "19014149953": {
+   "data": "2026-06-21T19:16:41Z",
+   "typ": "Ride",
+   "nazwa": "Late afternoon Kierszek-CH ride",
+   "probek": 3864,
+   "strumienie": [
+    "time",
+    "distance",
+    "latlng",
+    "altitude",
+    "velocity_smooth",
+    "moving",
+    "grade_smooth"
+   ],
+   "rowne_dlugosci": true,
+   "ukryte_gps": 578,
+   "pobrano": "2026-11-11T19:37Z"
+  },
+  "19000739541": {
+   "data": "2026-06-20T18:31:41Z",
+   "typ": "Ride",
+   "nazwa": "OB-Gassy-Mirków",
+   "probek": 6359,
+   "strumienie": [
+    "time",
+    "distance",
+    "latlng",
+    "altitude",
+    "velocity_smooth",
+    "moving",
+    "grade_smooth"
+   ],
+   "rowne_dlugosci": true,
+   "ukryte_gps": 679,
+   "pobrano": "2026-11-11T19:37Z"
+  },
+  "18971344203": {
+   "data": "2026-06-18T12:59:31Z",
+   "typ": "Ride",
+   "nazwa": "Lunch GK ride",
+   "probek": 5294,
+   "strumienie": [
+    "time",
+    "distance",
+    "latlng",
+    "altitude",
+    "velocity_smooth",
+    "moving",
+    "grade_smooth"
+   ],
+   "rowne_dlugosci": true,
+   "ukryte_gps": 867,
+   "pobrano": "2026-11-11T19:37Z"
+  },
+  "18945539070": {
+   "data": "2026-06-16T17:39:00Z",
+   "typ": "Ride",
+   "nazwa": "Gassy przez CH",
+   "probek": 2782,
+   "strumienie": [
+    "time",
+    "distance",
+    "latlng",
+    "altitude",
+    "velocity_smooth",
+    "moving",
+    "grade_smooth"
+   ],
+   "rowne_dlugosci": true,
+   "ukryte_gps": 628,
+   "pobrano": "2026-11-11T19:37Z"
+  },
+  "18841404334": {
+   "data": "2026-06-08T20:51:16Z",
+   "typ": "Ride",
+   "nazwa": "20k PB",
+   "probek": 2390,
+   "strumienie": [
+    "time",
+    "distance",
+    "latlng",
+    "altitude",
+    "velocity_smooth",
+    "moving",
+    "grade_smooth"
+   ],
+   "rowne_dlugosci": true,
+   "ukryte_gps": 402,
+   "pobrano": "2026-11-11T19:37Z"
+  },
+  "18784052439": {
+   "data": "2026-06-04T14:38:08Z",
+   "typ": "EBikeRide",
+   "nazwa": "Afternoon E-Bike Ride",
+   "probek": 2640,
+   "strumienie": [
+    "time",
+    "distance",
+    "latlng",
+    "altitude",
+    "velocity_smooth",
+    "moving",
+    "grade_smooth"
+   ],
+   "rowne_dlugosci": true,
+   "ukryte_gps": 526,
+   "pobrano": "2026-11-11T19:37Z"
+  },
+  "18729555478": {
+   "data": "2026-05-31T14:40:25Z",
+   "typ": "Ride",
+   "nazwa": "OB-Gassy",
+   "probek": 3594,
+   "strumienie": [
+    "time",
+    "distance",
+    "latlng",
+    "altitude",
+    "velocity_smooth",
+    "moving",
+    "grade_smooth"
+   ],
+   "rowne_dlugosci": true,
+   "ukryte_gps": 570,
+   "pobrano": "2026-11-11T19:37Z"
+  },
+  "18718998937": {
+   "data": "2026-05-30T19:26:04Z",
+   "typ": "Ride",
+   "nazwa": "OB-SP",
+   "probek": 1711,
+   "strumienie": [
+    "time",
+    "distance",
+    "latlng",
+    "altitude",
+    "velocity_smooth",
+    "moving",
+    "grade_smooth"
+   ],
+   "rowne_dlugosci": true,
+   "ukryte_gps": 531,
+   "pobrano": "2026-11-11T19:37Z"
+  },
+  "18692876636": {
+   "data": "2026-05-28T19:51:19Z",
+   "typ": "Ride",
+   "nazwa": "Rec 20k afternoon ride",
+   "probek": 2836,
+   "strumienie": [
+    "time",
+    "distance",
+    "latlng",
+    "altitude",
+    "velocity_smooth",
+    "moving",
+    "grade_smooth"
+   ],
+   "rowne_dlugosci": true,
+   "ukryte_gps": 506,
+   "pobrano": "2026-11-11T19:37Z"
+  },
+  "18635140776": {
+   "data": "2026-05-24T12:58:40Z",
+   "typ": "Ride",
+   "nazwa": "GK z tatą + gassy pace",
+   "probek": 6439,
+   "strumienie": [
+    "time",
+    "distance",
+    "latlng",
+    "altitude",
+    "velocity_smooth",
+    "moving",
+    "grade_smooth"
+   ],
+   "rowne_dlugosci": true,
+   "ukryte_gps": 676,
+   "pobrano": "2026-11-11T19:37Z"
+  },
+  "18619303262": {
+   "data": "2026-05-23T10:30:43Z",
+   "typ": "Ride",
+   "nazwa": "Wydłużona pętla 45k",
+   "probek": 2348,
+   "strumienie": [
+    "time",
+    "distance",
+    "latlng",
+    "altitude",
+    "velocity_smooth",
+    "moving",
+    "grade_smooth"
+   ],
+   "rowne_dlugosci": true,
+   "ukryte_gps": 361,
+   "pobrano": "2026-11-11T19:37Z"
+  },
+  "18554597453": {
+   "data": "2026-05-18T13:35:21Z",
+   "typ": "Ride",
+   "nazwa": "SzosaXgravel GK obustr.",
+   "probek": 4844,
+   "strumienie": [
+    "time",
+    "distance",
+    "latlng",
+    "altitude",
+    "velocity_smooth",
+    "moving",
+    "grade_smooth"
+   ],
+   "rowne_dlugosci": true,
+   "ukryte_gps": 693,
+   "pobrano": "2026-11-11T19:37Z"
+  },
+  "18530281768": {
+   "data": "2026-05-16T15:35:29Z",
+   "typ": "Ride",
+   "nazwa": "Pace po deszczu",
+   "probek": 2617,
+   "strumienie": [
+    "time",
+    "distance",
+    "latlng",
+    "altitude",
+    "velocity_smooth",
+    "moving",
+    "grade_smooth"
+   ],
+   "rowne_dlugosci": true,
+   "ukryte_gps": 563,
+   "pobrano": "2026-11-11T19:37Z"
+  },
+  "18492969096": {
+   "data": "2026-05-13T17:57:42Z",
+   "typ": "Ride",
+   "nazwa": "Chill Gassy rev z wjazdem",
+   "probek": 2773,
+   "strumienie": [
+    "time",
+    "distance",
+    "latlng",
+    "altitude",
+    "velocity_smooth",
+    "moving",
+    "grade_smooth"
+   ],
+   "rowne_dlugosci": true,
+   "ukryte_gps": 594,
+   "pobrano": "2026-11-11T19:37Z"
+  },
+  "18454701002": {
+   "data": "2026-05-10T17:09:54Z",
+   "typ": "Ride",
+   "nazwa": "Pętla z tatą",
+   "probek": 2840,
+   "strumienie": [
+    "time",
+    "distance",
+    "latlng",
+    "altitude",
+    "velocity_smooth",
+    "moving",
+    "grade_smooth"
+   ],
+   "rowne_dlugosci": true,
+   "ukryte_gps": 463,
+   "pobrano": "2026-11-11T19:37Z"
+  },
+  "18438077208": {
+   "data": "2026-05-09T13:42:14Z",
+   "typ": "Ride",
+   "nazwa": "Gassy obory afternoon ride",
+   "probek": 2804,
+   "strumienie": [
+    "time",
+    "distance",
+    "latlng",
+    "altitude",
+    "velocity_smooth",
+    "moving",
+    "grade_smooth"
+   ],
+   "rowne_dlugosci": true,
+   "ukryte_gps": 585,
+   "pobrano": "2026-11-11T19:37Z"
+  },
+  "18360199343": {
+   "data": "2026-05-03T13:47:58Z",
+   "typ": "Ride",
+   "nazwa": "Góra kawiarnia",
+   "probek": 5381,
+   "strumienie": [
+    "time",
+    "distance",
+    "latlng",
+    "altitude",
+    "velocity_smooth",
+    "moving",
+    "grade_smooth"
+   ],
+   "rowne_dlugosci": true,
+   "ukryte_gps": 608,
+   "pobrano": "2026-11-11T19:37Z"
+  },
+  "18346607726": {
+   "data": "2026-05-02T14:52:39Z",
+   "typ": "Ride",
+   "nazwa": "Rec ride wit dad",
+   "probek": 3080,
+   "strumienie": [
+    "time",
+    "distance",
+    "latlng",
+    "altitude",
+    "velocity_smooth",
+    "moving",
+    "grade_smooth"
+   ],
+   "rowne_dlugosci": true,
+   "ukryte_gps": 683,
+   "pobrano": "2026-11-11T19:37Z"
+  },
+  "18328405840": {
+   "data": "2026-05-01T09:12:44Z",
+   "typ": "Ride",
+   "nazwa": "Morning pace ride",
+   "probek": 2665,
+   "strumienie": [
+    "time",
+    "distance",
+    "latlng",
+    "altitude",
+    "velocity_smooth",
+    "moving",
+    "grade_smooth"
+   ],
+   "rowne_dlugosci": true,
+   "ukryte_gps": 555,
+   "pobrano": "2026-11-11T19:37Z"
+  },
+  "18296163995": {
+   "data": "2026-04-28T19:35:06Z",
+   "typ": "Ride",
+   "nazwa": "Evening Ride",
+   "probek": 3182,
+   "strumienie": [
+    "time",
+    "distance",
+    "latlng",
+    "altitude",
+    "velocity_smooth",
+    "moving",
+    "grade_smooth"
+   ],
+   "rowne_dlugosci": true,
+   "ukryte_gps": 664,
+   "pobrano": "2026-11-11T19:37Z"
+  },
+  "18011839913": {
+   "data": "2026-04-07T13:17:23Z",
+   "typ": "EBikeRide",
+   "nazwa": "Z basenu JK7",
+   "probek": 1711,
+   "strumienie": [
+    "time",
+    "distance",
+    "latlng",
+    "altitude",
+    "velocity_smooth",
+    "moving",
+    "grade_smooth"
+   ],
+   "rowne_dlugosci": true,
+   "ukryte_gps": 338,
+   "pobrano": "2026-11-11T19:37Z"
+  },
+  "18009740269": {
+   "data": "2026-04-07T10:19:22Z",
+   "typ": "EBikeRide",
+   "nazwa": "Basen Sopot",
+   "probek": 1646,
+   "strumienie": [
+    "time",
+    "distance",
+    "latlng",
+    "altitude",
+    "velocity_smooth",
+    "moving",
+    "grade_smooth"
+   ],
+   "rowne_dlugosci": true,
+   "ukryte_gps": 468,
+   "pobrano": "2026-11-11T19:37Z"
+  },
+  "17708859621": {
+   "data": "2026-03-13T14:52:37Z",
+   "typ": "Ride",
+   "nazwa": "GK-dom",
+   "probek": 4343,
+   "strumienie": [
+    "time",
+    "distance",
+    "latlng",
+    "altitude",
+    "velocity_smooth",
+    "moving",
+    "grade_smooth"
+   ],
+   "rowne_dlugosci": true,
+   "ukryte_gps": 1002,
+   "pobrano": "2026-11-11T19:37Z"
+  },
+  "17707959140": {
+   "data": "2026-03-13T12:11:32Z",
+   "typ": "Ride",
+   "nazwa": "OB-GK",
+   "probek": 4957,
+   "strumienie": [
+    "time",
+    "distance",
+    "latlng",
+    "altitude",
+    "velocity_smooth",
+    "moving",
+    "grade_smooth"
+   ],
+   "rowne_dlugosci": true,
+   "ukryte_gps": 333,
+   "pobrano": "2026-11-11T19:37Z"
+  },
+  "16566037541": {
+   "data": "2025-11-25T20:38:46Z",
+   "typ": "VirtualRide",
+   "nazwa": "Zwift - Foundation on R.G.V. in France",
+   "probek": 4287,
+   "strumienie": [
+    "time",
+    "distance",
+    "latlng",
+    "altitude",
+    "velocity_smooth",
+    "cadence",
+    "watts",
+    "moving",
+    "grade_smooth"
+   ],
+   "rowne_dlugosci": true,
+   "ukryte_gps": 0,
+   "pobrano": "2026-11-11T19:37Z"
+  },
+  "16547212377": {
+   "data": "2025-11-23T20:15:00Z",
+   "typ": "VirtualRide",
+   "nazwa": "Zwift - Intermittent on Tempus Fugit in Watopia",
+   "probek": 3784,
+   "strumienie": [
+    "time",
+    "distance",
+    "latlng",
+    "altitude",
+    "velocity_smooth",
+    "cadence",
+    "watts",
+    "moving",
+    "grade_smooth"
+   ],
+   "rowne_dlugosci": true,
+   "ukryte_gps": 0,
+   "pobrano": "2026-11-11T19:37Z"
+  },
+  "16479980049": {
+   "data": "2025-11-16T21:41:26Z",
+   "typ": "VirtualRide",
+   "nazwa": "Zwift - Foundation on Libby Hill After Party in Richmond",
+   "probek": 4033,
+   "strumienie": [
+    "time",
+    "distance",
+    "latlng",
+    "altitude",
+    "velocity_smooth",
+    "cadence",
+    "watts",
+    "moving",
+    "grade_smooth"
+   ],
+   "rowne_dlugosci": true,
+   "ukryte_gps": 0,
+   "pobrano": "2026-11-11T19:37Z"
+  },
+  "16377663365": {
+   "data": "2025-11-06T20:10:33Z",
+   "typ": "VirtualRide",
+   "nazwa": "Zwift - Tempo on Tempus Fugit in Watopia",
+   "probek": 5187,
+   "strumienie": [
+    "time",
+    "distance",
+    "latlng",
+    "altitude",
+    "velocity_smooth",
+    "cadence",
+    "watts",
+    "moving",
+    "grade_smooth"
+   ],
+   "rowne_dlugosci": true,
+   "ukryte_gps": 0,
+   "pobrano": "2026-11-11T19:37Z"
+  },
+  "16336493568": {
+   "data": "2025-11-02T21:52:10Z",
+   "typ": "VirtualRide",
+   "nazwa": "Zwift - Foundation on Watts the Limit in New York",
+   "probek": 3272,
+   "strumienie": [
+    "time",
+    "distance",
+    "latlng",
+    "altitude",
+    "velocity_smooth",
+    "cadence",
+    "watts",
+    "moving",
+    "grade_smooth"
+   ],
+   "rowne_dlugosci": true,
+   "ukryte_gps": 0,
+   "pobrano": "2026-11-11T19:37Z"
+  },
+  "16325922529": {
+   "data": "2025-11-01T22:41:17Z",
+   "typ": "VirtualRide",
+   "nazwa": "Zwift - Strength on Tempus Fugit in Watopia",
+   "probek": 4165,
+   "strumienie": [
+    "time",
+    "distance",
+    "latlng",
+    "altitude",
+    "velocity_smooth",
+    "cadence",
+    "watts",
+    "moving",
+    "grade_smooth"
+   ],
+   "rowne_dlugosci": true,
+   "ukryte_gps": 0,
+   "pobrano": "2026-11-11T19:37Z"
+  },
+  "16306020934": {
+   "data": "2025-10-30T21:23:36Z",
+   "typ": "VirtualRide",
+   "nazwa": "Zwift - Active Recovery on Croissant in France",
+   "probek": 1186,
+   "strumienie": [
+    "time",
+    "distance",
+    "latlng",
+    "altitude",
+    "velocity_smooth",
+    "cadence",
+    "watts",
+    "moving",
+    "grade_smooth"
+   ],
+   "rowne_dlugosci": true,
+   "ukryte_gps": 0,
+   "pobrano": "2026-11-11T19:37Z"
+  },
+  "16296395304": {
+   "data": "2025-10-29T21:23:09Z",
+   "typ": "VirtualRide",
+   "nazwa": "Zwift - Foundation on Red Zone Repeats in Makuri Islands",
+   "probek": 3271,
+   "strumienie": [
+    "time",
+    "distance",
+    "latlng",
+    "altitude",
+    "velocity_smooth",
+    "cadence",
+    "watts",
+    "moving",
+    "grade_smooth"
+   ],
+   "rowne_dlugosci": true,
+   "ukryte_gps": 0,
+   "pobrano": "2026-11-11T19:37Z"
+  },
+  "16286281071": {
+   "data": "2025-10-28T21:19:08Z",
+   "typ": "VirtualRide",
+   "nazwa": "Zwift - Tempo on Classique in London",
+   "probek": 4936,
+   "strumienie": [
+    "time",
+    "distance",
+    "latlng",
+    "altitude",
+    "velocity_smooth",
+    "cadence",
+    "watts",
+    "moving",
+    "grade_smooth"
+   ],
+   "rowne_dlugosci": true,
+   "ukryte_gps": 0,
+   "pobrano": "2026-11-11T19:45Z"
+  },
+  "16266432121": {
+   "data": "2025-10-26T21:08:52Z",
+   "typ": "VirtualRide",
+   "nazwa": "Zwift - Foundation on Sprinter's Playground in Makuri Islands",
+   "probek": 3509,
+   "strumienie": [
+    "time",
+    "distance",
+    "latlng",
+    "altitude",
+    "velocity_smooth",
+    "cadence",
+    "watts",
+    "moving",
+    "grade_smooth"
+   ],
+   "rowne_dlugosci": true,
+   "ukryte_gps": 0,
+   "pobrano": "2026-11-11T19:45Z"
+  },
+  "16225978401": {
+   "data": "2025-10-22T21:31:25Z",
+   "typ": "VirtualRide",
+   "nazwa": "Zwift - Strength on Beach Island Loop in Watopia",
+   "probek": 3524,
+   "strumienie": [
+    "time",
+    "distance",
+    "latlng",
+    "altitude",
+    "velocity_smooth",
+    "cadence",
+    "watts",
+    "moving",
+    "grade_smooth"
+   ],
+   "rowne_dlugosci": true,
+   "ukryte_gps": 0,
+   "pobrano": "2026-11-11T19:45Z"
+  },
+  "16215300750": {
+   "data": "2025-10-21T21:35:31Z",
+   "typ": "VirtualRide",
+   "nazwa": "Zwift - Foundation on Champs-Élysées in Paris",
+   "probek": 3198,
+   "strumienie": [
+    "time",
+    "distance",
+    "latlng",
+    "altitude",
+    "velocity_smooth",
+    "cadence",
+    "watts",
+    "moving",
+    "grade_smooth"
+   ],
+   "rowne_dlugosci": true,
+   "ukryte_gps": 0,
+   "pobrano": "2026-11-11T19:45Z"
+  },
+  "16194964157": {
+   "data": "2025-10-19T20:08:04Z",
+   "typ": "VirtualRide",
+   "nazwa": "Zwift - Tempo on Ven-Top in France",
+   "probek": 4029,
+   "strumienie": [
+    "time",
+    "distance",
+    "latlng",
+    "altitude",
+    "velocity_smooth",
+    "cadence",
+    "watts",
+    "moving",
+    "grade_smooth"
+   ],
+   "rowne_dlugosci": true,
+   "ukryte_gps": 0,
+   "pobrano": "2026-11-11T19:45Z"
+  },
+  "16183714130": {
+   "data": "2025-10-18T20:02:16Z",
+   "typ": "VirtualRide",
+   "nazwa": "Zwift - Race: HerD Beginner Races (C) on Going Coastal in Watopia",
+   "probek": 2371,
+   "strumienie": [
+    "time",
+    "distance",
+    "latlng",
+    "altitude",
+    "velocity_smooth",
+    "cadence",
+    "watts",
+    "moving",
+    "grade_smooth"
+   ],
+   "rowne_dlugosci": true,
+   "ukryte_gps": 0,
+   "pobrano": "2026-11-11T19:45Z"
+  },
+  "16182099651": {
+   "data": "2025-10-18T16:57:16Z",
+   "typ": "VirtualRide",
+   "nazwa": "Zwift - Foundation on Tempus Fugit in Watopia",
+   "probek": 2906,
+   "strumienie": [
+    "time",
+    "distance",
+    "latlng",
+    "altitude",
+    "velocity_smooth",
+    "cadence",
+    "watts",
+    "moving",
+    "grade_smooth"
+   ],
+   "rowne_dlugosci": true,
+   "ukryte_gps": 0,
+   "pobrano": "2026-11-11T19:45Z"
+  },
+  "16152610580": {
+   "data": "2025-10-15T20:27:19Z",
+   "typ": "VirtualRide",
+   "nazwa": "Zwift - Strength on Achterbahn in Innsbruck",
+   "probek": 3258,
+   "strumienie": [
+    "time",
+    "distance",
+    "latlng",
+    "altitude",
+    "velocity_smooth",
+    "cadence",
+    "watts",
+    "moving",
+    "grade_smooth"
+   ],
+   "rowne_dlugosci": true,
+   "ukryte_gps": 0,
+   "pobrano": "2026-11-11T19:45Z"
+  },
+  "16130454908": {
+   "data": "2025-10-13T20:26:17Z",
+   "typ": "VirtualRide",
+   "nazwa": "Zwift - Foundation on Tempus Fugit in Watopia",
+   "probek": 2906,
+   "strumienie": [
+    "time",
+    "distance",
+    "latlng",
+    "altitude",
+    "velocity_smooth",
+    "cadence",
+    "watts",
+    "moving",
+    "grade_smooth"
+   ],
+   "rowne_dlugosci": true,
+   "ukryte_gps": 0,
+   "pobrano": "2026-11-11T19:45Z"
+  },
+  "15954703695": {
+   "data": "2025-09-27T16:27:07Z",
+   "typ": "Ride",
+   "nazwa": "Gassy",
+   "probek": 3194,
+   "strumienie": [
+    "time",
+    "distance",
+    "latlng",
+    "altitude",
+    "velocity_smooth",
+    "moving",
+    "grade_smooth"
+   ],
+   "rowne_dlugosci": true,
+   "ukryte_gps": 784,
+   "pobrano": "2026-11-11T19:45Z"
+  },
+  "15875808667": {
+   "data": "2025-09-20T13:52:25Z",
+   "typ": "Ride",
+   "nazwa": "Gassy",
+   "probek": 2910,
+   "strumienie": [
+    "time",
+    "distance",
+    "latlng",
+    "altitude",
+    "velocity_smooth",
+    "moving",
+    "grade_smooth"
+   ],
+   "rowne_dlugosci": true,
+   "ukryte_gps": 568,
+   "pobrano": "2026-11-11T19:45Z"
+  },
+  "15820597167": {
+   "data": "2025-09-15T16:54:20Z",
+   "typ": "Ride",
+   "nazwa": "Urban ride",
+   "probek": 1806,
+   "strumienie": [
+    "time",
+    "distance",
+    "latlng",
+    "altitude",
+    "velocity_smooth",
+    "moving",
+    "grade_smooth"
+   ],
+   "rowne_dlugosci": true,
+   "ukryte_gps": 227,
+   "pobrano": "2026-11-11T19:45Z"
+  },
+  "15718034220": {
+   "data": "2025-09-06T15:39:58Z",
+   "typ": "Ride",
+   "nazwa": "CH",
+   "probek": 3841,
+   "strumienie": [
+    "time",
+    "distance",
+    "latlng",
+    "altitude",
+    "velocity_smooth",
+    "moving",
+    "grade_smooth"
+   ],
+   "rowne_dlugosci": true,
+   "ukryte_gps": 869,
+   "pobrano": "2026-11-11T19:45Z"
+  },
+  "15659929857": {
+   "data": "2025-09-01T16:37:35Z",
+   "typ": "Ride",
+   "nazwa": "CH Papiernia",
+   "probek": 2146,
+   "strumienie": [
+    "time",
+    "distance",
+    "latlng",
+    "altitude",
+    "velocity_smooth",
+    "moving",
+    "grade_smooth"
+   ],
+   "rowne_dlugosci": true,
+   "ukryte_gps": 276,
+   "pobrano": "2026-11-11T19:45Z"
+  },
+  "15650458577": {
+   "data": "2025-08-31T16:44:08Z",
+   "typ": "Ride",
+   "nazwa": "Gassy",
+   "probek": 2828,
+   "strumienie": [
+    "time",
+    "distance",
+    "latlng",
+    "altitude",
+    "velocity_smooth",
+    "moving",
+    "grade_smooth"
+   ],
+   "rowne_dlugosci": true,
+   "ukryte_gps": 577,
+   "pobrano": "2026-11-11T19:45Z"
+  },
+  "15232829749": {
+   "data": "2025-07-25T16:38:57Z",
+   "typ": "Ride",
+   "nazwa": "Małe Swory v7",
+   "probek": 3053,
+   "strumienie": [
+    "time",
+    "distance",
+    "latlng",
+    "altitude",
+    "velocity_smooth",
+    "moving",
+    "grade_smooth"
+   ],
+   "rowne_dlugosci": true,
+   "ukryte_gps": 539,
+   "pobrano": "2026-11-11T19:45Z"
+  },
+  "15220640080": {
+   "data": "2025-07-24T12:03:43Z",
+   "typ": "Ride",
+   "nazwa": "Charzykowy",
+   "probek": 6914,
+   "strumienie": [
+    "time",
+    "distance",
+    "latlng",
+    "altitude",
+    "velocity_smooth",
+    "moving",
+    "grade_smooth"
+   ],
+   "rowne_dlugosci": true,
+   "ukryte_gps": 512,
+   "pobrano": "2026-11-11T19:45Z"
+  },
+  "15211655006": {
+   "data": "2025-07-23T17:55:05Z",
+   "typ": "Ride",
+   "nazwa": "Młyn",
+   "probek": 1923,
+   "strumienie": [
+    "time",
+    "distance",
+    "latlng",
+    "altitude",
+    "velocity_smooth",
+    "moving",
+    "grade_smooth"
+   ],
+   "rowne_dlugosci": true,
+   "ukryte_gps": 584,
+   "pobrano": "2026-11-11T19:45Z"
+  },
+  "15121639521": {
+   "data": "2025-07-15T14:16:07Z",
+   "typ": "EBikeRide",
+   "nazwa": "Małe Swory v5",
+   "probek": 2547,
+   "strumienie": [
+    "time",
+    "distance",
+    "latlng",
+    "altitude",
+    "velocity_smooth",
+    "moving",
+    "grade_smooth"
+   ],
+   "rowne_dlugosci": true,
+   "ukryte_gps": 487,
+   "pobrano": "2026-11-11T19:45Z"
+  },
+  "14365604350": {
+   "data": "2025-05-03T14:56:06Z",
+   "typ": "EBikeRide",
+   "nazwa": "E-funka",
+   "probek": 4311,
+   "strumienie": [
+    "time",
+    "distance",
+    "latlng",
+    "altitude",
+    "velocity_smooth",
+    "moving",
+    "grade_smooth"
+   ],
+   "rowne_dlugosci": true,
+   "ukryte_gps": 480,
+   "pobrano": "2026-11-11T19:45Z"
+  },
+  "14344880484": {
+   "data": "2025-05-01T15:01:13Z",
+   "typ": "EBikeRide",
+   "nazwa": "Afternoon E-Bike Ride",
+   "probek": 4031,
+   "strumienie": [
+    "time",
+    "distance",
+    "latlng",
+    "altitude",
+    "velocity_smooth",
+    "moving",
+    "grade_smooth"
+   ],
+   "rowne_dlugosci": true,
+   "ukryte_gps": 693,
+   "pobrano": "2026-11-11T19:45Z"
+  },
+  "14299826298": {
+   "data": "2025-04-27T11:24:15Z",
+   "typ": "Ride",
+   "nazwa": "Nowinki",
+   "probek": 2449,
+   "strumienie": [
+    "time",
+    "distance",
+    "latlng",
+    "altitude",
+    "velocity_smooth",
+    "moving",
+    "grade_smooth"
+   ],
+   "rowne_dlugosci": true,
+   "ukryte_gps": 318,
+   "pobrano": "2026-11-11T19:45Z"
+  },
+  "14250366507": {
+   "data": "2025-04-22T11:01:56Z",
+   "typ": "Ride",
+   "nazwa": "Lunch Ride",
+   "probek": 3255,
+   "strumienie": [
+    "time",
+    "distance",
+    "latlng",
+    "altitude",
+    "velocity_smooth",
+    "moving",
+    "grade_smooth"
+   ],
+   "rowne_dlugosci": true,
+   "ukryte_gps": 702,
+   "pobrano": "2026-11-11T19:45Z"
+  },
+  "12359559632": {
+   "data": "2024-09-08T15:39:54Z",
+   "typ": "Ride",
+   "nazwa": "Nowy rower",
+   "probek": 3814,
+   "strumienie": [
+    "time",
+    "distance",
+    "latlng",
+    "altitude",
+    "velocity_smooth",
+    "moving",
+    "grade_smooth"
+   ],
+   "rowne_dlugosci": true,
+   "ukryte_gps": 844,
+   "pobrano": "2026-11-11T19:45Z"
+  },
+  "12256494897": {
+   "data": "2024-08-27T17:01:29Z",
+   "typ": "Ride",
+   "nazwa": "Małe Swory v4",
+   "probek": 2916,
+   "strumienie": [
+    "time",
+    "distance",
+    "latlng",
+    "altitude",
+    "velocity_smooth",
+    "moving",
+    "grade_smooth"
+   ],
+   "rowne_dlugosci": true,
+   "ukryte_gps": 370,
+   "pobrano": "2026-11-11T19:45Z"
+  },
+  "12246767145": {
+   "data": "2024-08-26T13:06:57Z",
+   "typ": "Ride",
+   "nazwa": "Charzykowy 1 raz samemu",
+   "probek": 6992,
+   "strumienie": [
+    "time",
+    "distance",
+    "latlng",
+    "altitude",
+    "velocity_smooth",
+    "moving",
+    "grade_smooth"
+   ],
+   "rowne_dlugosci": true,
+   "ukryte_gps": 591,
+   "pobrano": "2026-11-11T19:45Z"
+  },
+  "12229721957": {
+   "data": "2024-08-24T13:14:34Z",
+   "typ": "Ride",
+   "nazwa": "Ta sama trasa co wczoraj tylko na zwykłym",
+   "probek": 4821,
+   "strumienie": [
+    "time",
+    "distance",
+    "latlng",
+    "altitude",
+    "velocity_smooth",
+    "moving",
+    "grade_smooth"
+   ],
+   "rowne_dlugosci": true,
+   "ukryte_gps": 448,
+   "pobrano": "2026-11-11T19:45Z"
+  },
+  "12223083988": {
+   "data": "2024-08-23T17:11:08Z",
+   "typ": "EBikeRide",
+   "nazwa": "Nowa trasa- fajna na elektryk, ciężka ale może ciekawa na zwykły",
+   "probek": 3735,
+   "strumienie": [
+    "time",
+    "distance",
+    "latlng",
+    "altitude",
+    "velocity_smooth",
+    "moving",
+    "grade_smooth"
+   ],
+   "rowne_dlugosci": true,
+   "ukryte_gps": 367,
+   "pobrano": "2026-11-11T19:45Z"
+  },
+  "12221481226": {
+   "data": "2024-08-23T14:10:33Z",
+   "typ": "Ride",
+   "nazwa": "Bez powietrza w oponach",
+   "probek": 1020,
+   "strumienie": [
+    "time",
+    "distance",
+    "latlng",
+    "altitude",
+    "velocity_smooth",
+    "moving",
+    "grade_smooth"
+   ],
+   "rowne_dlugosci": true,
+   "ukryte_gps": 427,
+   "pobrano": "2026-11-11T19:45Z"
+  },
+  "12178538872": {
+   "data": "2024-08-18T12:45:26Z",
+   "typ": "Ride",
+   "nazwa": "Małe Swory v3",
+   "probek": 2955,
+   "strumienie": [
+    "time",
+    "distance",
+    "latlng",
+    "altitude",
+    "velocity_smooth",
+    "moving",
+    "grade_smooth"
+   ],
+   "rowne_dlugosci": true,
+   "ukryte_gps": 347,
+   "pobrano": "2026-11-11T19:45Z"
+  },
+  "12171567765": {
+   "data": "2024-08-17T13:23:22Z",
+   "typ": "Ride",
+   "nazwa": "Mama i tata",
+   "probek": 8351,
+   "strumienie": [
+    "time",
+    "distance",
+    "latlng",
+    "altitude",
+    "velocity_smooth",
+    "moving",
+    "grade_smooth"
+   ],
+   "rowne_dlugosci": true,
+   "ukryte_gps": 550,
+   "pobrano": "2026-11-11T19:45Z"
+  },
+  "12162790795": {
+   "data": "2024-08-16T12:26:35Z",
+   "typ": "Ride",
+   "nazwa": "Charzykowy",
+   "probek": 7396,
+   "strumienie": [
+    "time",
+    "distance",
+    "latlng",
+    "altitude",
+    "velocity_smooth",
+    "moving",
+    "grade_smooth"
+   ],
+   "rowne_dlugosci": true,
+   "ukryte_gps": 667,
+   "pobrano": "2026-11-11T19:45Z"
+  },
+  "12155844774": {
+   "data": "2024-08-15T18:04:21Z",
+   "typ": "Ride",
+   "nazwa": "Małe Swory v2",
+   "probek": 2926,
+   "strumienie": [
+    "time",
+    "distance",
+    "latlng",
+    "altitude",
+    "velocity_smooth",
+    "moving",
+    "grade_smooth"
+   ],
+   "rowne_dlugosci": true,
+   "ukryte_gps": 309,
+   "pobrano": "2026-11-11T19:45Z"
+  },
+  "12118877473": {
+   "data": "2024-08-11T12:54:48Z",
+   "typ": "Ride",
+   "nazwa": "5 mil",
+   "probek": 1106,
+   "strumienie": [
+    "time",
+    "distance",
+    "latlng",
+    "altitude",
+    "velocity_smooth",
+    "moving",
+    "grade_smooth"
+   ],
+   "rowne_dlugosci": true,
+   "ukryte_gps": 319,
+   "pobrano": "2026-11-11T19:45Z"
+  },
+  "12111692451": {
+   "data": "2024-08-10T15:03:16Z",
+   "typ": "Ride",
+   "nazwa": "Brusy-Swory",
+   "probek": 3310,
+   "strumienie": [
+    "time",
+    "distance",
+    "latlng",
+    "altitude",
+    "velocity_smooth",
+    "moving",
+    "grade_smooth"
+   ],
+   "rowne_dlugosci": true,
+   "ukryte_gps": 575,
+   "pobrano": "2026-11-11T19:45Z"
+  },
+  "12109302036": {
+   "data": "2024-08-10T10:22:16Z",
+   "typ": "Ride",
+   "nazwa": "Brusy-mecikal-brusy",
+   "probek": 3293,
+   "strumienie": [
+    "time",
+    "distance",
+    "latlng",
+    "altitude",
+    "velocity_smooth",
+    "moving",
+    "grade_smooth"
+   ],
+   "rowne_dlugosci": true,
+   "ukryte_gps": 322,
+   "pobrano": "2026-11-11T19:45Z"
+  },
+  "12102213373": {
+   "data": "2024-08-09T12:19:00Z",
+   "typ": "Ride",
+   "nazwa": "Brusy",
+   "probek": 3055,
+   "strumienie": [
+    "time",
+    "distance",
+    "latlng",
+    "altitude",
+    "velocity_smooth",
+    "moving",
+    "grade_smooth"
+   ],
+   "rowne_dlugosci": true,
+   "ukryte_gps": 466,
+   "pobrano": "2026-11-11T19:45Z"
+  },
+  "12086716023": {
+   "data": "2024-08-07T13:47:29Z",
+   "typ": "EBikeRide",
+   "nazwa": "Charzykowy i mecz pl z USA",
+   "probek": 6348,
+   "strumienie": [
+    "time",
+    "distance",
+    "latlng",
+    "altitude",
+    "velocity_smooth",
+    "moving",
+    "grade_smooth"
+   ],
+   "rowne_dlugosci": true,
+   "ukryte_gps": 599,
+   "pobrano": "2026-11-11T19:45Z"
+  },
+  "12079172370": {
+   "data": "2024-08-06T08:13:12Z",
+   "typ": "Ride",
+   "nazwa": "Chojnice",
+   "probek": 15061,
+   "strumienie": [
+    "time",
+    "distance",
+    "latlng",
+    "altitude",
+    "velocity_smooth",
+    "moving",
+    "grade_smooth"
+   ],
+   "rowne_dlugosci": true,
+   "ukryte_gps": 895,
+   "pobrano": "2026-11-11T19:45Z"
+  },
+  "12060008503": {
+   "data": "2024-08-04T13:13:26Z",
+   "typ": "Ride",
+   "nazwa": "Trening małe swory",
+   "probek": 3652,
+   "strumienie": [
+    "time",
+    "distance",
+    "latlng",
+    "altitude",
+    "velocity_smooth",
+    "moving",
+    "grade_smooth"
+   ],
+   "rowne_dlugosci": true,
+   "ukryte_gps": 779,
+   "pobrano": "2026-11-11T19:45Z"
+  },
+  "12052538322": {
+   "data": "2024-08-03T14:27:17Z",
+   "typ": "Ride",
+   "nazwa": "Zwykły vs elektryk",
+   "probek": 5026,
+   "strumienie": [
+    "time",
+    "distance",
+    "latlng",
+    "altitude",
+    "velocity_smooth",
+    "moving",
+    "grade_smooth"
+   ],
+   "rowne_dlugosci": true,
+   "ukryte_gps": 768,
+   "pobrano": "2026-11-11T19:45Z"
+  },
+  "12044109707": {
+   "data": "2024-08-02T13:07:59Z",
+   "typ": "EBikeRide",
+   "nazwa": "Charzykowy",
+   "probek": 6687,
+   "strumienie": [
+    "time",
+    "distance",
+    "latlng",
+    "altitude",
+    "velocity_smooth",
+    "moving",
+    "grade_smooth"
+   ],
+   "rowne_dlugosci": true,
+   "ukryte_gps": 512,
+   "pobrano": "2026-11-11T19:45Z"
+  },
+  "12029300701": {
+   "data": "2024-07-31T19:45:48Z",
+   "typ": "Ride",
+   "nazwa": "Test",
+   "probek": 268,
+   "strumienie": [
+    "time",
+    "distance",
+    "latlng",
+    "altitude",
+    "velocity_smooth",
+    "moving",
+    "grade_smooth"
+   ],
+   "rowne_dlugosci": true,
+   "ukryte_gps": 268,
+   "pobrano": "2026-11-11T19:45Z"
+  }
+ },
+ "zaktualizowano": "2026-11-11T19:45Z",
+ "pominiete_nie_jazdy": 8,
+ "liczba_jazd": 133
+}
