@@ -64,6 +64,18 @@ a indeks `i` to ta sama chwila we wszystkich strumieniach.
 Brak strumienia w pliku = urządzenie go nie nagrało (np. tętno przed pasem).
 Jazda dodana ręcznie nie ma żadnego strumienia, tylko szczegóły.
 
+## Dwie pułapki przy liczeniu (sprawdzone 11.11.2026)
+
+1. **Średnie Stravy liczą się tylko z sekund `moving = true`.** Średnia ze wszystkich
+   próbek wychodzi inna. Na wyścigu Stage 5 (`20913272956`) średnia mocy ze wszystkich
+   2756 próbek to 157,3 W, a z 2261 próbek w ruchu to **191,633 W, co do tysięcznej
+   tyle, ile podaje Strava**. Tętno tak samo: 173,828. Maksima i najlepsze okna
+   (5 s 674 W, 1 min 320, 5 min 252, 20 min 208) zgadzają się bez żadnego filtra.
+2. **`time` nie zawsze rośnie ściśle.** Pięć jazd z Garmina Edge 850 (21.06–6.07.2026)
+   ma co ~1000 próbek dwie próbki z tą samą sekundą. Tak zapisało urządzenie i tak
+   oddała Strava, a archiwum jest surowe, więc zostaje. Licząc cokolwiek „na sekundę”,
+   trzeba to obsłużyć (np. scalić próbki o tym samym `time`).
+
 ## Prywatność
 
 Repozytorium jest **publiczne**, a ślad GPS zaczyna się i kończy pod domem. Dlatego:

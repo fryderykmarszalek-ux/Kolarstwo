@@ -1521,6 +1521,13 @@ Format, strumienie i jednostki opisuje `surowe/README.md`, a plik tłumaczy sam 
 - Test offline (podstawiony `fetch`, 56 kontroli) **przeszedł też próbę mutacji**:
   wyłączona prywatność, niewyrzucona `private_note` i zostawiona polilinia — każda
   z trzech zmian została złapana.
+- **Pierwszy przebieg 11.11.2026: 133 z 133 jazd, 269 zapytań, 9 minut, 0 błędów.**
+  32,9 MB, 511 667 próbek. Kontrola po fakcie (2849 sprawdzeń): długości strumieni
+  = `original_size` Stravy, GPS ukryty na co najmniej 504–508 m od startu i końca,
+  34 ukryte przejazdy koło domu w środku jazd. Stage 5 wobec liczb Stravy z konektora
+  (inna droga): maksima i najlepsze okna co do wata, średnie co do tysięcznej —
+  **pod warunkiem liczenia z `moving = true`**. Ta pułapka i powtórzone sekundy
+  w 5 jazdach z Garmina opisane są w `surowe/README.md`.
 
 ---
 
