@@ -1,7 +1,7 @@
 {
  "format": 1,
  "id": "20841633124",
- "pobrano": "2026-11-12T02:18Z",
+ "pobrano": "2026-11-13T01:55Z",
  "zrodlo": "Strava API v3: /activities/{id}?include_all_efforts=true i /activities/{id}/streams (wszystkie typy, pełna rozdzielczość)",
  "prywatnosc": {"opis":"Zwift: współrzędne świata gry, bez przycinania","promien_m":0,"ukryte_punkty":0},
  "strumienie_meta": {"time":{"original_size":546,"resolution":"high","series_type":"distance"},"distance":{"original_size":546,"resolution":"high","series_type":"distance"},"latlng":{"original_size":546,"resolution":"high","series_type":"distance"},"altitude":{"original_size":546,"resolution":"high","series_type":"distance"},"velocity_smooth":{"original_size":546,"resolution":"high","series_type":"distance"},"heartrate":{"original_size":546,"resolution":"high","series_type":"distance"},"cadence":{"original_size":546,"resolution":"high","series_type":"distance"},"watts":{"original_size":546,"resolution":"high","series_type":"distance"},"moving":{"original_size":546,"resolution":"high","series_type":"distance"},"grade_smooth":{"original_size":546,"resolution":"high","series_type":"distance"}},
