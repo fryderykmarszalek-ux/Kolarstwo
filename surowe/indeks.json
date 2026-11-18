@@ -2,6 +2,27 @@
  "format": 1,
  "opis": "Indeks archiwum surowych danych jazd — szczegóły w surowe/README.md",
  "jazdy": {
+  "21025004699": {
+   "data": "2026-11-17T19:08:36Z",
+   "typ": "VirtualRide",
+   "nazwa": "Zwift - Whole Lotta Lava in Watopia+ 1000 watts attempt",
+   "probek": 2528,
+   "strumienie": [
+    "time",
+    "distance",
+    "latlng",
+    "altitude",
+    "velocity_smooth",
+    "heartrate",
+    "cadence",
+    "watts",
+    "moving",
+    "grade_smooth"
+   ],
+   "rowne_dlugosci": true,
+   "ukryte_gps": 0,
+   "pobrano": "2026-11-18T02:57Z"
+  },
   "20913272956": {
    "data": "2026-11-08T20:12:39Z",
    "typ": "VirtualRide",
@@ -21,7 +42,7 @@
    ],
    "rowne_dlugosci": true,
    "ukryte_gps": 0,
-   "pobrano": "2026-11-17T03:58Z"
+   "pobrano": "2026-11-18T02:57Z"
   },
   "20899342292": {
    "data": "2026-11-07T19:08:39Z",
@@ -41,7 +62,7 @@
    ],
    "rowne_dlugosci": true,
    "ukryte_gps": 0,
-   "pobrano": "2026-11-17T03:58Z"
+   "pobrano": "2026-11-18T02:57Z"
   },
   "20887153516": {
    "data": "2026-11-06T21:31:47Z",
@@ -62,7 +83,7 @@
    ],
    "rowne_dlugosci": true,
    "ukryte_gps": 0,
-   "pobrano": "2026-11-17T03:58Z"
+   "pobrano": "2026-11-18T02:57Z"
   },
   "20842371402": {
    "data": "2026-11-03T13:19:12Z",
@@ -2555,7 +2576,7 @@
    "pobrano": "2026-11-11T19:45Z"
   }
  },
- "zaktualizowano": "2026-11-17T03:58Z",
+ "zaktualizowano": "2026-11-18T02:57Z",
  "pominiete_nie_jazdy": 8,
- "liczba_jazd": 133
+ "liczba_jazd": 134
 }
