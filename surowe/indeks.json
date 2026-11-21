@@ -20,7 +20,7 @@
    ],
    "rowne_dlugosci": true,
    "ukryte_gps": 0,
-   "pobrano": "2026-11-20T02:24Z"
+   "pobrano": "2026-11-21T02:27Z"
   },
   "21047377293": {
    "data": "2026-11-19T14:51:39Z",
@@ -40,7 +40,7 @@
    ],
    "rowne_dlugosci": true,
    "ukryte_gps": 0,
-   "pobrano": "2026-11-20T02:24Z"
+   "pobrano": "2026-11-21T02:27Z"
   },
   "21025004699": {
    "data": "2026-11-17T19:08:36Z",
@@ -61,7 +61,7 @@
    ],
    "rowne_dlugosci": true,
    "ukryte_gps": 0,
-   "pobrano": "2026-11-20T02:24Z"
+   "pobrano": "2026-11-21T02:27Z"
   },
   "20913272956": {
    "data": "2026-11-08T20:12:39Z",
@@ -82,7 +82,7 @@
    ],
    "rowne_dlugosci": true,
    "ukryte_gps": 0,
-   "pobrano": "2026-11-20T02:24Z"
+   "pobrano": "2026-11-21T02:27Z"
   },
   "20899342292": {
    "data": "2026-11-07T19:08:39Z",
@@ -102,7 +102,7 @@
    ],
    "rowne_dlugosci": true,
    "ukryte_gps": 0,
-   "pobrano": "2026-11-20T02:24Z"
+   "pobrano": "2026-11-21T02:27Z"
   },
   "20887153516": {
    "data": "2026-11-06T21:31:47Z",
@@ -2616,7 +2616,7 @@
    "pobrano": "2026-11-11T19:45Z"
   }
  },
- "zaktualizowano": "2026-11-20T02:24Z",
+ "zaktualizowano": "2026-11-21T02:27Z",
  "pominiete_nie_jazdy": 8,
  "liczba_jazd": 136
 }
