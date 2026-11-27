@@ -2,6 +2,26 @@
  "format": 1,
  "opis": "Indeks archiwum surowych danych jazd — szczegóły w surowe/README.md",
  "jazdy": {
+  "21134838970": {
+   "data": "2026-11-26T18:47:12Z",
+   "typ": "VirtualRide",
+   "nazwa": "Zwift - Quick spin",
+   "probek": 985,
+   "strumienie": [
+    "time",
+    "distance",
+    "latlng",
+    "altitude",
+    "velocity_smooth",
+    "cadence",
+    "watts",
+    "moving",
+    "grade_smooth"
+   ],
+   "rowne_dlugosci": true,
+   "ukryte_gps": 0,
+   "pobrano": "2026-11-27T03:40Z"
+  },
   "21122314231": {
    "data": "2026-11-25T18:01:48Z",
    "typ": "VirtualRide",
@@ -20,7 +40,7 @@
    ],
    "rowne_dlugosci": true,
    "ukryte_gps": 0,
-   "pobrano": "2026-11-26T03:38Z"
+   "pobrano": "2026-11-27T03:40Z"
   },
   "21074680307": {
    "data": "2026-11-21T18:39:47Z",
@@ -40,7 +60,7 @@
    ],
    "rowne_dlugosci": true,
    "ukryte_gps": 0,
-   "pobrano": "2026-11-26T03:38Z"
+   "pobrano": "2026-11-27T03:40Z"
   },
   "21047476090": {
    "data": "2026-11-19T15:29:02Z",
@@ -60,7 +80,7 @@
    ],
    "rowne_dlugosci": true,
    "ukryte_gps": 0,
-   "pobrano": "2026-11-26T03:38Z"
+   "pobrano": "2026-11-27T03:40Z"
   },
   "21047377293": {
    "data": "2026-11-19T14:51:39Z",
@@ -80,7 +100,7 @@
    ],
    "rowne_dlugosci": true,
    "ukryte_gps": 0,
-   "pobrano": "2026-11-26T03:38Z"
+   "pobrano": "2026-11-27T03:40Z"
   },
   "21025004699": {
    "data": "2026-11-17T19:08:36Z",
@@ -101,7 +121,7 @@
    ],
    "rowne_dlugosci": true,
    "ukryte_gps": 0,
-   "pobrano": "2026-11-26T03:38Z"
+   "pobrano": "2026-11-27T03:40Z"
   },
   "20913272956": {
    "data": "2026-11-08T20:12:39Z",
@@ -2656,7 +2676,7 @@
    "pobrano": "2026-11-11T19:45Z"
   }
  },
- "zaktualizowano": "2026-11-26T03:38Z",
+ "zaktualizowano": "2026-11-27T03:40Z",
  "pominiete_nie_jazdy": 8,
- "liczba_jazd": 138
+ "liczba_jazd": 139
 }
